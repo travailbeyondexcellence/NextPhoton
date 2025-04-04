@@ -30,7 +30,7 @@ const LoginPage = () => {
     if (role) {
 
       console.log(`/${role}`);
-      router.push(`/${role}`);
+      router.push(`${role}`);
     }
   }, [user, router]);
 
