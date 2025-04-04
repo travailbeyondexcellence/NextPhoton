@@ -29,13 +29,9 @@ export default function SignInLayout({
     return (
 
 
-
-
-        
         <html lang="en">
 
-           
-            <body className={inter.className}>
+           <body className={inter.className}>
 
                 {children} <ToastContainer position="bottom-right" theme="dark" />
             </body>
