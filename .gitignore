@@ -16,6 +16,9 @@
 # production
 /build
 
+# prisma [relevnt only for the SQL Lte InFile System Database]
+generated/prisma/
+
 # misc
 .DS_Store
 *.pem
