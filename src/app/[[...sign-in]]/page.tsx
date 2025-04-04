@@ -1,6 +1,13 @@
 "use client";
 
 import * as Clerk from "@clerk/elements/common";
+import {
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import * as SignIn from "@clerk/elements/sign-in";
 import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
@@ -10,18 +17,41 @@ import { useEffect } from "react";
 const LoginPage = () => {
   const { isLoaded, isSignedIn, user } = useUser();
 
+  console.log (user);
+
   const router = useRouter();
 
   useEffect(() => {
     const role = user?.publicMetadata.role;
 
+    //const role = "admin";
+    console.log (role);
+
     if (role) {
+
+      console.log (`/${role}`);
       router.push(`/${role}`);
     }
   }, [user, router]);
 
   return (
-    <div className="h-screen flex items-center justify-center bg-lamaSkyLight">
+
+<>
+
+<div className="flex justify-end items-center p-4 gap-4 h-16">
+                    <SignedOut>
+                        <SignInButton />
+                        <SignUpButton />
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
+                </div>
+
+<div className="h-screen flex items-center justify-center bg-lamaSkyLight">
+      
+    
+      
       <SignIn.Root>
         <SignIn.Step
           name="start"
@@ -64,6 +94,9 @@ const LoginPage = () => {
         </SignIn.Step>
       </SignIn.Root>
     </div>
+</>
+
+
   );
 };
 
