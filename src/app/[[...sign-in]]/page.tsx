@@ -16,45 +16,27 @@ import { useEffect } from "react";
 
 const LoginPage = () => {
   const { isLoaded, isSignedIn, user } = useUser();
-
-  console.log(user);
-
   const router = useRouter();
 
   useEffect(() => {
-    const role = user?.publicMetadata.role;
-
-    //const role = "admin";
-    console.log(role);
-
-    if (role) {
-
-      console.log(`/${role}`);
-      router.push(`${role}`);
+    if (isLoaded && isSignedIn) {
+      router.push("/");
     }
-  }, [user, router]);
-
-
-
+  }, [isLoaded, isSignedIn, router]);
 
   return (
-
     <>
-
-<div className="flex justify-end items-center p-4 gap-4 h-16">
-  <SignedOut>
-    <SignInButton />
-    <SignUpButton />
-  </SignedOut>
-  <SignedIn>
-    <UserButton />
-  </SignedIn>
-  </div>  
+      {/* <div className="flex justify-end items-center p-4 gap-4 h-16">
+        <SignedOut>
+          <SignInButton />
+          <SignUpButton />
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div> */}
 
       <div className="h-screen flex items-center justify-center bg-lamaSkyLight overflow-y-hidden">
-
-
-
         <SignIn.Root>
           <SignIn.Step
             name="start"
@@ -98,11 +80,7 @@ const LoginPage = () => {
         </SignIn.Root>
       </div>
     </>
-
-
   );
 };
 
 export default LoginPage;
-
-
