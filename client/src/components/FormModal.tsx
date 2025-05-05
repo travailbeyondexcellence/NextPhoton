@@ -36,72 +36,64 @@ const deleteActionMap = {
 // import TeacherForm from "./forms/TeacherForm";
 // import StudentForm from "./forms/StudentForm";
 
-const TeacherForm = dynamic(() => import("./forms/TeacherForm"), {
+const TeacherForm = dynamic<{
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  type: "create" | "update";
+  data?: any;
+  relatedData?: any;
+}>(() => import("./forms/TeacherForm.tsx"), {
   loading: () => <h1>Loading...</h1>,
 });
-const StudentForm = dynamic(() => import("./forms/StudentForm"), {
+const StudentForm = dynamic<{
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  type: "create" | "update";
+  data?: any;
+  relatedData?: any;
+}>(() => import("./forms/StudentForm.tsx"), {
   loading: () => <h1>Loading...</h1>,
 });
-const SubjectForm = dynamic(() => import("./forms/SubjectForm"), {
+const SubjectForm = dynamic<{
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  type: "create" | "update";
+  data?: any;
+  relatedData?: any;
+}>(() => import("./forms/SubjectForm.tsx"), {
   loading: () => <h1>Loading...</h1>,
 });
-const ClassForm = dynamic(() => import("./forms/ClassForm"), {
+const ClassForm = dynamic<{
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  type: "create" | "update";
+  data?: any;
+  relatedData?: any;
+}>(() => import("./forms/ClassForm.tsx"), {
   loading: () => <h1>Loading...</h1>,
 });
-const ExamForm = dynamic(() => import("./forms/ExamForm"), {
+const ExamForm = dynamic<{
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  type: "create" | "update";
+  data?: any;
+  relatedData?: any;
+}>(() => import("./forms/ExamForm.tsx"), {
   loading: () => <h1>Loading...</h1>,
 });
 // TODO: OTHER FORMS
 
+interface FormProps {
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  type: "create" | "update";
+  data?: any;
+  relatedData?: any;
+}
+
 const forms: {
-  [key: string]: (
-    setOpen: Dispatch<SetStateAction<boolean>>,
-    type: "create" | "update",
-    data?: any,
-    relatedData?: any
-  ) => JSX.Element;
+  [key: string]: (props: FormProps) => JSX.Element;
 } = {
-  subject: (setOpen, type, data, relatedData) => (
-    <SubjectForm
-      type={type}
-      data={data}
-      setOpen={setOpen}
-      relatedData={relatedData}
-    />
-  ),
-  class: (setOpen, type, data, relatedData) => (
-    <ClassForm
-      type={type}
-      data={data}
-      setOpen={setOpen}
-      relatedData={relatedData}
-    />
-  ),
-  teacher: (setOpen, type, data, relatedData) => (
-    <TeacherForm
-      type={type}
-      data={data}
-      setOpen={setOpen}
-      relatedData={relatedData}
-    />
-  ),
-  student: (setOpen, type, data, relatedData) => (
-    <StudentForm
-      type={type}
-      data={data}
-      setOpen={setOpen}
-      relatedData={relatedData}
-    />
-  ),
-  exam: (setOpen, type, data, relatedData) => (
-    <ExamForm
-      type={type}
-      data={data}
-      setOpen={setOpen}
-      relatedData={relatedData}
-    />
-    // TODO OTHER LIST ITEMS
-  ),
+  subject: (props) => <SubjectForm {...props} />,
+  class: (props) => <ClassForm {...props} />,
+  teacher: (props) => <TeacherForm {...props} />,
+  student: (props) => <StudentForm {...props} />,
+  exam: (props) => <ExamForm {...props} />,
+  // TODO OTHER LIST ITEMS
 };
 
 const FormModal = ({
