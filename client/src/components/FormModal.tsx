@@ -41,7 +41,7 @@ const TeacherForm = dynamic<{
   type: "create" | "update";
   data?: any;
   relatedData?: any;
-}>(() => import("./forms/TeacherForm.tsx"), {
+}>(() => import("./forms/TeacherForm.tsx").then((mod) => mod.default), {
   loading: () => <h1>Loading...</h1>,
 });
 const StudentForm = dynamic<{
@@ -49,7 +49,7 @@ const StudentForm = dynamic<{
   type: "create" | "update";
   data?: any;
   relatedData?: any;
-}>(() => import("./forms/StudentForm.tsx"), {
+}>(() => import("./forms/StudentForm.tsx").then((mod) => mod.default), {
   loading: () => <h1>Loading...</h1>,
 });
 const SubjectForm = dynamic<{
@@ -57,7 +57,7 @@ const SubjectForm = dynamic<{
   type: "create" | "update";
   data?: any;
   relatedData?: any;
-}>(() => import("./forms/SubjectForm.tsx"), {
+}>(() => import("./forms/SubjectForm.tsx").then((mod) => mod.default), {
   loading: () => <h1>Loading...</h1>,
 });
 const ClassForm = dynamic<{
@@ -65,7 +65,7 @@ const ClassForm = dynamic<{
   type: "create" | "update";
   data?: any;
   relatedData?: any;
-}>(() => import("./forms/ClassForm.tsx"), {
+}>(() => import("./forms/ClassForm.tsx").then((mod) => mod.default), {
   loading: () => <h1>Loading...</h1>,
 });
 const ExamForm = dynamic<{
@@ -73,7 +73,7 @@ const ExamForm = dynamic<{
   type: "create" | "update";
   data?: any;
   relatedData?: any;
-}>(() => import("./forms/ExamForm.tsx"), {
+}>(() => import("./forms/ExamForm.tsx").then((mod) => mod.default), {
   loading: () => <h1>Loading...</h1>,
 });
 // TODO: OTHER FORMS
