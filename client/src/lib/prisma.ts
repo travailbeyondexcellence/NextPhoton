@@ -2,7 +2,12 @@
 import { PrismaClient } from '.././../../shared/db';
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  return new PrismaClient({
+    log: ['query', 'error', 'warn'],
+    // Enable tracing in development
+    // enableTracing: process.env.NODE_ENV === 'development',
+    // enableTracing: false,
+  })
 }
 
 declare const globalThis: {
