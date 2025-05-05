@@ -10,3 +10,5 @@ export class AppController {
     return this.appService.getHello();
   }
 }
+
+// Just a simple controller to test the server
