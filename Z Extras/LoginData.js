@@ -5,8 +5,8 @@
     // Clerk Dev Environment
     // Test Admin Login Data
 
-    // username: admin1
-    // password: testAdmin1@99
+    // username: testAdmin1
+    // password: testAdmin1@99 
     // email: admin1@nextphoton.com
 }
 
