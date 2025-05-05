@@ -8,7 +8,7 @@
     "shared/*"
   ],
   "scripts": {
-
+  "start:all": "turbo run dev --parallel",
     "build": "turbo run build"
   },
   "devDependencies": {
