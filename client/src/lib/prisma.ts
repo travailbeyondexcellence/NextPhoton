@@ -9,6 +9,17 @@ const prismaClientSingleton = () => {
     log: ['query', 'error', 'warn'],
     // Enable tracing in development
     // enableTracing: process.env.NODE_ENV === 'development',
+    // trace: {
+    //   level: 'query',
+    //   emit: (data) => console.log(data),
+    // },
+    // enableTracing: {
+    //   level: 'query',
+    //   emit: (data) => console.log(data),
+    // },
+    // enableTracing: true,
+
+    // enableTracing: undefined,
   })
 }
 
