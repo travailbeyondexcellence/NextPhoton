@@ -1,5 +1,7 @@
 "use client";
 
+import { useContext } from "react";
+import { ThemeContext } from "./ThemeProvider";
 import Image from "next/image";
 import {
   LineChart,
@@ -76,10 +78,31 @@ const data = [
 ];
 
 const FinanceChart = () => {
+  const { darkMode } = useContext(ThemeContext);
+
+  const chartStyles = {
+    grid: {
+      stroke: darkMode ? "#555" : "#ddd",
+    },
+    axis: {
+      tick: {
+        fill: darkMode ? "#888" : "#d1d5db",
+      },
+    },
+    line: {
+      income: {
+        stroke: darkMode ? "#22577A" : "#C3EBFA",
+      },
+      expense: {
+        stroke: darkMode ? "#4A4272" : "#CFCEFF",
+      },
+    },
+  };
+
   return (
-    <div className="bg-white rounded-xl w-full h-full p-4">
+    <div className="bg-white dark:bg-gray-900 rounded-xl w-full h-full p-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-lg font-semibold">Finance</h1>
+        <h1 className="text-lg font-semibold dark:text-gray-100">Finance</h1>
         <Image src="/moreDark.png" alt="" width={20} height={20} />
       </div>
       <ResponsiveContainer width="100%" height="90%">
@@ -94,28 +117,23 @@ const FinanceChart = () => {
             bottom: 5,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#ddd" />
+          <CartesianGrid strokeDasharray="3 3" style={{ stroke: chartStyles.grid.stroke }} />
           <XAxis
             dataKey="name"
             axisLine={false}
-            tick={{ fill: "#d1d5db" }}
+            tick={{ fill: chartStyles.axis.tick.fill }}
             tickLine={false}
             tickMargin={10}
           />
-          <YAxis axisLine={false} tick={{ fill: "#d1d5db" }} tickLine={false}  tickMargin={20}/>
+          <YAxis axisLine={false} tick={{ fill: chartStyles.axis.tick.fill }} tickLine={false} tickMargin={20} />
           <Tooltip />
           <Legend
             align="center"
             verticalAlign="top"
             wrapperStyle={{ paddingTop: "10px", paddingBottom: "30px" }}
           />
-          <Line
-            type="monotone"
-            dataKey="income"
-            stroke="#C3EBFA"
-            strokeWidth={5}
-          />
-          <Line type="monotone" dataKey="expense" stroke="#CFCEFF" strokeWidth={5}/>
+          <Line type="monotone" dataKey="income" strokeWidth={5} style={{ stroke: chartStyles.line.income.stroke }} />
+          <Line type="monotone" dataKey="expense" strokeWidth={5} style={{ stroke: chartStyles.line.expense.stroke }} />
         </LineChart>
       </ResponsiveContainer>
     </div>

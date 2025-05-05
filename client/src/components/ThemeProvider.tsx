@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
+
+export const ThemeContext = createContext({
+  darkMode: false,
+  setDarkMode: (darkMode: boolean) => {},
+});
 
 const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [darkMode, setDarkMode] = useState(false);
