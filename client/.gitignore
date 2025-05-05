@@ -13,6 +13,8 @@
 /.next/
 /out/
 
+.turbo
+
 # production
 /build
 
