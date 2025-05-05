@@ -23,7 +23,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // <ClerkProvider>
+  
       <html lang="en">
         <body className={inter.className}>
 
@@ -33,6 +33,6 @@ export default async function RootLayout({
           <ToastContainer position="bottom-right" theme="dark" />
         </body>
       </html>
-    // </ClerkProvider>
+   
   );
 }
