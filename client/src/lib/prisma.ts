@@ -1,12 +1,14 @@
-// import { PrismaClient } from '@prisma/client'
-import { PrismaClient } from '.././../../shared/db';
+import { PrismaClient } from '@prisma/client'
+// import { PrismaClient } from '.././../../shared/db';
+
+// import { PrismaClient } from '../../../shared/db/index';
+// import { Prisma } from '../../../shared/db/index';
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
     log: ['query', 'error', 'warn'],
     // Enable tracing in development
     // enableTracing: process.env.NODE_ENV === 'development',
-    // enableTracing: false,
   })
 }
 
