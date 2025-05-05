@@ -1,5 +1,6 @@
 # Root
 .env
+.turbo
 node_modules/
 pnpm-lock.yaml
 dist/
