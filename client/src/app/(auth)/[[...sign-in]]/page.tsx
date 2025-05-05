@@ -8,17 +8,17 @@ import {
   SignedOut,
   UserButton,
   SignIn, // Import SignIn from @clerk/nextjs
-  useUser, // ❌ remove
+  useUser, // ⚠️ remove comment iif wanting to temperorily disable clerk 
 } from "@clerk/nextjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { isLoaded, isSignedIn, user } = useUser(); // ❌ remove
+  const { isLoaded, isSignedIn, user } = useUser(); // ⚠️ remove comment iif wanting to temperorily disable clerk 
   const router = useRouter();
 
-  useEffect(() => { // ❌ remove related effect
+  useEffect(() => { // ⚠️ comment iif wanting to temperorily disable clerk 
     if (isLoaded && isSignedIn) {
       router.push("/");
     }
