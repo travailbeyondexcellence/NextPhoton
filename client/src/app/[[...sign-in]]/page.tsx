@@ -8,21 +8,21 @@ import {
   SignedOut,
   UserButton,
   SignIn, // Import SignIn from @clerk/nextjs
-  useUser,
+  // useUser, // ❌ remove
 } from "@clerk/nextjs";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const LoginPage = () => {
-  const { isLoaded, isSignedIn, user } = useUser();
+  // const { isLoaded, isSignedIn, user } = useUser(); // ❌ remove
   const router = useRouter();
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      router.push("/");
-    }
-  }, [isLoaded, isSignedIn, router]);
+  // useEffect(() => { // ❌ remove related effect
+  //   if (isLoaded && isSignedIn) {
+  //     router.push("/");
+  //   }
+  // }, [isLoaded, isSignedIn, router]);
 
   return (
     <>
