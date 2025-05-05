@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { extractSubdomain } from '../shared/auth/getTenant';
 
-export function middleware(req: NextRequest) {
-    const host = req.headers.get('host') || '';
+export async function middleware(req: NextRequest) {
+    const host = await req.headers.get('host') || '';
     const tenantSlug = extractSubdomain(host);
 
     if (!tenantSlug) {
