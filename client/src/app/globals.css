@@ -10,6 +10,12 @@ body {
   width: 100% !important;
   border: none !important;
   font-family: "Inter", sans-serif !important;
+  background-color: white !important;
+  color: #222 !important;
+}
+.dark .react-calendar {
+  background-color: #1a202c !important;
+  color: #f3f4f6 !important;
 }
 
 .react-calendar__navigation__label__labelText {
@@ -19,6 +25,10 @@ body {
 .react-calendar__tile--active {
   background-color: #c3ebfa !important;
   color: black !important;
+}
+.dark .react-calendar__tile--active {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
 }
 
 .rbc-btn-group:first-child {
@@ -109,4 +119,41 @@ body {
 .rbc-event-label{
   color: gray !important;
   margin-bottom: 5px;
+}
+
+/* react-big-calendar dark mode overrides */
+.dark .rbc-calendar,
+.dark .rbc-time-view,
+.dark .rbc-timeslot-group,
+.dark .rbc-day-slot,
+.dark .rbc-time-content {
+  background-color: #1a202c !important;
+  color: #f3f4f6 !important;
+}
+.dark .rbc-time-gutter.rbc-time-column {
+  background-color: #111827 !important;
+  color: #d1d5db !important;
+}
+.dark .rbc-event {
+  color: #f3f4f6 !important;
+}
+.dark .rbc-event-label {
+  color: #a1a1aa !important;
+}
+.dark .rbc-toolbar,
+.dark .rbc-toolbar button,
+.dark .rbc-toolbar-label {
+  background-color: #111827 !important;
+  color: #f3f4f6 !important;
+}
+.dark .rbc-toolbar button.rbc-active {
+  background-color: #4b5563 !important;
+  color: #f3f4f6 !important;
+}
+.dark .rbc-btn-group:last-child button {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+.dark .rbc-time-view {
+  border-color: #374151 !important;
 }

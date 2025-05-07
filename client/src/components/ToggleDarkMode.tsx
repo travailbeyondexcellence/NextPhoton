@@ -34,8 +34,8 @@ const ToggleDarkMode = () => {
         style={darkMode ? { transform: "translateX(32px)" } : {}}
       ></div>
       <div className="absolute inset-0 flex items-center justify-around">
-        <FiSun className="text-yellow-400" />
-        <BsMoonStarsFill className="text-blue-400" />
+        {!darkMode && <FiSun className="text-yellow-400" />}
+        {darkMode && <BsMoonStarsFill className="text-blue-400" />}
       </div>
     </div>
   );
