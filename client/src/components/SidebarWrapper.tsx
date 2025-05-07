@@ -32,7 +32,7 @@ export default function SidebarWrapper({
       {showSidebar && (
         <button
           onClick={() => setShowSidebar(false)}
-          className="absolute top-4 left-[13%] lg:block z-50 bg-white p-2 rounded-full shadow text-blue-950"
+          className="absolute top-4 left-[13%] lg:block z-50 bg-white md:p-2 rounded-full shadow text-blue-950 mt-1 md:mt-0 "
         >
           <X />
         </button>

@@ -8,7 +8,7 @@ const Navbar = async () => {
   return (
     <div className="flex items-center justify-between p-4">
       {/* SEARCH BAR */}
-      <div className="hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
+      <div className="hidden md:flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2 lg:ml-16 md:ml-20 mt-1.5">
         <Image src="/search.png" alt="" width={14} height={14} />
         <input
           type="text"
@@ -17,7 +17,7 @@ const Navbar = async () => {
         />
       </div>
       {/* ICONS AND USER */}
-      <div className="flex items-center gap-6 justify-end w-full">
+      <div className="flex items-center md:gap-6 gap-3 justify-end w-full">
         <ToggleDarkMode />
         <div className="bg-white rounded-full w-7 h-7 flex items-center justify-center cursor-pointer">
           <Image src="/message.png" alt="" width={20} height={20} />

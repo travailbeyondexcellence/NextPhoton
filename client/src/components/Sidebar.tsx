@@ -8,7 +8,7 @@ export default function Sidebar(){
 
     return(
             //LEFT SIDEBAR
-      <div className="w-[56px] md:w-[72px] lg:w-[200px] xl:w-[240px] p-4">
+      <div className="w-[56px] md:w-[72px] lg:w-[200px] xl:w-[240px] p-4 mt-1">
       <Link
         href="/"
         className="flex items-center justify-center lg:justify-start gap-2"
