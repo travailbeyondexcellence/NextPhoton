@@ -145,7 +145,7 @@ const TeacherListPage = async ({
   ]);
 
   return (
-    <div className="bg-white dark:bg-gray-900 p-4 rounded-md flex-1 m-4 mt-0 transition-colors duration-200">
+    <div className="bg-white dark:bg-gray-900 p-4 rounded-md flex-1 min-h-0 min-w-0 m-4 mt-0 transition-colors duration-200">
       {/* TOP */}
       <div className="flex items-center justify-between">
         <h1 className="hidden md:block text-lg font-semibold text-gray-900 dark:text-gray-100">All Teachers</h1>
