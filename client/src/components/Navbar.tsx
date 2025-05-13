@@ -1,7 +1,8 @@
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
-import ToggleDarkMode from "./ToggleDarkMode";
+// import ToggleDarkMode from "./ToggleDarkMode";
+import ThemeToggle from "./ThemeToggle";
 
 const Navbar = async () => {
   const user = await currentUser();
@@ -18,7 +19,7 @@ const Navbar = async () => {
       </div>
       {/* ICONS AND USER */}
       <div className="flex items-center gap-6 justify-end w-full">
-        <ToggleDarkMode />
+        <ThemeToggle />
         <div className="bg-white dark:bg-gray-800 rounded-full w-7 h-7 flex items-center justify-center cursor-pointer transition-colors duration-200">
           <Image src="/message.png" alt="" width={20} height={20} className="dark:invert" />
         </div>

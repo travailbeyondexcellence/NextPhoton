@@ -1,4 +1,4 @@
-// ❌ remove clerk imports
+
 import {
   clerkMiddleware,
   createRouteMatcher,
@@ -7,12 +7,12 @@ import {
 import { routeAccessMap } from "./lib/settings";
 import { NextResponse } from "next/server";
 
-// ❌ remove clerk related types and logic
+
 type Role = "admin" | "student" | "teacher" | "parent";
 const protectedRoutes = Object.keys(routeAccessMap);
 const isProtectedRoute = createRouteMatcher(protectedRoutes);
 
-// ❌ Temporarily bypass clerkMiddleware logic
+
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = auth();
   const pathname = req.nextUrl.pathname;
@@ -44,7 +44,12 @@ export default clerkMiddleware(async (auth, req) => {
   // Not signed in
   if (!userId) {
     const signInUrl = new URL("/sign-in", req.url);
-    signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
+
+    if (pathname !== "/sign-in") {
+      signInUrl.searchParams.set("redirect_url", req.nextUrl.pathname);
+    }
+
+
     return NextResponse.redirect(signInUrl);
   }
   try {
