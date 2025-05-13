@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface NavbarProps {
   onMenuClick?: () => void
@@ -33,6 +34,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
         <div className="flex items-center space-x-4">
+          <ThemeToggle />
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
           </Button>
