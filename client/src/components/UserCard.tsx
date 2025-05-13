@@ -15,12 +15,12 @@ const UserCard = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/users/${type}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${type}`);
         if (!response.ok) {
           throw new Error('Failed to fetch users');
         }
-        const data = await response.json();
-        setData(data);
+        const users = await response.json();
+        setData(users.length);
       } catch (error) {
         console.error('Error fetching users:', error);
         // Handle error appropriately (e.g., show error message to user)
