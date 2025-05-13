@@ -23,7 +23,7 @@ export default function DashboardLayout({
       </div>
       {/* RIGHT */}
       <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] dark:bg-gray-700 overflow-auto min-h-0 min-w-0 flex flex-col">
-        <Navbar />
+        <Navbar role="admin" name="Admin User" />
         {children}
       </div>
     </div>
