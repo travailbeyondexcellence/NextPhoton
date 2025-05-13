@@ -40,7 +40,8 @@ Before you begin, ensure you have the following installed:
    # In the root directory
    npx prisma generate --schema=shared/prisma/schema.prisma
 
-   npx prisma migrate dev
+   npx prisma migrate dev --schema=shared/prisma/schema.prisma
+
    ```
 
 ## Running the Project
