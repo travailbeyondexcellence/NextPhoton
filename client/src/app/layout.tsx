@@ -9,7 +9,7 @@ import { ClerkProvider,
   UserButton, } from "@clerk/nextjs";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ThemeProvider from "../components/ThemeProvider";
+import { ThemeProvider } from '../components/ThemeProvider';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,14 +25,14 @@ export default async function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          <ThemeProvider>{children}</ThemeProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
           <ToastContainer position="bottom-right" theme="dark" />
         </body>
       </html>
     </ClerkProvider>
   );
-
-
 }
