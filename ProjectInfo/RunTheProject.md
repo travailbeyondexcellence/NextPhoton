@@ -38,7 +38,8 @@ Before you begin, ensure you have the following installed:
 2. **Database Setup**
    ```bash
    # In the root directory
-   npx prisma generate
+   npx prisma generate --schema=shared/prisma/schema.prisma
+
    npx prisma migrate dev
    ```
 
