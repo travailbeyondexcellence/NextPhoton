@@ -4,7 +4,7 @@ import { adminMenu } from "../menus/adminMenu.tsx";
 import { teacherMenu } from "../menus/teacherMenu.tsx";
 import { studentMenu } from "../menus/studentMenu.tsx";
 import { parentMenu } from "../menus/parentMenu.tsx";
-import { MenuItem } from "../types";
+
 
 const menuMap: Record<string, any[]> = {
   admin: adminMenu,
@@ -24,7 +24,7 @@ const Menu = async () => {
           <span className="hidden lg:block text-gray-400 font-light my-4">
             {i.title}
           </span>
-          {i.items.map((item: MenuItem) => (
+          {i.items.map((item: any) => (
             <Link
               href={item.href}
               key={item.label}
