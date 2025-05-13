@@ -1,9 +1,9 @@
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
-import { adminMenu } from "../menus/adminMenu.tsx";
-import { teacherMenu } from "../menus/teacherMenu.tsx";
-import { studentMenu } from "../menus/studentMenu.tsx";
-import { parentMenu } from "../menus/parentMenu.tsx";
+import { adminMenu } from "../app/(dashboard)/menus/adminMenu.tsx";
+import { teacherMenu } from "../app/(dashboard)/menus/teacherMenu.tsx";
+import { studentMenu } from "../app/(dashboard)/menus/studentMenu.tsx";
+import { parentMenu } from "../app/(dashboard)/menus/parentMenu.tsx";
 
 
 const menuMap: Record<string, any[]> = {
