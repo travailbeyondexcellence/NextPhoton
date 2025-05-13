@@ -47,13 +47,11 @@ const AnnouncementListPage = async ({
   const renderRow = (item: AnnouncementList) => (
     <tr
       key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
+      className="border-b border-gray-200 dark:border-gray-700 even:bg-slate-50 dark:even:bg-gray-800 text-sm hover:bg-lamaPurpleLight dark:hover:bg-gray-700"
     >
-      <td className="flex items-center gap-4 p-4">{item.title}</td>
-      <td>{item.class?.name || "-"}</td>
-      <td className="hidden md:table-cell">
-        {new Intl.DateTimeFormat("en-US").format(item.date)}
-      </td>
+      <td className="flex items-center gap-4 p-4 text-gray-900 dark:text-gray-100">{item.title}</td>
+      <td className="text-gray-700 dark:text-gray-300">{item.class?.name || '-'}</td>
+      <td className="text-gray-700 dark:text-gray-300">{item.date && new Date(item.date).toLocaleDateString()}</td>
       <td>
         <div className="flex items-center gap-2">
           {role === "admin" && (
@@ -116,24 +114,20 @@ const AnnouncementListPage = async ({
   ]);
 
   return (
-    <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
+    <div className="bg-white dark:bg-gray-900 p-4 rounded-md flex-1 m-4 mt-0 transition-colors duration-200">
       {/* TOP */}
       <div className="flex items-center justify-between">
-        <h1 className="hidden md:block text-lg font-semibold">
-          All Announcements
-        </h1>
+        <h1 className="hidden md:block text-lg font-semibold text-gray-900 dark:text-gray-100">All Announcements</h1>
         <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
           <TableSearch />
           <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow dark:bg-gray-800 hover:bg-yellow-300 dark:hover:bg-gray-700 transition-colors duration-200">
               <Image src="/filter.png" alt="" width={14} height={14} />
             </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow">
+            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-lamaYellow dark:bg-gray-800 hover:bg-yellow-300 dark:hover:bg-gray-700 transition-colors duration-200">
               <Image src="/sort.png" alt="" width={14} height={14} />
             </button>
-            {role === "admin" && (
-              <FormContainer table="announcement" type="create" />
-            )}
+            {role === "admin" && <FormContainer table="announcement" type="create" />}
           </div>
         </div>
       </div>
