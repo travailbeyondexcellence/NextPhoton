@@ -4,8 +4,10 @@ import Image from "next/image";
 import ThemeToggle from "./ThemeToggle";
 import { Menu as MenuIcon } from "lucide-react";
 import React from "react";
+import { useSidebarStore } from "../lib/store";
 
-export default function Navbar({ toggleSidebar, role, name }: { toggleSidebar?: () => void; role: string; name: string }) {
+export default function Navbar({ role, name }: { role: string; name: string }) {
+  const toggleSidebar = useSidebarStore((state) => state.toggle);
   return (
     <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 transition-colors duration-200">
       {/* HAMBURGER + SEARCH BAR */}
