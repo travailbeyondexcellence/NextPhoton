@@ -1,7 +1,6 @@
 "use client";
 
-import { useContext } from "react";
-import { ThemeContext } from "./ThemeProvider";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import {
   LineChart,
@@ -78,7 +77,8 @@ const data = [
 ];
 
 const FinanceChart = () => {
-  const { darkMode } = useContext(ThemeContext);
+  const { theme } = useTheme();
+  const darkMode = theme === "dark";
 
   const chartStyles = {
     grid: {
