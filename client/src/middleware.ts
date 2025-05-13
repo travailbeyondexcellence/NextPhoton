@@ -8,7 +8,7 @@ import { routeAccessMap } from "./lib/settings";
 import { NextResponse } from "next/server";
 
 
-type Role = "admin" | "student" | "teacher" | "parent";
+type Role = "admin" |"employee" | "educator" | "learner" | "guardian" 
 const protectedRoutes = Object.keys(routeAccessMap);
 const isProtectedRoute = createRouteMatcher(protectedRoutes);
 
@@ -24,9 +24,10 @@ export default clerkMiddleware(async (auth, req) => {
     if (role) {
       const roleRedirectMap: Record<Role, string> = {
         admin: "/admin",
-        teacher: "/teacher",
-        student: "/student",
-        parent: "/parent",
+        employee: "/employee", // name changed on 13 May 2025
+        educator: "/educator", // name changed on 13 May 2025
+        learner: "/learner",
+        guardian: "/guardian", // name changed on 13 May 2025
       };
 
       const redirectUrl = roleRedirectMap[role];
@@ -39,6 +40,10 @@ export default clerkMiddleware(async (auth, req) => {
   // Skip role check for unprotected routes
   if (!isProtectedRoute(req)) {
     return NextResponse.next();
+  }
+
+  if (isProtectedRoute(req)) {
+    auth().protect();
   }
 
   // Not signed in
@@ -78,22 +83,13 @@ export default clerkMiddleware(async (auth, req) => {
   }
 });
 
-// Basic middleware stub to allow all requests when Clerk is disabled
-// export default function middleware(req: Request) {
-//   return NextResponse.next();
-// }
+export const config = {
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
+}
 
-// export const config = {
-//   matcher: [
-//     "/admin/:path*",
-//     "/student/:path*",
-//     "/teacher/:path*",
-//     "/parent/:path*",
-//     "/list/:path*",
-//     "/((?!api|_next/static|_next/image|favicon.ico).*)",
-//     // Skip Next.js internals and all static files, unless found in search params
-//     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-//     // Always run for API routes
-//     "/(api|trpc)(.*)",
-//   ],
-// };
+
