@@ -2,7 +2,6 @@
 
 import { useContext, useState, useEffect } from "react";
 import { ThemeContext } from "./ThemeProvider";
-import prisma from "../lib/prisma";
 import Image from "next/image";
 
 const UserCard = ({
@@ -15,14 +14,17 @@ const UserCard = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      const modelMap: Record<typeof type, any> = {
-        admin: prisma.admin,
-        teacher: prisma.teacher,
-        student: prisma.student,
-        parent: prisma.parent,
-      };
-      const count = await modelMap[type].count();
-      setData(count);
+      try {
+        const response = await fetch(`/api/users/${type}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        const data = await response.json();
+        setData(data);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        // Handle error appropriately (e.g., show error message to user)
+      }
     };
     fetchData();
   }, [type]);
