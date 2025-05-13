@@ -3,11 +3,16 @@ import Navbar from "./Navbar";
 import Menu from "./Menu";
 import Image from "next/image";
 import Link from "next/link";
-import { useSidebarStore } from "../lib/store";
+import { useSidebarStore, useUserStore } from "../lib/store";
+import { useEffect } from "react";
 
-export default function SidebarClient({ children, role, name }: { children: React.ReactNode; role: string; name: string }) {
+export default function SidebarClient({ children, role, name, user }: { children: React.ReactNode; role: string; name: string; user: any }) {
   const isOpen = useSidebarStore((state) => state.isOpen);
   const setOpen = useSidebarStore((state) => state.setOpen);
+  const setUser = useUserStore((state) => state.setUser);
+  useEffect(() => {
+    setUser(user);
+  }, [user, setUser]);
   const sidebarTransition =
     "transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]";
 
