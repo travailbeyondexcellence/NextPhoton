@@ -1,6 +1,42 @@
 import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
 import Link from "next/link";
+import {
+  Home,
+  Users,
+  GraduationCap,
+  User,
+  BookOpen,
+  Building2,
+  NotebookPen,
+  FileText,
+  ClipboardList,
+  Calendar,
+  MessageSquare,
+  Megaphone,
+  UserCircle,
+  Settings,
+  LogOut,
+} from "lucide-react";
+
+const iconMap: Record<string, JSX.Element> = {
+  "/home.png": <Home size={20} />,
+  "/teacher.png": <Users size={20} />,
+  "/student.png": <GraduationCap size={20} />,
+  "/parent.png": <User size={20} />,
+  "/subject.png": <BookOpen size={20} />,
+  "/class.png": <Building2 size={20} />,
+  "/lesson.png": <NotebookPen size={20} />,
+  "/exam.png": <FileText size={20} />,
+  "/assignment.png": <ClipboardList size={20} />,
+  "/result.png": <FileText size={20} />,
+  "/attendance.png": <ClipboardList size={20} />,
+  "/calendar.png": <Calendar size={20} />,
+  "/message.png": <MessageSquare size={20} />,
+  "/announcement.png": <Megaphone size={20} />,
+  "/profile.png": <UserCircle size={20} />,
+  "/setting.png": <Settings size={20} />,
+  "/logout.png": <LogOut size={20} />,
+};
 
 const menuItems = [
   {
@@ -135,7 +171,7 @@ const Menu = async () => {
                   key={item.label}
                   className="flex items-center justify-center lg:justify-start gap-4 text-gray-500 py-2 md:px-2 rounded-md hover:bg-lamaSkyLight"
                 >
-                  <Image src={item.icon} alt="" width={20} height={20} />
+                  {iconMap[item.icon]}
                   <span className="hidden lg:block">{item.label}</span>
                 </Link>
               );
