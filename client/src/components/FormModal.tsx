@@ -129,6 +129,7 @@ const FormModal = ({
       }
     }, [state, router]);
 
+    const FormComponent = forms[table];
     return type === "delete" && id ? (
       <form action={formAction} className="p-4 flex flex-col gap-4">
         <input type="text | number" name="id" value={id} hidden />
@@ -140,7 +141,16 @@ const FormModal = ({
         </button>
       </form>
     ) : type === "create" || type === "update" ? (
-      forms[table](setOpen, type, data, relatedData)
+      FormComponent ? (
+        <FormComponent
+          setOpen={setOpen}
+          type={type}
+          data={data}
+          relatedData={relatedData}
+        />
+      ) : (
+        "Form not found!"
+      )
     ) : (
       "Form not found!"
     );
