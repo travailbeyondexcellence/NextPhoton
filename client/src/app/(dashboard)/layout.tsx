@@ -2,17 +2,21 @@
 
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Sidebar } from "@/components/DashboardSidebar";
-import { Navbar } from "@/components/DashboardNavbar";
+
+import { SidebarProvider } from "@/components/ui/sidebar";
+
+import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { DashboardNavbar } from "@/components/DashboardNavbar";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
+    <SidebarProvider>
     <div className="relative flex min-h-screen">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
-        <Sidebar />
+        <DashboardSidebar />
       </div>
 
       {/* Mobile Sidebar */}
@@ -21,15 +25,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <button className="sr-only">Open menu</button>
         </SheetTrigger>
         <SheetContent side="left" className="p-0">
-          <Sidebar />
+          <DashboardSidebar />
         </SheetContent>
       </Sheet>
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col">
-        <Navbar onMenuClick={() => setIsMobileMenuOpen(true)} />
+        <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
         <main className="flex-1 p-6">{children}</main>
       </div>
-    </div>
+      </div>
+      </SidebarProvider>
   );
 }

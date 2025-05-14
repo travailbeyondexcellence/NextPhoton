@@ -12,7 +12,7 @@ interface NavbarProps {
   onMenuClick?: () => void
 }
 
-export function Navbar({ onMenuClick }: NavbarProps) {
+export function DashboardNavbar({ onMenuClick }: NavbarProps) {
   return (
  
     <div className="flex h-16 items-center border-b bg-background px-4">
@@ -26,7 +26,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
       </Button>
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center space-x-4">
-         
+        <SidebarTrigger />
           <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
         <div className="flex items-center space-x-4">

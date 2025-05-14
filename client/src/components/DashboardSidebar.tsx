@@ -16,14 +16,14 @@ import {
 } from "@/components/ui/sidebar"
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
-export function Sidebar() {
+export function DashboardSidebar() {
   const pathname = usePathname()
 
   return (
     <SidebarProvider defaultOpen>
-      <ShadcnSidebar>
+      <ShadcnSidebar collapsible="offcanvas">
         <SidebarHeader className="p-6 flex justify-between">
-          <span><h2 className="text-lg font-semibold">NextPhoton</h2> <SidebarTrigger /></span>
+          <span><h2 className="text-lg font-semibold">NextPhoton</h2> </span>
          
           
         </SidebarHeader>
@@ -64,7 +64,7 @@ export function Sidebar() {
         </SidebarContent>
       </ShadcnSidebar>
       <main className="flex-1">
-      <SidebarTrigger />
+     
      
         {/* Your main content will be rendered here */}
       </main>
