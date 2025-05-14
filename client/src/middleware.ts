@@ -12,21 +12,25 @@ type Role = "admin" |"employee" | "educator" | "learner" | "guardian"
 const protectedRoutes = Object.keys(routeAccessMap);
 const isProtectedRoute = createRouteMatcher(protectedRoutes);
 
-const validRoutes = [
-  "/", "/sign-in", "/admin", "/employee", "/educator", "/learner", "/guardian",
-  // Add all known routes here (e.g., static and dynamic)
-];
+// const validRoutes = [
+//   "/", "/sign-in", "/admin", "/employee", "/educator", "/learner", "/guardian",
+//   // Add all known routes here (e.g., static and dynamic)
+// ];
 
-function isKnownRoute(pathname: string): boolean {
-  return validRoutes.some((route) => {
-    if (route.includes(":")) {
-      // Handle dynamic routes using param matching
-      const regex = new RegExp("^" + route.replace(/:[^/]+/g, "[^/]+") + "$");
-      return regex.test(pathname);
-    }
-    return pathname === route;
-  });
-}
+// function isKnownRoute(pathname: string): boolean {
+//   return validRoutes.some((route) => {
+//     if (route.includes(":")) {
+//       // Handle dynamic routes using param matching
+//       const regex = new RegExp("^" + route.replace(/:[^/]+/g, "[^/]+") + "$");
+//       return regex.test(pathname);
+//     }
+//     return pathname === route;
+//   });
+// }
+
+// if (!isKnownRoute(pathname)) {
+//   return NextResponse.next(); // Don't protect unknown routes
+// }
 
 
 
@@ -41,7 +45,7 @@ export default clerkMiddleware(async (auth, req) => {
     if (role) {
       const roleRedirectMap: Record<Role, string> = {
         admin: "/admin",
-        employee: "/employee", // name changed on 13 May 2025
+        employee: "/employee", // name added on 13 May 2025
         educator: "/educator", // name changed on 13 May 2025
         learner: "/learner",
         guardian: "/guardian", // name changed on 13 May 2025
@@ -58,9 +62,7 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  if (!isKnownRoute(pathname)) {
-    return NextResponse.next(); // Don't protect unknown routes
-  }
+ 
 
   if (isProtectedRoute(req)) {
     auth().protect();
