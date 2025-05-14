@@ -26,7 +26,7 @@ export function DashboardNavbar({ onMenuClick }: NavbarProps) {
       </Button>
 
       {/* Left: Sidebar toggle + page title */}
-      <div className="flex items-center space-x-4 flex-1">
+      <div className="flex items-center space-x-4 grow min-w-0">
         <SidebarTrigger />
         <h2 className="text-lg font-semibold">Dashboard</h2>
       </div>
