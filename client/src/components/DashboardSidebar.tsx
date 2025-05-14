@@ -22,8 +22,10 @@ export function Sidebar() {
   return (
     <SidebarProvider defaultOpen>
       <ShadcnSidebar>
-        <SidebarHeader className="p-6">
-          <h2 className="text-lg font-semibold">NextPhoton</h2>
+        <SidebarHeader className="p-6 flex justify-between">
+          <span><h2 className="text-lg font-semibold">NextPhoton</h2> <SidebarTrigger /></span>
+         
+          
         </SidebarHeader>
         <SidebarContent>
           {adminMenu.map((group, index) => (
@@ -62,7 +64,8 @@ export function Sidebar() {
         </SidebarContent>
       </ShadcnSidebar>
       <main className="flex-1">
-        <SidebarTrigger />
+      <SidebarTrigger />
+     
         {/* Your main content will be rendered here */}
       </main>
     </SidebarProvider>

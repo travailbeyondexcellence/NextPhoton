@@ -5,12 +5,16 @@ import { Button } from "@/components/ui/button"
 import ThemeToggle from "@/components/ThemeToggle"
 import { UserButton } from "@clerk/nextjs"
 
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { useState } from "react"
+
 interface NavbarProps {
   onMenuClick?: () => void
 }
 
 export function Navbar({ onMenuClick }: NavbarProps) {
   return (
+ 
     <div className="flex h-16 items-center border-b bg-background px-4">
       <Button
         variant="ghost"
@@ -22,6 +26,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
       </Button>
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center space-x-4">
+         
           <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
         <div className="flex items-center space-x-4">
@@ -40,6 +45,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           />
         </div>
       </div>
-    </div>
+      </div>
+      
   )
 } 
