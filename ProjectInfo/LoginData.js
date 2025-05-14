@@ -21,6 +21,8 @@
     // username: testStudent1
     // password: testStudent1@99
     // email: teststudent1@nextphoton.com
+
+    // change name to learner in the place of student
 }
 
 {
@@ -32,6 +34,9 @@
     // username: testParent1
     // password: testParent1@99
     // email: testparent1@nextphoton.com
+
+
+    // Change name to Guardian in place of parent
 }
 
 
