@@ -12,7 +12,7 @@ const educator = {
   subjects: ["Physics", "Mathematics"],
   levels: ["Senior School", "Junior College", "JEE Advanced"],
   exams: ["10th Boards", "JEE Main", "NEET", "Olympiads"],
-  priceTier: "premium-3",
+  priceTier: "intermediate-2",
   yearsWithNextPhoton: 5,
   studentsTaught: 1800,
   hoursTaught: 3200,
@@ -58,7 +58,8 @@ const EducatorCard_forAdmin = () => {
         alt={educator.name}
         width={240}
         height={192}
-        className="w-full  md:w-56 object-cover bg-muted dark:bg-gray-800"
+        className="w-full  md:w-56 object-cover bg-muted dark:bg-gray-800  hover:scale-[1.05] transition-transform duration-300"
+    
       />
 
       {/* Main Section */}
