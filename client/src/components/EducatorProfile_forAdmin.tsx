@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { User } from 'lucide-react';
+import { User, Atom, Dice5 } from 'lucide-react';
 import { educator, educatorReviews, adminNotes } from "../app/(dashboard)/admin/educators/[educatorID]/dummyData"; 
 
 const EducatorProfile_forAdmin = () => {
@@ -42,7 +42,7 @@ const EducatorProfile_forAdmin = () => {
           {/* Stats */}
           <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
             <h3 className="font-medium text-lg mb-4">Educator Stats</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center p-4">
               <div>
                 <p className="text-2xl font-bold">{educator.yearsWithNextPhoton}+</p>
                 <p className="text-sm text-slate-500 dark:text-gray-400">Years with NextPhoton</p>
@@ -58,33 +58,21 @@ const EducatorProfile_forAdmin = () => {
             </div>
             </div>
 
-              {/* Subjects */}
+          
         {/* Subjects */}
 <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
   <h3 className="font-medium text-lg mb-4">Subjects</h3>
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center p-4">
     
     {/* Physics */}
     <div className="flex flex-col items-center justify-center space-y-2">
-      <Image
-        src="/icons/physics.png" // Your uploaded image here
-        alt="Physics"
-        width={64} // Adjust as needed
-        height={64} // Adjust as needed
-        className="object-contain"
-      />
+    <Atom />
       <p className="text-sm font-semibold">Physics</p>
     </div>
 
     {/* Mathematics */}
     <div className="flex flex-col items-center justify-center space-y-2">
-      <Image
-        src="/icons/mathematics.png" // Add a math icon image similarly
-        alt="Mathematics"
-        width={64} // Adjust as needed
-        height={64} // Adjust as needed
-        className="object-contain"
-      />
+    <Dice5 />
       <p className="text-sm font-semibold">Mathematics</p>
     </div>
     
