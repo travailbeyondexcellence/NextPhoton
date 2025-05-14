@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { adminMenu } from "@/app/(dashboard)/menus/adminMenu"
+import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
 export function Sidebar() {
   const pathname = usePathname()
