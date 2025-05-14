@@ -1,9 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import React from "react";
 import Image from "next/image";
 
 const educator = {
+  id: "12345",
   name: "Dr. Meera Sharma",
   username: "@meera.physics",
   emailFallback: "meerasharma@nextphoton.com",
@@ -45,6 +48,11 @@ const getPriceTagColor = (tier: string) => {
 };
 
 const EducatorCard_forAdmin = () => {
+
+ 
+
+  const router = useRouter();
+
   return (
     <div className="relative flex flex-col md:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted dark:bg-gray-900 dark:text-gray-100 dark:border-gray-800 w-full max-w-4xl cursor-pointer hover:scale-[1.015] transition-transform duration-300">
       {/* Floating top-right price tag */}
@@ -119,7 +127,7 @@ const EducatorCard_forAdmin = () => {
 
         {/* Actions */}
         <div className="flex gap-3 pt-1">
-          <button className="bg-primary text-white px-4 py-1.5 rounded-md dark:bg-slate-500 dark:text-slate-900">
+          <button className="bg-primary text-white px-4 py-1.5 rounded-md dark:bg-slate-500 dark:text-slate-900" onClick={() => router.push(`/admin/educators/${educator.id}`)}>
             View Profile
           </button>
           <button className="border border-muted px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">
