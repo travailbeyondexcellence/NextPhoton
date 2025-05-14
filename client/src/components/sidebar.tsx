@@ -3,8 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import {
   Sidebar as ShadcnSidebar,
@@ -36,6 +34,7 @@ export function Sidebar() {
               <SidebarMenu>
                 {group.items.map((item) => {
                   const isActive = pathname === item.href
+                  const Icon = item.icon // Store the icon component
                   return (
                     <SidebarMenuItem key={item.href}>
                       <SidebarMenuButton
@@ -47,7 +46,9 @@ export function Sidebar() {
                         )}
                       >
                         <Link href={item.href}>
-                          <span className="mr-2">{item.icon}</span>
+                          <span className="mr-2">
+                            <Icon size={20} />
+                          </span>
                           {item.label}
                         </Link>
                       </SidebarMenuButton>
