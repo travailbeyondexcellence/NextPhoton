@@ -33,7 +33,7 @@ export const adminMenu: SidebarGroup[] = [
     title: "MENU",
     items: [
       { icon: Home, label: "Home", href: "/" },
-      { icon: Users, label: "Teachers", href: "/list/teachers" },
+      { icon: Users, label: "Educators", href: "/admin/educators" },
       { icon: GraduationCap, label: "Students", href: "/list/students" },
       { icon: User, label: "Parents", href: "/list/parents" },
       { icon: BookOpen, label: "Subjects", href: "/list/subjects" },
