@@ -13,28 +13,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-    <div className="relative flex min-h-screen">
-      {/* Desktop Sidebar */}
-      <div className="hidden md:block">
+      <div className="flex min-h-screen">
         <DashboardSidebar />
+        <div className="flex-1 flex flex-col">
+          <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
+          <main className="flex-1 p-6">{children}</main>
+        </div>
       </div>
-
-      {/* Mobile Sidebar */}
-      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetTrigger asChild className="md:hidden">
-          <button className="sr-only">Open menu</button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0">
-          <DashboardSidebar />
-        </SheetContent>
-      </Sheet>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-      </div>
-      </SidebarProvider>
+    </SidebarProvider>
   );
 }

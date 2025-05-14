@@ -14,8 +14,9 @@ interface NavbarProps {
 
 export function DashboardNavbar({ onMenuClick }: NavbarProps) {
   return (
- 
-    <div className="flex h-16 items-center border-b bg-background px-4">
+    <div
+      className="w-full flex h-16 items-center border-b bg-background px-4"
+    >
       <Button
         variant="ghost"
         size="icon"
@@ -26,7 +27,7 @@ export function DashboardNavbar({ onMenuClick }: NavbarProps) {
       </Button>
       <div className="flex flex-1 items-center justify-between">
         <div className="flex items-center space-x-4">
-        <SidebarTrigger />
+          <SidebarTrigger />
           <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
         <div className="flex items-center space-x-4">
@@ -45,7 +46,6 @@ export function DashboardNavbar({ onMenuClick }: NavbarProps) {
           />
         </div>
       </div>
-      </div>
-      
+    </div>
   )
 } 
