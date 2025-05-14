@@ -1,6 +1,25 @@
 // This file contains dummy data for educator reviews and admin notes.
 // It is used for testing and development purposes only.
 
+const educator = {
+    id: "12345",
+    name: "Dr. Meera Sharma",
+    username: "@meera.physics",
+    emailFallback: "meerasharma@nextphoton.com",
+    intro: "Passionate Physics & Maths educator who simplifies the toughest topics. lorem20 years of experience in teaching JEE and NEET aspirants. I believe in making learning fun and engaging.",
+    qualification: "Ph.D. in Theoretical Physics, IIT Bombay",
+    subjects: ["Physics", "Mathematics"],
+    levels: ["Senior School", "Junior College", "JEE Advanced"],
+    exams: ["10th Boards", "JEE Main", "NEET", "Olympiads"],
+    priceTier: "intermediate-2",
+    yearsWithNextPhoton: 5,
+    studentsTaught: 1800,
+    hoursTaught: 3200,
+    profileImage: "/educators/edumeerasharma.png",
+};
+  
+
+
 const educatorReviews = [
     {
         studentName: "Aarav Patel",
@@ -32,7 +51,7 @@ const educatorReviews = [
     }
 ];
 
-export default educatorReviews;  
+
 
 const adminNotes = [
     {
@@ -52,4 +71,4 @@ const adminNotes = [
     }
 ];
   
-export { adminNotes };
+export { adminNotes, educator, educatorReviews };

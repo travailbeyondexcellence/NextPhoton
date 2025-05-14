@@ -5,22 +5,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 
-const educator = {
-  id: "12345",
-  name: "Dr. Meera Sharma",
-  username: "@meera.physics",
-  emailFallback: "meerasharma@nextphoton.com",
-  intro: "Passionate Physics & Maths educator who simplifies the toughest topics. lorem20 years of experience in teaching JEE and NEET aspirants. I believe in making learning fun and engaging.",
-  qualification: "Ph.D. in Theoretical Physics, IIT Bombay",
-  subjects: ["Physics", "Mathematics"],
-  levels: ["Senior School", "Junior College", "JEE Advanced"],
-  exams: ["10th Boards", "JEE Main", "NEET", "Olympiads"],
-  priceTier: "intermediate-2",
-  yearsWithNextPhoton: 5,
-  studentsTaught: 1800,
-  hoursTaught: 3200,
-  profileImage: "/educators/edumeerasharma.png",
-};
+import { educator } from "@/app/(dashboard)/admin/educators/[educatorID]/dummyData";
 
 const getPriceTagColor = (tier: string) => {
   switch (tier.toLowerCase()) {
