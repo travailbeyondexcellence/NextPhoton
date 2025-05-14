@@ -19,21 +19,20 @@ const educator = {
   
 
 const EducatorCard_forAdmin = () => { return (
-    <div className="flex flex-col md:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted w-full max-w-4xl">
+    <div className="flex flex-col md:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted dark:bg-gray-900 dark:text-gray-100 dark:border-gray-800 w-full max-w-4xl">
     {/* Left: Profile Image */}
     <Image
       src={educator.profileImage}
       alt={educator.name}
       width={192}
       height={192}
-      className="w-full md:w-48 object-cover"
+      className="w-full md:w-48 object-cover bg-muted dark:bg-gray-800"
     />
   
     {/* Right: Content */}
-    {/* Right: Content */}
     <div className="flex-1 p-6 space-y-2">
       <div className="text-xl font-semibold">{educator.name}</div>
-      <div className="text-sm text-muted-foreground">
+      <div className="text-sm text-muted-foreground dark:text-gray-400">
         {educator.username || educator.emailFallback}
       </div>
       <p className="text-sm">{educator.intro}</p>
@@ -56,23 +55,23 @@ const EducatorCard_forAdmin = () => { return (
       <div className="flex flex-wrap gap-6 text-sm pt-2">
         <div>
           <span className="font-bold">{educator.yearsWithNextPhoton}+</span><br />
-          <span className="text-muted-foreground">Years w/ NextPhoton</span>
+          <span className="text-muted-foreground dark:text-gray-400">Years w/ NextPhoton</span>
         </div>
         <div>
           <span className="font-bold">{educator.studentsTaught.toLocaleString()}</span><br />
-          <span className="text-muted-foreground">Students Taught</span>
+          <span className="text-muted-foreground dark:text-gray-400">Students Taught</span>
         </div>
         <div>
           <span className="font-bold">{educator.hoursTaught.toLocaleString()}</span><br />
-          <span className="text-muted-foreground">Hours Taught</span>
+          <span className="text-muted-foreground dark:text-gray-400">Hours Taught</span>
         </div>
       </div>
   
       {/* Actions */}
       <div className="flex gap-3 pt-4">
         <button className="bg-primary text-white px-4 py-1.5 rounded-md dark:bg-slate-500 dark:text-slate-900">View Profile</button>
-        <button className="border border-muted px-4 py-1.5 rounded-md">Message</button>
-        <button className="border border-muted px-4 py-1.5 rounded-md">Call</button>
+        <button className="border border-muted px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">Message</button>
+        <button className="border border-muted px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100">Call</button>
       </div>
     </div>
   </div>

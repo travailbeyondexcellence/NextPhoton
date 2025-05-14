@@ -7,7 +7,9 @@ const Educators = () => {
     <div>Educators
 
 
-      <EducatorCard_forAdmin/>
+      <EducatorCard_forAdmin />
+      
+
 
 
 
