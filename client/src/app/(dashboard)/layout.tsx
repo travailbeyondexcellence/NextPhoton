@@ -9,19 +9,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="grow flex flex-col min-w-0 bg-blue-100">
     <SidebarProvider>
-      <div className="flex min-h-screen">
-        {/* Sidebar */}
+    <div className="flex grow min-h-screen bg-blue-100">
+      {/* 🚨 Make sidebar layout-aware, no absolute/fixed inside */}
+      <aside className="">
         <DashboardSidebar />
+      </aside>
 
-        {/* Main Content Area */}
-        <div className="grow flex flex-col min-w-0">
-          <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
-          <main className="flex-1 p-6">{children}</main>
-        </div>
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
+        <main className="flex-1 p-6">{children}</main>
       </div>
-      </SidebarProvider>
-      </div>
+    </div>
+  </SidebarProvider>
   );
 }

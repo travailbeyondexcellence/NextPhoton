@@ -14,25 +14,25 @@ interface NavbarProps {
 
 export function DashboardNavbar({ onMenuClick }: NavbarProps) {
   return (
-    <header className="w-full h-16 border-b bg-background px-4 flex items-center">
-      {/* Mobile Menu Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="mr-2 md:hidden"
-        onClick={onMenuClick}
-      >
-        <Menu className="h-5 w-5" />
-      </Button>
-
-      {/* Left: Sidebar toggle + page title */}
-      <div className="flex items-center space-x-4 grow min-w-0">
+    <header className="w-full h-16 bg-yellow-200 border border-red-500 px-4 flex items-center justify-between"
+>
+      {/* Left: Sidebar trigger + title */}
+      <div className="flex items-center gap-4 min-w-0">
+        {/* Mobile menu (optional) */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onMenuClick}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         <SidebarTrigger />
-        <h2 className="text-lg font-semibold">Dashboard</h2>
+        <h2 className="text-lg font-semibold truncate">Dashboard</h2>
       </div>
 
-      {/* Right: Actions */}
-      <div className="flex items-center space-x-4">
+      {/* Right: Theme, notifications, profile */}
+      <div className="flex items-center gap-4 shrink-0">
         <ThemeToggle />
         <Button variant="ghost" size="icon">
           <Bell className="h-5 w-5" />
