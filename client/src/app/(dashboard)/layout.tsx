@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-    <div className="flex grow min-h-screen bg-blue-100">
+    <div className="flex grow min-h-screen bg-slate-100">
       {/* 🚨 Make sidebar layout-aware, no absolute/fixed inside */}
       <aside className="">
         <DashboardSidebar />
