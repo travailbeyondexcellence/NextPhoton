@@ -38,7 +38,7 @@ const EducatorProfile_forAdmin = () => {
               <p className="text-sm text-white/80 mt-1">20+ years of educational excellence</p>
             </div>
           </div>
-    
+          <div className="grid md:grid-cols-2 gap-4">
           {/* Stats */}
           <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
             <h3 className="font-medium text-lg mb-4">Educator Stats</h3>
@@ -57,6 +57,43 @@ const EducatorProfile_forAdmin = () => {
               </div>
             </div>
             </div>
+
+              {/* Subjects */}
+        {/* Subjects */}
+<div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
+  <h3 className="font-medium text-lg mb-4">Subjects</h3>
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
+    
+    {/* Physics */}
+    <div className="flex flex-col items-center justify-center space-y-2">
+      <Image
+        src="/icons/physics.png" // Your uploaded image here
+        alt="Physics"
+        width={64} // Adjust as needed
+        height={64} // Adjust as needed
+        className="object-contain"
+      />
+      <p className="text-sm font-semibold">Physics</p>
+    </div>
+
+    {/* Mathematics */}
+    <div className="flex flex-col items-center justify-center space-y-2">
+      <Image
+        src="/icons/mathematics.png" // Add a math icon image similarly
+        alt="Mathematics"
+        width={64} // Adjust as needed
+        height={64} // Adjust as needed
+        className="object-contain"
+      />
+      <p className="text-sm font-semibold">Mathematics</p>
+    </div>
+    
+  </div>
+</div>
+
+                
+
+                </div>
             
              {/* Additional Details */}
       <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl space-y-3">
