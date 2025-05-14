@@ -14,9 +14,8 @@ interface NavbarProps {
 
 export function DashboardNavbar({ onMenuClick }: NavbarProps) {
   return (
-    <div
-      className="w-full flex h-16 items-center border-b bg-background px-4"
-    >
+    <header className="w-full h-16 border-b bg-background px-4 flex items-center">
+      {/* Mobile Menu Button */}
       <Button
         variant="ghost"
         size="icon"
@@ -25,27 +24,25 @@ export function DashboardNavbar({ onMenuClick }: NavbarProps) {
       >
         <Menu className="h-5 w-5" />
       </Button>
-      <div className="flex flex-1 items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <SidebarTrigger />
-          <h2 className="text-lg font-semibold">Dashboard</h2>
-        </div>
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
-          <UserButton 
-            afterSignOutUrl="/"
-            signInUrl="/sign-in"
-            appearance={{
-              elements: {
-                avatarBox: "h-8 w-8"
-              }
-            }}
-          />
-        </div>
+
+      {/* Left: Sidebar toggle + page title */}
+      <div className="flex items-center space-x-4 flex-1">
+        <SidebarTrigger />
+        <h2 className="text-lg font-semibold">Dashboard</h2>
       </div>
-    </div>
-  )
-} 
+
+      {/* Right: Actions */}
+      <div className="flex items-center space-x-4">
+        <ThemeToggle />
+        <Button variant="ghost" size="icon">
+          <Bell className="h-5 w-5" />
+        </Button>
+        <UserButton 
+          afterSignOutUrl="/"
+          signInUrl="/sign-in"
+          appearance={{ elements: { avatarBox: "h-8 w-8" } }}
+        />
+      </div>
+    </header>
+  );
+}
