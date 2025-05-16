@@ -1,33 +1,43 @@
 'use client';
 
+import { useState } from 'react';
+
 import Image from 'next/image';
 import { Pencil, Trash2 } from 'lucide-react';
 import { educator as singleEducator } from '../app/(dashboard)/admin/educators/[educatorID]/dummyData'; // adjust import as per your structure
 
+import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1.ts';
+
+const educatorsArr = [...educators];
+
 type Educator = typeof singleEducator;
 
-const educators: Educator[] = [
-  singleEducator,
-  {
-    ...singleEducator,
-    id: '67890',
-    name: 'Prof. Anand Iyer',
-    username: '@anand.chem',
-    emailFallback: 'anandiyer@nextphoton.com',
-    intro: 'Chemistry enthusiast & Olympiad mentor. 15+ years of experience helping students achieve top ranks.',
-    qualification: 'M.Sc. in Organic Chemistry, IISc Bangalore',
-    subjects: ['Chemistry'],
-    levels: ['Junior College', 'JEE Advanced'],
-    exams: ['JEE Main', 'Olympiads'],
-    priceTier: 'advanced-1',
-    yearsWithNextPhoton: 3,
-    studentsTaught: 1200,
-    hoursTaught: 2400,
-    profileImage: '/educators/eduanandiyer.png',
-  },
-];
+// const educators: Educator[] = [
+//   singleEducator,
+//   {
+//     ...singleEducator,
+//     id: '67890',
+//     name: 'Prof. Anand Iyer',
+//     username: '@anand.chem',
+//     emailFallback: 'anandiyer@nextphoton.com',
+//     intro: 'Chemistry enthusiast & Olympiad mentor. 15+ years of experience helping students achieve top ranks.',
+//     qualification: 'M.Sc. in Organic Chemistry, IISc Bangalore',
+//     subjects: ['Chemistry'],
+//     levels: ['Junior College', 'JEE Advanced'],
+//     exams: ['JEE Main', 'Olympiads'],
+//     priceTier: 'advanced-1',
+//     yearsWithNextPhoton: 3,
+//     studentsTaught: 1200,
+//     hoursTaught: 2400,
+//     profileImage: '/educators/eduanandiyer.png',
+//   },
+// ];
 
 const EducatorsList_forAdmin = () => {
+
+    const [educators, setEducators] = useState(educatorsArr);
+
+
   return (
     <div className="bg-white shadow rounded-lg overflow-x-auto">
       <table className="min-w-full text-sm text-left">

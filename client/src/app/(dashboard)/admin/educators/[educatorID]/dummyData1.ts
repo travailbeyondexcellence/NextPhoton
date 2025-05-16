@@ -1,0 +1,341 @@
+// This file contains dummy data for 9 educators along with reviews and admin notes.
+// It is used for testing and development purposes only.
+
+type Review = {
+    studentName: string;
+    exam: string;
+    rating: number;
+    comment: string;
+    date: string;
+};
+
+type AdminNote = {
+    author: string;
+    timestamp: string;
+    note: string;
+};
+
+type Educator = {
+    id: string;
+    name: string;
+    username: string;
+    emailFallback: string;
+    intro: string;
+    qualification: string;
+    subjects: string[];
+    levels: string[];
+    exams: string[];
+    priceTier: string;
+    yearsWithNextPhoton: number;
+    studentsTaught: number;
+    hoursTaught: number;
+    profileImage: string;
+    educatorReviews: Review[];
+    adminNotes: AdminNote[];
+};
+
+const educators: Educator[] = [
+    {
+        id: "e001",
+        name: "Dr. Meera Sharma",
+        username: "@meera.physics",
+        emailFallback: "meerasharma@nextphoton.com",
+        intro: "Passionate Physics & Maths educator who simplifies the toughest topics. 20 years of experience in JEE and NEET coaching.",
+        qualification: "Ph.D. in Theoretical Physics, IIT Bombay",
+        subjects: ["Physics", "Mathematics"],
+        levels: ["Senior School", "Junior College", "JEE Advanced"],
+        exams: ["10th Boards", "JEE Main", "NEET", "Olympiads"],
+        priceTier: "intermediate-2",
+        yearsWithNextPhoton: 5,
+        studentsTaught: 1800,
+        hoursTaught: 3200,
+        profileImage: "/educators/edumeerasharma.png",
+        educatorReviews: [
+            {
+                studentName: "Aarav Patel",
+                exam: "JEE Main",
+                rating: 5,
+                comment: "Dr. Meera’s classes are crystal clear. Her Physics explanations helped me crack tough problems easily!",
+                date: "2024-03-10",
+            },
+            {
+                studentName: "Ishita Reddy",
+                exam: "NEET",
+                rating: 4,
+                comment: "Her analogies made complex topics simple. Just wish classes were a bit longer.",
+                date: "2024-02-25",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Priya Singh",
+                timestamp: "2023-08-12",
+                note: "Highly requested by top batches. Consistently rated high in feedback forms.",
+            },
+            {
+                author: "Admin – Arjun Mehta",
+                timestamp: "2022-11-05",
+                note: "Prefers evening slots. Avoid back-to-back scheduling.",
+            },
+        ],
+    },
+    {
+        id: "e002",
+        name: "Prof. Anand Iyer",
+        username: "@anand.chem",
+        emailFallback: "anandiyer@nextphoton.com",
+        intro: "Chemistry expert with a flair for conceptual clarity. Known for simplifying Organic Chemistry reactions.",
+        qualification: "M.Sc. Organic Chemistry, IISc Bangalore",
+        subjects: ["Chemistry"],
+        levels: ["Junior College", "JEE Advanced"],
+        exams: ["JEE Main", "Olympiads"],
+        priceTier: "premium-1",
+        yearsWithNextPhoton: 3,
+        studentsTaught: 1200,
+        hoursTaught: 2500,
+        profileImage: "https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5",
+        educatorReviews: [
+            {
+                studentName: "Simran Jain",
+                exam: "JEE Main",
+                rating: 5,
+                comment: "Organic Chemistry finally makes sense thanks to Anand Sir!",
+                date: "2024-01-14",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Neha Shah",
+                timestamp: "2022-10-18",
+                note: "Best suited for advanced batches.",
+            },
+        ],
+    },
+    {
+        id: "e003",
+        name: "Ms. Nisha Rao",
+        username: "@nisha.biology",
+        emailFallback: "nisharao@nextphoton.com",
+        intro: "Interactive Biology teacher focused on NEET preparation. Believes in visual learning.",
+        qualification: "M.Sc. Microbiology, Delhi University",
+        subjects: ["Biology"],
+        levels: ["Senior School", "NEET"],
+        exams: ["12th Boards", "NEET"],
+        priceTier: "intermediate-1",
+        yearsWithNextPhoton: 4,
+        studentsTaught: 1000,
+        hoursTaught: 2000,
+        profileImage: "/educators/edunisharao.png",
+        educatorReviews: [
+            {
+                studentName: "Devansh Shah",
+                exam: "NEET",
+                rating: 4,
+                comment: "Very visual and interactive. Helps in fast revision.",
+                date: "2023-11-20",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Priya Singh",
+                timestamp: "2023-03-05",
+                note: "Receives high feedback for doubt resolution.",
+            },
+        ],
+    },
+    {
+        id: "e004",
+        name: "Mr. Ramesh Kulkarni",
+        username: "@ramesh.maths",
+        emailFallback: "rameshkulkarni@nextphoton.com",
+        intro: "Veteran Mathematics professor with strong roots in problem-solving strategies.",
+        qualification: "M.Sc. Mathematics, Pune University",
+        subjects: ["Mathematics"],
+        levels: ["JEE Main", "Senior School"],
+        exams: ["10th Boards", "JEE Main"],
+        priceTier: "beginner-3",
+        yearsWithNextPhoton: 6,
+        studentsTaught: 2200,
+        hoursTaught: 3600,
+        profileImage: "/educators/edurameshkulkarni.png",
+        educatorReviews: [
+            {
+                studentName: "Ananya Desai",
+                exam: "JEE Main",
+                rating: 5,
+                comment: "His problem-solving techniques are top notch.",
+                date: "2024-01-08",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Rohan D.",
+                timestamp: "2022-12-10",
+                note: "Very punctual. Excellent attendance record.",
+            },
+        ],
+    },
+    {
+        id: "e005",
+        name: "Ms. Tanya Kapoor",
+        username: "@tanya.english",
+        emailFallback: "tanyakapoor@nextphoton.com",
+        intro: "Language coach focused on grammar and comprehension. Known for practical, engaging sessions.",
+        qualification: "M.A. English, JNU",
+        subjects: ["English"],
+        levels: ["10th", "11th", "12th"],
+        exams: ["Boards", "Olympiads"],
+        priceTier: "beginner-2",
+        yearsWithNextPhoton: 2,
+        studentsTaught: 800,
+        hoursTaught: 1400,
+        profileImage: "/educators/edutanyakapoor.png",
+        educatorReviews: [
+            {
+                studentName: "Nikhil Rao",
+                exam: "10th Boards",
+                rating: 5,
+                comment: "My grammar improved a lot! Highly recommend.",
+                date: "2024-02-05",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Arjun Mehta",
+                timestamp: "2023-01-14",
+                note: "Useful for crash English modules.",
+            },
+        ],
+    },
+    {
+        id: "e006",
+        name: "Mr. Vivek Deshmukh",
+        username: "@vivek.physics",
+        emailFallback: "vivekdeshmukh@nextphoton.com",
+        intro: "Physics mentor with a visual-first approach. Specializes in motion, electricity, and optics.",
+        qualification: "M.Sc. Physics, BITS Pilani",
+        subjects: ["Physics"],
+        levels: ["Senior School", "JEE Main"],
+        exams: ["Boards", "JEE Main"],
+        priceTier: "intermediate-3",
+        yearsWithNextPhoton: 3,
+        studentsTaught: 1500,
+        hoursTaught: 2200,
+        profileImage: "/educators/eduvivekdeshmukh.png",
+        educatorReviews: [
+            {
+                studentName: "Ritika Naik",
+                exam: "JEE Main",
+                rating: 4,
+                comment: "Good use of diagrams and animations.",
+                date: "2023-10-22",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Rohan D.",
+                timestamp: "2022-09-20",
+                note: "Appreciated for concept clarity.",
+            },
+        ],
+    },
+    {
+        id: "e007",
+        name: "Dr. Farah Qureshi",
+        username: "@farah.bio",
+        emailFallback: "farahqureshi@nextphoton.com",
+        intro: "Award-winning Biology Olympiad coach. Popular for her crash courses and test series.",
+        qualification: "Ph.D. in Genetics, AIIMS",
+        subjects: ["Biology"],
+        levels: ["NEET", "Olympiads"],
+        exams: ["NEET", "Olympiads"],
+        priceTier: "premium-2",
+        yearsWithNextPhoton: 4,
+        studentsTaught: 1300,
+        hoursTaught: 2800,
+        profileImage: "/educators/edufarahqureshi.png",
+        educatorReviews: [
+            {
+                studentName: "Sana Sheikh",
+                exam: "Olympiads",
+                rating: 5,
+                comment: "Cracked stage 2 because of her prep material.",
+                date: "2024-03-01",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Priya Singh",
+                timestamp: "2022-11-11",
+                note: "Popular for advanced biology mentorship.",
+            },
+        ],
+    },
+    {
+        id: "e008",
+        name: "Mr. Arvind Menon",
+        username: "@arvind.social",
+        emailFallback: "arvindmenon@nextphoton.com",
+        intro: "Humanities mentor focusing on Political Science and Geography. Encourages analytical thinking.",
+        qualification: "M.A. Political Science, TISS Mumbai",
+        subjects: ["Political Science", "Geography"],
+        levels: ["Senior School"],
+        exams: ["Boards", "Olympiads"],
+        priceTier: "beginner-1",
+        yearsWithNextPhoton: 1,
+        studentsTaught: 600,
+        hoursTaught: 900,
+        profileImage: "/educators/eduarvindmenon.png",
+        educatorReviews: [
+            {
+                studentName: "Rehan Khan",
+                exam: "12th Boards",
+                rating: 4,
+                comment: "Helps develop perspectives, not just memorize.",
+                date: "2023-12-01",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Neha Shah",
+                timestamp: "2023-01-05",
+                note: "Suitable for board prep and essays.",
+            },
+        ],
+    },
+    {
+        id: "e009",
+        name: "Ms. Shruti Desai",
+        username: "@shruti.computer",
+        emailFallback: "shrutidesai@nextphoton.com",
+        intro: "Computer Science coach for ICSE and CBSE. Focuses on logic building and Python.",
+        qualification: "M.Tech Computer Science, VIT",
+        subjects: ["Computer Science"],
+        levels: ["Senior School", "Junior College"],
+        exams: ["Boards", "Olympiads"],
+        priceTier: "intermediate-1",
+        yearsWithNextPhoton: 3,
+        studentsTaught: 950,
+        hoursTaught: 1800,
+        profileImage: "/educators/edushrutidesai.png",
+        educatorReviews: [
+            {
+                studentName: "Pranay Bhatia",
+                exam: "12th Boards",
+                rating: 5,
+                comment: "Her Python problem sheets are gold!",
+                date: "2024-01-18",
+            },
+        ],
+        adminNotes: [
+            {
+                author: "Admin – Arjun Mehta",
+                timestamp: "2023-04-02",
+                note: "Strong track record in ICSE CS boards.",
+            },
+        ],
+    },
+];
+
+export { educators };
+  
