@@ -36,7 +36,7 @@ const EducatorsCardsView_forAdmin = () => {
     const [educators, setEducators] = useState(educatorsArr);
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
       {educators.map((edu: any) => (
         <EducatorCard_forAdmin key={edu.id} educator={edu} />
       ))}
