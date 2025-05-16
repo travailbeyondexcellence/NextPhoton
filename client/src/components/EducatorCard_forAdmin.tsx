@@ -51,7 +51,7 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
   const router = useRouter();
 
   return (
-    <div className="relative flex flex-col md:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted dark:bg-gray-900 dark:text-gray-100 dark:border-gray-800 w-full max-w-4xl cursor-pointer hover:scale-[1.015] transition-transform duration-300">
+    <div className="relative flex flex-col xl:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted dark:bg-gray-900 dark:text-gray-100 dark:border-gray-800 w-full max-w-4xl cursor-pointer hover:scale-[1.015] transition-transform duration-300">
       {/* Price Tag */}
       <div
         className={`absolute top-2 right-2 text-xs font-semibold px-3 py-1 rounded ${getPriceTagColor(educator.priceTier)}`}
