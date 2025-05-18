@@ -50,18 +50,21 @@ export const adminMenu: SidebarGroup[] = [
       // ________________________________Features for Learners________________________________
 
 
-      { icon: NotebookPen, label: "Academic Plan", href: "/admin/AcademicPlan" },
+      { icon: NotebookPen, label: "Academic Plans", href: "/admin/AcademicPlans" },
       { icon: NotebookPen, label: "Class Sessions", href: "/admin/ClassSessions" },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
-      { icon: FileText, label: "Exams", href: "/TRAVAILEPRACTISEEXAMS/admin/exams" },
-      { icon: FileText, label: "Practise", href: "/TRAVAILEPRACTISEEXAMS/admin/exams" },
-      { icon: ClipboardList, label: "Assignments", href: "/admin/assignments" },
+  
+      { icon: FileText, label: "Practise", href: "/TRAVAIL-PRACTISE-EXAMS/admin/TRAVAIL-PRACTISE" }, // This will open travail.photonecademy.com/practise for the student, and the student will be able to see the practice assignments that are assigned to them.
+      // For the admin, it will populate the dashboard with all the practise assignments that are assigned to the students and the practise that the students have done recently.Admin can view perstudent performance and the practise that the students have done recently.
+      { icon: FileText, label: "Exams", href: "/TRAVAIL-PRACTISE-EXAMS/admin/TRAVAIL-EXAMS" }, // This will open travail.photonecademy.com/exams for the student, and the student will be able to see the exams that are assigned to them.
+      // For the admin, it will populate the dashboard with all the exams that are assigned to the students, the exams the students have given recently and the practise that the students have done recently.
+      { icon: ClipboardList, label: "Home Tasks", href: "/admin/HomeTasks" },
       { icon: FileText, label: "Performance", href: "/admin/performance" },
       // For the academic performance of the students+
 
       // __________________________________Messaging________________________________________
    
-      { icon: PackageCheck, label: "Tasks", href: "/admin/tasks" },
+      { icon: PackageCheck, label: "EduCare Tasks", href: "/admin/EducareTasks" },
       { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications" },
       { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
     ],
