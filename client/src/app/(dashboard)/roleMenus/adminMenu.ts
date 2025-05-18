@@ -15,6 +15,9 @@ import {
   Settings,
   LogOut,
   LucideIcon,
+  PackageCheck,
+  Wallet,
+  CreditCard,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -35,18 +38,21 @@ export const adminMenu: SidebarGroup[] = [
       { icon: Home, label: "Home", href: "/" },
       { icon: Users, label: "Educators", href: "/admin/educators" },
       { icon: GraduationCap, label: "Learners", href: "/admin/learners" },
-      { icon: User, label: "Guardians", href: "/admin/parents" },
+      { icon: User, label: "Guardians", href: "/admin/guardians" },
     
       { icon: Building2, label: "ClassSessions", href: "/admin/classSessions" },
-      { icon: ClipboardList, label: "Attendance", href: "/admin/studentAttendance" },
+      { icon: Calendar, label: "Attendance", href: "/admin/studentAttendance" },
 
-
+      // __________________________________________________________________________
+      
+      { icon: NotebookPen, label: "Class Sessions", href: "/admin/ClassSessions" },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
       { icon: FileText, label: "Exams", href: "/admin/exams" },
       { icon: ClipboardList, label: "Assignments", href: "/admin/assignments" },
       { icon: FileText, label: "Performance", href: "/admin/performance" },
+      // For the academic performance of the students+
    
-      { icon: Calendar, label: "Tasks", href: "/admin/tasks" },
+      { icon: PackageCheck, label: "Tasks", href: "/admin/tasks" },
       { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications" },
       { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
     ],
@@ -54,9 +60,12 @@ export const adminMenu: SidebarGroup[] = [
   {
     title: "OTHER",
     items: [
+      { icon: Wallet, label: "Profile", href: "/admin/feesManagement" },
       { icon: UserCircle, label: "Profile", href: "/profile" },
       { icon: Settings, label: "Settings", href: "/settings" },
       { icon: LogOut, label: "Logout", href: "/logout" },
     ],
   },
 ];
+
+
