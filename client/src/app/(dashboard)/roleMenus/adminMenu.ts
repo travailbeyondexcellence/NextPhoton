@@ -49,6 +49,8 @@ export const adminMenu: SidebarGroup[] = [
 
       // ________________________________Features for Learners________________________________
 
+
+      { icon: NotebookPen, label: "Academic Plan", href: "/admin/AcademicPlan" },
       { icon: NotebookPen, label: "Class Sessions", href: "/admin/ClassSessions" },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
       { icon: FileText, label: "Exams", href: "/TRAVAILEPRACTISEEXAMS/admin/exams" },
