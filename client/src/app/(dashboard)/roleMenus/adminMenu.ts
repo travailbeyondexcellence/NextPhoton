@@ -34,18 +34,21 @@ export const adminMenu: SidebarGroup[] = [
     items: [
       { icon: Home, label: "Home", href: "/" },
       { icon: Users, label: "Educators", href: "/admin/educators" },
-      { icon: GraduationCap, label: "Students", href: "/list/students" },
-      { icon: User, label: "Parents", href: "/list/parents" },
-      { icon: BookOpen, label: "Subjects", href: "/list/subjects" },
-      { icon: Building2, label: "Classes", href: "/list/classes" },
-      { icon: NotebookPen, label: "Lessons", href: "/list/lessons" },
-      { icon: FileText, label: "Exams", href: "/list/exams" },
-      { icon: ClipboardList, label: "Assignments", href: "/list/assignments" },
-      { icon: FileText, label: "Results", href: "/list/results" },
-      { icon: ClipboardList, label: "Attendance", href: "/list/attendance" },
-      { icon: Calendar, label: "Events", href: "/list/events" },
-      { icon: MessageSquare, label: "Messages", href: "/list/messages" },
-      { icon: Megaphone, label: "Announcements", href: "/list/announcements" },
+      { icon: GraduationCap, label: "Learners", href: "/admin/learners" },
+      { icon: User, label: "Guardians", href: "/admin/parents" },
+    
+      { icon: Building2, label: "ClassSessions", href: "/admin/classSessions" },
+      { icon: ClipboardList, label: "Attendance", href: "/admin/studentAttendance" },
+
+
+      { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
+      { icon: FileText, label: "Exams", href: "/admin/exams" },
+      { icon: ClipboardList, label: "Assignments", href: "/admin/assignments" },
+      { icon: FileText, label: "Performance", href: "/admin/performance" },
+   
+      { icon: Calendar, label: "Tasks", href: "/admin/tasks" },
+      { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications" },
+      { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
     ],
   },
   {
