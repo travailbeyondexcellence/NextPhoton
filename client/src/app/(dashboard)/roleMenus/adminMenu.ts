@@ -73,7 +73,7 @@ export const adminMenu: SidebarGroup[] = [
   {
     title: "OTHER",
     items: [
-      { icon: Wallet, label: "Profile", href: "/admin/feesManagement" },
+      { icon: Wallet, label: "Fees", href: "/admin/feesManagement" },
       { icon: UserCircle, label: "Profile", href: "/profile" },
       { icon: Settings, label: "Settings", href: "/settings" },
       { icon: LogOut, label: "Logout", href: "/logout" },
