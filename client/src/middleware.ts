@@ -12,6 +12,10 @@ type Role = "admin" |"employee" | "educator" | "learner" | "guardian"
 const protectedRoutes = Object.keys(routeAccessMap);
 const isProtectedRoute = createRouteMatcher(protectedRoutes);
 
+
+// const clerkClient: any = clerkClient();
+
+
 // const validRoutes = [
 //   "/", "/sign-in", "/admin", "/employee", "/educator", "/learner", "/guardian",
 //   // Add all known routes here (e.g., static and dynamic)
@@ -39,7 +43,7 @@ export default clerkMiddleware(async (auth, req) => {
   const pathname = req.nextUrl.pathname;
 
   if (userId && (pathname === "/" || pathname === "/sign-in")) {
-    const user = await clerkClient.users.getUser(userId);
+    const user = await clerkClient().users.getUser(userId);
     const role = user.publicMetadata.role as Role | undefined;
 
     if (role) {
@@ -80,7 +84,7 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(signInUrl);
   }
   try {
-    const user = await clerkClient.users.getUser(userId);
+    const user = await clerkClient().users.getUser(userId);
     const role = user.publicMetadata.role as Role | undefined;
 
     if (!role) {
