@@ -44,10 +44,11 @@ export const adminMenu: SidebarGroup[] = [
       { icon: Calendar, label: "Attendance", href: "/admin/studentAttendance" },
 
       // __________________________________________________________________________
-      
+
       { icon: NotebookPen, label: "Class Sessions", href: "/admin/ClassSessions" },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
-      { icon: FileText, label: "Exams", href: "/admin/exams" },
+      { icon: FileText, label: "Exams", href: "/TRAVAILEPRACTISEEXAMS/admin/exams" },
+      { icon: FileText, label: "Practise", href: "/TRAVAILEPRACTISEEXAMS/admin/exams" },
       { icon: ClipboardList, label: "Assignments", href: "/admin/assignments" },
       { icon: FileText, label: "Performance", href: "/admin/performance" },
       // For the academic performance of the students+
