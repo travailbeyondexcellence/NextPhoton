@@ -35,6 +35,10 @@ export const adminMenu: SidebarGroup[] = [
   {
     title: "MENU",
     items: [
+    
+      // ________________________Dashboards, Lists and OverView_______________________________
+    
+    
       { icon: Home, label: "Home", href: "/" },
       { icon: Users, label: "Educators", href: "/admin/educators" },
       { icon: GraduationCap, label: "Learners", href: "/admin/learners" },
@@ -43,7 +47,7 @@ export const adminMenu: SidebarGroup[] = [
       { icon: Building2, label: "ClassSessions", href: "/admin/classSessions" },
       { icon: Calendar, label: "Attendance", href: "/admin/studentAttendance" },
 
-      // __________________________________________________________________________
+      // ________________________________Features for Learners________________________________
 
       { icon: NotebookPen, label: "Class Sessions", href: "/admin/ClassSessions" },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
@@ -52,6 +56,8 @@ export const adminMenu: SidebarGroup[] = [
       { icon: ClipboardList, label: "Assignments", href: "/admin/assignments" },
       { icon: FileText, label: "Performance", href: "/admin/performance" },
       // For the academic performance of the students+
+
+      // __________________________________Messaging________________________________________
    
       { icon: PackageCheck, label: "Tasks", href: "/admin/tasks" },
       { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications" },
