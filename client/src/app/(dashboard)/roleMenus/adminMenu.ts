@@ -67,6 +67,7 @@ export const adminMenu: SidebarGroup[] = [
       { icon: PackageCheck, label: "EduCare Tasks", href: "/admin/EducareTasks" },
       { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications" },
       { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
+      { icon: Settings, label: "NextPhoton Settings", href: "/NextPhotonSettings" },
     ],
   },
   {
