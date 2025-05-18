@@ -50,7 +50,7 @@ export const adminMenu: SidebarGroup[] = [
       // ________________________________Features for Learners________________________________
 
 
-      { icon: NotebookPen, label: "Academic Plans", href: "/admin/AcademicPlans" },
+      { icon: BookOpen, label: "Academic Plans", href: "/admin/AcademicPlans" },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
   
       { icon: FileText, label: "Practise", href: "/TRAVAIL-PRACTISE-EXAMS/admin/TRAVAIL-PRACTISE" }, // This will open travail.photonecademy.com/practise for the student, and the student will be able to see the practice assignments that are assigned to them.
