@@ -22,8 +22,10 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex w-screen h-screen overflow-hidden">
       <aside
-        className={`sidebar fixed top-0 left-0 h-screen w-56 z-50 bg-background transition-transform duration-300 ease-in-out border-r border-transparent dark:border-transparent
-    ${open ? "translate-x-0" : "-translate-x-full"}
+        className={`sidebar fixed top-0 left-0 h-screen w-56 z-50 bg-background transition-transform duration-300 ease-in-out border-transparent dark:border-transparent overflow-y-auto
+   
+    
+        ${open ? "translate-x-0" : "-translate-x-full"}
   `}
       >
         <DashboardSidebar />

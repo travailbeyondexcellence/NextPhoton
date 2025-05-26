@@ -9,7 +9,7 @@ const config: Config = {
 		"./src/**/*.{js,ts,jsx,tsx,mdx}", // add this line to include all files
 	],
 
-	darkMode: "class",
+	// darkMode: "class",
 
 	// safelist: 'greedy', // or 'full' depending on your needs
 
