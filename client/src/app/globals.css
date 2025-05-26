@@ -75,28 +75,12 @@
   }
 }
 
-
-
-body {
-  background-color: rgb(222, 222, 233); /* equivalent to gray-100 */
-  color: #111827; /* equivalent to gray-900 */
+/* Hide scrollbar buttons (arrows) in WebKit-based browsers (Chrome, Edge, Safari) */
+.scrollbar-hide-buttons::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
 }
-
-.dark body {
-  background-color: #1d2639; /* equivalent to gray-900 */
-  color: #f9fafb; /* equivalent to gray-100 */
-}
-
-/* Hide subtle scrollbar track line in dark mode */
-.sidebar::-webkit-scrollbar-track {
-  background: transparent;
-  background-color: transparent !important;
-}
-
-.sidebar {
-  border-right: none !important;
-}
-
 
 /* Base scrollbar (applies to both light and dark) */
 .custom-scrollbar {
@@ -123,6 +107,29 @@ body {
   background-color: rgba(255, 255, 255, 0.2); /* translucent white */
   border-radius: 0px;
 }
+
+body {
+  background-color: rgb(222, 222, 233); /* equivalent to gray-100 */
+  color: #111827; /* equivalent to gray-900 */
+}
+
+.dark body {
+  background-color: #1d2639; /* equivalent to gray-900 */
+  color: #f9fafb; /* equivalent to gray-100 */
+}
+
+/* Hide subtle scrollbar track line in dark mode */
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+  background-color: transparent !important;
+}
+
+.sidebar {
+  border-right: none !important;
+}
+
+
+
 
 
 

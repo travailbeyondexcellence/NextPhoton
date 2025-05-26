@@ -48,7 +48,9 @@ export function DashboardSidebar() {
     <div >
   {/* Sidebar content */}
 
-      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted scrollbar-track-transparent bg-background border-none dark:border-none">
+      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted scrollbar-hide-buttons bg-background border-none dark:border-none">
+
+        {/* Sidebar Header */}
         <SidebarHeader className="px-0 flex h-16 items-center justify-start :hover:cursor-pointer  bg-gray-300 light:bg-gray-300 dark:bg-gray-900 dark:text-gray-500"  >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
@@ -64,10 +66,13 @@ export function DashboardSidebar() {
 
 
       </SidebarHeader>
-        <SidebarContent className="px-4 bg-gray-300 text-yellow-200 dark:bg-gray-900 dark:text-gray-300">
+        <SidebarContent className="px-4  bg-gray-300 text-yellow-200 dark:bg-gray-900 dark:text-gray-300">
         {adminMenu.map((group, groupIndex) => (
-          <div key={group.title} className="py-2">
-            <h3 className="mb-2 px-4 text-sm font-semibold text-muted-foreground dark:text-gray-500">
+          <div
+            key={group.title}
+            className={`py-2 ${groupIndex === 0 ? "mt-2" : ""}`}
+          >
+            <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground dark:text-gray-500">
               {group.title}
             </h3>
             <SidebarMenu>
@@ -105,7 +110,7 @@ export function DashboardSidebar() {
                           <Link
                             key={subIndex}
                             href={subItem.href || "#"}
-                            className="flex items-center gap-2  py-1 text-sm text-muted-foreground hover:text-foreground"
+                            className="flex items-center gap-2  py-2 text-sm text-muted-foreground hover:text-foreground"
                           >
                             <Icon size={16} />
                             <span className="">
@@ -143,7 +148,7 @@ export function DashboardSidebar() {
                 )
               })}
             </SidebarMenu>
-            {groupIndex < adminMenu.length - 1 && <Separator className="my-4" />}
+            {groupIndex < adminMenu.length - 1 && <Separator className="my-0" />}
           </div>
         ))}
       </SidebarContent>
