@@ -49,7 +49,7 @@ export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
   {/* Sidebar content */}
 
       <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10">
-        <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900 dark:text-gray-300" onClick={() => router.push("/")} >
+        <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900"  >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
           <Image
@@ -59,9 +59,9 @@ export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
             height={48}
             className="rounded-full"
           />
-          <h2 className="text-lg font-bold :hover:cursor-pointer" onClick={() => router.push("/")}>Next Photon</h2></span>
+            <h2 className="text-lg font-bold :hover:cursor-pointer  bg-gray-300 text-yellow-200 dark:bg-gray-800 dark:text-gray-200" onClick={() => router.push("/")}>Next Photon</h2></span>
       </SidebarHeader>
-        <SidebarContent className="px-4  dark:bg-gray-900 dark:text-gray-300">
+        <SidebarContent className="px-4 bg-gray-300 text-yellow-200 dark:bg-gray-800 dark:text-gray-200">
         {adminMenu.map((group, groupIndex) => (
           <div key={group.title} className="py-4">
             <h3 className="mb-2 px-4 text-sm font-semibold text-muted-foreground">
