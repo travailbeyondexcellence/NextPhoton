@@ -41,3 +41,4 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+

@@ -55,7 +55,7 @@ export function DashboardSidebar() {
       <ShadcnSidebar collapsible="offcanvas" className="px-0 pl-0 ml-0 flex justify-start">
 
         {/* Sidebar Header */}
-        <SidebarHeader className="px-0 pl-4 ml-0 flex h-16 justify-start :hover:cursor-pointer  bg-gray-300 light:bg-gray-300 dark:bg-gray-950 dark:text-gray-500" >
+        <SidebarHeader className="px-0 pl-4 ml-0 flex h-16 justify-start :hover:cursor-pointer bg-gray-300 dark:bg-gray-950 dark:text-gray-500" >
 
           <span className="pl-0 p-0 flex items-center gap-2 justify-start :hover:cursor-pointer" onClick={() => router.push("/")}>
             <Image
@@ -117,7 +117,7 @@ export function DashboardSidebar() {
                               <Link
                                 key={subIndex}
                                 href={subItem.href || "#"}
-                                className="flex items-center gap-2  py-2 text-sm text-muted-foreground hover:text-foreground"
+                                className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground"
                               >
                                 <Icon size={16} />
                                 <span className="">
