@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
 import {
   Sidebar as ShadcnSidebar,
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
   SidebarContent,
   SidebarHeader,
   SidebarMenu,
@@ -45,6 +48,32 @@ export function DashboardSidebar() {
               {group.items.map((item) => {
                 const isActive = pathname === item.href
                 const Icon = item.icon // Store the icon component
+
+                if (item.children) {
+                  return (
+                    <Collapsible key={item.href} className="px-2">
+                      <CollapsibleTrigger className="flex items-center justify-between w-full text-sm py-2 font-medium">
+                        <span className="flex items-center gap-2">
+                          <item.icon size={16} /> {item.label}
+                        </span>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pl-6">
+                        {item.children.map((subItem, subIndex) => (
+                          <Link
+                            key={subIndex}
+                            href={subItem.href || "#"}
+                            className="block py-1 text-sm text-muted-foreground hover:text-foreground"
+                          >
+                            {subItem.label}
+                          </Link>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) 
+
+}
+             
+          
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton

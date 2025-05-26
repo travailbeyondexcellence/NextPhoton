@@ -24,6 +24,7 @@ export interface SidebarItem {
   icon: LucideIcon;
   label: string;
   href: string;
+  children?: SidebarItem[];
 }
 
 export interface SidebarGroup {
@@ -50,7 +51,13 @@ export const adminMenu: SidebarGroup[] = [
       // ________________________________Features for Learners________________________________
 
 
-      { icon: BookOpen, label: "Academic Plans", href: "/admin/AcademicPlans" },
+      {
+        icon: BookOpen, label: "Academic Plans", href: "/admin/AcademicPlans", children: [
+          { icon: BookOpen, label: "Premade Plans", href: "/admin/academicplans/premade" },
+          { icon: BookOpen, label: "Assigned Plans", href: "/admin/academicplans/assigned" },
+          { icon: BookOpen, label: "Executed Plans", href: "/admin/academicplans/executed" },
+          { icon: BookOpen, label: "Mindmaps", href: "/admin/academicplans/mindmaps" },
+      ], },
       { icon: NotebookPen, label: "Daily Study Plan", href: "/admin/dailyStudyPlan" },
   
       { icon: FileText, label: "Practise", href: "/TRAVAIL-PRACTISE-EXAMS/admin/TRAVAIL-PRACTISE" }, // This will open travail.photonecademy.com/practise for the student, and the student will be able to see the practice assignments that are assigned to them.
