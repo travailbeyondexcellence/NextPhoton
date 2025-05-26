@@ -57,7 +57,7 @@ export function DashboardSidebar() {
         {/* Sidebar Header */}
         <SidebarHeader className="px-0 flex h-16 items-center justify-start :hover:cursor-pointer  bg-gray-300 light:bg-gray-300 dark:bg-gray-900 dark:text-gray-500"  >
 
-          <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
+          <span className="flex items-center gap-2 justify-start" onClick={() => router.push("/")}>
             <Image
               src="/PhotonLogo/PhotonEarth.png"
               alt="Photon Logo"
@@ -72,12 +72,12 @@ export function DashboardSidebar() {
         </SidebarHeader>
         <SidebarContent >
 
-          <SimpleBar style={{ maxHeight: '100vh' }}>
+          <SimpleBar className="w-56 ml-4" style={{ maxHeight: '100vh' }}>
             
             {adminMenu.map((group, groupIndex) => (
               <div
                 key={group.title}
-                className={`py-2 ${groupIndex === 0 ? "mt-2" : ""}`}
+                className={`py-2 overflow-y-hidden ${groupIndex === 0 ? "mt-2" : ""}`}
               >
                 <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground dark:text-gray-500">
                   {group.title}
