@@ -1,9 +1,74 @@
-@tailwind base;
+@import "tailwindcss";
+
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+
+
+/* @theme {
+  --color-lamaSky: #C3EBFA;
+  --color-lamaSkyLight: #EDF9FD;
+  --color-lamaPurple: #CFCEFF;
+  --color-lamaPurpleLight: #F1F0FF;
+  --color-lamaYellow: #FAE27C;
+  --color-lamaYellowLight: #FEFCE8;
+  --background: hsl(var(--background));
+  --foreground: hsl(var(--foreground));
+  --card: hsl(var(--card));
+  --card-foreground: hsl(var(--card-foreground));
+  --popover: hsl(var(--popover));
+  --popover-foreground: hsl(var(--popover-foreground));
+  --primary: hsl(var(--primary));
+  --primary-foreground: hsl(var(--primary-foreground));
+  --secondary: hsl(var(--secondary));
+  --secondary-foreground: hsl(var(--secondary-foreground));
+  --muted: hsl(var(--muted));
+  --muted-foreground: hsl(var(--muted-foreground));
+  --accent: hsl(var(--accent));
+  --accent-foreground: hsl(var(--accent-foreground));
+  --destructive: hsl(var(--destructive));
+  --destructive-foreground: hsl(var(--destructive-foreground));
+  --border: hsl(var(--border));
+  --input: hsl(var(--input));
+  --ring: hsl(var(--ring));
+  --chart-1: hsl(var(--chart-1));
+  --chart-2: hsl(var(--chart-2));
+  --chart-3: hsl(var(--chart-3));
+  --chart-4: hsl(var(--chart-4));
+  --chart-5: hsl(var(--chart-5));
+  --sidebar-background: hsl(var(--sidebar-background));
+  --sidebar-foreground: hsl(var(--sidebar-foreground));
+  --sidebar-primary: hsl(var(--sidebar-primary));
+  --sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --sidebar-accent: hsl(var(--sidebar-accent));
+  --sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --sidebar-border: hsl(var(--sidebar-border));
+  --sidebar-ring: hsl(var(--sidebar-ring));
+
+  --gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+
+  --radius: var(--radius);
+  --borderRadius-lg: var(--radius);
+  --borderRadius-md: calc(var(--radius) - 2px);
+  --borderRadius-sm: calc(var(--radius) - 4px);
+} */
+
+/* Add any base styles or custom utilities here */
+
+/* // ... existing code ... */
+
+
+
 
 body {
-  @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  background-color: white;
+  color: #111827; /* equivalent to gray-900 */
+}
+
+.dark body {
+  background-color: #111827; /* equivalent to gray-900 */
+  color: #f9fafb; /* equivalent to gray-100 */
 }
 
 /* Base scrollbar (applies to both light and dark) */
