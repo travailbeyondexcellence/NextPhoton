@@ -49,7 +49,7 @@ export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
   {/* Sidebar content */}
 
       <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10">
-        <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer border-amber-400  dark:bg-gray-900 dark:text-gray-300" onClick={() => router.push("/")} >
+        <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900 dark:text-gray-300" onClick={() => router.push("/")} >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
           <Image
