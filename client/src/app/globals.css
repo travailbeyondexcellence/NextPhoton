@@ -326,9 +326,9 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    @reference border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @reference bg-background text-foreground;
   }
 }
