@@ -29,7 +29,7 @@ export default async function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className="min-h-screen bg-background font-sans text-foreground transition-colors duration-200">
+        <body className="min-h-screen bg-gray-200 light:bg-gray-300 dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"

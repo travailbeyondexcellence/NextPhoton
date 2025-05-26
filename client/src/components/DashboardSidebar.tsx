@@ -55,7 +55,7 @@ export function DashboardSidebar() {
       <ShadcnSidebar collapsible="offcanvas" className="">
 
         {/* Sidebar Header */}
-        <SidebarHeader className="px-0 flex h-16 items-center justify-start :hover:cursor-pointer  bg-gray-300 light:bg-gray-300 dark:bg-gray-900 dark:text-gray-500"  >
+        <SidebarHeader className="px-0 ml-0 flex h-16 items-center justify-start :hover:cursor-pointer  bg-gray-300 light:bg-gray-300 dark:bg-gray-950 dark:text-gray-500"  >
 
           <span className="flex items-center gap-2 justify-start" onClick={() => router.push("/")}>
             <Image
@@ -77,7 +77,7 @@ export function DashboardSidebar() {
             {adminMenu.map((group, groupIndex) => (
               <div
                 key={group.title}
-                className={`py-2 overflow-y-hidden ${groupIndex === 0 ? "mt-2" : ""}`}
+                className={`py-2 overflow-hidden ${groupIndex === 0 ? "mt-2" : ""}`}
               >
                 <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground dark:text-gray-500">
                   {group.title}
@@ -101,7 +101,7 @@ export function DashboardSidebar() {
                               )
                             )
                           }>
-                          <CollapsibleTrigger className="flex items-center justify-between w-full text-sm py-2 font-medium">
+                          <CollapsibleTrigger className="flex items-center justify-between w-[90%] text-sm py-2 font-medium">
                             <span className="flex items-center gap-2">
                               <item.icon size={16} /> {item.label}
                             </span>
