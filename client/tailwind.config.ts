@@ -78,10 +78,12 @@ const config: Config = {
   		}
   	}
   },
-	plugins: [require("tailwindcss-animate"), require('tailwind-scrollbar'), require('@tailwindcss/typography')],
-	variants: {
-		scrollbar: ['rounded'],
-	}
+	plugins: [
+		require("tailwindcss-animate"),
+		require('tailwind-scrollbar'),
+		require('@tailwindcss/typography')
+	],
+	
 	  
 };
 export default config;
