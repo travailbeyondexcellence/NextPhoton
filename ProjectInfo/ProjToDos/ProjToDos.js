@@ -25,7 +25,7 @@ const Todos = [
 
     {
         id: todo3,
-        title: "LightMode not working for the sidebar - fix it",
+        title: "LightMode not working for the sidebar - fix it Tailwind CSS fixes",
         description: "LightMode not working for the sidebar - fix it",
         completed: false,
         assignedTo: "Zenith",
