@@ -14,7 +14,7 @@ interface NavbarProps {
 
 export function DashboardNavbar() {
   return (
-    <header className="w-full h-16 border-b  dark:bg-gray-900 dark:border-gray-800 px-4 flex items-center justify-between">
+    <header className="w-full h-16 border-b light:bg-gray-300 light:text-gray-900 dark:bg-gray-900 dark:border-gray-800 px-4 flex items-center justify-between">
       {/* Left: Sidebar trigger + title */}
       <div className="flex items-center gap-4 min-w-0">
       
