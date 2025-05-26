@@ -48,8 +48,8 @@ export function DashboardSidebar() {
     <div >
   {/* Sidebar content */}
 
-      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10 bg-blue-700">
-        <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900"  >
+      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-muted scrollbar-track-transparent bg-background border-none dark:border-none">
+        <SidebarHeader className="px-0 flex h-16 items-center justify-between :hover:cursor-pointer  bg-gray-300 light:bg-gray-300 dark:bg-gray-900 dark:text-gray-500"  >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
           <Image
@@ -57,14 +57,14 @@ export function DashboardSidebar() {
             alt="Photon Logo"
             width={48}
             height={48}
-            className="rounded-full"
+              className="rounded-full md:width={48} md:height={48}"
           />
-            <h2 className="text-lg font-bold :hover:cursor-pointer  bg-gray-300 text-yellow-200 dark:bg-gray-800 dark:text-gray-200" onClick={() => router.push("/")}>Next Photon</h2></span>
+            <h2 className="text-lg font-bold :hover:cursor-pointer text-muted-foreground text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500" onClick={() => router.push("/")}> Next Photon </h2></span>
       </SidebarHeader>
-        <SidebarContent className="px-4 bg-gray-300 text-yellow-200 dark:bg-gray-800 dark:text-gray-200">
+        <SidebarContent className="px-4 bg-gray-300 text-yellow-200 dark:bg-gray-900 dark:text-gray-300">
         {adminMenu.map((group, groupIndex) => (
-          <div key={group.title} className="py-4">
-            <h3 className="mb-2 px-4 text-sm font-semibold text-muted-foreground">
+          <div key={group.title} className="py-2">
+            <h3 className="mb-2 px-4 text-sm font-semibold text-muted-foreground dark:text-gray-500">
               {group.title}
             </h3>
             <SidebarMenu>

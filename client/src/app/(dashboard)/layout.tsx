@@ -17,12 +17,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const { open } = useSidebar();
 
-  console.log("Sidebar open state:", open);
+  // console.log("Sidebar open state:", open);
 
   return (
     <div className="flex w-screen h-screen overflow-hidden">
       <aside
-        className={`fixed top-0 left-0 h-screen w-56 z-50 bg-background transition-transform duration-300 ease-in-out
+        className={`sidebar fixed top-0 left-0 h-screen w-56 z-50 bg-background transition-transform duration-300 ease-in-out border-r border-transparent dark:border-transparent
     ${open ? "translate-x-0" : "-translate-x-full"}
   `}
       >
@@ -31,7 +31,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
 
 
       <div
-        className={`w-screen flex flex-col min-h-screen transition-all duration-300 ${open ? "ml-56" : "ml-0"
+        className={`w-screen flex flex-col min-h-screen transition-all duration-300 ${open ? "ml-56" : "ml-0 pl-0"
           }`}
       >
         <DashboardNavbar />

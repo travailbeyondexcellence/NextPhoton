@@ -71,6 +71,17 @@ body {
   color: #f9fafb; /* equivalent to gray-100 */
 }
 
+/* Hide subtle scrollbar track line in dark mode */
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+  background-color: transparent !important;
+}
+
+.sidebar {
+  border-right: none !important;
+}
+
+
 /* Base scrollbar (applies to both light and dark) */
 .custom-scrollbar {
   scrollbar-width: thin;
