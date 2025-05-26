@@ -8,15 +8,19 @@ import { cn } from "@/lib/utils"
 import { Separator } from "@/components/ui/separator"
 import {
   Sidebar as ShadcnSidebar,
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
   SidebarContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
+
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
 export function DashboardSidebar() {
@@ -28,7 +32,7 @@ export function DashboardSidebar() {
     <ShadcnSidebar collapsible="offcanvas">
       <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer" onClick={() => router.push("/")} >
 
-        <span className="flex items-center gap-2 " onClick = {() => router.push("/")}>
+        <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
           <Image
             src="/PhotonLogo/PhotonEarth.png"
             alt="Photon Logo"
@@ -69,11 +73,11 @@ export function DashboardSidebar() {
                         ))}
                       </CollapsibleContent>
                     </Collapsible>
-                  ) 
+                  )
 
-}
-             
-          
+                }
+
+
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
