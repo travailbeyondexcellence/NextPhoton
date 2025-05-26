@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-    <div className="flex grow min-h-screen">
+    <div className="flex  min-w-screen min-h-screen">
         <aside
           className={`bg-red-400 transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'w-0' : 'w-64'
             } shrink-0`}
