@@ -7,8 +7,19 @@ const Todos = [
         description: "Clerk Access Issues as per role matching",
         completed: false,
         assignedTo: "Zenith",
-        dueDate: "2023-10-01",
+        dueDate: "2025-10-01",
         priority: "High",
         tags: ["tag1", "tag2"],
     },
+
+    {
+        id: 2,
+        title: "Scrollbar fixes",
+        description: "Scrollbar is becoming thin AFTER we inspect Element (whereas it should be thin from the start - to be resolved",
+        completed: false,
+        assignedTo: "Zenith",
+        dueDate: "2025-10-01",
+        priority: "Medium",
+        tags: ["tag1", "tag2"],
+    }
 ]
