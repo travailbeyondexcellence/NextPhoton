@@ -21,14 +21,28 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 
+import { ChevronDown, ChevronRightSquare } from "lucide-react";
+
+import { useState } from "react"
+
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
 export function DashboardSidebar() {
+
+  const [openStates, setOpenStates] = useState<boolean[][]>(() =>
+    adminMenu.map((group) => group.items.map(() => false))
+  );
+
+
   const pathname = usePathname()
   const router = useRouter()
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   return (
+
+    <div className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/40">
+  {/* Sidebar content */}
+
     <ShadcnSidebar collapsible="offcanvas">
       <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer" onClick={() => router.push("/")} >
 
@@ -43,32 +57,54 @@ export function DashboardSidebar() {
           <h2 className="text-lg font-bold :hover:cursor-pointer" onClick={() => router.push("/")}>Next Photon</h2></span>
       </SidebarHeader>
       <SidebarContent className="px-4">
-        {adminMenu.map((group, index) => (
+        {adminMenu.map((group, groupIndex) => (
           <div key={group.title} className="py-4">
             <h3 className="mb-2 px-4 text-sm font-semibold text-muted-foreground">
               {group.title}
             </h3>
             <SidebarMenu>
-              {group.items.map((item) => {
+              {group.items.map((item, itemIndex) => {
                 const isActive = pathname === item.href
                 const Icon = item.icon // Store the icon component
 
                 if (item.children) {
                   return (
-                    <Collapsible key={item.href} className="px-2">
+                    <Collapsible key={itemIndex} className="px-2" open={openStates[groupIndex][itemIndex]}
+                      onOpenChange={() =>
+                        setOpenStates((prev) =>
+                          prev.map((groupArr, gIdx) =>
+                            gIdx === groupIndex
+                              ? groupArr.map((val, i) =>
+                                i === itemIndex ? !val : val
+                              )
+                              : groupArr
+                          )
+                        )
+                    }>
                       <CollapsibleTrigger className="flex items-center justify-between w-full text-sm py-2 font-medium">
                         <span className="flex items-center gap-2">
                           <item.icon size={16} /> {item.label}
                         </span>
+
+                        <ChevronRightSquare
+                          size={16}
+                          className={`transition-transform duration-300 ${openStates[groupIndex][itemIndex] ? "rotate-90" : "rotate-0"
+                            }`}
+                        />
                       </CollapsibleTrigger>
-                      <CollapsibleContent className="pl-6">
+                      <CollapsibleContent className="pl-4">
                         {item.children.map((subItem, subIndex) => (
                           <Link
                             key={subIndex}
                             href={subItem.href || "#"}
-                            className="block py-1 text-sm text-muted-foreground hover:text-foreground"
+                            className="flex items-center gap-2  py-1 text-sm text-muted-foreground hover:text-foreground"
                           >
-                            {subItem.label}
+                            <Icon size={16} />
+                            <span className="">
+                          
+                            
+                              {subItem.label}
+                            </span>
                           </Link>
                         ))}
                       </CollapsibleContent>
@@ -99,10 +135,12 @@ export function DashboardSidebar() {
                 )
               })}
             </SidebarMenu>
-            {index < adminMenu.length - 1 && <Separator className="my-4" />}
+            {groupIndex < adminMenu.length - 1 && <Separator className="my-4" />}
           </div>
         ))}
       </SidebarContent>
-    </ShadcnSidebar>
+      </ShadcnSidebar>
+      
+    </div>
   )
 } 

@@ -6,6 +6,35 @@ body {
   @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
 }
 
+/* Base scrollbar (applies to both light and dark) */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.3) transparent; /* fallback for Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Light mode scrollbar */
+.light .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15); /* translucent black */
+  border-radius: 3px;
+}
+
+/* Dark mode scrollbar */
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2); /* translucent white */
+  border-radius: 3px;
+}
+
+
+
+
 .react-calendar {
   width: 100% !important;
   border: none !important;
