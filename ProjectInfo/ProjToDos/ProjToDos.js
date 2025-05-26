@@ -21,7 +21,7 @@ const Todos = [
         dueDate: "2025-10-01",
         priority: "Medium",
         tags: ["tag1", "tag2"],
-    }
+    },
 
     {
         id: todo3,

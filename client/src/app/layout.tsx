@@ -16,6 +16,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Next Photon EduTech Management Dashboard",
   description: "Next Photon EduTech Management System",
+  icons: {
+    icon: "/favicon.png", // adjust path if needed
+  },
 };
 
 export default async function RootLayout({
