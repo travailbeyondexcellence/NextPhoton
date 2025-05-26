@@ -48,7 +48,7 @@ export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
     <div >
   {/* Sidebar content */}
 
-      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10">
+      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10 bg-blue-700">
         <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900"  >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
