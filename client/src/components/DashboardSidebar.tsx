@@ -40,11 +40,11 @@ export function DashboardSidebar() {
 
   return (
 
-    <div className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/40">
+    <div className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10">
   {/* Sidebar content */}
 
     <ShadcnSidebar collapsible="offcanvas">
-      <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer" onClick={() => router.push("/")} >
+      <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900 dark:text-gray-300" onClick={() => router.push("/")} >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
           <Image
@@ -56,7 +56,7 @@ export function DashboardSidebar() {
           />
           <h2 className="text-lg font-bold :hover:cursor-pointer" onClick={() => router.push("/")}>Next Photon</h2></span>
       </SidebarHeader>
-      <SidebarContent className="px-4">
+        <SidebarContent className="px-4  dark:bg-gray-900 dark:text-gray-300">
         {adminMenu.map((group, groupIndex) => (
           <div key={group.title} className="py-4">
             <h3 className="mb-2 px-4 text-sm font-semibold text-muted-foreground">

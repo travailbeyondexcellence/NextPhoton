@@ -26,7 +26,7 @@ export default function ThemeToggle() {
       {theme === 'dark' ? (
         <FiSun className="w-5 h-5 text-yellow-500" />
       ) : (
-        <FiMoon className="w-5 h-5 text-gray-700" />
+        <FiMoon className="w-5 h-5 text-blue-300" />
       )}
     </button>
   );
