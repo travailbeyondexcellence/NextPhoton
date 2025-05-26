@@ -27,7 +27,7 @@ import { useState } from "react"
 
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
-export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
+export function DashboardSidebar() {
  
 
 
@@ -40,7 +40,7 @@ export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
   const router = useRouter()
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  if (hidden) { return null }; // ✅ Don't render if hidden
+
 
 
   return (

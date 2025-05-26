@@ -11,16 +11,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
     <div className="flex min-w-screen min-h-screen">
-        <aside
-          className={`bg-red-400 transition-all duration-300 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'w-0' : 'w-64'
-            } shrink-0`}
-        >
-          <DashboardSidebar hidden={isMobileMenuOpen} />
+        <aside>
+          <DashboardSidebar  />
         </aside>
 
       {/* Main content */}
-      <div className={`flex flex-col flex-grow min-w-0 w-full bg-amber-400`}>
-        <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
+        <div className={`flex flex-col flex-grow min-w-0  bg-amber-400 `}>
+          <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>
