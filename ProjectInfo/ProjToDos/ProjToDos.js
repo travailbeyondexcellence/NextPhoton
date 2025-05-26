@@ -2,7 +2,7 @@
 
 const Todos = [
     {
-        id: 1,
+        id: todo1,
         title: "Clerk Access Issues as per role matching",
         description: "Clerk Access Issues as per role matching",
         completed: false,
@@ -13,8 +13,8 @@ const Todos = [
     },
 
     {
-        id: 2,
-        title: "Scrollbar fixes",
+        id: todo2,
+        title: "Tailwind Slim Scrollbar fixes",
         description: "Scrollbar is becoming thin AFTER we inspect Element (whereas it should be thin from the start - to be resolved",
         completed: false,
         assignedTo: "Zenith",
