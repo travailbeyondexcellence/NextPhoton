@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 bg-amber-400">
+      <div className="flex-1 flex flex-col min-w-0 w-full bg-amber-400">
         <DashboardNavbar onMenuClick={() => setIsMobileMenuOpen(true)} />
         <main className="flex-1 p-6">{children}</main>
       </div>
