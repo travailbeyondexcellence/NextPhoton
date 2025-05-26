@@ -27,7 +27,9 @@ import { useState } from "react"
 
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ hidden = false }: { hidden?: boolean }) {
+ 
+
 
   const [openStates, setOpenStates] = useState<boolean[][]>(() =>
     adminMenu.map((group) => group.items.map(() => false))
@@ -38,13 +40,16 @@ export function DashboardSidebar() {
   const router = useRouter()
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
+  if (hidden) { return null }; // ✅ Don't render if hidden
+
+
   return (
 
-    <div className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10">
+    <div >
   {/* Sidebar content */}
 
-    <ShadcnSidebar collapsible="offcanvas">
-      <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer dark:bg-gray-900 dark:text-gray-300" onClick={() => router.push("/")} >
+      <ShadcnSidebar collapsible="offcanvas" className="custom-scrollbar overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-rounded-md scrollbar-thumb-white/20 hover:scrollbar-thumb-white/10">
+        <SidebarHeader className="p-6 flex justify-between :hover:cursor-pointer border-amber-400  dark:bg-gray-900 dark:text-gray-300" onClick={() => router.push("/")} >
 
         <span className="flex items-center gap-2 " onClick={() => router.push("/")}>
           <Image

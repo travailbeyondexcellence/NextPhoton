@@ -62,12 +62,12 @@
 
 
 body {
-  background-color: white;
+  background-color: rgb(222, 222, 233); /* equivalent to gray-100 */
   color: #111827; /* equivalent to gray-900 */
 }
 
 .dark body {
-  background-color: #111827; /* equivalent to gray-900 */
+  background-color: #1d2639; /* equivalent to gray-900 */
   color: #f9fafb; /* equivalent to gray-100 */
 }
 
@@ -88,18 +88,18 @@ body {
 /* Light mode scrollbar */
 .light .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.15); /* translucent black */
-  border-radius: 3px;
+  border-radius: 0px;
 }
 
 /* Dark mode scrollbar */
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2); /* translucent white */
-  border-radius: 3px;
+  border-radius: 0px;
 }
 
 
 
-
+/* 
 .react-calendar {
   width: 100% !important;
   border: none !important;
@@ -123,7 +123,7 @@ body {
 .dark .react-calendar__tile--active {
   background-color: #374151 !important;
   color: #f3f4f6 !important;
-}
+} */
 
 
 @layer base {
@@ -138,7 +138,7 @@ body {
 
 @layer base {
   * {
-    @reference border-border;
+    /* @reference border-border; */
   }
   body {
     @reference bg-background text-foreground;
