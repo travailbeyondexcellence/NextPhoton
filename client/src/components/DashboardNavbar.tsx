@@ -9,23 +9,15 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { useState } from "react"
 
 interface NavbarProps {
-  onMenuClick?: () => void
+  
 }
 
-export function DashboardNavbar({ onMenuClick }: NavbarProps) {
+export function DashboardNavbar() {
   return (
     <header className="w-full h-16 border-b border-border bg-background dark:bg-gray-900 dark:border-gray-800 px-4 flex items-center justify-between">
       {/* Left: Sidebar trigger + title */}
       <div className="flex items-center gap-4 min-w-0">
-        {/* Mobile menu (optional) */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={onMenuClick}
-        >
-          <Menu className="h-5 w-5 text-foreground dark:text-gray-100" />
-        </Button>
+      
         {/* SidebarTrigger with dark mode styles */}
         <div className="dark:bg-gray-800 dark:text-gray-100 rounded-md">
           <SidebarTrigger className="text-foreground dark:text-gray-100" />
