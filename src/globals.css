@@ -7,38 +7,6 @@
   --color-lamaPurpleLight: #F1F0FF;
   --color-lamaYellow: #FAE27C;
   --color-lamaYellowLight: #FEFCE8;
-  --background: hsl(var(--background));
-  --foreground: hsl(var(--foreground));
-  --card: hsl(var(--card));
-  --card-foreground: hsl(var(--card-foreground));
-  --popover: hsl(var(--popover));
-  --popover-foreground: hsl(var(--popover-foreground));
-  --primary: hsl(var(--primary));
-  --primary-foreground: hsl(var(--primary-foreground));
-  --secondary: hsl(var(--secondary));
-  --secondary-foreground: hsl(var(--secondary-foreground));
-  --muted: hsl(var(--muted));
-  --muted-foreground: hsl(var(--muted-foreground));
-  --accent: hsl(var(--accent));
-  --accent-foreground: hsl(var(--accent-foreground));
-  --destructive: hsl(var(--destructive));
-  --destructive-foreground: hsl(var(--destructive-foreground));
-  --border: hsl(var(--border));
-  --input: hsl(var(--input));
-  --ring: hsl(var(--ring));
-  --chart-1: hsl(var(--chart-1));
-  --chart-2: hsl(var(--chart-2));
-  --chart-3: hsl(var(--chart-3));
-  --chart-4: hsl(var(--chart-4));
-  --chart-5: hsl(var(--chart-5));
-  --sidebar-background: hsl(var(--sidebar-background));
-  --sidebar-foreground: hsl(var(--sidebar-foreground));
-  --sidebar-primary: hsl(var(--sidebar-primary));
-  --sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --sidebar-accent: hsl(var(--sidebar-accent));
-  --sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --sidebar-border: hsl(var(--sidebar-border));
-  --sidebar-ring: hsl(var(--sidebar-ring));
 
   --gradient-radial: radial-gradient(var(--tw-gradient-stops));
   --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
@@ -47,6 +15,100 @@
   --borderRadius-lg: var(--radius);
   --borderRadius-md: calc(var(--radius) - 2px);
   --borderRadius-sm: calc(var(--radius) - 4px);
+}
+
+:root {
+  --background: 0 0% 100%; /* HSL for white */
+  --foreground: 222.2 84% 4.9%; /* HSL for a dark color */
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 214.3 31.7% 91.1%;
+  --input: 214.3 31.7% 91.1%;
+  --ring: 222.2 47.4% 11.2%;
+
+  --chart-1: 12 6.5% 15.1%;
+  --chart-2: 19.2 83.5% 50.6%;
+  --chart-3: 10.1 84.1% 51.8%;
+  --chart-4: 35.9 92.4% 58.3%;
+  --chart-5: 24.8 95.9% 59.2%;
+
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 222.2 84% 4.9%;
+  --sidebar-primary: 222.2 47.4% 11.2%;
+  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-accent: 210 40% 96.1%;
+  --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+  --sidebar-border: 214.3 31.7% 91.1%;
+  --sidebar-ring: 222.2 47.4% 11.2%;
+
+  --radius: 0.5rem; /* Example default radius */
+}
+
+:root .dark {
+  --background: 222.2 84% 4.9%; /* HSL for a dark color */
+  --foreground: 210 40% 98%; /* HSL for white */
+
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+
+  --secondary: 200 15.3% 19.6%;
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 81.5%;
+
+  --chart-1: 12 6.5% 15.1%; /* Keep same for now, adjust as needed */
+  --chart-2: 19.2 83.5% 50.6%;
+  --chart-3: 10.1 84.1% 51.8%;
+  --chart-4: 35.9 92.4% 58.3%;
+  --chart-5: 24.8 95.9% 59.2%;
+
+  --sidebar-background: 222.2 84% 4.9%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 210 40% 98%;
+  --sidebar-primary-foreground: 222.2 47.4% 11.2%;
+  --sidebar-accent: 217.2 32.6% 17.5%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217.2 32.6% 17.5%;
+  --sidebar-ring: 212.7 26.8% 81.5%;
+
+  --radius: 0.5rem;
 }
 
 /* Add any base styles or custom utilities here */
