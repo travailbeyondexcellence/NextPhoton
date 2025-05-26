@@ -4,7 +4,7 @@ import {
   createRouteMatcher,
   clerkClient,
 } from "@clerk/nextjs/server";
-import { routeAccessMap } from "./lib/settings";
+import { routeAccessMap } from "./lib/routeAccessMap";
 import { NextResponse } from "next/server";
 
 
@@ -68,9 +68,9 @@ export default clerkMiddleware(async (auth, req) => {
 
  
 
-  if (isProtectedRoute(req)) {
-    auth().protect();
-  }
+  // if (isProtectedRoute(req)) {
+  //   auth().protect();
+  // }
 
   // Not signed in
   if (!userId) {
