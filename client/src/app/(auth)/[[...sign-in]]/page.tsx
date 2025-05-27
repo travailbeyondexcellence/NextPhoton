@@ -1,108 +1,100 @@
-"use client";
+'use client'
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { authClient } from "../../../lib/auth-client";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod"
 
-const LoginPage = () => {
-  const router = useRouter();
+import { z } from "zod"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { signInFormSchema } from "@/lib/auth-schema";
+import { toast } from "@/hooks/use-toast";
+import { authClient } from "@/lib/auth-client";
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [session, setSession] = useState<any | null>(null);
-  const [status, setStatus] = useState<string>("idle");
+export default function SignIn() {
+  const form = useForm<z.infer<typeof signInFormSchema>>({
+    resolver: zodResolver(signInFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
 
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const sessionData = await authClient.getSession();
-        setSession(sessionData);
-        setStatus(sessionData ? "authenticated" : "unauthenticated");
-      } catch (error) {
-        console.error("Error checking session:", error);
-        setStatus("error");
-      }
-    };
-    checkSession();
-  }, []);
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-    setStatus("loading");
-
-    try {
-      const result = await authClient.signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError(result.error);
-        setStatus("error");
-      } else {
-        setStatus("authenticated");
-        // Successful sign-in, handle redirect if needed (useEffect will handle it here)
-      }
-    } catch (error: any) {
-      setError(error.message);
-      setStatus("error");
-    }
-  };
-
-  if (status === "loading") {
-    return <div>Loading...</div>; // Or a loading spinner
+  async function onSubmit(values: z.infer<typeof signInFormSchema>) {
+    const { email, password } = values;
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+      callbackURL: "/dashboard",
+    }, {
+      onRequest: () => {
+        toast({
+          title: "Please wait...",
+        })
+      },
+      onSuccess: () => {
+        form.reset()
+      },
+      onError: (ctx) => {
+        alert(ctx.error.message);
+      },
+    });
   }
 
   return (
-    <div className="h-screen flex items-center justify-center bg-lamaSkyLight overflow-y-hidden">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-            <input
-              type="email"
-              id="email"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-            <input
-              type="password"
-              id="password"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Sign In
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Sign In</CardTitle>
+        <CardDescription>
+          Welcome back! Please sign in to continue.
+        </CardDescription>
+      </CardHeader>
 
-export default LoginPage;
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input placeholder="john@mail.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter your password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button className="w-full" type="submit">Submit</Button>
+          </form>
+        </Form>
+      </CardContent>
+
+      <CardFooter className='flex justify-center'>
+        <p className='text-sm text-muted-foreground'>
+          Don&apos;t have an account yet?{' '}
+          <Link href='/sign-up' className='text-primary hover:underline'>
+            Sign up
+          </Link>
+        </p>
+      </CardFooter>
+    </Card>
+
+  )
+}
