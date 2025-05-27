@@ -1,52 +1,43 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useSession, signIn } from "better-auth/react"; // Import useSession and signIn from better-auth/react
+import { signUp } from "better-auth/react"; // Assuming signUp exists and is imported like this
+import Link from "next/link";
 
-const LoginPage = () => {
-  const { data: session, status } = useSession(); // Use useSession from better-auth/react
+const EmployeeSignupPage = () => {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     try {
-      const result = await signIn("credentials", { // Use signIn from better-auth/react
+      // Assuming signUp function exists and accepts email, password, and role
+      const result = await signUp({
         email,
         password,
-        redirect: false, // Prevent automatic redirect
+        role: "EMPLOYEE", // Specify the role
       });
 
       if (result?.error) {
         setError(result.error);
       } else {
-        // Successful sign-in, handle redirect if needed (useEffect will handle it here)
+        // Successful signup, redirect to sign-in or a welcome page
+        router.push("/sign-in");
       }
     } catch (error: any) {
       setError(error.message);
     }
   };
 
-  if (status === "loading") {
-    return <div>Loading...</div>; // Or a loading spinner
-  }
-
   return (
     <div className="h-screen flex items-center justify-center bg-lamaSkyLight overflow-y-hidden">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Employee Sign Up</h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -76,13 +67,16 @@ const LoginPage = () => {
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Sign In
+              Sign Up
             </button>
           </div>
         </form>
+        <p className="text-center text-gray-500 text-xs mt-4">
+          Already have an account? <Link href="/sign-in" className="text-blue-500 hover:text-blue-800">Sign in</Link>
+        </p>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default EmployeeSignupPage; 

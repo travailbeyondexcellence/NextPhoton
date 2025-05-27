@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ClerkProvider, 
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton, } from "@clerk/nextjs";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { authClient } from "@/lib/auth-client";
+import { AuthProvider } from "better-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,9 +23,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className="min-h-screen bg-gray-200 light:bg-gray-300 dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-gray-200 light:bg-gray-300 dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
+        <AuthProvider client={authClient}>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -39,8 +35,8 @@ export default async function RootLayout({
             {children}
           </ThemeProvider>
           <ToastContainer position="bottom-right" theme="dark" />
-        </body>
-      </html>
-    </ClerkProvider>
+        </AuthProvider>
+      </body>
+    </html>
   );
 }
