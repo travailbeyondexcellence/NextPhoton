@@ -45,6 +45,8 @@ export default function SignIn() {
   }
 
   return (
+
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
@@ -82,7 +84,7 @@ export default function SignIn() {
                 </FormItem>
               )}
             />
-            <Button className="w-full" type="submit">Submit</Button>
+              <Button className="w-full mt-2 bg-gradient-to-b from-teal-500 to-blue-800  inline-block hover:from-teal-600 hover:to-blue-800 :hover:bg-gradient-to-t" type="submit">Submit</Button>
           </form>
         </Form>
       </CardContent>
@@ -90,12 +92,13 @@ export default function SignIn() {
       <CardFooter className='flex justify-center'>
         <p className='text-sm text-muted-foreground'>
           Don&apos;t have an account yet?{' '}
-          <Link href='/sign-up' className='text-primary hover:underline'>
+          <Link href='/signup' className='text-primary hover:underline'>
             Sign up
           </Link>
         </p>
       </CardFooter>
-    </Card>
+      </Card>
+    </div>
 
   )
 }
