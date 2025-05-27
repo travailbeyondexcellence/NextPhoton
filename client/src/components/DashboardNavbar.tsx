@@ -8,6 +8,8 @@ import ThemeToggle from "@/components/ThemeToggle"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { useState } from "react"
 
+// Clerk has been remoed from the Application UI
+
 interface NavbarProps {
   
 }
