@@ -8,7 +8,7 @@
       "dom.iterable",
       "esnext"
     ],
-     "types": ["next"],
+     "types": ["next", "node"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -36,7 +36,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "postcss.config.js", "../Zen Project Notes/tailwind.config.ts"  ],
+, "postcss.config.js", "../Zen Project Notes/tailwind.config.ts", "src/lib/test-prisma.ts"  ],
   "exclude": [
     "node_modules"
   ]
