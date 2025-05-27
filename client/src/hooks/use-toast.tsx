@@ -37,7 +37,7 @@ function toast({
     toastFn(title || "", {
         description,
         duration,
-      
+
         action: actionLabel && onAction
             ? {
                 label: actionLabel,

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { formSchema } from "@/lib/auth-schema";
 import { authClient } from "@/lib/auth-client";
-import { toast } from "@/hooks/use-toastOLD";
+import { toast } from "@/hooks/use-toast";
 
 export default function SignUp() {
     const form = useForm<z.infer<typeof formSchema>>({
