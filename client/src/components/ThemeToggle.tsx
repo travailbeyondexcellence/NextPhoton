@@ -7,7 +7,7 @@ import { BsFillMoonStarsFill } from "react-icons/bs";
 
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme(); // Use next-themes for theme management, theres are destructured from useTheme, they are NOt local state variables
 
   // Avoid hydration mismatch
   useEffect(() => {

@@ -6,8 +6,25 @@ import { DashboardNavbar } from "@/components/DashboardNavbar";
 
 import { useTheme } from "next-themes";
 
+import { useEffect } from "react";
+
 // ✅ Outer wrapper
 export default function Layout({ children }: { children: React.ReactNode }) {
+
+  const {theme, setTheme} = useTheme(); // Use next-themes for theme management, theres are destructured from useTheme, they are NOt local state variables
+
+  useEffect(() => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      setTheme(storedTheme);
+      // document.documentElement.classList.toggle('dark', stored === 'dark'); // not needed with next-themes
+    }
+
+  } , []);
+
+
+
+
   return (
     <SidebarProvider>
       <LayoutWithSidebar>{children}</LayoutWithSidebar>
@@ -17,6 +34,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 // ✅ Actual layout logic using sidebar context
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
+
+
   const { open } = useSidebar();
 
 
