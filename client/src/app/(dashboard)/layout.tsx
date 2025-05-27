@@ -26,7 +26,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       // document.documentElement.classList.toggle('dark', stored === 'dark'); // not needed with next-themes
     }
 
-  } , []);
+  }, []);
+  
+
+  // bg - gray - 300!important dark: bg - gray - 800
+
+
 
 
   if (!mounted) return null; // ✅ Prevent hydration mismatch
@@ -50,6 +55,8 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const asideBackground = themeObject.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100';
   const asideText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
 
+  const dashboardBackground = themeObject.theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200';
+
 
   // console.log("Current theme:", themeObject);
   // console.log("Sidebar open state:", open);
@@ -63,16 +70,16 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         ${open ? "translate-x-0" : "-translate-x-full"}
   `}
       >
-        {/* <DashboardSidebar /> */}
+        <DashboardSidebar />
       </aside>
 
-      {/* <DashboardSidebar /> */}
+ 
 
       <div
-        className={`w-screen flex flex-col min-h-screen transition-all duration-300 bg-background  ${open ? "ml-56" : "ml-0 pl-0"
+        className={`w-screen flex flex-col min-h-screen transition-all duration-300 ${dashboardBackground}  ${open ? "ml-56" : "ml-0 pl-0"
           }`}
       >
-        {/* <DashboardNavbar /> */}
+        <DashboardNavbar />
         <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>
     </div>

@@ -20,13 +20,13 @@ export function DashboardNavbar() {
 
 
   const themeObject = useTheme();
-  const dashboardBackground = themeObject.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100';
-  const dashboardText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
+  const dashboardNavbarBackground = themeObject.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100';
+  const dashboardNavbarText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
 
 
 
   return (
-    <header className={`w-full h-16  light:bg-gray-300 light:text-gray-900 px-4 flex items-center justify-between ${dashboardBackground} ${dashboardText}`}>
+    <header className={`w-full h-16  light:bg-gray-300 light:text-gray-900 px-4 flex items-center justify-between ${dashboardNavbarBackground} ${dashboardNavbarText}`}>
       {/* Left: Sidebar trigger + title */}
       <div className="flex items-center gap-4 min-w-0">
       
