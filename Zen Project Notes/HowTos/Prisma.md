@@ -119,6 +119,18 @@ generator client {
 Adjust `output` only if your setup has custom build steps or monorepo isolation.
 
 ---
+### ✅ 8. **Env variables are loaded frrom the.env of the root as prisma is a shared resource that will be used by  both the client and the server hence the .env of the root will have the DB URL**
+
+```
+
+// Use Prisma Studio as follows to check the DB Entries:
+
+zen@ZenVerse MINGW64 ~/Zen Education/NextPhoton/client (dev)
+$ npx prisma studio  --schema=../shared/prisma/schema.prisma
+Environment variables loaded from .env
+Prisma schema loaded from ..\shared\prisma\schema.prisma
+Prisma Studio is up on http://localhost:5555
+```
 
 ### 🧪 Final Test
 
