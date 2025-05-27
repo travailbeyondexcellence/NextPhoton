@@ -24,7 +24,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-gray-300 dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
+      <body className="min-h-screen bg-gray-300 !important dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
        
           <ThemeProvider
             attribute="class"
