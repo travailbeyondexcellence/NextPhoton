@@ -7,6 +7,7 @@ const config: Config = {
 		"./src/app/**/*.{js,ts,jsx,tsx,mdx}",
 		"./src/app/globals.css", // assuming this is where your scrollbar classes are defined
 		"./src/**/*.{js,ts,jsx,tsx,mdx}", // add this line to include all files
+		"./src/**/*.{js,ts,jsx,tsx}"
 	],
 
 	darkMode: "class",

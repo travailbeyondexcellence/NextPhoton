@@ -50,7 +50,9 @@ export default function SignUp() {
     }
 
     return (
-        <Card className="w-full max-w-md mx-auto">
+
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Card className="w-full max-w-lg mx-auto ">
             <CardHeader>
                 <CardTitle>Sign Up</CardTitle>
                 <CardDescription>Create your account to get started.</CardDescription>
@@ -98,7 +100,7 @@ export default function SignUp() {
                                 </FormItem>
                             )}
                         />
-                        <Button className="w-full" type="submit">Submit</Button>
+                            <Button className="w-full bg-gradient-to-b from-teal-500 to-blue-800  inline-block" type="submit">Submit</Button>
                     </form>
                 </Form>
             </CardContent>
@@ -106,12 +108,18 @@ export default function SignUp() {
             <CardFooter className='flex justify-center'>
                 <p className='text-sm text-muted-foreground'>
                     Already have an account?{' '}
-                    <Link href='/sign-in' className='text-primary hover:underline'>
+                    <Link href='/signin' className='text-primary hover:underline'>
                         Sign in
                     </Link>
                 </p>
             </CardFooter>
-        </Card>
+
+
+            {/* <div className="absolute bottom-0 left-0 right-0 h-16 bg-red-400 flex items-center justify-center">
+            </div> */}
+            </Card>
+            
+        </div>
 
     )
 }
