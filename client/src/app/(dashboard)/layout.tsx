@@ -6,12 +6,18 @@ import { DashboardNavbar } from "@/components/DashboardNavbar";
 
 import { useTheme } from "next-themes";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
 // ✅ Outer wrapper
 export default function Layout({ children }: { children: React.ReactNode }) {
 
-  const {theme, setTheme} = useTheme(); // Use next-themes for theme management, theres are destructured from useTheme, they are NOt local state variables
+  const { theme, setTheme } = useTheme(); // Use next-themes for theme management, theres are destructured from useTheme, they are NOt local state variables
+  
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme');
@@ -23,7 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   } , []);
 
 
-
+  if (!mounted) return null; // ✅ Prevent hydration mismatch
 
   return (
     <SidebarProvider>
