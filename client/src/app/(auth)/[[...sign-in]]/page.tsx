@@ -2,15 +2,31 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSession, signIn } from "better-auth/react"; // Import useSession and signIn from better-auth/react
+import { authClient } from "../../../lib/auth-client";
 
 const LoginPage = () => {
-  const { data: session, status } = useSession(); // Use useSession from better-auth/react
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [session, setSession] = useState<any | null>(null);
+  const [status, setStatus] = useState<string>("idle");
+
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const sessionData = await authClient.getSession();
+        setSession(sessionData);
+        setStatus(sessionData ? "authenticated" : "unauthenticated");
+      } catch (error) {
+        console.error("Error checking session:", error);
+        setStatus("error");
+      }
+    };
+    checkSession();
+  }, []);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -18,24 +34,28 @@ const LoginPage = () => {
     }
   }, [status, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setStatus("loading");
 
     try {
-      const result = await signIn("credentials", { // Use signIn from better-auth/react
+      const result = await authClient.signIn("credentials", {
         email,
         password,
-        redirect: false, // Prevent automatic redirect
+        redirect: false,
       });
 
       if (result?.error) {
         setError(result.error);
+        setStatus("error");
       } else {
+        setStatus("authenticated");
         // Successful sign-in, handle redirect if needed (useEffect will handle it here)
       }
     } catch (error: any) {
       setError(error.message);
+      setStatus("error");
     }
   };
 
