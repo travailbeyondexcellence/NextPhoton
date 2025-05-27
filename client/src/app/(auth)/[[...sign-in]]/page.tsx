@@ -9,8 +9,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { signInFormSchema } from "@/lib/auth-schema";
-import { toast } from "@/hooks/use-toast";
+// import { signInFormSchema } from "@/lib/auth-schema";
+import { signInFormSchema } from "../../../lib/auth-schema"; // Adjust the import path as necessary
+import { toast } from "../../../hooks/use-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignIn() {
