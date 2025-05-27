@@ -11,7 +11,7 @@ root/
 ├── server/ # Backend: API routes, auth logic, Prisma schema
 ├── shared/ # Shared types, utils, and constants
 
-├── ProjectInfo / # Folder maintained by the Author and Devs for internal tasks and as a record of project history and some components they may need in the future. Ignore this folder totally!
+├── Zen Project Notes / # Folder maintained by the Author and Devs for internal tasks and as a record of project history and some components they may need in the future. Ignore this folder totally!
 
 
 ---
