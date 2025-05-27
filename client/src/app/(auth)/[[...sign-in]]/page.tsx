@@ -1,5 +1,9 @@
 'use client'
 
+import { Eye, EyeOff } from "lucide-react"
+
+import { useState } from "react";
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,6 +19,10 @@ import { toast } from "../../../hooks/use-toastOLD";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignIn() {
+
+
+  const [pwdVisible, setPwdVisible] = useState(false);
+
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -25,6 +33,8 @@ export default function SignIn() {
 
   async function onSubmit(values: z.infer<typeof signInFormSchema>) {
     const { email, password } = values;
+
+
     const { data, error } = await authClient.signIn.email({
       email,
       password,
@@ -78,7 +88,22 @@ export default function SignIn() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="Enter your password" {...field} />
+
+                    <div className="flex items-center relative">
+                      <Input type={pwdVisible ? "text" : "password"} placeholder="Enter your password" {...field}/> 
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setPwdVisible(!pwdVisible)}
+                        className="absolute right-1 top-1/2 -translate-y-1/2"
+                      >
+                        {pwdVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        <span className="sr-only">{pwdVisible ? "Hide" : "Show"} password</span>
+                      </Button>
+                    </div>
+                   
+                  
                   </FormControl>
                   <FormMessage />
                 </FormItem>
