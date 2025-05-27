@@ -7,22 +7,22 @@ type RouteAccessMap = {
 export const routeAccessMap: RouteAccessMap = {
   "/(.*)": ["admin"],
   "/admin(.*)": ["admin"],
-  "/student(.*)": ["student", "admin"],
-  "/teacher(.*)": ["teacher"],
-  "/parent(.*)": ["parent"],
-  "/list/teachers": ["admin", "teacher"],
-  "/list/students": ["admin", "teacher"],
-  "/list/parents": ["admin", "teacher"],
-  "/list/subjects": ["admin"],
-  "/list/classes": ["admin", "teacher"],
-  "/list/exams": ["admin", "teacher", "student", "parent"],
-  "/list/assignments": ["admin", "teacher", "student", "parent"],
-  "/list/results": ["admin", "teacher", "student", "parent"],
-  "/list/attendance": ["admin", "teacher", "student", "parent"],
-  "/list/events": ["admin", "teacher", "student", "parent"],
-  "/list/announcements": ["admin", "teacher", "student", "parent"],
-  "/academicplans/acadmindmaps": ["admin", "employee", "educator"], 
-  "/academicplans(.*)": ["admin", "employee", "educator"]
+  "/learner(.*)": ["learner", "admin"],
+  "/educator(.*)": ["educator"],
+  "/guardian(.*)": ["guardian"],
+  "/educators": ["admin", "educator"],
+  "/learners": ["admin", "educator"],
+  "/guardians": ["admin", "educator"],
+  "/subjects": ["admin"],
+  "/classes": ["admin", "educator"],
+  "/exams": ["admin", "educator", "learner", "guardian"],
+  "/assignments": ["admin", "educator", "learner", "guardian"],
+  "/results": ["admin", "educator", "learner", "guardian"],
+  "/attendance": ["admin", "educator", "learner", "guardian"],
+  "/events": ["admin", "educator", "learner", "guardian"],
+  "/announcements": ["admin", "educator", "learner", "guardian"],
+  "/academicplans/acadmindmaps": ["admin", "employee", "intern", "educator"], 
+  "/academicplans(.*)": ["admin", "employee", "intern", "educator"]
 
 
 };
