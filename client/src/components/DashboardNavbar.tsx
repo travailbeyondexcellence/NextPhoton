@@ -3,7 +3,7 @@
 import { Bell, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ThemeToggle from "@/components/ThemeToggle"
-import { UserButton } from "@clerk/nextjs"
+
 
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { useState } from "react"
@@ -31,11 +31,7 @@ export function DashboardNavbar() {
         <Button variant="ghost" size="icon">
           <Bell className="h-5 w-5 text-foreground dark:text-gray-100" />
         </Button>
-        <UserButton 
-          afterSignOutUrl="/"
-          signInUrl="/sign-in"
-          appearance={{ elements: { avatarBox: "h-8 w-8" } }}
-        />
+    
       </div>
     </header>
   );
