@@ -1,8 +1,0 @@
-packages:
-  - client
-  - server
-  - shared/*
-
-
-overrides:
-  "@clerk/shared": "2.9.2"
