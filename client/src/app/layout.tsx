@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { authClient } from "@/lib/auth-client";
-import { AuthProvider } from "better-auth/react";
+import { useStore } from "better-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +25,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-gray-200 light:bg-gray-300 dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
-        <AuthProvider client={authClient}>
+       
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -35,7 +35,7 @@ export default async function RootLayout({
             {children}
           </ThemeProvider>
           <ToastContainer position="bottom-right" theme="dark" />
-        </AuthProvider>
+ 
       </body>
     </html>
   );
