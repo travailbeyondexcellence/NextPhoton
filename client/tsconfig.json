@@ -36,7 +36,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "postcss.config.js", "../ProjectInfo/tailwind.config.ts"  ],
+, "postcss.config.js", "../Zen Project Notes/tailwind.config.ts"  ],
   "exclude": [
     "node_modules"
   ]
