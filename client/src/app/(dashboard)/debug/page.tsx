@@ -17,7 +17,7 @@ const Welcome = () => {
       <p className="text-gray-600 dark:text-blue-300">This is a simple reusable component in Next.js.</p>
 
       <div
-        className={`w-auto h-screen ${theme === "dark" ? "bg-gray-900" : "bg-amber-200"
+        className={`w-auto h-screen ${theme === "dark" ? "bg-teal-900" : "bg-amber-200"
           }`}
       >
         Hello

@@ -31,6 +31,9 @@ import { useState } from "react"
 
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
+
+import { useTheme } from "next-themes";
+
 export function DashboardSidebar() {
 
 
@@ -45,9 +48,15 @@ export function DashboardSidebar() {
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 
+ 
 
+
+  const themeObject = useTheme();
+  const sidebarHeaderBackground = themeObject.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-200';
+  // const sidebarHeaderText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
 
   return (
+
 
     <div >
       {/* Sidebar content */}
@@ -55,7 +64,7 @@ export function DashboardSidebar() {
       <ShadcnSidebar collapsible="offcanvas" className="px-0 pl-0 ml-0 flex justify-start">
 
         {/* Sidebar Header */}
-        <SidebarHeader className="px-0 pl-4 ml-0 flex h-16 justify-start :hover:cursor-pointer bg-gray-300 dark:bg-gray-950 dark:text-gray-500" >
+        <SidebarHeader className={`px-0 pl-4 ml-0 flex h-16 justify-start :hover:cursor-pointer ${sidebarHeaderBackground}`} >
 
           <span className="pl-0 p-0 flex items-center gap-2 justify-start :hover:cursor-pointer" onClick={() => router.push("/")}>
             <Image
@@ -102,8 +111,8 @@ export function DashboardSidebar() {
                             )
                           }>
                           <CollapsibleTrigger className="flex items-center justify-between w-[90%] text-sm py-2 font-medium">
-                            <span className="flex items-center gap-2">
-                              <item.icon size={16} /> {item.label}
+                            <span className="flex items-center gap-2 ">
+                              <item.icon size={20} className="mr-2" /> {item.label}
                             </span>
 
                             <ChevronRightSquare

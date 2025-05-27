@@ -4,6 +4,8 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 
+import { useTheme } from "next-themes";
+
 // ✅ Outer wrapper
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -17,14 +19,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const { open } = useSidebar();
 
+
+  // import { useTheme } from "next-themes";
+  const themeObject = useTheme();
+  const asideBackground = themeObject.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100';
+  const asideText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
+
+
+  // console.log("Current theme:", themeObject);
   // console.log("Sidebar open state:", open);
 
   return (
     <div className="flex w-screen h-screen overflow-hidden">
       <aside
-        className={`sidebar fixed top-0 left-0 h-screen p-0 pl-0 w-56 z-50 transition-transform duration-300 ease-in-out border-transparent dark:border-transparent overflow-hidden bg-gray-300 dark:bg-gray-900 text-gray-700 dark:text-gray-400
+        className={`sidebar fixed top-0 left-0 h-screen p-0 pl-0 w-56 z-50 transition-transform duration-300 ease-in-out border-transparent dark:border-transparent overflow-hidden
    
-    
+        ${asideBackground} ${asideText} shadow-lg
         ${open ? "translate-x-0" : "-translate-x-full"}
   `}
       >
