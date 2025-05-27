@@ -3,20 +3,35 @@
 // Inspired by react-hot-toast library
 import * as React from "react"
 
-import type {
-    ToastActionElement,
-    ToastProps,
-} from "@/components/ui/toast"
+import { toast as sonnerToast } from "sonner";
+
+// import type {
+//     ToastActionElement,
+//     ToastProps,
+// } from "../components/ui/sonner"
+
+
+type ToasterToast = {
+    id: string
+    title?: string;
+    description?: string;
+    open?: boolean;
+    actionLabel?: string;
+    onAction?: () => void;
+    duration?: number;
+    important?: boolean;
+    onOpenChange?: (open: boolean) => void;
+  };
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
 
-type ToasterToast = ToastProps & {
-    id: string
-    title?: React.ReactNode
-    description?: React.ReactNode
-    action?: ToastActionElement
-}
+// type ToasterToast = ToastProps & {
+//     id: string
+//     title?: React.ReactNode
+//     description?: React.ReactNode
+//     action?: ToastActionElement
+// }
 
 const actionTypes = {
     ADD_TOAST: "ADD_TOAST",
@@ -51,6 +66,29 @@ type Action =
         type: ActionType["REMOVE_TOAST"]
         toastId?: ToasterToast["id"]
     }
+
+// function toast({
+//     title,
+//     description,
+//     actionLabel,
+//     onAction,
+//     duration = 4000,
+//     important = false,
+// }: ToastOptions) {
+//     sonnerToast(title || "", {
+//         description,
+//         duration,
+//         important,
+//         action: actionLabel && onAction
+//             ? {
+//                 label: actionLabel,
+//                 onClick: onAction,
+//             }
+//             : undefined,
+//     });
+// }
+      
+
 
 interface State {
     toasts: ToasterToast[]
@@ -152,13 +190,15 @@ function toast({ ...props }: Toast) {
         })
     const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
 
+    interface AddToastProps extends Omit<ToasterToast, "id" | "open" | "onOpenChange"> { }
+
     dispatch({
         type: "ADD_TOAST",
         toast: {
-            ...props,
+            ...props as AddToastProps,
             id,
             open: true,
-            onOpenChange: (open) => {
+            onOpenChange: (open: boolean) => {
                 if (!open) dismiss()
             },
         },
