@@ -14,32 +14,36 @@ datasource db {
 model Admin {
   id       String @id
   username String @unique
+  user     User   @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
-model Student {
-  id          String       @id
-  username    String       @unique
-  name        String
-  surname     String
-  email       String?      @unique
-  phone       String?      @unique
-  address     String
-  img         String?
-  bloodType   String
-  sex         UserSex
-  createdAt   DateTime     @default(now())
-  parentId    String
-  parent      Parent       @relation(fields: [parentId], references: [id])
-  classId     Int
-  class       Class        @relation(fields: [classId], references: [id])
-  gradeId     Int
-  grade       Grade        @relation(fields: [gradeId], references: [id])
-  attendances Attendance[]
-  results     Result[]
-  birthday    DateTime
+model Employee {
+  id        String    @id
+  username  String    @unique
+  name      String
+  surname   String
+  email     String?   @unique
+  phone     String?   @unique
+  address   String
+  img       String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
-model Teacher {
+model Intern {
+  id        String    @id
+  username  String    @unique
+  name      String
+  surname   String
+  email     String?   @unique
+  phone     String?   @unique
+  address   String
+  img       String?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Educator {
   id        String    @id
   username  String    @unique
   name      String
@@ -55,9 +59,34 @@ model Teacher {
   lessons   Lesson[]
   classes   Class[]
   birthday  DateTime
+  user      User      @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
-model Parent {
+model Learner {
+  id          String       @id
+  username    String       @unique
+  name        String
+  surname     String
+  email       String?      @unique
+  phone       String?      @unique
+  address     String
+  img         String?
+  bloodType   String
+  sex         UserSex
+  createdAt   DateTime     @default(now())
+  guardianId  String
+  guardian    Guardian     @relation(fields: [guardianId], references: [id])
+  classId     Int
+  class       Class        @relation(fields: [classId], references: [id])
+  gradeId     Int
+  grade       Grade        @relation(fields: [gradeId], references: [id])
+  attendances Attendance[]
+  results     Result[]
+  birthday    DateTime
+  user        User         @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Guardian {
   id        String    @id
   username  String    @unique
   name      String
@@ -66,15 +95,16 @@ model Parent {
   phone     String    @unique
   address   String
   createdAt DateTime  @default(now())
-  students  Student[]
+  learners  Learner[]
+  user      User      @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Grade {
   id    Int @id @default(autoincrement())
   level Int @unique
 
-  students Student[]
-  classess Class[]
+  learners Learner[]
+  classes  Class[]
 }
 
 model Class {
@@ -83,19 +113,19 @@ model Class {
   capacity Int
 
   supervisorId  String?
-  supervisor    Teacher?       @relation(fields: [supervisorId], references: [id])
+  supervisor    Educator?    @relation(fields: [supervisorId], references: [id])
   lessons       Lesson[]
-  students      Student[]
+  learners      Learner[]
   gradeId       Int
-  grade         Grade          @relation(fields: [gradeId], references: [id])
+  grade         Grade       @relation(fields: [gradeId], references: [id])
   events        Event[]
   announcements Announcement[]
 }
 
 model Subject {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  teachers Teacher[]
+  id       Int        @id @default(autoincrement())
+  name     String     @unique
+  educators Educator[]
   lessons  Lesson[]
 }
 
@@ -110,8 +140,8 @@ model Lesson {
   subject     Subject      @relation(fields: [subjectId], references: [id])
   classId     Int
   class       Class        @relation(fields: [classId], references: [id])
-  teacherId   String
-  teacher     Teacher      @relation(fields: [teacherId], references: [id])
+  educatorId  String
+  educator    Educator     @relation(fields: [educatorId], references: [id])
   exams       Exam[]
   assignments Assignment[]
   attendances Attendance[]
@@ -147,8 +177,8 @@ model Result {
   exam         Exam?       @relation(fields: [examId], references: [id])
   assignmentId Int?
   assignment   Assignment? @relation(fields: [assignmentId], references: [id])
-  studentId    String
-  student      Student     @relation(fields: [studentId], references: [id])
+  learnerId    String
+  learner      Learner     @relation(fields: [learnerId], references: [id])
 }
 
 model Attendance {
@@ -156,8 +186,8 @@ model Attendance {
   date    DateTime
   present Boolean
 
-  studentId String
-  student   Student @relation(fields: [studentId], references: [id])
+  learnerId String
+  learner   Learner @relation(fields: [learnerId], references: [id])
   lessonId  Int
   lesson    Lesson  @relation(fields: [lessonId], references: [id])
 }
@@ -194,4 +224,68 @@ enum Day {
   WEDNESDAY
   THURSDAY
   FRIDAY
+}
+
+// Better Auth Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+  admin         Admin?
+  employee      Employee?
+  intern        Intern?
+  educator      Educator?
+  learner       Learner?
+  guardian      Guardian?
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+  INTERN
+  EDUCATOR
+  LEARNER
+  GUARDIAN
+  USER
 }
