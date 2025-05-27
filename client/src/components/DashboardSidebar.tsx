@@ -27,7 +27,7 @@ import 'simplebar-react/dist/simplebar.min.css';
 import SimpleBar from 'simplebar-react';
 
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 
@@ -35,6 +35,18 @@ import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
 import { useTheme } from "next-themes";
 
 export function DashboardSidebar() {
+
+  const [mounted, setMounted] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+
+  useEffect(() => {
+    setIsMobile(typeof window !== "undefined" && window.innerWidth < 768);
+  }, []);
+  
+
+  useEffect(() => setMounted(true), []);
 
 
 
@@ -45,13 +57,15 @@ export function DashboardSidebar() {
 
   const pathname = usePathname()
   const router = useRouter()
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 
- 
+
+
 
 
   const themeObject = useTheme();
+
+  if (!mounted) return null;
   const sidebarHeaderBackground = themeObject.theme === 'dark' ? 'bg-gray-950' : 'bg-gray-200';
   // const sidebarHeaderText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
 

@@ -29,21 +29,43 @@ export default async function RootLayout({
 
 
 
-return (
+  return (
     <html lang="en" suppressHydrationWarning>
+
+      <head>
+        {/* 👇 This script ensures the correct theme is applied before hydration */}
+        {/* <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  const theme = localStorage.getItem('theme');
+                  if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (_) {}
+              })();
+            `,
+          }}
+        /> */}
+      </head>
+
+
       <body className="min-h-screen bg-gray-300 !important dark:bg-gray-800 font-sans text-foreground transition-colors duration-200">
-       
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            // value={{ dark: "dark", light: "" }}
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-          <ToastContainer position="bottom-right" theme="dark" />
- 
+
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          // value={{ dark: "dark", light: "" }}
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+        <ToastContainer position="bottom-right" theme="dark" />
+
       </body>
     </html>
   );

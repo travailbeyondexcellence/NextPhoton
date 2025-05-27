@@ -57,14 +57,16 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         ${open ? "translate-x-0" : "-translate-x-full"}
   `}
       >
-        <DashboardSidebar />
+        {/* <DashboardSidebar /> */}
       </aside>
 
+      {/* <DashboardSidebar /> */}
+
       <div
-        className={`w-screen flex flex-col min-h-screen transition-all duration-300 bg-background  dark:bg-green-300  bg-amber-300 ${open ? "ml-56" : "ml-0 pl-0"
+        className={`w-screen flex flex-col min-h-screen transition-all duration-300 bg-background  ${open ? "ml-56" : "ml-0 pl-0"
           }`}
       >
-        <DashboardNavbar />
+        {/* <DashboardNavbar /> */}
         <main className="flex-1 p-6 overflow-auto">{children}</main>
       </div>
     </div>
