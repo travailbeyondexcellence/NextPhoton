@@ -1,150 +1,144 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../../node_modules/@prisma/client"
   output   = "../../node_modules/.prisma/client"
-
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
 }
 
 model Admin {
-  id       String @id
-  username String @unique
-  user     BetterAuthUser   @relation(fields: [id], references: [id], onDelete: Cascade)
+  id       String         @id
+  username String         @unique
+  user     BetterAuthUser @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Employee {
-  id        String    @id
-  username  String    @unique
+  id        String         @id
+  username  String         @unique
   name      String
   surname   String
-  email     String?   @unique
-  phone     String?   @unique
+  email     String?        @unique
+  phone     String?        @unique
   address   String
   img       String?
-  createdAt DateTime  @default(now())
-  user      BetterAuthUser      @relation(fields: [id], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  user      BetterAuthUser @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Intern {
-  id        String    @id
-  username  String    @unique
+  id        String         @id
+  username  String         @unique
   name      String
   surname   String
-  email     String?   @unique
-  phone     String?   @unique
+  email     String?        @unique
+  phone     String?        @unique
   address   String
   img       String?
-  createdAt DateTime  @default(now())
-  user      BetterAuthUser      @relation(fields: [id], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  user      BetterAuthUser @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Educator {
-  id        String    @id
-  username  String    @unique
+  id        String         @id
+  username  String         @unique
   name      String
   surname   String
-  email     String?   @unique
-  phone     String?   @unique
+  email     String?        @unique
+  phone     String?        @unique
   address   String
   img       String?
   bloodType String
   sex       UserSex
-  createdAt DateTime  @default(now())
-  subjects  Subject[]
-  lessons   Lesson[]
-  classes   Class[]
+  createdAt DateTime       @default(now())
   birthday  DateTime
-  user      BetterAuthUser      @relation(fields: [id], references: [id], onDelete: Cascade)
+  classes   Class[]
+  user      BetterAuthUser @relation(fields: [id], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+  subjects  Subject[]      @relation("EducatorToSubject")
 }
 
 model Learner {
-  id          String       @id
-  username    String       @unique
+  id          String         @id
+  username    String         @unique
   name        String
   surname     String
-  email       String?      @unique
-  phone       String?      @unique
+  email       String?        @unique
+  phone       String?        @unique
   address     String
   img         String?
   bloodType   String
   sex         UserSex
-  createdAt   DateTime     @default(now())
+  createdAt   DateTime       @default(now())
   guardianId  String
-  guardian    Guardian     @relation(fields: [guardianId], references: [id])
   classId     Int
-  class       Class        @relation(fields: [classId], references: [id])
   gradeId     Int
-  grade       Grade        @relation(fields: [gradeId], references: [id])
-  attendances Attendance[]
-  results     Result[]
   birthday    DateTime
-  user        BetterAuthUser         @relation(fields: [id], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+  class       Class          @relation(fields: [classId], references: [id])
+  grade       Grade          @relation(fields: [gradeId], references: [id])
+  guardian    Guardian       @relation(fields: [guardianId], references: [id])
+  user        BetterAuthUser @relation(fields: [id], references: [id], onDelete: Cascade)
+  results     Result[]
 }
 
 model Guardian {
-  id        String    @id
-  username  String    @unique
+  id        String         @id
+  username  String         @unique
   name      String
   surname   String
-  email     String?   @unique
-  phone     String    @unique
+  email     String?        @unique
+  phone     String         @unique
   address   String
-  createdAt DateTime  @default(now())
+  createdAt DateTime       @default(now())
+  user      BetterAuthUser @relation(fields: [id], references: [id], onDelete: Cascade)
   learners  Learner[]
-  user      BetterAuthUser      @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Grade {
-  id    Int @id @default(autoincrement())
-  level Int @unique
-
-  learners Learner[]
+  id       Int       @id @default(autoincrement())
+  level    Int       @unique
   classes  Class[]
+  learners Learner[]
 }
 
 model Class {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  capacity Int
-
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  capacity      Int
   supervisorId  String?
-  supervisor    Educator?    @relation(fields: [supervisorId], references: [id])
-  lessons       Lesson[]
-  learners      Learner[]
   gradeId       Int
-  grade         Grade       @relation(fields: [gradeId], references: [id])
-  events        Event[]
   announcements Announcement[]
+  grade         Grade          @relation(fields: [gradeId], references: [id])
+  supervisor    Educator?      @relation(fields: [supervisorId], references: [id])
+  events        Event[]
+  learners      Learner[]
+  lessons       Lesson[]
 }
 
 model Subject {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique
-  educators Educator[]
-  lessons  Lesson[]
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  lessons   Lesson[]
+  educators Educator[] @relation("EducatorToSubject")
 }
 
 model Lesson {
-  id        Int      @id @default(autoincrement())
-  name      String
-  day       Day
-  startTime DateTime
-  endTime   DateTime
-
+  id          Int          @id @default(autoincrement())
+  name        String
+  day         Day
+  startTime   DateTime
+  endTime     DateTime
   subjectId   Int
-  subject     Subject      @relation(fields: [subjectId], references: [id])
   classId     Int
-  class       Class        @relation(fields: [classId], references: [id])
   educatorId  String
-  educator    Educator     @relation(fields: [educatorId], references: [id])
-  exams       Exam[]
   assignments Assignment[]
   attendances Attendance[]
+  exams       Exam[]
+  class       Class        @relation(fields: [classId], references: [id])
+  educator    Educator     @relation(fields: [educatorId], references: [id])
+  subject     Subject      @relation(fields: [subjectId], references: [id])
 }
 
 model Exam {
@@ -152,10 +146,9 @@ model Exam {
   title     String
   startTime DateTime
   endTime   DateTime
-
-  lessonId Int
-  lesson   Lesson   @relation(fields: [lessonId], references: [id])
-  results  Result[]
+  lessonId  Int
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  results   Result[]
 }
 
 model Assignment {
@@ -163,33 +156,30 @@ model Assignment {
   title     String
   startDate DateTime
   dueDate   DateTime
-
-  lessonId Int
-  lesson   Lesson   @relation(fields: [lessonId], references: [id])
-  results  Result[]
+  lessonId  Int
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+  results   Result[]
 }
 
 model Result {
-  id    Int @id @default(autoincrement())
-  score Int
-
+  id           Int         @id @default(autoincrement())
+  score        Int
   examId       Int?
-  exam         Exam?       @relation(fields: [examId], references: [id])
   assignmentId Int?
-  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
   learnerId    String
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id])
+  exam         Exam?       @relation(fields: [examId], references: [id])
   learner      Learner     @relation(fields: [learnerId], references: [id])
 }
 
 model Attendance {
-  id      Int      @id @default(autoincrement())
-  date    DateTime
-  present Boolean
-
-  learnerId String
-  learner   Learner @relation(fields: [learnerId], references: [id])
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  present   Boolean
   lessonId  Int
-  lesson    Lesson  @relation(fields: [lessonId], references: [id])
+  learnerId String
+  learner   Learner  @relation(fields: [learnerId], references: [id])
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
 }
 
 model Event {
@@ -198,9 +188,8 @@ model Event {
   description String
   startTime   DateTime
   endTime     DateTime
-
-  classId Int?
-  class   Class? @relation(fields: [classId], references: [id])
+  classId     Int?
+  class       Class?   @relation(fields: [classId], references: [id])
 }
 
 model Announcement {
@@ -208,9 +197,60 @@ model Announcement {
   title       String
   description String
   date        DateTime
+  classId     Int?
+  class       Class?   @relation(fields: [classId], references: [id])
+}
 
-  classId Int?
-  class   Class? @relation(fields: [classId], references: [id])
+model BetterAuthAccount {
+  id                String         @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model BetterAuthSession {
+  id           String         @id @default(cuid())
+  sessionToken String         @unique
+  userId       String
+  expires      DateTime
+  user         BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BetterAuthUser {
+  id            String              @id @default(cuid())
+  name          String?
+  email         String?             @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole            @default(USER)
+  admin         Admin?
+  accounts      BetterAuthAccount[]
+  sessions      BetterAuthSession[]
+  educator      Educator?
+  employee      Employee?
+  guardian      Guardian?
+  intern        Intern?
+  learner       Learner?
+}
+
+model BetterAuthVerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 enum UserSex {
@@ -224,60 +264,6 @@ enum Day {
   WEDNESDAY
   THURSDAY
   FRIDAY
-}
-
-// Better Auth Models
-model BetterAuthAccount {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-
-  user BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-}
-
-model BetterAuthSession {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         BetterAuthUser     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model BetterAuthUser {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole  @default(USER)
-  accounts      BetterAuthAccount[]
-  sessions      BetterAuthSession[]
-  admin         Admin?
-  employee      Employee?
-  intern        Intern?
-  educator      Educator?
-  learner       Learner?
-  guardian      Guardian?
-}
-
-model BetterAuthVerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
 }
 
 enum UserRole {

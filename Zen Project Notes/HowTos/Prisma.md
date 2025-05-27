@@ -45,8 +45,11 @@ npm install prisma @prisma/client
 Run this from the root (or adjust path):
 
 ```bash
-npx prisma generate --schema=shared/prisma/schema.prisma
+npx prisma generate --schema=../shared/prisma/schema.prisma
+
 ```
+
+![alt text](prismagenerate.png)
 
 This reads `DATABASE_URL` and generates the client in `node_modules/.prisma/client`.
 
@@ -57,7 +60,18 @@ This reads `DATABASE_URL` and generates the client in `node_modules/.prisma/clie
 Test the connection:
 
 ```bash
-npx prisma db pull --schema=shared/prisma/schema.prisma
+npx prisma db pull --schema=../shared/prisma/schema.prisma
+```
+```
+zen@ZenVerse MINGW64 ~/Zen Education/NextPhoton/client (dev)
+$ npx prisma db pull --schema=../shared/prisma/schema.prisma   
+Prisma schema loaded from ..\shared\prisma\schema.prisma
+Environment variables loaded from .env
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-steep-king-a13wqaa8-pooler.ap-southeast-1.aws.neon.tech"
+
+✔ Introspected 20 models and wrote them into ..\shared\prisma\schema.prisma in 4.20s
+      
+Run prisma generate to generate Prisma Client.
 ```
 
 If it succeeds without error, the connection is working.
@@ -80,13 +94,13 @@ const prisma = new PrismaClient();
 To apply schema changes to Neon DB:
 
 ```bash
-npx prisma migrate deploy --schema=shared/prisma/schema.prisma
+npx prisma migrate deploy --schema=../shared/prisma/schema.prisma
 ```
 
 Or create a new one:
 
 ```bash
-npx prisma migrate dev --schema=shared/prisma/schema.prisma
+npx prisma migrate dev --schema=../shared/prisma/schema.prisma
 ```
 
 ---
