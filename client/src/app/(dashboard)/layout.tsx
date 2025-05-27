@@ -32,7 +32,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div
-        className={`w-screen flex flex-col min-h-screen transition-all duration-300 bg-background bg-amber-300  dark:bg-green-300 ${open ? "ml-56" : "ml-0 pl-0"
+        className={`w-screen flex flex-col min-h-screen transition-all duration-300 bg-background  dark:bg-green-300  bg-amber-300 ${open ? "ml-56" : "ml-0 pl-0"
           }`}
       >
         <DashboardNavbar />
