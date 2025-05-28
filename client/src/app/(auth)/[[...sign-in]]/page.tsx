@@ -38,7 +38,7 @@ export default function SignIn() {
     const { data, error } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/dashboard",
+      callbackURL: "/admin",
     }, {
       onRequest: () => {
         toast({
