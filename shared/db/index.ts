@@ -1,5 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import type { PrismaClient as PrismaClientType } from '@prisma/client';
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 declare global {
   // Augment the global object only once
