@@ -7,13 +7,17 @@
 
 // import { PrismaClient } from '@prisma/client';
 
-const path = require('path');
-const dotenv = require('dotenv');
-// const { PrismaClient } = require('@prisma/client');
-// const prisma = new PrismaClient();
-// import { prisma } from '../../../shared/db';
-const sharedDb = require('../../../shared/db');
-const prisma = sharedDb.prisma;
+// const path = require('path');
+// const dotenv = require('dotenv');
+// // const { PrismaClient } = require('@prisma/client');
+// // const prisma = new PrismaClient();
+// // import { prisma } from '../../../shared/db';
+// const sharedDb = require('../../../shared/db');
+// const prisma = sharedDb.prisma;
+
+import path from 'path';
+import dotenv from 'dotenv';
+import prisma from '../../../shared/db'; // ✅ import default
 
 const dotenvPath = path.resolve(__dirname, '../../../.env');
 

@@ -1,9 +1,9 @@
-// shared/db.ts
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
+import type { PrismaClient as PrismaClientType } from '@prisma/client';
 
 declare global {
   // Augment the global object only once
-  var _prisma: PrismaClient | undefined;
+  var _prisma: PrismaClientType | undefined;
 }
 
 const prisma = global._prisma ?? new PrismaClient({ log: ['error', 'warn'] });
