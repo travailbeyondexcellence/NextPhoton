@@ -260,15 +260,15 @@ model User {
   createdAt     DateTime
   updatedAt     DateTime
   admin         Admin?
-  Account       Account[] 
-  Session       Session[]
+
   educator      Educator?
   employee      Employee?
   guardian      Guardian?
   intern        Intern?
   learner       Learner?
 
-
+  sessions Session[]
+  accounts Account[]
 
   @@map("user")
 }
