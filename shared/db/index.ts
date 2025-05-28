@@ -37,7 +37,7 @@ async function main() {
   const users = await prisma.user.findMany(); // ✅ model name in camelCase
 
   console.log("✅ Users fetched from Neon DB:");
-  console.log(users);
+  console.log("1st User:", users[0]);
 }
 
 main()
