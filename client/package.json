@@ -2,13 +2,15 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "generate": "prisma generate --schema=../shared/prisma/schema.prisma",
-    "prisma:studio": "npx prisma studio  --schema=../shared/prisma/schema.prisma"
+    "prisma:studio": "npx prisma studio  --schema=../shared/prisma/schema.prisma",
+    "test:prisma": "npx ts-node --project ./tsconfig.json src/lib/test-prisma.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

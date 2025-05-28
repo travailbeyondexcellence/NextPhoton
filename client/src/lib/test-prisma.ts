@@ -1,7 +1,7 @@
 // This script is used to test Prisma connection to the Neon database.
 
 // THIS FILE SHOULD NOT BE DELETED OR MOVED.
-// Make sure to run this script from the client directory: `npx ts-node src/lib/test-prisma.ts`
+// Make sure to run this script from the client directory: `npx tsx src/lib/test-prisma.ts` (after installing tsx)
 // Ensure you have the correct environment variables set in your .env file.
 
 
@@ -17,7 +17,11 @@
 
 import path from 'path';
 import dotenv from 'dotenv';
-import prisma from '../../../shared/db'; // ✅ import default
+import { prisma } from '../../../shared/db'; // ✅ import default
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const dotenvPath = path.resolve(__dirname, '../../../.env');
 

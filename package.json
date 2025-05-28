@@ -15,6 +15,7 @@
     "prisma:deployprod": "npx prisma migrate deploy --schema=shared/prisma/schema.prisma"
   },
   "devDependencies": {
+    "tsx": "^4.19.4",
     "turbo": "*"
   },
   "dependencies": {
