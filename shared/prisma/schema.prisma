@@ -260,7 +260,7 @@ model User {
   createdAt     DateTime
   updatedAt     DateTime
   admin         Admin?
-  Account       Account[]
+  Account       Account[] 
   Session       Session[]
   educator      Educator?
   employee      Employee?
