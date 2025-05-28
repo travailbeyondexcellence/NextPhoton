@@ -1,11 +1,15 @@
 // tsconfig.base.json
 {
   "compilerOptions": {
+    "paths": {
+      "@shared/*": ["shared/*"]
+    },
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
   }
 }
