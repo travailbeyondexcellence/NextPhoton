@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
   output   = "C:/Users/zen/Zen Education/NextPhoton/node_modules/.prisma/client"
@@ -9,90 +10,90 @@ datasource db {
 }
 
 model Admin {
-  id       String         @id
-  username String         @unique
-  user     User @relation(fields: [id], references: [id], onDelete: Cascade)
+  id       String @id
+  username String @unique
+  user     User   @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Employee {
-  id        String         @id
-  username  String         @unique
+  id        String   @id
+  username  String   @unique
   name      String
   surname   String
-  email     String?        @unique
-  phone     String?        @unique
+  email     String?  @unique
+  phone     String?  @unique
   address   String
   img       String?
-  createdAt DateTime       @default(now())
-  user      User @relation(fields: [id], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Intern {
-  id        String         @id
-  username  String         @unique
+  id        String   @id
+  username  String   @unique
   name      String
   surname   String
-  email     String?        @unique
-  phone     String?        @unique
+  email     String?  @unique
+  phone     String?  @unique
   address   String
   img       String?
-  createdAt DateTime       @default(now())
-  user      User @relation(fields: [id], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
 model Educator {
-  id        String         @id
-  username  String         @unique
+  id        String    @id
+  username  String    @unique
   name      String
   surname   String
-  email     String?        @unique
-  phone     String?        @unique
+  email     String?   @unique
+  phone     String?   @unique
   address   String
   img       String?
   bloodType String
   sex       UserSex
-  createdAt DateTime       @default(now())
+  createdAt DateTime  @default(now())
   birthday  DateTime
   classes   Class[]
-  user      User @relation(fields: [id], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [id], references: [id], onDelete: Cascade)
   lessons   Lesson[]
-  subjects  Subject[]      @relation("EducatorToSubject")
+  subjects  Subject[] @relation("EducatorToSubject")
 }
 
 model Learner {
-  id          String         @id
-  username    String         @unique
+  id          String       @id
+  username    String       @unique
   name        String
   surname     String
-  email       String?        @unique
-  phone       String?        @unique
+  email       String?      @unique
+  phone       String?      @unique
   address     String
   img         String?
   bloodType   String
   sex         UserSex
-  createdAt   DateTime       @default(now())
+  createdAt   DateTime     @default(now())
   guardianId  String
   classId     Int
   gradeId     Int
   birthday    DateTime
   attendances Attendance[]
-  class       Class          @relation(fields: [classId], references: [id])
-  grade       Grade          @relation(fields: [gradeId], references: [id])
-  guardian    Guardian       @relation(fields: [guardianId], references: [id])
-  user        User @relation(fields: [id], references: [id], onDelete: Cascade)
+  class       Class        @relation(fields: [classId], references: [id])
+  grade       Grade        @relation(fields: [gradeId], references: [id])
+  guardian    Guardian     @relation(fields: [guardianId], references: [id])
+  user        User         @relation(fields: [id], references: [id], onDelete: Cascade)
   results     Result[]
 }
 
 model Guardian {
-  id        String         @id
-  username  String         @unique
+  id        String    @id
+  username  String    @unique
   name      String
   surname   String
-  email     String?        @unique
-  phone     String         @unique
+  email     String?   @unique
+  phone     String    @unique
   address   String
-  createdAt DateTime       @default(now())
-  user      User @relation(fields: [id], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [id], references: [id], onDelete: Cascade)
   learners  Learner[]
 }
 
@@ -202,7 +203,7 @@ model Announcement {
 }
 
 model Account {
-  id                String         @id
+  id                String  @id
   userId            String
   type              String
   provider          String
@@ -214,37 +215,62 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  User    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
 
   @@unique([provider, providerAccountId])
+  @@map("account")
 }
 
 model Session {
-  id             String         @id
-  sessionToken   String         @unique
-  userId         String
-  expires        DateTime
-  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt    DateTime
+  token        String
+  createdAt    DateTime
+  updatedAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+
+  @@unique([token])
+  @@map("session")
 }
 
 model User {
-  id                String              @id
-  name              String?
-  email             String?             @unique
-  emailVerified     Boolean?            @default(false)        
-  image             String?
-  password          String?
-  role              UserRole            @default(USER)
-  createdAt         DateTime            
-  updatedAt         DateTime            
-  admin             Admin?
-  Account Account[]
-  Session Session[]
-  educator          Educator?
-  employee          Employee?
-  guardian          Guardian?
-  intern            Intern?
-  learner           Learner?
+  id            String    @id
+  name          String?
+  email         String?   @unique
+  emailVerified Boolean?  @default(false)
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime
+  updatedAt     DateTime
+  admin         Admin?
+  Account       Account[]
+  Session       Session[]
+  educator      Educator?
+  employee      Employee?
+  guardian      Guardian?
+  intern        Intern?
+  learner       Learner?
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
 }
 
 model VerificationToken {
@@ -276,4 +302,15 @@ enum UserRole {
   LEARNER
   GUARDIAN
   USER
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
 }
