@@ -36,9 +36,6 @@ console.log("🔍 Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
 // npx ts-node src/lib/test-prisma.ts
 
-
-
-
 async function main() {
     const users = await prisma.user.findMany(); // ✅ model name in camelCase
 
