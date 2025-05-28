@@ -1,18 +1,15 @@
+// shared/db.ts
 import { PrismaClient } from '@prisma/client';
 
 declare global {
-  // Avoid re-declaring in hot reload
-  // eslint-disable-next-line no-var
-  var prisma: PrismaClient | undefined;
+  // Augment the global object only once
+  var _prisma: PrismaClient | undefined;
 }
 
-// Use a singleton pattern in dev to avoid exhausting DB connections on reloads
-export const prisma =
-  global.prisma ??
-  new PrismaClient({
-    log: ['error', 'warn'],
-  });
+const prisma = global._prisma ?? new PrismaClient({ log: ['error', 'warn'] });
 
 if (process.env.NODE_ENV !== 'production') {
-  global.prisma = prisma;
+  global._prisma = prisma;
 }
+
+export default prisma;

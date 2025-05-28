@@ -9,6 +9,11 @@
 
 const path = require('path');
 const dotenv = require('dotenv');
+// const { PrismaClient } = require('@prisma/client');
+// const prisma = new PrismaClient();
+// import { prisma } from '../../../shared/db';
+const sharedDb = require('../../../shared/db');
+const prisma = sharedDb.prisma;
 
 const dotenvPath = path.resolve(__dirname, '../../../.env');
 
@@ -21,16 +26,13 @@ console.log("📂 Current Working Directory:", process.cwd());
 console.log("📄 Loading .env from:", dotenvPath);
 console.log("🔍 Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
-
-const { PrismaClient } = require('@prisma/client');
-
 // npx ts-node src/lib/test-prisma.ts
-console.log("🔍 Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
-const prisma = new PrismaClient();
+
+
 
 async function main() {
-    const users = await prisma.betterAuthUser.findMany(); // ✅ model name in camelCase
+    const users = await prisma.user.findMany(); // ✅ model name in camelCase
 
     console.log("✅ Users fetched from Neon DB:");
     console.log(users);
