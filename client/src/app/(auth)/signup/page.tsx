@@ -27,6 +27,7 @@ export default function SignUp() {
             name: "",
             email: "",
             password: "",
+            emailVerified: null,
         },
     })
 
@@ -36,6 +37,7 @@ export default function SignUp() {
             email,
             password,
             name,
+            
             callbackURL: "/signin",
         }, {
             onRequest: () => {
@@ -43,8 +45,12 @@ export default function SignUp() {
                     title: "Please wait...",
                 })
             },
-            onSuccess: () => {
+            onSuccess: async () => {
                 form.reset()
+                let createdUser = await prisma.user.update({
+                    where: { email },
+                    data: { emailVerified: new Date() }
+                  });
             },
             onError: (ctx) => {
                 toast({ title: ctx.error.message, variant: 'destructive' });

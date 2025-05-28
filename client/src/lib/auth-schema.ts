@@ -15,7 +15,9 @@ export const formSchema = z.object({
     password: z
         .string()
         .min(8, { message: "Password must be at least 8 characters long" })
-        .max(50, { message: "Password cannot exceed 50 characters" })
+        .max(50, { message: "Password cannot exceed 50 characters" }),
+    
+    emailVerified : z.any().optional(),
 });
 
 export const signInFormSchema = formSchema.pick({

@@ -1,7 +1,7 @@
 {
   "name": "next-photon-Zen-EduCare-Management-System",
   "private": true,
-  "packageManager": "pnpm@8.15.4",
+  "packageManager": "npm@11.3.0",
   "workspaces": [
     "client",
     "server",
@@ -9,13 +9,18 @@
   ],
   "scripts": {
     "start:all": "turbo run dev --filter=client... --filter=server... --parallel --output-logs=full",
-    "build": "turbo run build"
+    "build": "turbo run build",
+    "prisma:push": "npx prisma db push --schema=shared/prisma/schema.prisma && npx prisma generate --schema=shared/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --name your_change_name --schema=shared/prisma/schema.prisma",
+    "prisma:deployprod": "npx prisma migrate deploy --schema=shared/prisma/schema.prisma"
   },
   "devDependencies": {
     "turbo": "*"
   },
   "dependencies": {
+    "@prisma/client": "^6.8.2",
     "dotenv": "^16.5.0",
+    "prisma": "^6.8.2",
     "react-hook-form": "^7.56.3",
     "simplebar-react": "^3.3.1",
     "zod": "^3.24.4"

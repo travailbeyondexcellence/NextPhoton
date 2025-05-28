@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate": "prisma generate --schema=../shared/prisma/schema.prisma"
+    "generate": "prisma generate --schema=../shared/prisma/schema.prisma",
+    "prisma:studio": "npx prisma studio  --schema=../shared/prisma/schema.prisma"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
