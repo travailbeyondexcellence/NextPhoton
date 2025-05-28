@@ -56,3 +56,15 @@ main()
 
 
 
+// Successful running of the command looks like:
+
+// zen @ZenVerse MINGW64 ~/Zen Education/NextPhoton / client(dev)
+// $ npx tsx src / lib / test - prisma.ts
+// 📂 Current Working Directory: C: \Users\zen\Zen Education\NextPhoton\client
+// 📄 Loading.env from: C: \Users\zen\Zen Education\NextPhoton\.env
+// 🔍 Loaded DATABASE_URL: postgresql://neondb_owner:npg_1gMUbdQyB3Ol@ep-steep-king-a13wqaa8-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+// ✅ Users fetched from Neon DB:
+// []
+
+
+
