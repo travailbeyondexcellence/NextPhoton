@@ -47,10 +47,6 @@ export default function SignUp() {
             },
             onSuccess: async () => {
                 form.reset()
-                let createdUser = await prisma.user.update({
-                    where: { email },
-                    data: { emailVerified: new Date() }
-                  });
             },
             onError: (ctx) => {
                 toast({ title: ctx.error.message, variant: 'destructive' });
