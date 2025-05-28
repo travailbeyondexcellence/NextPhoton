@@ -1,5 +1,10 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+//  npx @better-auth/cli generate --config=./prisma/auth.ts 
+// run the above comand from inside the shared folder to generate the schema files that are needed for betterAuth to work with Prisma.
+
+
+
 // If your Prisma file is located elsewhere, you can change the path
 // import { PrismaClient } from "../../../shared/db/index";
 

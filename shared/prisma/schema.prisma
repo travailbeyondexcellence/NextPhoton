@@ -267,8 +267,8 @@ model User {
   guardian      Guardian?
   intern        Intern?
   learner       Learner?
-  sessions      Session[]
-  accounts      Account[]
+
+
 
   @@map("user")
 }
