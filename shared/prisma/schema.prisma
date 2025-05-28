@@ -202,7 +202,7 @@ model Announcement {
 }
 
 model BetterAuthAccount {
-  id                String         @id @default(cuid())
+  id                String         @id
   userId            String
   type              String
   provider          String
@@ -214,35 +214,35 @@ model BetterAuthAccount {
   scope             String?
   id_token          String?
   session_state     String?
-  user              BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  BetterAuthUser    BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
 model BetterAuthSession {
-  id           String         @id @default(cuid())
-  sessionToken String         @unique
-  userId       String
-  expires      DateTime
-  user         BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             String         @id
+  sessionToken   String         @unique
+  userId         String
+  expires        DateTime
+  BetterAuthUser BetterAuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model BetterAuthUser {
-  id            String              @id @default(cuid())
-  name          String?
-  email         String?             @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole            @default(USER)
-  admin         Admin?
-  accounts      BetterAuthAccount[]
-  sessions      BetterAuthSession[]
-  educator      Educator?
-  employee      Employee?
-  guardian      Guardian?
-  intern        Intern?
-  learner       Learner?
+  id                String              @id
+  name              String?
+  email             String?             @unique
+  emailVerified     DateTime?
+  image             String?
+  password          String?
+  role              UserRole            @default(USER)
+  admin             Admin?
+  BetterAuthAccount BetterAuthAccount[]
+  BetterAuthSession BetterAuthSession[]
+  educator          Educator?
+  employee          Employee?
+  guardian          Guardian?
+  intern            Intern?
+  learner           Learner?
 }
 
 model BetterAuthVerificationToken {

@@ -36,7 +36,7 @@ export default function SignUp() {
             email,
             password,
             name,
-            callbackURL: "/sign-in",
+            callbackURL: "/signin",
         }, {
             onRequest: () => {
                 toast({

@@ -93,14 +93,24 @@ const prisma = new PrismaClient();
 
 To apply schema changes to Neon DB:
 
-```bash
+```
 npx prisma migrate deploy --schema=../shared/prisma/schema.prisma
+```
+
+```
+npx prisma migrate deploy --schema=../shared/prisma/schema.prisma
+// if running frrom the project root
 ```
 
 Or create a new one:
 
 ```bash
 npx prisma migrate dev --schema=../shared/prisma/schema.prisma
+```
+
+```
+npx prisma generate --schema=shared/prisma/schema.prisma
+// if running frrom the project root
 ```
 
 ---
