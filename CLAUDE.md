@@ -68,3 +68,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Prisma schema changes require running `npm run prisma:push` from root
 - Both client and server can be started simultaneously with `npm run start:all`
 - The project uses strict TypeScript enforcement across all packages
+
+### Git & Github Workflow Notes
+- And the primary developer himself works with various different repositories simultaneously, so it is always very important to git pull before making any changes, and it is always very important to run git pull before even analyzing the tasks that are about to be performed. 
+- Do create a separate branch for the changes that Claude is making. The name of the branch should start from /feature/Claude/[descriptive-name-about-the-feature], if its a bugfix branch, it should be /bigfix/Claude/[descriptiven-ame-about-the-bugfix] and so on
