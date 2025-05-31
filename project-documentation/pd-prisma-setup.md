@@ -24,7 +24,12 @@ NextPhoton/
 NextPhoton/
 ├── shared/
 │   ├── prisma/
-│   │   └── schema.prisma          # ✅ Single schema source
+│   │   ├── schema.prisma          # ✅ Main schema (generator & datasource only)
+│   │   └── schemas/               # ✅ Multi-file schema directory
+│   │       ├── auth.prisma        # ✅ Better-auth models
+│   │       ├── user-profiles.prisma # ✅ Role-specific profiles
+│   │       ├── roles-permissions.prisma # ✅ ABAC system
+│   │       └── ...other-domains.prisma # ✅ Domain-specific models
 │   └── db/
 │       ├── index.ts               # ✅ Centralized client
 │       └── test-connection.ts     # ✅ Validation tests
@@ -39,7 +44,8 @@ NextPhoton/
 ## 📁 File Structure & Responsibilities
 
 ### **Shared Folder (`shared/`)**
-- **`shared/prisma/schema.prisma`** - Single Prisma schema definition
+- **`shared/prisma/schema.prisma`** - Main schema file (generator & datasource only)
+- **`shared/prisma/schemas/`** - Multi-file schema directory containing domain models
 - **`shared/db/index.ts`** - Centralized Prisma client with singleton pattern
 - **`shared/db/test-connection.ts`** - Database connection validation tests
 
@@ -55,7 +61,50 @@ NextPhoton/
 
 ## 🔧 Implementation Details
 
-### **1. Centralized Prisma Client (`shared/db/index.ts`)**
+### **1. Multi-File Schema Organization**
+
+NextPhoton uses Prisma's multi-file schema feature (GA since v6.7.0) to organize models by domain:
+
+**Main Schema File (`shared/prisma/schema.prisma`):**
+```prisma
+// Main Prisma Schema File
+// Contains only generator and datasource configuration
+// All models are in separate files in schemas/ directory
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models organized in schemas/ directory:
+// - auth.prisma - Better-auth models
+// - user-profiles.prisma - Role-specific profiles
+// - roles-permissions.prisma - ABAC system
+// ... other domain files
+```
+
+**Domain-Specific Model Files (`shared/prisma/schemas/`):**
+- `auth.prisma` - User, Session, Account, Verification (Better-auth)
+- `user-profiles.prisma` - LearnerProfile, GuardianProfile, EducatorProfile, etc.
+- `roles-permissions.prisma` - Role, Permission, UserRole, UserPermission
+- `academic-system.prisma` - Curriculum, Subject, Topic, Exam models
+- `session-management.prisma` - LearningSession, SessionBooking models
+- `financial-system.prisma` - Payment, Invoice, RateProposal models
+- `communication.prisma` - Message, Notification, Announcement models
+- `analytics-reporting.prisma` - Analytics and reporting models
+
+**Key Benefits:**
+- ✅ **Domain Separation**: Models grouped by business domain
+- ✅ **Reduced Merge Conflicts**: Teams can work on different domains
+- ✅ **Better Organization**: Clear file naming and structure
+- ✅ **Automatic Combining**: Prisma handles file combination automatically
+
+### **2. Centralized Prisma Client (`shared/db/index.ts`)**
 
 ```typescript
 import { PrismaClient } from '@prisma/client';
@@ -190,20 +239,22 @@ npx tsx shared/db/test-connection.ts
 
 ## 📦 Package.json Scripts
 
-Essential scripts for Prisma management:
+Essential scripts for multi-file Prisma schema management:
 
 ```json
 {
   "scripts": {
-    "prisma:generate": "npx prisma generate --schema=shared/prisma/schema.prisma",
-    "prisma:push": "npx prisma db push --schema=shared/prisma/schema.prisma && npx prisma generate --schema=shared/prisma/schema.prisma",
-    "prisma:migrate": "npx prisma migrate dev --name your_change_name --schema=shared/prisma/schema.prisma",
-    "prisma:studio": "npx prisma studio --schema=shared/prisma/schema.prisma",
+    "prisma:generate": "npx prisma generate --schema=shared/prisma",
+    "prisma:push": "npx prisma db push --schema=shared/prisma && npx prisma generate --schema=shared/prisma",
+    "prisma:migrate": "npx prisma migrate dev --name your_change_name --schema=shared/prisma",
+    "prisma:studio": "npx prisma studio --schema=shared/prisma",
     "test:db": "npx tsx shared/db/test-connection.ts",
     "test:prisma": "npm run test:db"
   }
 }
 ```
+
+**⚠️ Important:** Note that `--schema` points to the **directory** (`shared/prisma`) not the file (`shared/prisma/schema.prisma`). This is required for multi-file schema support.
 
 ## 🚨 Common Issues & Solutions
 
@@ -236,18 +287,38 @@ npm run prisma:generate
 
 ### **Issue 4: Schema Changes Not Reflected**
 
-**Cause**: Client not regenerated after schema changes
+**Cause**: Client not regenerated after schema changes or using wrong schema path
 
 **Solution**:
 ```bash
+# Ensure using directory path, not file path
 npm run prisma:push  # Push schema + regenerate client
+
+# Verify multi-file schema is working
+npm run test:db
+```
+
+### **Issue 5: Multi-File Schema Not Working**
+
+**Cause**: Using file path instead of directory path in commands
+
+**Solution**:
+```bash
+# ✅ CORRECT: Use directory path
+--schema=shared/prisma
+
+# ❌ WRONG: Don't use file path
+--schema=shared/prisma/schema.prisma
 ```
 
 ## 🔄 Development Workflow
 
 ### **1. Making Schema Changes**
 ```bash
-# 1. Edit shared/prisma/schema.prisma
+# 1. Edit appropriate file in shared/prisma/schemas/
+#    - auth.prisma for user/session models
+#    - user-profiles.prisma for role profiles
+#    - etc.
 # 2. Push changes to database
 npm run prisma:push
 
@@ -260,10 +331,12 @@ cd server && npm run start:dev
 
 ### **2. Adding New Models**
 ```bash
-# 1. Add model to shared/prisma/schema.prisma
+# 1. Choose appropriate schema file in shared/prisma/schemas/
+#    - Create new domain file if needed (e.g., payments.prisma)
+#    - Add model to existing domain file if applicable
 # 2. Update shared/db/test-connection.ts to test new model
-# 3. Regenerate client
-npm run prisma:generate
+# 3. Push schema changes and regenerate client
+npm run prisma:push
 
 # 4. Add model exposure in server/src/prisma/prisma.service.ts
 # 5. Test new model access
@@ -306,14 +379,18 @@ npm run build
 ### **✅ DO**
 - Import Prisma client from `shared/db/index`
 - Use provided test utilities for validation
-- Follow centralized schema management
+- Follow multi-file schema organization by domain
+- Edit models in appropriate `schemas/` files
+- Use directory path (`shared/prisma`) in commands
 - Update shared test file when adding models
 - Use npm scripts for Prisma operations
 
 ### **❌ DON'T**
 - Create separate Prisma clients in client/server
 - Generate multiple Prisma clients
-- Duplicate schema files
+- Copy models between schema files
+- Put all models in main schema.prisma file
+- Use file path instead of directory path in commands
 - Skip connection testing after changes
 - Use different Prisma versions across services
 
@@ -321,10 +398,12 @@ npm run build
 
 NextPhoton's centralized Prisma architecture ensures:
 
-1. **Single Source of Truth**: One schema, one client, consistent access
-2. **Proper Testing**: Comprehensive validation utilities
-3. **Type Safety**: Shared types across entire application
-4. **Performance**: Efficient connection pooling and memory usage
-5. **Maintainability**: Simplified schema evolution and debugging
+1. **Single Source of Truth**: One client, consistent access across services
+2. **Multi-File Organization**: Domain-separated models for better maintainability
+3. **Proper Testing**: Comprehensive validation utilities
+4. **Type Safety**: Shared types across entire application
+5. **Performance**: Efficient connection pooling and memory usage
+6. **Team Collaboration**: Reduced merge conflicts with domain separation
+7. **Maintainability**: Simplified schema evolution and debugging
 
 This approach prevents the common monorepo pitfall of multiple Prisma instances and ensures robust, scalable database access across all NextPhoton services.
