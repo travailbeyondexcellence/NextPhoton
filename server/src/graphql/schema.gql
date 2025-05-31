@@ -24,8 +24,8 @@ type UserOutput {
   """Whether the user account is active"""
   isActive: Boolean!
 
-  """Timestamp when email was verified"""
-  emailVerified: Date
+  """Whether the user email has been verified"""
+  emailVerified: Boolean!
 }
 
 type PaginationInfo {

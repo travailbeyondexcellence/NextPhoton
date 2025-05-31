@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import type { PrismaClient as PrismaClientType } from '@prisma/client';
-import dotenv from 'dotenv';
-import path from 'path';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 /**
  * Centralized Prisma Client for NextPhoton
  * 
