@@ -2,8 +2,6 @@ import { PrismaClient } from '@prisma/client';
 import type { PrismaClient as PrismaClientType } from '@prisma/client';
 import dotenv from 'dotenv';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
 /**
  * Centralized Prisma Client for NextPhoton
  * 
@@ -17,11 +15,8 @@ import { fileURLToPath } from 'url';
  * - Proper connection management
  */
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables from root .env file
-const dotenvPath = path.resolve(__dirname, '../../.env');
+// Load environment variables from root .env file  
+const dotenvPath = path.resolve(process.cwd(), '.env');
 dotenv.config({ path: dotenvPath });
 
 // Global type augmentation for singleton pattern

@@ -34,6 +34,6 @@ export class UserOutput {
   @Field({ description: 'Whether the user account is active' })
   isActive!: boolean;
 
-  @Field({ nullable: true, description: 'Timestamp when email was verified' })
-  emailVerified?: Date;
+  @Field({ description: 'Whether the user email has been verified' })
+  emailVerified!: boolean;
 }
