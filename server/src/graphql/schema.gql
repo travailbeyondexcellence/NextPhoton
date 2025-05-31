@@ -1,0 +1,107 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserOutput {
+  """Unique identifier for the user"""
+  id: ID!
+
+  """User email address"""
+  email: String!
+
+  """Display name for the user"""
+  name: String!
+
+  """User profile image URL"""
+  image: String
+
+  """Timestamp when user account was created"""
+  createdAt: Date!
+
+  """Timestamp when user account was last updated"""
+  updatedAt: Date!
+
+  """Whether the user account is active"""
+  isActive: Boolean!
+
+  """Timestamp when email was verified"""
+  emailVerified: Date
+}
+
+type PaginationInfo {
+  """Total number of items available"""
+  totalCount: Int!
+
+  """Number of items in current page"""
+  currentCount: Int!
+
+  """Whether there are more items available"""
+  hasNextPage: Boolean!
+
+  """Whether there are previous items available"""
+  hasPreviousPage: Boolean!
+
+  """Cursor for next page"""
+  nextCursor: String
+
+  """Cursor for previous page"""
+  previousCursor: String
+}
+
+type UsersResponse {
+  """List of users in current page"""
+  users: [UserOutput!]!
+
+  """Pagination metadata"""
+  pagination: PaginationInfo!
+}
+
+"""Date custom scalar type (ISO 8601 format)"""
+scalar Date
+
+type Query {
+  """Get current authenticated user profile"""
+  me: UserOutput!
+
+  """Get user by ID"""
+  user(id: String!): UserOutput
+
+  """Get paginated list of users"""
+  users(pagination: PaginationInput): UsersResponse!
+}
+
+input PaginationInput {
+  """Number of items to return (max 100)"""
+  limit: Int = 10
+
+  """Number of items to skip"""
+  offset: Int = 0
+
+  """Cursor for pagination (base64 encoded)"""
+  cursor: String
+
+  """Sort field name"""
+  sortBy: String
+
+  """Sort direction (asc or desc)"""
+  sortOrder: String = "asc"
+}
+
+type Mutation {
+  """Create a new user account"""
+  createUser(input: CreateUserInput!): UserOutput!
+}
+
+input CreateUserInput {
+  """User email address"""
+  email: String!
+
+  """User password (minimum 8 characters)"""
+  password: String!
+
+  """Display name for the user"""
+  name: String!
+
+  """User profile image URL"""
+  image: String
+}

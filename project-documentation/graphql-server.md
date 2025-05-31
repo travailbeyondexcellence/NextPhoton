@@ -1,4 +1,5 @@
-GraphQL Server Implementation Strategy for NextPhoton
+
+
 
   Based on my analysis of the current NestJS server structure and project documentation, here's the
   comprehensive strategy for implementing GraphQL:
