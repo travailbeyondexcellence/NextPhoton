@@ -213,6 +213,10 @@ model SessionFeedback {
   providedBy    String // learner, educator, guardian, ecm
   providerId    String // ID of the provider
   
+  // Relations to providers (optional - based on providedBy type)
+  educatorId    String?
+  educator      EducatorProfile? @relation(fields: [educatorId], references: [id])
+  
   // Ratings (1-5 scale)
   overallRating    Int?
   contentRating    Int?
