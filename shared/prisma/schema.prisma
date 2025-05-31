@@ -1,4 +1,8 @@
 
+// Main Prisma Schema File
+// This file contains only the generator and datasource configuration
+// All models are organized in separate files in the schemas/ directory
+
 generator client {
   provider = "prisma-client-js"
   output   = "../../node_modules/.prisma/client"
@@ -9,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// All models are now organized in separate schema files:
+// Models are organized in separate schema files:
 // - schemas/auth.prisma - Better-auth models (User, Session, Account, Verification)
 // - schemas/roles-permissions.prisma - ABAC system (Role, Permission, UserRole, etc.)
 // - schemas/user-profiles.prisma - All role-specific profiles

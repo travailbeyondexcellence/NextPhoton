@@ -407,3 +407,4 @@ NextPhoton's centralized Prisma architecture ensures:
 7. **Maintainability**: Simplified schema evolution and debugging
 
 This approach prevents the common monorepo pitfall of multiple Prisma instances and ensures robust, scalable database access across all NextPhoton services.
+
