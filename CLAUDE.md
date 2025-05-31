@@ -90,6 +90,10 @@ NextPhoton is an "Uber for Educators" platform focused on **micromanagement and 
 - Both client and server can be started simultaneously with `npm run start:all`
 - The project uses strict TypeScript enforcement across all packages
 
+### Elaborate Commenting
+- Write code with alaborate comments as and when possible
+- Future developers as well as AI Agents rely heavily on the comments you are writing, hence be very delberate, explicit and clear in commenting
+
 ### Git & Github Workflow Notes
 - And the primary developer himself works with various different repositories simultaneously, so it is always very important to git pull before making any changes, and it is always very important to run git pull before even analyzing the tasks that are about to be performed. 
 - Do create a separate branch for the changes that Claude is making. The name of the branch should start from /feature/Claude/[descriptive-name-about-the-feature], if its a bugfix branch, it should be /bigfix/Claude/[descriptiven-ame-about-the-bugfix] and so on
