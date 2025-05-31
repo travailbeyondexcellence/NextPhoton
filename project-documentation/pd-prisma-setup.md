@@ -104,6 +104,221 @@ datasource db {
 - ✅ **Better Organization**: Clear file naming and structure
 - ✅ **Automatic Combining**: Prisma handles file combination automatically
 
+## 🚀 Setting Up Multi-File Schema Structure
+
+### **Step-by-Step Setup Process**
+
+**1. Create the Directory Structure:**
+```bash
+# From NextPhoton root directory
+mkdir -p shared/prisma/schemas
+```
+
+**2. Prepare Main Schema File:**
+Create `shared/prisma/schema.prisma` with ONLY configuration:
+```prisma
+// Main Prisma Schema File
+// Contains only generator and datasource configuration
+// All models are in separate files in schemas/ directory
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models organized in schemas/ directory:
+// - auth.prisma - Better-auth models
+// - user-profiles.prisma - Role-specific profiles
+// - roles-permissions.prisma - ABAC system
+// ... other domain files
+```
+
+**3. Create Domain-Specific Schema Files:**
+In `shared/prisma/schemas/` directory, create:
+
+**`auth.prisma`** (Better-auth models):
+```prisma
+// Better-Auth Models
+// Authentication and session management for NextPhoton
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+// ... other auth models
+```
+
+**`user-profiles.prisma`** (Role-specific profiles):
+```prisma
+// User Profile Models
+// Role-specific user profiles for NextPhoton
+
+model LearnerProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation("UserLearner", fields: [userId], references: [id])
+  
+  // Learner-specific fields
+  grade            String?
+  subjects         String[]
+  learningGoals    String?
+  
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  isActive         Boolean   @default(true)
+
+  @@map("learner_profile")
+}
+
+// ... other profile models
+```
+
+**4. Update Package.json Scripts:**
+Ensure all scripts use directory path:
+```json
+{
+  "scripts": {
+    "prisma:generate": "npx prisma generate --schema=shared/prisma",
+    "prisma:push": "npx prisma db push --schema=shared/prisma && npx prisma generate --schema=shared/prisma",
+    "prisma:migrate": "npx prisma migrate dev --name your_change_name --schema=shared/prisma",
+    "prisma:studio": "npx prisma studio --schema=shared/prisma"
+  }
+}
+```
+
+**5. Generate and Test:**
+```bash
+# Generate Prisma client from multi-file schema
+npm run prisma:push
+
+# Test the setup
+npm run test:db
+```
+
+### **Migration from Single File to Multi-File**
+
+If migrating from a single `schema.prisma` file:
+
+**1. Backup Current Schema:**
+```bash
+cp shared/prisma/schema.prisma shared/prisma/schema.prisma.backup
+```
+
+**2. Extract Models by Domain:**
+- Move User, Session, Account, Verification → `schemas/auth.prisma`
+- Move profile models → `schemas/user-profiles.prisma`
+- Move role/permission models → `schemas/roles-permissions.prisma`
+- etc.
+
+**3. Update Main Schema:**
+Remove all model definitions, keep only generator and datasource blocks
+
+**4. Update Scripts:**
+Change all `--schema=shared/prisma/schema.prisma` to `--schema=shared/prisma`
+
+**5. Test Migration:**
+```bash
+npm run prisma:push
+npm run test:db
+```
+
+### **Domain Organization Guidelines**
+
+**Recommended File Structure:**
+```
+shared/prisma/schemas/
+├── auth.prisma                    # Authentication & sessions
+├── user-profiles.prisma           # Role-specific profiles  
+├── roles-permissions.prisma       # ABAC system
+├── academic-system.prisma         # Curriculum, subjects, topics
+├── session-management.prisma      # Learning sessions, bookings
+├── monitoring-progress.prisma     # ECM tracking, progress
+├── financial-system.prisma        # Payments, invoicing, rates
+├── communication.prisma           # Messages, notifications
+└── analytics-reporting.prisma     # Analytics, reporting
+```
+
+**File Naming Conventions:**
+- Use kebab-case: `user-profiles.prisma` not `UserProfiles.prisma`
+- Be descriptive: `session-management.prisma` not `sessions.prisma`
+- Group related models: All payment-related models in `financial-system.prisma`
+
+### **Common Setup Mistakes to Avoid**
+
+❌ **Wrong Script Configuration:**
+```json
+"prisma:push": "npx prisma db push --schema=shared/prisma/schema.prisma"
+```
+
+✅ **Correct Script Configuration:**
+```json
+"prisma:push": "npx prisma db push --schema=shared/prisma"
+```
+
+❌ **Models in Main Schema:**
+```prisma
+// shared/prisma/schema.prisma
+generator client { ... }
+datasource db { ... }
+
+model User { ... }  // ❌ Don't put models here
+```
+
+✅ **Clean Main Schema:**
+```prisma
+// shared/prisma/schema.prisma
+generator client { ... }
+datasource db { ... }
+
+// Models are in schemas/ directory files
+```
+
+❌ **Importing/Referencing Other Files:**
+```prisma
+// ❌ Prisma doesn't support imports
+import { User } from './auth.prisma'
+```
+
+✅ **Direct Model Usage:**
+```prisma
+// ✅ Models are automatically available across files
+model LearnerProfile {
+  userId  String  @unique
+  user    User    @relation("UserLearner", fields: [userId], references: [id])
+}
+```
+
 ### **2. Centralized Prisma Client (`shared/db/index.ts`)**
 
 ```typescript
@@ -407,4 +622,32 @@ NextPhoton's centralized Prisma architecture ensures:
 7. **Maintainability**: Simplified schema evolution and debugging
 
 This approach prevents the common monorepo pitfall of multiple Prisma instances and ensures robust, scalable database access across all NextPhoton services.
+
+## 📚 Additional Resources
+
+### **Official Prisma Documentation**
+- [Multi-file Prisma Schema](https://www.prisma.io/docs/orm/prisma-schema/overview/location)
+- [Prisma Schema Location](https://www.prisma.io/docs/orm/prisma-schema/overview/location)
+- [Organizing Schema Files](https://www.prisma.io/blog/organize-your-prisma-schema-with-multi-file-support)
+
+### **NextPhoton-Specific Commands**
+```bash
+# Quick setup verification
+npm run test:db
+
+# Schema file validation
+npx prisma validate --schema=shared/prisma
+
+# Studio with multi-file schema
+npm run prisma:studio
+
+# Format all schema files
+npx prisma format --schema=shared/prisma
+```
+
+### **IDE Setup for Multi-File Schemas**
+For optimal development experience:
+1. Install [Prisma VS Code Extension](https://marketplace.visualstudio.com/items?itemName=Prisma.prisma) v5.15.0+
+2. Ensure workspace is opened at NextPhoton root for proper schema discovery
+3. Use "Go to Definition" to navigate between related models across files
 
