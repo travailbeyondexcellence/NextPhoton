@@ -10,10 +10,13 @@
   "scripts": {
     "start:all": "turbo run dev --filter=client... --filter=server... --parallel --output-logs=full",
     "build": "turbo run build",
+    "prisma:generate": "npx prisma generate --schema=shared/prisma/schema.prisma",
     "prisma:push": "npx prisma db push --schema=shared/prisma/schema.prisma && npx prisma generate --schema=shared/prisma/schema.prisma",
     "prisma:migrate": "npx prisma migrate dev --name your_change_name --schema=shared/prisma/schema.prisma",
     "prisma:deployprod": "npx prisma migrate deploy --schema=shared/prisma/schema.prisma",
-    "prisma:studio": "npx prisma studio  --schema=shared/prisma/schema.prisma"
+    "prisma:studio": "npx prisma studio  --schema=shared/prisma/schema.prisma",
+    "test:db": "npx tsx shared/db/test-connection.ts",
+    "test:prisma": "npm run test:db"
   },
   "devDependencies": {
     "@better-auth/cli": "^1.2.8",
