@@ -2,6 +2,27 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Project Context - REQUIRED READING
+
+**CRITICAL**: At the start of EVERY coding session, you MUST read these folders to understand the project:
+
+### Required Documentation Reading:
+1. **`project-documentation/`** - Complete project context including:
+   - `pd-overview.md` - Project vision and unique value proposition
+   - `pd-business-model.md` - Revenue strategy and market analysis
+   - `pd-roles-permissions.md` - ABAC system and role definitions
+   - `pd-technical-architecture.md` - Technical stack and system design
+   - `pd-workflows.md` - User journeys and operational processes
+   - `pd-analytics.md` - Business intelligence requirements
+   - `roadmap.md` - Feature prioritization
+
+2. **`project-brainstorming/`** - Schema design decisions including:
+   - `sample-schema.md` - Proposed Prisma schema with all models
+   - `schema-reasoning.md` - Architectural decision explanations
+
+### Project Summary:
+NextPhoton is an "Uber for Educators" platform focused on **micromanagement and outside-classroom monitoring** (80-90% focus) rather than content delivery like competitors. Key roles: Learner, Guardian, Educator, EduCare Manager (ECM), Employee, Intern, Admin.
+
 ## Development Commands
 
 ### Root-level commands (from `/root/ZenTech/NextPhoton/`):
