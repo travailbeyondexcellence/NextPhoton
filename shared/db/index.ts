@@ -4,50 +4,51 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+/**
+ * Centralized Prisma Client for NextPhoton
+ * 
+ * This is the single source of truth for database connections across
+ * the entire NextPhoton application (client, server, and any other services).
+ * 
+ * Features:
+ * - Singleton pattern to prevent multiple client instances
+ * - Automatic environment variable loading
+ * - Development-friendly logging
+ * - Proper connection management
+ */
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Load environment variables from root .env file
 const dotenvPath = path.resolve(__dirname, '../../.env');
 dotenv.config({ path: dotenvPath });
 
-
-
-// Function to test Prisma connection is working:
-
-
+// Global type augmentation for singleton pattern
 declare global {
-  // Augment the global object only once
   var _prisma: PrismaClientType | undefined;
 }
 
-const prisma = global._prisma ?? new PrismaClient({ log: ['error', 'warn'] });
+// Create singleton Prisma client instance
+const prisma = global._prisma ?? new PrismaClient({ 
+  log: ['error', 'warn'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
+  }
+});
 
+// In development, store client globally to prevent hot reload issues
 if (process.env.NODE_ENV !== 'production') {
   global._prisma = prisma;
 }
 
-
-
-
-console.log("📂 Current Working Directory:", process.cwd());
-console.log("📄 Loading .env from:", dotenvPath);
-console.log("🔍 Loaded DATABASE_URL:", process.env.DATABASE_URL);
-
-async function main() {
-  const users = await prisma.user.findMany(); // ✅ model name in camelCase
-
-  console.log("✅ Users fetched from Neon DB:");
-
-  if (users.length) { console.log("1st User:", users[0]); }
-
+// Log connection info for debugging (only in development)
+if (process.env.NODE_ENV !== 'production') {
+  console.log("📂 Shared DB Client - Working Directory:", process.cwd());
+  console.log("📄 Shared DB Client - Loading .env from:", dotenvPath);
+  console.log("🔍 Shared DB Client - DATABASE_URL configured:", !!process.env.DATABASE_URL);
 }
-
-main()
-  .catch((e) => {
-    console.error("❌ Prisma Error:", e);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
 
 export { prisma };
