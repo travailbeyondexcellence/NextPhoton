@@ -36,7 +36,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Key Technologies
 - **Database**: PostgreSQL with Prisma ORM
 - **Authentication**: Better-auth with Prisma adapter
-- **Frontend**: Next.js 15, Radix UI components, React Hook Form with Zod validation
+- **Frontend**: Next.js 15, Radix UI components, React Hook Form with Zod validation, ShadCN
 - **Backend**: NestJS framework
 - **Styling**: Tailwind CSS v4 with dark mode support
 - **State Management**: Zustand
