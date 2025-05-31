@@ -72,3 +72,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Git & Github Workflow Notes
 - And the primary developer himself works with various different repositories simultaneously, so it is always very important to git pull before making any changes, and it is always very important to run git pull before even analyzing the tasks that are about to be performed. 
 - Do create a separate branch for the changes that Claude is making. The name of the branch should start from /feature/Claude/[descriptive-name-about-the-feature], if its a bugfix branch, it should be /bigfix/Claude/[descriptiven-ame-about-the-bugfix] and so on
+- **IMPORTANT**: Never include "Co-authored by Claude" or Claude website links in commit messages. Write clean, simple commit messages without any Claude attribution or generated-by tags.
