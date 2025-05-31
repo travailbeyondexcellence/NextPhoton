@@ -62,10 +62,36 @@ NextPhoton is an "Uber for Educators" platform focused on **micromanagement and 
 - **Styling**: Tailwind CSS v4 with dark mode support
 - **State Management**: Zustand
 
-### Database Schema Location
-- Primary schema: `shared/prisma/schema.prisma`
-- Better-auth models: User, Session, Account, Verification tables
-- Database client generated to `node_modules/.prisma/client`
+### Database Schema Location & Prisma Architecture
+- **Primary schema**: `shared/prisma/schema.prisma` - Single source of truth
+- **Centralized client**: `shared/db/index.ts` - Singleton Prisma client for entire monorepo
+- **Better-auth models**: User, Session, Account, Verification tables
+- **Database client**: Generated to `node_modules/.prisma/client` from shared schema
+
+#### ✅ CORRECT Prisma Setup (NextPhoton Architecture):
+```
+shared/
+├── prisma/schema.prisma          # Single schema source
+└── db/
+    ├── index.ts                  # Centralized Prisma client
+    └── test-connection.ts        # Connection validation tests
+server/src/prisma/prisma.service.ts  # Imports from shared/db/index
+client/src/lib/prisma.ts          # Imports from shared/db/index (future)
+```
+
+#### ❌ WRONG Approach (Never Do This):
+```
+client/prisma/schema.prisma       # ❌ Separate schema
+server/prisma/schema.prisma       # ❌ Duplicate schema  
+client/lib/prisma.ts              # ❌ Separate client
+server/prisma.service.ts          # ❌ Separate client
+```
+
+#### Key Prisma Commands:
+- `npm run prisma:generate` - Generate client from shared schema
+- `npm run prisma:push` - Push schema + generate client
+- `npm run test:db` - Validate Prisma connection and setup
+- `npm run prisma:studio` - Open database management UI
 
 ### Multi-tenant Architecture
 - Application implements **ABAC (Attribute-Based Access Control)**
@@ -79,14 +105,18 @@ NextPhoton is an "Uber for Educators" platform focused on **micromanagement and 
 - Auth client utilities in `client/src/lib/auth-client.ts`
 
 ### Important File Locations
-- Prisma utilities: `shared/db/index.ts`
+- **Prisma client**: `shared/db/index.ts` - ALWAYS import from here
+- **Prisma service**: `server/src/prisma/prisma.service.ts` - NestJS wrapper
+- **Prisma tests**: `shared/db/test-connection.ts` - Connection validation
 - Auth schemas: `client/src/lib/auth-schema.ts`
 - Form validation: `client/src/lib/formValidationSchemas.ts`
 - Global state: `client/src/statestore/store.ts`
 
 ### Development Notes
 - Always use `npm` as package manager
+- **Prisma Architecture**: Use centralized client from `shared/db/index.ts` - NEVER create separate Prisma clients
 - Prisma schema changes require running `npm run prisma:push` from root
+- Test Prisma connection with `npm run test:db` after any schema changes
 - Both client and server can be started simultaneously with `npm run start:all`
 - The project uses strict TypeScript enforcement across all packages
 
