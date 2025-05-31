@@ -1,0 +1,269 @@
+// User Profile Models
+// Role-specific profile information for all NextPhoton user types
+
+model LearnerProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserLearner", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName       String
+  lastName        String
+  dateOfBirth     DateTime
+  phoneNumber     String?
+  emergencyContact String?
+  
+  // Educational Information
+  currentGrade    String?
+  school          String?
+  board           String? // CBSE, ICSE, State Board, etc.
+  subjects        String[] // Array of subjects
+  
+  // Learning Preferences
+  learningStyle   String? // visual, auditory, kinesthetic, etc.
+  preferredLanguage String @default("English")
+  
+  // Goals and Aspirations
+  academicGoals   String?
+  careerAspirations String?
+  targetExams     String[] // JEE, NEET, etc.
+  
+  // Guardian Information
+  guardianId      String?
+  guardian        GuardianProfile? @relation("LearnerGuardian", fields: [guardianId], references: [id])
+  
+  // Academic Records
+  academicRecords AcademicRecord[]
+  
+  // Sessions and Progress
+  learningSessions LearningSession[]
+  progressRecords  ProgressRecord[]
+  assignments      Assignment[]
+  assignmentSubmissions AssignmentSubmission[]
+  attendanceRecords AttendanceRecord[]
+  
+  // Academic and Assessment
+  learnerCurriculums LearnerCurriculum[]
+  assessmentSubmissions AssessmentSubmission[]
+  
+  // Monitoring and Goals
+  interventions    Intervention[]
+  progressReports  ProgressReport[]
+  milestones      Milestone[]
+  learningGoals   LearningGoal[]
+  
+  // Bookings
+  sessionBookings SessionBooking[]
+  
+  // ECM Assignment
+  assignedECMId   String?
+  assignedECM     ECMProfile? @relation("ECMLearners", fields: [assignedECMId], references: [id])
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("learner_profiles")
+}
+
+model GuardianProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserGuardian", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName     String
+  lastName      String
+  relationship  String // parent, grandparent, sibling, etc.
+  phoneNumber   String
+  address       String?
+  
+  // Professional Information
+  occupation    String?
+  organization  String?
+  
+  // Contact Preferences
+  preferredContactMethod String @default("email") // email, phone, sms, app
+  notificationSettings   Json?
+  
+  // Associated Learners
+  learners      LearnerProfile[] @relation("LearnerGuardian")
+  
+  // Payment Information
+  paymentMethods PaymentMethod[]
+  invoices       Invoice[]
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("guardian_profiles")
+}
+
+model EducatorProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserEducator", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  address       String?
+  dateOfBirth   DateTime?
+  
+  // Professional Information
+  qualifications String[] // Array of qualifications
+  specializations String[] // Subjects/areas of expertise
+  experience     Int?     // Years of experience
+  
+  // Verification Information
+  verificationStatus String @default("pending") // pending, verified, rejected
+  documentsUploaded  String[] // URLs to uploaded documents
+  backgroundCheck    String @default("pending") // pending, completed, failed
+  
+  // Teaching Information
+  teachingStyle      String?
+  languages          String[] // Languages they can teach in
+  availableTimings   Json?    // Availability schedule
+  hourlyRate         Decimal? // Proposed hourly rate
+  rateStatus         String @default("pending") // pending, approved, rejected
+  
+  // Platform Information
+  averageRating      Decimal? @default(0)
+  totalRatings       Int      @default(0)
+  totalSessionsHours Decimal? @default(0)
+  
+  // Sessions and Records
+  learningSessions   LearningSession[]
+  sessionFeedbacks   SessionFeedback[]
+  rateProposals      RateProposal[]
+  sessionBookings    SessionBooking[]
+  
+  isActive    Boolean  @default(true)
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("educator_profiles")
+}
+
+model ECMProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserECM", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  employeeId    String? @unique
+  
+  // Professional Information
+  department    String?
+  specialization String[] // Age groups, subjects, etc.
+  experience     Int?     // Years of experience in education
+  
+  // Workload Management
+  maxLearners    Int      @default(50) // Maximum learners they can manage
+  currentLoad    Int      @default(0)  // Current number of assigned learners
+  
+  // Performance Metrics
+  interventionSuccess Decimal? @default(0) // Success rate of interventions
+  avgResponseTime     Int?     @default(0) // Average response time in minutes
+  
+  // Assigned Learners
+  assignedLearners   LearnerProfile[] @relation("ECMLearners")
+  interventions      Intervention[]
+  progressReports    ProgressReport[]
+  
+  // Sessions managed
+  managedSessions    LearningSession[] @relation("ECMSessions")
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("ecm_profiles")
+}
+
+model EmployeeProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserEmployee", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  employeeId    String? @unique
+  
+  // Employment Information
+  department    String
+  position      String
+  joiningDate   DateTime
+  
+  // Contact Information
+  emergencyContact String?
+  address          String?
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("employee_profiles")
+}
+
+model InternProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserIntern", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  dateOfBirth   DateTime?
+  
+  // Internship Information
+  department    String
+  internshipType String // paid, unpaid, academic
+  startDate     DateTime
+  endDate       DateTime
+  stipend       Decimal?
+  
+  // Educational Background
+  institution   String?
+  course        String?
+  year          String?
+  
+  // Mentor Information
+  mentorId      String?
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("intern_profiles")
+}
+
+model AdminProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserAdmin", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  
+  // Admin Information
+  adminLevel    String @default("platform") // platform, organization, department
+  permissions   Json?  // Additional admin permissions
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("admin_profiles")
+}

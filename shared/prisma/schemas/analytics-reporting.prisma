@@ -1,0 +1,324 @@
+// Analytics & Reporting Models
+// Business intelligence, reporting, and analytics data
+
+model AnalyticsEvent {
+  id              String @id @default(cuid())
+  
+  // Event details
+  eventType       String // page_view, session_completed, assignment_submitted, etc.
+  eventCategory   String // user_engagement, academic_performance, financial, etc.
+  
+  // Event source
+  userId          String?
+  sessionId       String? // Browser/app session
+  
+  // Event data
+  properties      Json // Event-specific properties
+  
+  // Context
+  platform        String? // web, mobile, api
+  userAgent       String?
+  ipAddress       String?
+  
+  // Timing
+  timestamp       DateTime @default(now())
+  
+  // Processed status
+  isProcessed     Boolean @default(false)
+  processedAt     DateTime?
+  
+  @@map("analytics_events")
+}
+
+model DashboardMetric {
+  id              String @id @default(cuid())
+  
+  // Metric identification
+  metricName      String
+  metricType      String // counter, gauge, histogram, etc.
+  category        String // academic, financial, engagement, etc.
+  
+  // Metric value
+  value           Decimal
+  unit            String? // percentage, count, currency, etc.
+  
+  // Context
+  userId          String? // If metric is user-specific
+  organizationId  String? // If metric is organization-specific
+  
+  // Dimensions
+  dimensions      Json? // Additional metric dimensions
+  
+  // Time context
+  periodType      String // daily, weekly, monthly, quarterly, yearly
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Calculation
+  calculatedAt    DateTime @default(now())
+  calculationMethod String? // How this metric was calculated
+  
+  @@unique([metricName, periodType, periodStart, userId, organizationId])
+  @@map("dashboard_metrics")
+}
+
+model Report {
+  id              String @id @default(cuid())
+  
+  // Report details
+  name            String
+  type            String // academic_progress, financial_summary, engagement_report, etc.
+  description     String?
+  
+  // Report configuration
+  parameters      Json // Report parameters and filters
+  template        String? // Report template used
+  
+  // Generated report
+  reportData      Json // Generated report data
+  summary         Json? // Report summary/highlights
+  
+  // Scheduling
+  isScheduled     Boolean @default(false)
+  frequency       String? // daily, weekly, monthly, quarterly
+  nextRunAt       DateTime?
+  
+  // Recipients
+  recipients      String[] // User IDs who should receive this report
+  
+  // Status
+  status          String @default("completed") // pending, running, completed, failed
+  
+  // File export
+  exportFormat    String? // pdf, excel, csv
+  exportUrl       String? // URL to exported file
+  
+  // Generation details
+  generatedBy     String
+  generatedAt     DateTime @default(now())
+  
+  // Usage tracking
+  viewCount       Int @default(0)
+  lastViewedAt    DateTime?
+  
+  createdAt       DateTime @default(now())
+  
+  @@map("reports")
+}
+
+model LearningAnalytics {
+  id              String @id @default(cuid())
+  learnerId       String
+  
+  // Time period
+  periodType      String // daily, weekly, monthly
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Engagement metrics
+  totalStudyTime  Int @default(0) // in minutes
+  sessionsAttended Int @default(0)
+  assignmentsCompleted Int @default(0)
+  averageScore    Decimal @default(0)
+  
+  // Performance trends
+  progressRate    Decimal @default(0) // percentage improvement
+  consistencyScore Decimal @default(0) // consistency of performance
+  difficultyLevel  Decimal @default(0) // average difficulty of content
+  
+  // Behavioral patterns
+  preferredStudyTime String? // morning, afternoon, evening
+  averageSessionDuration Int? // in minutes
+  breakPattern    Json? // Break patterns during study
+  
+  // Subject-wise analytics
+  subjectPerformance Json // Subject-wise performance data
+  
+  // Comparative analytics
+  peerComparison  Json? // Comparison with peer group
+  previousPeriodComparison Json? // Comparison with previous period
+  
+  // Predictions
+  predictedPerformance Decimal? // Predicted performance for next period
+  riskFactors     String[] // Identified risk factors
+  recommendations String[] // AI-generated recommendations
+  
+  calculatedAt    DateTime @default(now())
+  
+  @@unique([learnerId, periodType, periodStart])
+  @@map("learning_analytics")
+}
+
+model EducatorAnalytics {
+  id              String @id @default(cuid())
+  educatorId      String
+  
+  // Time period
+  periodType      String // daily, weekly, monthly
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Teaching metrics
+  totalSessions   Int @default(0)
+  totalStudents   Int @default(0)
+  averageRating   Decimal @default(0)
+  completionRate  Decimal @default(0)
+  
+  // Performance metrics
+  studentImprovement Decimal @default(0) // Average student improvement
+  retentionRate   Decimal @default(0) // Student retention rate
+  punctualityScore Decimal @default(0) // Session punctuality
+  
+  // Financial metrics
+  totalEarnings   Decimal @default(0)
+  averageRate     Decimal @default(0)
+  utilizationRate Decimal @default(0) // Booking utilization
+  
+  // Subject-wise analytics
+  subjectDistribution Json // Distribution of sessions by subject
+  performanceBySubject Json // Performance metrics by subject
+  
+  // Student feedback analysis
+  feedbackSummary Json // Aggregated feedback analysis
+  improvementAreas String[] // Areas for improvement
+  
+  // Rankings and comparisons
+  platformRanking Int? // Ranking among all educators
+  categoryRanking Int? // Ranking in their subject category
+  
+  calculatedAt    DateTime @default(now())
+  
+  @@unique([educatorId, periodType, periodStart])
+  @@map("educator_analytics")
+}
+
+model BusinessAnalytics {
+  id              String @id @default(cuid())
+  
+  // Time period
+  periodType      String // daily, weekly, monthly, quarterly, yearly
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Revenue metrics
+  totalRevenue    Decimal @default(0)
+  recurringRevenue Decimal @default(0)
+  newRevenue      Decimal @default(0)
+  averageRevenuePer String // per user, per session, etc.
+  
+  // User metrics
+  totalUsers      Int @default(0)
+  newUsers        Int @default(0)
+  activeUsers     Int @default(0)
+  retentionRate   Decimal @default(0)
+  churnRate       Decimal @default(0)
+  
+  // Engagement metrics
+  totalSessions   Int @default(0)
+  averageSessionDuration Decimal @default(0)
+  completionRate  Decimal @default(0)
+  satisfactionScore Decimal @default(0)
+  
+  // Operational metrics
+  supportTickets  Int @default(0)
+  responseTime    Decimal @default(0) // Average response time
+  resolutionRate  Decimal @default(0)
+  
+  // Market metrics
+  acquisitionCost Decimal @default(0) // Customer acquisition cost
+  lifetimeValue   Decimal @default(0) // Customer lifetime value
+  conversionRate  Decimal @default(0)
+  
+  // Cost metrics
+  operationalCosts Decimal @default(0)
+  technologyCosts Decimal @default(0)
+  marketingCosts  Decimal @default(0)
+  
+  // Growth metrics
+  growthRate      Decimal @default(0)
+  marketShare     Decimal @default(0)
+  
+  calculatedAt    DateTime @default(now())
+  
+  @@unique([periodType, periodStart])
+  @@map("business_analytics")
+}
+
+model AlertRule {
+  id              String @id @default(cuid())
+  
+  // Rule identification
+  name            String
+  description     String?
+  category        String // performance, engagement, financial, etc.
+  
+  // Rule conditions
+  metricName      String // What metric to monitor
+  operator        String // greater_than, less_than, equals, etc.
+  threshold       Decimal // Threshold value
+  
+  // Context filters
+  filters         Json? // Additional filters for the rule
+  
+  // Alert configuration
+  severity        String // low, medium, high, critical
+  alertType       String // immediate, daily_digest, weekly_summary
+  
+  // Recipients
+  recipients      String[] // User IDs or roles to notify
+  
+  // Action configuration
+  autoActions     String[] // Actions to take automatically
+  escalationRules Json? // Escalation configuration
+  
+  // Status
+  isActive        Boolean @default(true)
+  
+  // Tracking
+  lastTriggered   DateTime?
+  triggerCount    Int @default(0)
+  
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("alert_rules")
+}
+
+model DataExport {
+  id              String @id @default(cuid())
+  
+  // Export details
+  name            String
+  type            String // user_data, analytics_data, financial_data, etc.
+  format          String // csv, json, excel, pdf
+  
+  // Export parameters
+  parameters      Json // Filters, date ranges, etc.
+  
+  // Data scope
+  dataTypes       String[] // Which data types to include
+  dateRange       Json // Start and end dates
+  
+  // Export status
+  status          String @default("pending") // pending, processing, completed, failed
+  
+  // File information
+  fileUrl         String? // URL to download the export
+  fileSize        Int? // File size in bytes
+  recordCount     Int? // Number of records exported
+  
+  // Processing
+  startedAt       DateTime?
+  completedAt     DateTime?
+  errorMessage    String? // Error message if failed
+  
+  // Expiry and cleanup
+  expiresAt       DateTime // When the export file expires
+  
+  // Requester
+  requestedBy     String
+  requestedAt     DateTime @default(now())
+  
+  @@map("data_exports")
+}

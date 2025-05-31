@@ -1,0 +1,325 @@
+// Financial System Models
+// Payments, invoicing, rate management, and financial transactions
+
+model PaymentMethod {
+  id              String @id @default(cuid())
+  guardianId      String
+  guardian        GuardianProfile @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  
+  // Payment method details
+  type            String // card, upi, bank_transfer, wallet, etc.
+  provider        String // razorpay, paytm, stripe, etc.
+  
+  // Method-specific data (encrypted)
+  methodData      Json   // Encrypted payment method details
+  
+  // Display information
+  displayName     String // Last 4 digits of card, UPI ID, etc.
+  
+  // Status
+  isActive        Boolean @default(true)
+  isDefault       Boolean @default(false)
+  isVerified      Boolean @default(false)
+  
+  // Usage tracking
+  lastUsedAt      DateTime?
+  usageCount      Int @default(0)
+  
+  // Related transactions
+  transactions    Transaction[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("payment_methods")
+}
+
+model Transaction {
+  id              String @id @default(cuid())
+  
+  // Transaction parties
+  payerId         String // Guardian ID
+  payeeId         String? // Educator ID (for session payments)
+  
+  // Payment method
+  paymentMethodId String?
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  
+  // Transaction details
+  type            String // session_payment, subscription, refund, commission, etc.
+  amount          Decimal
+  currency        String @default("INR")
+  
+  // Platform fees and commissions
+  platformFee     Decimal @default(0)
+  educatorEarning Decimal @default(0)
+  taxAmount       Decimal @default(0)
+  
+  // Transaction reference
+  referenceType   String? // session, subscription, invoice
+  referenceId     String? // ID of the referenced entity
+  
+  // Payment gateway information
+  gatewayProvider String // razorpay, stripe, paytm, etc.
+  gatewayTxnId    String? // Gateway transaction ID
+  gatewayResponse Json?   // Gateway response data
+  
+  // Status tracking
+  status          String @default("pending") // pending, processing, completed, failed, cancelled, refunded
+  
+  // Timing
+  initiatedAt     DateTime @default(now())
+  completedAt     DateTime?
+  failedAt        DateTime?
+  
+  // Failure handling
+  failureReason   String?
+  retryCount      Int @default(0)
+  maxRetries      Int @default(3)
+  
+  // Refund information
+  refundAmount    Decimal @default(0)
+  refundReason    String?
+  refundedAt      DateTime?
+  
+  // Related records
+  invoiceId       String?
+  invoice         Invoice? @relation("InvoiceTransactions", fields: [invoiceId], references: [id])
+  
+  @@map("transactions")
+}
+
+model Invoice {
+  id              String @id @default(cuid())
+  invoiceNumber   String @unique
+  
+  // Invoice parties
+  guardianId      String
+  guardian        GuardianProfile @relation(fields: [guardianId], references: [id], onDelete: Cascade)
+  
+  // Invoice details
+  type            String // session_fees, subscription, late_fees, etc.
+  status          String @default("draft") // draft, sent, paid, overdue, cancelled
+  
+  // Financial details
+  subtotal        Decimal
+  taxAmount       Decimal @default(0)
+  discountAmount  Decimal @default(0)
+  totalAmount     Decimal
+  currency        String @default("INR")
+  
+  // Timeline
+  issueDate       DateTime @default(now())
+  dueDate         DateTime
+  paidDate        DateTime?
+  
+  // Invoice items
+  items           InvoiceItem[]
+  
+  // Payment tracking
+  paidAmount      Decimal @default(0)
+  pendingAmount   Decimal
+  transactions    Transaction[] @relation("InvoiceTransactions")
+  
+  // Communication
+  sentAt          DateTime?
+  remindersSent   Int @default(0)
+  lastReminderAt  DateTime?
+  
+  // Notes and terms
+  notes           String?
+  terms           String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id              String @id @default(cuid())
+  invoiceId       String
+  invoice         Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  
+  // Item details
+  description     String
+  type            String // session, material, late_fee, etc.
+  
+  // Reference to source
+  referenceType   String? // session, subscription, etc.
+  referenceId     String? // ID of the referenced entity
+  
+  // Pricing
+  quantity        Decimal @default(1)
+  unitPrice       Decimal
+  totalPrice      Decimal
+  
+  // Tax information
+  taxRate         Decimal @default(0)
+  taxAmount       Decimal @default(0)
+  
+  createdAt       DateTime @default(now())
+  
+  @@map("invoice_items")
+}
+
+model RateProposal {
+  id              String @id @default(cuid())
+  educatorId      String
+  educator        EducatorProfile @relation(fields: [educatorId], references: [id], onDelete: Cascade)
+  
+  // Rate details
+  subjectId       String?
+  grade           String?
+  sessionType     String // one-on-one, group, demo
+  proposedRate    Decimal
+  currency        String @default("INR")
+  
+  // Justification
+  justification   String?
+  experience      String?
+  qualifications  String[]
+  
+  // Market comparison
+  marketRate      Decimal?
+  competitorRates Json? // Competitor rate analysis
+  
+  // Proposal timeline
+  effectiveFrom   DateTime
+  validUntil      DateTime?
+  
+  // Approval workflow
+  status          String @default("pending") // pending, approved, rejected, withdrawn
+  reviewedBy      String? // Admin who reviewed
+  reviewedAt      DateTime?
+  reviewNotes     String?
+  
+  // Current rate tracking
+  currentRate     Decimal?
+  previousRate    Decimal?
+  
+  // Usage after approval
+  bookingsCount   Int @default(0)
+  totalEarnings   Decimal @default(0)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("rate_proposals")
+}
+
+model EarningsRecord {
+  id              String @id @default(cuid())
+  educatorId      String
+  
+  // Earnings context
+  sourceType      String // session, bonus, referral, etc.
+  sourceId        String? // ID of the source (session ID, etc.)
+  
+  // Financial details
+  grossAmount     Decimal // Total amount before deductions
+  platformFee     Decimal // Platform commission
+  taxDeduction    Decimal @default(0)
+  netAmount       Decimal // Amount credited to educator
+  currency        String @default("INR")
+  
+  // Timing
+  earnedDate      DateTime @default(now())
+  payoutDate      DateTime?
+  
+  // Payout information
+  payoutStatus    String @default("pending") // pending, processing, completed, failed
+  payoutMethod    String? // bank_transfer, upi, wallet, etc.
+  payoutReference String? // Bank reference number
+  
+  // Related transaction
+  transactionId   String?
+  
+  @@map("earnings_records")
+}
+
+model Commission {
+  id              String @id @default(cuid())
+  
+  // Commission context
+  type            String // platform_fee, referral_bonus, etc.
+  referenceType   String // transaction, session, subscription
+  referenceId     String
+  
+  // Financial details
+  baseAmount      Decimal // Amount on which commission is calculated
+  commissionRate  Decimal // Commission percentage
+  commissionAmount Decimal // Calculated commission
+  currency        String @default("INR")
+  
+  // Recipients
+  recipientType   String // platform, referrer, etc.
+  recipientId     String?
+  
+  // Status
+  status          String @default("pending") // pending, calculated, paid
+  
+  // Timing
+  earnedDate      DateTime @default(now())
+  calculatedAt    DateTime?
+  paidAt          DateTime?
+  
+  @@map("commissions")
+}
+
+model Refund {
+  id              String @id @default(cuid())
+  transactionId   String
+  
+  // Refund details
+  refundAmount    Decimal
+  refundReason    String
+  refundType      String // full, partial, goodwill
+  
+  // Approval workflow
+  requestedBy     String // Guardian ID
+  approvedBy      String? // Admin ID
+  status          String @default("pending") // pending, approved, rejected, processed
+  
+  // Processing
+  processedAt     DateTime?
+  gatewayRefundId String? // Gateway refund ID
+  
+  // Timeline
+  requestedAt     DateTime @default(now())
+  approvedAt      DateTime?
+  
+  @@map("refunds")
+}
+
+model Subscription {
+  id              String @id @default(cuid())
+  guardianId      String
+  
+  // Subscription details
+  planName        String
+  planType        String // monthly, quarterly, yearly
+  price           Decimal
+  currency        String @default("INR")
+  
+  // Benefits
+  benefits        Json // Plan benefits and limits
+  
+  // Status and timeline
+  status          String @default("active") // active, paused, cancelled, expired
+  startDate       DateTime @default(now())
+  endDate         DateTime
+  nextBillingDate DateTime?
+  
+  // Payment
+  autoRenewal     Boolean @default(true)
+  paymentMethodId String?
+  
+  // Usage tracking
+  usageData       Json? // Track usage against plan limits
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("subscriptions")
+}

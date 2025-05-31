@@ -1,0 +1,321 @@
+// Monitoring & Progress Models
+// ECM monitoring, progress tracking, and intervention management
+
+model ProgressRecord {
+  id              String @id @default(cuid())
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Progress context
+  subjectId       String?
+  topicId         String?
+  sessionId       String?
+  
+  // Progress metrics
+  progressType    String // academic, behavioral, engagement, attendance
+  metricName      String // test_score, assignment_completion, participation, etc.
+  value           Decimal
+  maxValue        Decimal?
+  unit            String? // percentage, score, hours, etc.
+  
+  // Comparison data
+  previousValue   Decimal?
+  improvement     Decimal? // Calculated improvement
+  percentile      Decimal? // Compared to peers
+  
+  // Timeline
+  recordDate      DateTime @default(now())
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  
+  // Context and notes
+  notes           String?
+  recordedBy      String // ECM, Educator, or System
+  
+  // Intervention tracking
+  interventions   Intervention[] @relation("ProgressInterventions")
+  
+  @@map("progress_records")
+}
+
+model Intervention {
+  id              String @id @default(cuid())
+  
+  // Target learner
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Intervention details
+  type            String // academic_support, behavioral, motivational, parent_meeting, etc.
+  category        String // preventive, corrective, supportive
+  priority        String @default("medium") // low, medium, high, critical
+  
+  // Trigger and context
+  triggerType     String // poor_performance, attendance_issue, behavioral_concern, etc.
+  triggerData     Json?  // Data that triggered the intervention
+  
+  // Intervention plan
+  title           String
+  description     String
+  objectives      String[]
+  actionPlan      String
+  expectedOutcome String?
+  
+  // Timeline
+  plannedStart    DateTime
+  plannedEnd      DateTime
+  actualStart     DateTime?
+  actualEnd       DateTime?
+  
+  // Assignment
+  assignedTo      String // ECM ID
+  ecm             ECMProfile @relation(fields: [assignedTo], references: [id])
+  
+  // Collaboration
+  involvedParties String[] // educator, guardian, counselor, etc.
+  guardianInformed Boolean @default(false)
+  educatorInformed Boolean @default(false)
+  
+  // Resources
+  resourcesNeeded String[]
+  estimatedCost   Decimal?
+  
+  // Status tracking
+  status          String @default("planned") // planned, active, completed, cancelled, on_hold
+  
+  // Outcome tracking
+  successMetrics  String[]
+  actualOutcome   String?
+  effectivenessRating Int? // 1-5 scale
+  
+  // Progress relation
+  relatedProgress ProgressRecord[] @relation("ProgressInterventions")
+  
+  // Follow-up
+  followUpRequired Boolean @default(false)
+  followUpDate     DateTime?
+  followUpNotes    String?
+  
+  // Documentation
+  notes           String?
+  attachments     String[] // URLs to related documents
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("interventions")
+}
+
+model ProgressReport {
+  id              String @id @default(cuid())
+  
+  // Report context
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Report details
+  reportType      String // weekly, monthly, quarterly, custom
+  title           String
+  
+  // Reporting period
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Academic progress
+  academicSummary Json // Subject-wise progress data
+  overallGrade    String?
+  improvements    String[]
+  concerns        String[]
+  
+  // Behavioral and engagement
+  attendanceRate  Decimal?
+  participationLevel Decimal? // Average participation score
+  behavioralNotes String?
+  
+  // Session and homework performance
+  sessionsAttended Int?
+  totalSessions    Int?
+  homeworkCompletion Decimal? // Percentage
+  averageScores    Json // Subject-wise average scores
+  
+  // Goals and targets
+  previousGoals    String[] // Goals from last report
+  goalAchievement  Json     // Status of previous goals
+  newGoals         String[] // Goals for next period
+  
+  // Recommendations
+  academicRecommendations String[]
+  parentRecommendations   String[]
+  nextSteps              String[]
+  
+  // Interventions
+  interventionsApplied   String[] // Interventions during this period
+  interventionOutcomes   Json     // Outcomes of interventions
+  
+  // Communication
+  guardianMeeting     Boolean @default(false)
+  meetingDate         DateTime?
+  meetingNotes        String?
+  guardianFeedback    String?
+  
+  // Report generation
+  generatedBy         String // ECM ID
+  ecm                 ECMProfile @relation(fields: [generatedBy], references: [id])
+  
+  // Approval and sharing
+  approvedBy          String?
+  approvedAt          DateTime?
+  sharedWithGuardian  Boolean @default(false)
+  sharedWithEducator  Boolean @default(false)
+  sharedAt            DateTime?
+  
+  // Attachments
+  attachments         String[] // URLs to charts, graphs, additional documents
+  
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@map("progress_reports")
+}
+
+model Alert {
+  id              String @id @default(cuid())
+  
+  // Alert context
+  learnerId       String?
+  educatorId      String?
+  ecmId           String?
+  
+  // Alert details
+  type            String // performance_drop, attendance_issue, behavior_concern, etc.
+  severity        String // low, medium, high, critical
+  title           String
+  message         String
+  
+  // Trigger data
+  triggerMetric   String? // What metric triggered this alert
+  thresholdValue  Decimal?
+  actualValue     Decimal?
+  
+  // Alert rules
+  ruleId          String? // ID of the alert rule that triggered this
+  
+  // Status
+  status          String @default("active") // active, acknowledged, resolved, dismissed
+  
+  // Response tracking
+  acknowledgedBy  String?
+  acknowledgedAt  DateTime?
+  resolvedBy      String?
+  resolvedAt      DateTime?
+  resolution      String?
+  
+  // Auto-actions
+  autoActionsApplied Boolean @default(false)
+  actionsApplied     String[]
+  
+  // Escalation
+  escalationLevel    Int @default(1)
+  escalatedAt        DateTime?
+  escalatedTo        String?
+  
+  createdAt          DateTime @default(now())
+  
+  @@map("alerts")
+}
+
+model Milestone {
+  id              String @id @default(cuid())
+  
+  // Milestone context
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Milestone details
+  type            String // academic, behavioral, engagement, attendance
+  title           String
+  description     String
+  
+  // Achievement criteria
+  criteria        Json   // Specific criteria for achieving this milestone
+  targetValue     Decimal?
+  unit            String?
+  
+  // Progress tracking
+  currentProgress Decimal @default(0)
+  isAchieved      Boolean @default(false)
+  achievedAt      DateTime?
+  
+  // Timeline
+  targetDate      DateTime?
+  
+  // Rewards and recognition
+  rewardType      String? // badge, certificate, points, etc.
+  rewardValue     Decimal?
+  rewardAwarded   Boolean @default(false)
+  
+  // Celebration
+  celebrationNote String?
+  sharedWithGuardian Boolean @default(false)
+  
+  // Milestone creation
+  createdBy       String // ECM or Educator who set this milestone
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("milestones")
+}
+
+model LearningGoal {
+  id              String @id @default(cuid())
+  
+  // Goal context
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Goal details
+  title           String
+  description     String
+  category        String // academic, skill, behavioral, career
+  
+  // Goal specification
+  targetMetric    String // test_score, completion_rate, skill_level, etc.
+  targetValue     Decimal
+  unit            String
+  
+  // Timeline
+  setDate         DateTime @default(now())
+  targetDate      DateTime
+  
+  // Progress tracking
+  currentValue    Decimal @default(0)
+  progressPercent Decimal @default(0)
+  isAchieved      Boolean @default(false)
+  achievedAt      DateTime?
+  
+  // Goal setting
+  setBy           String // learner, guardian, ecm, educator
+  setById         String
+  
+  // Approval (if set by learner)
+  approvedBy      String?
+  approvedAt      DateTime?
+  
+  // Support and action plan
+  actionSteps     String[]
+  resourcesNeeded String[]
+  supportRequired String?
+  
+  // Review and updates
+  lastReviewDate  DateTime?
+  nextReviewDate  DateTime?
+  reviewNotes     String?
+  
+  // Status
+  status          String @default("active") // active, achieved, paused, cancelled, overdue
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("learning_goals")
+}

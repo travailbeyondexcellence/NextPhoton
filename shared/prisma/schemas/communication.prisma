@@ -1,0 +1,314 @@
+// Communication Models
+// Messaging, notifications, and communication features
+
+model Conversation {
+  id              String @id @default(cuid())
+  
+  // Conversation details
+  title           String?
+  type            String @default("direct") // direct, group, support, announcement
+  
+  // Participants
+  participants    ConversationParticipant[]
+  messages        Message[]
+  
+  // Group conversation settings
+  isGroup         Boolean @default(false)
+  maxParticipants Int?
+  
+  // Conversation settings
+  isArchived      Boolean @default(false)
+  isMuted         Boolean @default(false)
+  
+  // Last activity
+  lastMessageAt   DateTime?
+  lastMessageId   String?
+  
+  // Metadata
+  metadata        Json? // Additional conversation data
+  
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id              String @id @default(cuid())
+  conversationId  String
+  userId          String
+  
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  // Participant role
+  role            String @default("member") // member, admin, moderator
+  
+  // Participation settings
+  joinedAt        DateTime @default(now())
+  leftAt          DateTime?
+  isActive        Boolean @default(true)
+  
+  // Notification settings
+  notificationsEnabled Boolean @default(true)
+  lastReadAt      DateTime?
+  unreadCount     Int @default(0)
+  
+  // Permissions
+  canSendMessages Boolean @default(true)
+  canAddParticipants Boolean @default(false)
+  
+  @@unique([conversationId, userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id              String @id @default(cuid())
+  conversationId  String
+  senderId        String
+  
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  
+  // Message content
+  content         String?
+  messageType     String @default("text") // text, image, file, audio, video, system
+  
+  // Attachments
+  attachments     MessageAttachment[]
+  
+  // Message features
+  isEdited        Boolean @default(false)
+  editedAt        DateTime?
+  isDeleted       Boolean @default(false)
+  deletedAt       DateTime?
+  
+  // Reply and threading
+  replyToId       String?
+  replyTo         Message? @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies         Message[] @relation("MessageReplies")
+  
+  // Reactions
+  reactions       MessageReaction[]
+  
+  // Delivery tracking
+  deliveryStatus  String @default("sent") // sent, delivered, read
+  readBy          MessageReadReceipt[]
+  
+  // System messages
+  systemData      Json? // For system-generated messages
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id              String @id @default(cuid())
+  messageId       String
+  message         Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // File details
+  fileName        String
+  originalName    String
+  fileType        String
+  fileSize        Int
+  
+  // Storage
+  storageUrl      String
+  thumbnailUrl    String?
+  
+  // File metadata
+  metadata        Json? // Image dimensions, video duration, etc.
+  
+  uploadedAt      DateTime @default(now())
+  
+  @@map("message_attachments")
+}
+
+model MessageReaction {
+  id              String @id @default(cuid())
+  messageId       String
+  userId          String
+  
+  message         Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  // Reaction details
+  emoji           String // 👍, ❤️, 😂, etc.
+  reactionType    String @default("emoji") // emoji, custom
+  
+  createdAt       DateTime @default(now())
+  
+  @@unique([messageId, userId, emoji])
+  @@map("message_reactions")
+}
+
+model MessageReadReceipt {
+  id              String @id @default(cuid())
+  messageId       String
+  userId          String
+  
+  message         Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  readAt          DateTime @default(now())
+  
+  @@unique([messageId, userId])
+  @@map("message_read_receipts")
+}
+
+model Notification {
+  id              String @id @default(cuid())
+  
+  // Notification target
+  userId          String
+  
+  // Notification details
+  type            String // message, session_reminder, assignment_due, etc.
+  title           String
+  content         String
+  
+  // Notification data
+  data            Json? // Additional notification data
+  
+  // Reference to source
+  referenceType   String? // message, session, assignment, etc.
+  referenceId     String? // ID of the referenced entity
+  
+  // Delivery channels
+  channels        String[] // push, email, sms, in_app
+  
+  // Status tracking
+  status          String @default("pending") // pending, sent, delivered, read, failed
+  
+  // Read tracking
+  isRead          Boolean @default(false)
+  readAt          DateTime?
+  
+  // Delivery tracking
+  pushSent        Boolean @default(false)
+  pushSentAt      DateTime?
+  emailSent       Boolean @default(false)
+  emailSentAt     DateTime?
+  smsSent         Boolean @default(false)
+  smsSentAt       DateTime?
+  
+  // Scheduling
+  scheduledFor    DateTime?
+  
+  // User actions
+  actionTaken     Boolean @default(false)
+  actionType      String? // clicked, dismissed, etc.
+  actionAt        DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("notifications")
+}
+
+model NotificationTemplate {
+  id              String @id @default(cuid())
+  
+  // Template details
+  name            String @unique
+  type            String // session_reminder, assignment_due, etc.
+  
+  // Template content
+  title           String
+  content         String
+  
+  // Template variables
+  variables       String[] // Variables that can be replaced
+  
+  // Channel-specific templates
+  pushTemplate    String?
+  emailTemplate   String?
+  emailSubject    String?
+  smsTemplate     String?
+  
+  // Settings
+  isActive        Boolean @default(true)
+  
+  // Usage tracking
+  usageCount      Int @default(0)
+  lastUsedAt      DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("notification_templates")
+}
+
+model NotificationPreference {
+  id              String @id @default(cuid())
+  userId          String
+  
+  // Notification type preferences
+  notificationType String // messages, sessions, assignments, etc.
+  
+  // Channel preferences
+  pushEnabled     Boolean @default(true)
+  emailEnabled    Boolean @default(true)
+  smsEnabled      Boolean @default(false)
+  inAppEnabled    Boolean @default(true)
+  
+  // Timing preferences
+  quietHoursStart String? // HH:mm format
+  quietHoursEnd   String? // HH:mm format
+  timezone        String @default("Asia/Kolkata")
+  
+  // Frequency settings
+  frequency       String @default("immediate") // immediate, daily_digest, weekly_digest
+  
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([userId, notificationType])
+  @@map("notification_preferences")
+}
+
+model Announcement {
+  id              String @id @default(cuid())
+  
+  // Announcement details
+  title           String
+  content         String
+  type            String // general, urgent, maintenance, feature, etc.
+  priority        String @default("normal") // low, normal, high, urgent
+  
+  // Targeting
+  targetAudience  String[] // all, learners, guardians, educators, etc.
+  targetUserIds   String[] // Specific user IDs (optional)
+  
+  // Scheduling
+  publishAt       DateTime @default(now())
+  expiresAt       DateTime?
+  
+  // Status
+  status          String @default("draft") // draft, published, archived
+  
+  // Engagement tracking
+  viewCount       Int @default(0)
+  
+  // Attachments
+  attachments     String[] // URLs to attachments
+  
+  // Publisher information
+  publishedBy     String
+  publishedAt     DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("announcements")
+}
+
+model AnnouncementView {
+  id              String @id @default(cuid())
+  announcementId  String
+  userId          String
+  
+  viewedAt        DateTime @default(now())
+  
+  @@unique([announcementId, userId])
+  @@map("announcement_views")
+}

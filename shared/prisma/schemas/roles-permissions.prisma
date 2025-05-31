@@ -1,0 +1,126 @@
+// ABAC (Attribute-Based Access Control) System
+// Role and permission management for NextPhoton
+
+model Role {
+  id          String @id @default(cuid())
+  name        String @unique // learner, guardian, educator, ecm, employee, intern, admin
+  displayName String
+  description String?
+  isActive    Boolean @default(true)
+  isDefault   Boolean @default(false)
+  
+  // Default permissions for this role
+  rolePermissions RolePermission[]
+  
+  // Users with this role
+  userRoles UserRole[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String @id @default(cuid())
+  resource    String // users, sessions, curriculum, etc.
+  action      String // create, read, update, delete, approve, etc.
+  description String?
+  
+  // Role-based permissions
+  rolePermissions RolePermission[]
+  
+  // Individual user permission overrides
+  userPermissions UserPermission[]
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([resource, action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  // Permission constraints (optional)
+  constraints  Json?      // Additional conditions like tenant_id, department, etc.
+  
+  createdAt    DateTime   @default(now())
+  
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id       String @id @default(cuid())
+  userId   String
+  roleId   String
+  
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  
+  // Multi-tenant support
+  organizationId String?
+  
+  // Role-specific metadata
+  metadata Json? // Role-specific data like department, specialization, etc.
+  
+  isActive   Boolean  @default(true)
+  assignedAt DateTime @default(now())
+  expiresAt  DateTime?
+  assignedBy String?  // userId of who assigned this role
+  
+  @@unique([userId, roleId, organizationId])
+  @@map("user_roles")
+}
+
+model UserPermission {
+  id           String     @id @default(cuid())
+  userId       String
+  permissionId String
+  
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  
+  // Override type: grant (add permission) or deny (remove permission)
+  overrideType String     // 'grant' | 'deny'
+  
+  // Permission constraints
+  constraints  Json?
+  
+  // Multi-tenant support
+  organizationId String?
+  
+  grantedBy  String?   // userId of who granted this permission
+  grantedAt  DateTime  @default(now())
+  expiresAt  DateTime?
+  reason     String?   // Reason for the override
+  
+  @@unique([userId, permissionId, organizationId])
+  @@map("user_permissions")
+}
+
+model Organization {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique
+  description String?
+  
+  // Organization settings
+  settings    Json?
+  
+  // Organization branding
+  logo        String?
+  primaryColor String?
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("organizations")
+}

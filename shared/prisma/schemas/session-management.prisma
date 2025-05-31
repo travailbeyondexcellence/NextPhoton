@@ -1,0 +1,276 @@
+// Session Management Models
+// Learning sessions, bookings, and session-related activities
+
+model LearningSession {
+  id          String @id @default(cuid())
+  
+  // Session participants
+  learnerId   String
+  educatorId  String
+  ecmId       String? // ECM who approved the session
+  
+  learner     LearnerProfile  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  educator    EducatorProfile @relation(fields: [educatorId], references: [id], onDelete: Cascade)
+  ecm         ECMProfile?     @relation("ECMSessions", fields: [ecmId], references: [id])
+  
+  // Session details
+  title       String
+  description String?
+  subject     String
+  topics      String[] // Topics to be covered
+  
+  // Scheduling
+  scheduledStart DateTime
+  scheduledEnd   DateTime
+  actualStart    DateTime?
+  actualEnd      DateTime?
+  
+  // Session configuration
+  sessionType    String @default("one-on-one") // one-on-one, group, demo
+  format         String @default("online")     // online, offline, hybrid
+  duration       Int    // Duration in minutes
+  
+  // Status tracking
+  status         String @default("scheduled") // scheduled, in-progress, completed, cancelled, no-show
+  
+  // Location/Platform
+  meetingLink    String? // Video call link
+  meetingId      String? // Platform-specific meeting ID
+  location       String? // Physical location for offline sessions
+  
+  // Approval workflow
+  educatorApproval String @default("pending") // pending, approved, rejected
+  ecmApproval      String @default("pending") // pending, approved, rejected
+  approvalNotes    String?
+  
+  // Session outcomes
+  objectives     String[]
+  actualTopics   String[] // Topics actually covered
+  homework       String?  // Homework assigned
+  nextSessionPlan String? // Plan for next session
+  
+  // Recordings and materials
+  recordingUrl   String?
+  materials      String[] // URLs to session materials
+  
+  // Related records
+  assignments    Assignment[]
+  feedbacks      SessionFeedback[]
+  attendanceRecords AttendanceRecord[]
+  
+  // Financial
+  cost           Decimal?
+  paymentStatus  String @default("pending") // pending, paid, refunded
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@map("learning_sessions")
+}
+
+model SessionBooking {
+  id             String @id @default(cuid())
+  
+  // Booking details
+  learnerId      String
+  educatorId     String
+  requestedBy    String // Guardian or Learner
+  
+  learner        LearnerProfile  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  educator       EducatorProfile @relation(fields: [educatorId], references: [id], onDelete: Cascade)
+  
+  // Session preferences
+  preferredDates DateTime[]
+  preferredTimes String[] // Time slots like "morning", "afternoon", "evening"
+  subject        String
+  topics         String[]
+  sessionType    String @default("one-on-one")
+  format         String @default("online")
+  duration       Int    @default(60) // Duration in minutes
+  
+  // Special requirements
+  requirements   String?
+  learningGoals  String?
+  
+  // Status and workflow
+  status         String @default("pending") // pending, approved, rejected, converted
+  educatorResponse String @default("pending") // pending, accepted, declined
+  ecmResponse    String @default("pending") // pending, approved, rejected
+  
+  // Responses and notes
+  educatorNotes  String?
+  ecmNotes       String?
+  rejectionReason String?
+  
+  // Conversion to session
+  sessionId      String? @unique
+  
+  // Pricing
+  proposedRate   Decimal?
+  agreedRate     Decimal?
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@map("session_bookings")
+}
+
+model Assignment {
+  id             String @id @default(cuid())
+  
+  // Assignment details
+  title          String
+  description    String
+  instructions   String?
+  
+  // Association
+  learnerId      String
+  sessionId      String?
+  topicId        String?
+  
+  learner        LearnerProfile   @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  session        LearningSession? @relation(fields: [sessionId], references: [id])
+  topic          Topic?           @relation(fields: [topicId], references: [id])
+  
+  // Assignment configuration
+  type           String // homework, practice, project, reading, etc.
+  priority       String @default("medium") // low, medium, high, urgent
+  difficultyLevel String @default("medium") // easy, medium, hard
+  
+  // Timing
+  assignedDate   DateTime @default(now())
+  dueDate        DateTime
+  estimatedHours Decimal?
+  
+  // Resources
+  attachments    String[] // URLs to assignment materials
+  referenceLinks String[]
+  
+  // Submission
+  submissionType String @default("text") // text, file, link, video, etc.
+  maxSubmissions Int    @default(1)
+  
+  // Grading
+  totalMarks     Decimal?
+  passingMarks   Decimal?
+  
+  // Status
+  status         String @default("assigned") // assigned, in-progress, submitted, graded, overdue
+  
+  // Submission records
+  submissions    AssignmentSubmission[]
+  
+  // Assignment creation
+  createdBy      String  // Educator or ECM who created it
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id            String @id @default(cuid())
+  assignmentId  String
+  learnerId     String
+  
+  assignment    Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  learner       LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Submission content
+  content       String?  // Text content
+  attachments   String[] // File URLs
+  links         String[] // External links
+  
+  // Submission tracking
+  submittedAt   DateTime @default(now())
+  isLate        Boolean  @default(false)
+  attemptNumber Int      @default(1)
+  
+  // Grading
+  score         Decimal?
+  maxScore      Decimal?
+  percentage    Decimal?
+  grade         String?  // A, B, C, etc.
+  
+  // Feedback
+  feedback      String?
+  gradedBy      String?  // Educator who graded
+  gradedAt      DateTime?
+  
+  // Status
+  status        String @default("submitted") // submitted, graded, returned, resubmission_required
+  
+  @@unique([assignmentId, learnerId, attemptNumber])
+  @@map("assignment_submissions")
+}
+
+model SessionFeedback {
+  id            String @id @default(cuid())
+  sessionId     String
+  session       LearningSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  // Feedback provider
+  providedBy    String // learner, educator, guardian, ecm
+  providerId    String // ID of the provider
+  
+  // Ratings (1-5 scale)
+  overallRating    Int?
+  contentRating    Int?
+  teachingRating   Int?
+  engagementRating Int?
+  
+  // Detailed feedback
+  positives     String?
+  improvements  String?
+  comments      String?
+  
+  // Session effectiveness
+  topicsClarity    Int? // How well topics were explained
+  paceRating       Int? // Was the pace appropriate
+  interactionLevel Int? // Level of interaction
+  
+  // Recommendations
+  recommendEducator Boolean?
+  wouldBookAgain    Boolean?
+  
+  // Follow-up
+  suggestedTopics   String[]
+  nextSessionNeeds  String?
+  
+  createdAt     DateTime @default(now())
+  
+  @@unique([sessionId, providedBy, providerId])
+  @@map("session_feedbacks")
+}
+
+model AttendanceRecord {
+  id            String @id @default(cuid())
+  sessionId     String
+  learnerId     String
+  
+  session       LearningSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  learner       LearnerProfile  @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Attendance tracking
+  status        String @default("present") // present, absent, late, left-early
+  
+  // Timing
+  joinedAt      DateTime?
+  leftAt        DateTime?
+  duration      Int?     // Actual attendance duration in minutes
+  
+  // Engagement tracking
+  participationLevel Int? // 1-5 scale
+  attentiveness     Int? // 1-5 scale
+  
+  // Notes
+  notes         String?
+  reasonForAbsence String?
+  
+  // Recorded by
+  recordedBy    String // Educator or ECM
+  recordedAt    DateTime @default(now())
+  
+  @@unique([sessionId, learnerId])
+  @@map("attendance_records")
+}

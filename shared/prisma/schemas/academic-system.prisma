@@ -1,0 +1,258 @@
+// Academic System Models
+// Curriculum, assessments, subjects, and academic content management
+
+model Subject {
+  id          String @id @default(cuid())
+  name        String
+  code        String @unique
+  description String?
+  
+  // Hierarchy
+  parentId    String?
+  parent      Subject? @relation("SubjectHierarchy", fields: [parentId], references: [id])
+  children    Subject[] @relation("SubjectHierarchy")
+  
+  // Curriculum associations
+  curriculumSubjects CurriculumSubject[]
+  topics             Topic[]
+  assessments        Assessment[]
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("subjects")
+}
+
+model Curriculum {
+  id          String @id @default(cuid())
+  name        String
+  version     String
+  description String?
+  
+  // Target demographics
+  board       String // CBSE, ICSE, State Board, etc.
+  grade       String
+  year        String?
+  
+  // Curriculum structure
+  subjects    CurriculumSubject[]
+  
+  // Assignments to learners
+  learnerCurriculums LearnerCurriculum[]
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([name, version, board, grade])
+  @@map("curriculums")
+}
+
+model CurriculumSubject {
+  id           String @id @default(cuid())
+  curriculumId String
+  subjectId    String
+  
+  curriculum   Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  subject      Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  // Subject-specific settings
+  isRequired     Boolean @default(true)
+  weightage      Decimal? // Percentage weightage in curriculum
+  expectedHours  Int?     // Expected hours for completion
+  difficultyLevel String @default("medium") // easy, medium, hard
+  
+  // Ordering
+  order          Int?
+  
+  @@unique([curriculumId, subjectId])
+  @@map("curriculum_subjects")
+}
+
+model Topic {
+  id          String @id @default(cuid())
+  subjectId   String
+  subject     Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  name        String
+  description String?
+  
+  // Hierarchy
+  parentId    String?
+  parent      Topic?  @relation("TopicHierarchy", fields: [parentId], references: [id])
+  children    Topic[] @relation("TopicHierarchy")
+  
+  // Learning objectives
+  objectives  String[]
+  
+  // Difficulty and timing
+  difficultyLevel String @default("medium")
+  estimatedHours  Decimal?
+  
+  // Content references
+  contentUrls     String[] // URLs to study materials
+  prerequisites   String[] // Topic IDs that should be completed first
+  
+  // Ordering within subject
+  order       Int?
+  
+  // Assignments and assessments
+  assignments Assignment[]
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("topics")
+}
+
+model LearnerCurriculum {
+  id           String @id @default(cuid())
+  learnerId    String
+  curriculumId String
+  
+  learner      LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  curriculum   Curriculum     @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  
+  // Customization
+  customizations Json? // Custom modifications to the curriculum
+  
+  // Progress tracking
+  status         String @default("active") // active, completed, paused, discontinued
+  progressPercent Decimal @default(0)
+  
+  // Timing
+  startDate      DateTime @default(now())
+  expectedEndDate DateTime?
+  actualEndDate   DateTime?
+  
+  @@unique([learnerId, curriculumId])
+  @@map("learner_curriculums")
+}
+
+model Assessment {
+  id          String @id @default(cuid())
+  title       String
+  description String?
+  
+  // Association
+  subjectId   String?
+  subject     Subject? @relation(fields: [subjectId], references: [id])
+  
+  // Assessment configuration
+  type        String   // quiz, assignment, test, project, etc.
+  format      String   // multiple_choice, essay, practical, etc.
+  
+  // Timing and attempts
+  duration    Int?     // Duration in minutes
+  maxAttempts Int      @default(1)
+  
+  // Grading
+  totalMarks  Decimal
+  passingMarks Decimal?
+  
+  // Questions and content
+  questions   AssessmentQuestion[]
+  
+  // Submissions
+  submissions AssessmentSubmission[]
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("assessments")
+}
+
+model AssessmentQuestion {
+  id           String @id @default(cuid())
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  
+  // Question content
+  question     String
+  questionType String   // multiple_choice, true_false, short_answer, essay, etc.
+  
+  // For multiple choice questions
+  options      String[] // Array of options
+  correctAnswers String[] // Array of correct answer indices/text
+  
+  // Grading
+  marks        Decimal
+  
+  // Ordering
+  order        Int?
+  
+  // Feedback
+  explanation  String? // Explanation for the correct answer
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("assessment_questions")
+}
+
+model AssessmentSubmission {
+  id           String @id @default(cuid())
+  assessmentId String
+  learnerId    String
+  
+  assessment   Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  learner      LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Submission data
+  answers      Json     // Answers provided by learner
+  
+  // Grading
+  score        Decimal?
+  maxScore     Decimal
+  percentage   Decimal?
+  grade        String?  // A, B, C, etc.
+  
+  // Timing
+  startedAt    DateTime @default(now())
+  submittedAt  DateTime?
+  gradedAt     DateTime?
+  
+  // Attempt tracking
+  attemptNumber Int     @default(1)
+  
+  // Review and feedback
+  feedback     String?
+  reviewedBy   String? // Educator or ECM who reviewed
+  
+  @@unique([assessmentId, learnerId, attemptNumber])
+  @@map("assessment_submissions")
+}
+
+model AcademicRecord {
+  id        String @id @default(cuid())
+  learnerId String
+  learner   LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+  
+  // Academic information
+  academicYear String
+  grade        String
+  board        String
+  school       String?
+  
+  // Subject-wise performance
+  subjects     Json // Subject-wise marks/grades
+  
+  // Overall performance
+  totalMarks   Decimal?
+  obtainedMarks Decimal?
+  percentage   Decimal?
+  grade_overall String?
+  rank         Int?
+  
+  // Additional information
+  achievements String[]
+  remarks      String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("academic_records")
+}
