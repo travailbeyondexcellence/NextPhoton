@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { TempPrismaService } from '../prisma/temp-prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 /**
  * Users Module
@@ -19,8 +19,8 @@ import { TempPrismaService } from '../prisma/temp-prisma.service';
 @Module({
     controllers: [UsersController],
     providers: [
-        UsersService,       // User business logic service
-        TempPrismaService,  // Temporary database mock service
+        UsersService,    // User business logic service
+        PrismaService,   // Real Prisma database service
     ],
     exports: [
         UsersService,    // Export for use in GraphQL resolvers and other modules

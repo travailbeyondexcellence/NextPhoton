@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { TempPrismaService } from '../prisma/temp-prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserInput } from '../dto/inputs/create-user.input';
 import { PaginationInput } from '../dto/common/pagination.dto';
 
@@ -18,7 +18,7 @@ import { PaginationInput } from '../dto/common/pagination.dto';
  */
 @Injectable()
 export class UsersService {
-    constructor(private prisma: TempPrismaService) { }
+    constructor(private prisma: PrismaService) { }
 
     /**
      * Get users by type (legacy method for compatibility)
@@ -27,25 +27,33 @@ export class UsersService {
      * @returns Array of users of specified type
      */
     async getUsers(type: string) {
-        const modelMap: Record<string, any> = {
-            admin: this.prisma.admin,
-            teacher: this.prisma.teacher,
-            student: this.prisma.student,
-            parent: this.prisma.parent,
+        // Legacy method - return mock data for now since these models don't exist yet
+        // TODO: Replace with real profile queries when user profiles are implemented
+        
+        const mockData: Record<string, any[]> = {
+            admin: [
+                { id: 'admin-1', name: 'Admin User 1', email: 'admin1@example.com' },
+                { id: 'admin-2', name: 'Admin User 2', email: 'admin2@example.com' },
+            ],
+            teacher: [
+                { id: 'teacher-1', name: 'Teacher User 1', email: 'teacher1@example.com' },
+                { id: 'teacher-2', name: 'Teacher User 2', email: 'teacher2@example.com' },
+            ],
+            student: [
+                { id: 'student-1', name: 'Student User 1', email: 'student1@example.com' },
+                { id: 'student-2', name: 'Student User 2', email: 'student2@example.com' },
+            ],
+            parent: [
+                { id: 'parent-1', name: 'Parent User 1', email: 'parent1@example.com' },
+                { id: 'parent-2', name: 'Parent User 2', email: 'parent2@example.com' },
+            ],
         };
 
-        const model = modelMap[type];
-        if (!model) {
+        if (!mockData[type]) {
             throw new BadRequestException('Invalid user type');
         }
 
-        try {
-            const users = await model.findMany();
-            return users;
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            throw error;
-        }
+        return mockData[type];
     }
 
     /**
@@ -58,9 +66,26 @@ export class UsersService {
         try {
             const user = await this.prisma.user.findUnique({
                 where: { id },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    emailVerified: true,
+                }
             });
 
-            return user;
+            if (!user) {
+                return null;
+            }
+
+            // Add isActive field (not in Better-auth schema, but needed for GraphQL)
+            return {
+                ...user,
+                isActive: true, // Default to true since Better-auth doesn't have this field
+            };
         } catch (error) {
             console.error('Error finding user by ID:', error);
             throw error;
@@ -84,11 +109,26 @@ export class UsersService {
                     orderBy: {
                         [sortBy]: sortOrder,
                     },
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        emailVerified: true,
+                    }
                 }),
                 this.prisma.user.count()
             ]);
 
-            return { users, totalCount };
+            // Add isActive field to all users
+            const usersWithActive = users.map(user => ({
+                ...user,
+                isActive: true, // Default to true since Better-auth doesn't have this field
+            }));
+
+            return { users: usersWithActive, totalCount };
         } catch (error) {
             console.error('Error finding users with pagination:', error);
             throw error;
@@ -103,19 +143,35 @@ export class UsersService {
      */
     async create(input: CreateUserInput) {
         try {
-            // TODO: Integrate with Better-auth for proper user creation
-            // This is a placeholder implementation
+            // Generate a unique ID for Better-auth compatibility
+            const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
             const user = await this.prisma.user.create({
                 data: {
+                    id: userId,
                     email: input.email,
                     name: input.name,
                     image: input.image,
-                    // Note: Password hashing should be handled by Better-auth
-                    // This is just a placeholder structure
+                    emailVerified: false, // New users need to verify email
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
                 },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    emailVerified: true,
+                }
             });
 
-            return user;
+            // Add isActive field for GraphQL compatibility
+            return {
+                ...user,
+                isActive: true,
+            };
         } catch (error) {
             console.error('Error creating user:', error);
             if ((error as any).code === 'P2002') {
@@ -136,10 +192,26 @@ export class UsersService {
         try {
             const user = await this.prisma.user.update({
                 where: { id },
-                data: updates,
+                data: {
+                    ...updates,
+                    updatedAt: new Date(),
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    emailVerified: true,
+                }
             });
 
-            return user;
+            // Add isActive field for GraphQL compatibility
+            return {
+                ...user,
+                isActive: true,
+            };
         } catch (error) {
             console.error('Error updating user:', error);
             if ((error as any).code === 'P2025') {
