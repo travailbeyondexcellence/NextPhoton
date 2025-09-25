@@ -33,29 +33,49 @@ export default function SignUp() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         const { name, email, password } = values;
+        
+        // Show loading toast
+        toast({
+            title: "Please wait...",
+            description: "Creating your account...",
+        });
+
+        // Call NestJS backend for registration
         const { data, error } = await authClient.signUp.email({
             email,
             password,
             name,
-            
-            callbackURL: "/signin",
-        }, {
-            onRequest: () => {
-                toast({
-                    title: "Please wait...",
-                })
-            },
-            onSuccess: async () => {
-                form.reset()
-            },
-            onError: (ctx) => {
-                toast({ title: ctx.error.message, variant: 'destructive' });
-                form.setError('email', {
-                    type: 'manual',
-                    message: ctx.error.message
-                })
-            },
+            role: 'learner', // Default role, can be made dynamic
         });
+
+        if (error) {
+            // Show error toast
+            toast({ 
+                title: "Registration Failed", 
+                description: error.message,
+                variant: 'destructive' 
+            });
+            
+            // Set form error
+            form.setError('email', {
+                type: 'manual',
+                message: error.message
+            });
+        } else if (data) {
+            // Success - show success toast
+            toast({
+                title: "Account Created!",
+                description: "Redirecting to sign in...",
+            });
+            
+            // Reset form
+            form.reset();
+            
+            // Redirect to signin page after a short delay
+            setTimeout(() => {
+                window.location.href = '/signin';
+            }, 1500);
+        }
     }
 
     return (

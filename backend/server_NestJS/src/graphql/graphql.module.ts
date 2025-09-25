@@ -3,9 +3,11 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { UserResolver } from './resolvers/user.resolver';
+import { AuthResolver } from './resolvers/auth.resolver';
 import { GqlAuthGuard } from './guards/gql-auth.guard';
 import { DateScalar } from './scalars/date.scalar';
 import { UsersModule } from '../users/users.module';
+import { AuthModule } from '../auth/auth.module';
 
 /**
  * GraphQL Module Configuration
@@ -44,9 +46,11 @@ import { UsersModule } from '../users/users.module';
       // Note: CORS is handled by the Express server, not GraphQL directly
     }),
     UsersModule,  // Import UsersModule to access UsersService in resolvers
+    AuthModule,   // Import AuthModule to access AuthService in resolvers
   ],
   providers: [
     UserResolver,     // Register User resolver for GraphQL operations
+    AuthResolver,     // Register Auth resolver for GraphQL authentication
     GqlAuthGuard,     // Register GraphQL authentication guard
     DateScalar,       // Register custom Date scalar type
   ],

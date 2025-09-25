@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 // import { signInFormSchema } from "@/lib/auth-schema";
 import { signInFormSchema } from "../../../lib/auth-schema"; // Adjust the import path as necessary
-import { toast } from "../../../hooks/use-toastOLD";
+import { toast } from "@/hooks/use-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignIn() {
@@ -34,24 +34,56 @@ export default function SignIn() {
   async function onSubmit(values: z.infer<typeof signInFormSchema>) {
     const { email, password } = values;
 
+    // Show loading toast
+    toast({
+      title: "Please wait...",
+      description: "Signing you in...",
+    });
 
+    // Call NestJS backend for login
     const { data, error } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/admin",
-    }, {
-      onRequest: () => {
-        toast({
-          title: "Please wait...",
-        })
-      },
-      onSuccess: () => {
-        form.reset()
-      },
-      onError: (ctx) => {
-        alert(ctx.error.message);
-      },
     });
+
+    if (error) {
+      // Show error toast
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: 'destructive'
+      });
+      
+      // Set form error
+      form.setError('email', {
+        type: 'manual',
+        message: error.message
+      });
+    } else if (data) {
+      // Success - show success toast
+      toast({
+        title: "Welcome back!",
+        description: "Redirecting to dashboard...",
+      });
+      
+      // Reset form
+      form.reset();
+      
+      // Redirect based on user role
+      setTimeout(() => {
+        // You can customize redirect based on user roles
+        const userRoles = data.user.roles;
+        if (userRoles.includes('admin')) {
+          window.location.href = '/admin';
+        } else if (userRoles.includes('educator')) {
+          window.location.href = '/educator';
+        } else if (userRoles.includes('learner')) {
+          window.location.href = '/learner';
+        } else {
+          window.location.href = '/dashboard';
+        }
+      }, 1500);
+    }
   }
 
   return (
