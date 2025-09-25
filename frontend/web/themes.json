@@ -28,7 +28,7 @@
   },
   "themes": {
     "celeste": {
-      "name": "🌌 Celeste",
+      "name": "Celeste",
       "description": "Calming blue with cosmic glass morphism",
       "order": 1,
       "colors": {
@@ -77,7 +77,7 @@
       "recentEditOpacity": 0.3
     },
     "emerald": {
-      "name": "🌿 Emerald",
+      "name": "Emerald",
       "description": "Fresh green with nature-inspired glass",
       "order": 2,
       "colors": {
@@ -126,7 +126,7 @@
       "recentEditOpacity": 0.3
     },
     "emnight": {
-      "name": "🌲 Emerald Night",
+      "name": "Emerald Night",
       "description": "Dark emerald with deep forest glass",
       "order": 3,
       "colors": {
@@ -175,7 +175,7 @@
       "recentEditOpacity": 0.3
     },
     "midnight": {
-      "name": "🌙 Midnight",
+      "name": "Midnight",
       "description": "Deep purple with cosmic glass",
       "order": 4,
       "colors": {
@@ -224,7 +224,7 @@
       "recentEditOpacity": 0.3
     },
     "storm": {
-      "name": "⛈️ Storm",
+      "name": "Storm",
       "description": "Dark slate with electric glass",
       "order": 5,
       "colors": {
@@ -273,7 +273,7 @@
       "recentEditOpacity": 0.3
     },
     "arctic": {
-      "name": "🧊 Arctic",
+      "name": "Arctic",
       "description": "Cool teal with ice-like glass",
       "order": 6,
       "colors": {
@@ -322,7 +322,7 @@
       "recentEditOpacity": 0.3
     },
     "sunset": {
-      "name": "🌅 Sunset",
+      "name": "Sunset",
       "description": "Warm orange with golden glass",
       "order": 7,
       "colors": {
@@ -371,7 +371,7 @@
       "recentEditOpacity": 0.3
     },
     "coral": {
-      "name": "🌺 Coral Fushia",
+      "name": "Coral Fushia",
       "description": "Peachy-pink with soft glass",
       "order": 8,
       "colors": {
@@ -420,7 +420,7 @@
       "recentEditOpacity": 0.3
     },
     "rosegarden": {
-      "name": "🌹 Rosey",
+      "name": "Rosey",
       "description": "Deep crimson with romantic glass",
       "order": 9,
       "colors": {
@@ -469,7 +469,7 @@
       "recentEditOpacity": 0.3
     },
     "mono": {
-      "name": "☯ MonoChrome",
+      "name": "MonoChrome",
       "description": "Pure monochrome with elegant glass",
       "order": 10,
       "colors": {
@@ -518,7 +518,7 @@
       "recentEditOpacity": 0.3
     },
     "sepia": {
-      "name": "📜 Sepia",
+      "name": "Sepia",
       "description": "Vintage feel with antique glass",
       "order": 11,
       "colors": {
@@ -567,7 +567,7 @@
       "recentEditOpacity": 0.3
     },
     "hicon": {
-      "name": "⚡ HiCon",
+      "name": "HiCon",
       "description": "High contrast with minimal glass",
       "order": 12,
       "colors": {

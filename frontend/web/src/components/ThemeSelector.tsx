@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@/hooks/useTheme';
 import { GlassCard } from '@/components/glass';
 import { cn } from '@/lib/utils';
+import { Palette } from 'lucide-react';
 
 /**
  * ThemeSelector Component
@@ -15,6 +16,29 @@ export function ThemeSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { currentTheme, changeTheme, themes, isLoading } = useTheme();
+
+  // Map themes with their icons
+  const getThemedIcons = () => {
+    const iconMap: Record<string, string> = {
+      'emerald': '🌿',
+      'emnight': '🌲',
+      'celeste': '🌌',
+      'hicon': '⚡',
+      'arctic': '🧊',
+      'mono': '🔲',
+      'sunset': '🌅',
+      'sepia': '📜',
+      'coral': '🌸',
+      'midnight': '🌙',
+      'rosegarden': '🌹',
+      'storm': '⛈️'
+    };
+
+    return themes.map(theme => ({
+      ...theme,
+      icon: iconMap[theme.key] || '🎨'
+    }));
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -52,8 +76,7 @@ export function ThemeSelector() {
         )}
         aria-label="Select theme"
       >
-        <span className="text-lg">{currentThemeData?.name.split(' ')[0]}</span>
-        <span className="text-sm text-muted-foreground hidden sm:inline">Theme</span>
+        <Palette className="w-5 h-5" />
         <svg
           className={cn(
             "w-4 h-4 transition-transform duration-200",
@@ -68,11 +91,12 @@ export function ThemeSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-50">
-          <div className="bg-background/95 backdrop-blur-xl rounded-lg p-4 border border-border/30 shadow-2xl">
-            <div className="grid grid-cols-2 gap-2">
+        <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-50">
+          <div className="bg-background/98 backdrop-blur-xl rounded-xl p-5 border border-border/40 shadow-2xl">
+            <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
+            <div className="grid grid-cols-2 gap-3">
               {/* Two column layout - themes alternate left/right based on order */}
-              {themes.map((theme) => (
+              {getThemedIcons().map((theme, index) => (
                 <button
                   key={theme.key}
                   onClick={() => {
@@ -80,26 +104,27 @@ export function ThemeSelector() {
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "text-left p-3 rounded-lg",
-                    "bg-card/20 backdrop-blur-sm border border-border/30",
-                    "hover:bg-card/30 hover:border-border/40",
-                    "transition-all duration-200",
-                    currentTheme === theme.key && "bg-primary/30 border-primary/50"
+                    "text-left p-3 rounded-lg relative overflow-hidden",
+                    "bg-white/5 backdrop-blur-sm border",
+                    currentTheme === theme.key 
+                      ? "border-primary/60 bg-primary/10" 
+                      : "border-white/10 hover:border-white/20 hover:bg-white/10",
+                    "transition-all duration-200"
                   )}
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div 
-                      className="w-5 h-5 rounded-full border border-border/50"
-                      style={{ backgroundColor: theme.backgroundColor }}
-                    />
-                    <div 
-                      className="w-5 h-5 rounded-full border border-border/50"
-                      style={{ backgroundColor: theme.primaryColor }}
-                    />
+                  {/* Theme icon/graphic */}
+                  <div className="absolute -left-2 -top-2 text-6xl opacity-20">
+                    {theme.icon}
                   </div>
-                  <div className="font-medium text-sm">{theme.name}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                    {theme.description}
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-lg">{theme.icon}</span>
+                      <div className="font-medium text-sm">{theme.name}</div>
+                    </div>
+                    <div className="text-xs text-muted-foreground line-clamp-2">
+                      {theme.description}
+                    </div>
                   </div>
                 </button>
               ))}
