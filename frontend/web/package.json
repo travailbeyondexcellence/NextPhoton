@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 369",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 369",
     "lint": "next lint",
     "generate": "prisma generate --schema=../../shared/prisma/schema.prisma",
     "prisma:studio": "npx prisma studio  --schema=../../shared/prisma/schema.prisma",

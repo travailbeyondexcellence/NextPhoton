@@ -50,7 +50,7 @@ class AuthService {
 
   constructor() {
     // Use environment variable or default to localhost
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:963';
   }
 
   /**
