@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { ThemeSelector } from '@/components/ThemeSelector';
 
 /**
  * GraphQL Test Interface
@@ -187,18 +188,23 @@ export default function TestGraphQL() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-violet-900">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--background-gradient-from)] via-[var(--background-gradient-via)] to-[var(--background-gradient-to)]">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header with Theme Selector */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
-            GraphQL API Test Interface
-          </h1>
-          <p className="text-gray-300">
-            Test GraphQL queries and mutations without opening the playground
-          </p>
-          <div className="mt-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-            <p className="text-yellow-300 text-sm">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-4xl font-bold text-foreground mb-2">
+                GraphQL API Test Interface
+              </h1>
+              <p className="text-muted-foreground">
+                Test GraphQL queries and mutations without opening the playground
+              </p>
+            </div>
+            <ThemeSelector />
+          </div>
+          <div className="mt-4 p-4 bg-warning/10 border border-warning/30 rounded-lg backdrop-blur-sm">
+            <p className="text-warning text-sm">
               <strong>Backend URL:</strong> http://localhost:963/graphql
             </p>
           </div>
@@ -208,7 +214,7 @@ export default function TestGraphQL() {
           {/* Left Panel - Templates */}
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-              <h2 className="text-xl font-semibold text-white mb-4">Query Templates</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">Query Templates</h2>
               <div className="space-y-2">
                 {queryTemplates.map((template, index) => (
                   <button
@@ -216,14 +222,14 @@ export default function TestGraphQL() {
                     onClick={() => selectTemplate(template)}
                     className={`w-full text-left p-3 rounded-lg transition-all ${
                       selectedQuery.name === template.name
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-white/5 text-muted-foreground hover:bg-white/10'
                     }`}
                   >
                     <div className="font-medium">{template.name}</div>
                     <div className="text-sm opacity-80 mt-1">{template.description}</div>
                     {template.requiresAuth && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded">
+                      <span className="inline-block mt-2 px-2 py-1 bg-warning/20 text-warning text-xs rounded">
                         Requires Auth
                       </span>
                     )}
@@ -234,12 +240,12 @@ export default function TestGraphQL() {
 
             {/* Auth Token */}
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-              <h2 className="text-xl font-semibold text-white mb-4">Authentication Token</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-4">Authentication Token</h2>
               <textarea
                 value={authToken}
                 onChange={(e) => setAuthToken(e.target.value)}
                 placeholder="Paste your JWT token here (or it will be set automatically after login)"
-                className="w-full h-24 p-3 bg-white/5 text-white placeholder-gray-400 rounded-lg border border-white/10 focus:border-blue-500 focus:outline-none"
+                className="w-full h-24 p-3 bg-white/5 text-foreground placeholder-muted-foreground rounded-lg border border-white/10 focus:border-primary focus:outline-none"
               />
               {authToken && (
                 <button
@@ -247,7 +253,7 @@ export default function TestGraphQL() {
                     setAuthToken('');
                     toast.success('Token cleared');
                   }}
-                  className="mt-2 px-3 py-1 bg-red-500/20 text-red-300 rounded hover:bg-red-500/30 transition-colors"
+                  className="mt-2 px-3 py-1 bg-destructive/20 text-destructive rounded hover:bg-destructive/30 transition-colors"
                 >
                   Clear Token
                 </button>
@@ -259,10 +265,10 @@ export default function TestGraphQL() {
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Query</h2>
+                <h2 className="text-xl font-semibold text-foreground">Query</h2>
                 <button
                   onClick={() => copyToClipboard(query, 'Query')}
-                  className="px-3 py-1 bg-white/10 text-white rounded hover:bg-white/20 transition-colors"
+                  className="px-3 py-1 bg-white/10 text-foreground rounded hover:bg-white/20 transition-colors"
                 >
                   📋 Copy
                 </button>
@@ -270,16 +276,16 @@ export default function TestGraphQL() {
               <textarea
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full h-64 p-3 bg-white/5 text-white font-mono text-sm rounded-lg border border-white/10 focus:border-blue-500 focus:outline-none"
+                className="w-full h-64 p-3 bg-white/5 text-foreground font-mono text-sm rounded-lg border border-white/10 focus:border-primary focus:outline-none"
               />
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Variables</h2>
+                <h2 className="text-xl font-semibold text-foreground">Variables</h2>
                 <button
                   onClick={() => copyToClipboard(variables, 'Variables')}
-                  className="px-3 py-1 bg-white/10 text-white rounded hover:bg-white/20 transition-colors"
+                  className="px-3 py-1 bg-white/10 text-foreground rounded hover:bg-white/20 transition-colors"
                 >
                   📋 Copy
                 </button>
@@ -288,7 +294,7 @@ export default function TestGraphQL() {
                 value={variables}
                 onChange={(e) => setVariables(e.target.value)}
                 placeholder="{}"
-                className="w-full h-32 p-3 bg-white/5 text-white font-mono text-sm rounded-lg border border-white/10 focus:border-blue-500 focus:outline-none"
+                className="w-full h-32 p-3 bg-white/5 text-foreground font-mono text-sm rounded-lg border border-white/10 focus:border-primary focus:outline-none"
               />
             </div>
 
@@ -297,8 +303,8 @@ export default function TestGraphQL() {
               disabled={loading}
               className={`w-full py-3 rounded-lg font-semibold transition-all ${
                 loading
-                  ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-700 hover:to-violet-700'
+                  ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                  : 'bg-gradient-to-r from-primary to-secondary text-primary-foreground hover:opacity-90'
               }`}
             >
               {loading ? '⏳ Executing...' : '🚀 Execute Query'}
@@ -309,11 +315,11 @@ export default function TestGraphQL() {
           <div className="lg:col-span-1">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 h-full">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Response</h2>
+                <h2 className="text-xl font-semibold text-foreground">Response</h2>
                 {response && (
                   <button
                     onClick={() => copyToClipboard(JSON.stringify(response, null, 2), 'Response')}
-                    className="px-3 py-1 bg-white/10 text-white rounded hover:bg-white/20 transition-colors"
+                    className="px-3 py-1 bg-white/10 text-foreground rounded hover:bg-white/20 transition-colors"
                   >
                     📋 Copy
                   </button>
@@ -321,11 +327,11 @@ export default function TestGraphQL() {
               </div>
               <div className="bg-black/30 rounded-lg p-4 h-[500px] overflow-auto">
                 {response ? (
-                  <pre className="text-green-300 font-mono text-sm whitespace-pre-wrap">
+                  <pre className="text-success font-mono text-sm whitespace-pre-wrap">
                     {JSON.stringify(response, null, 2)}
                   </pre>
                 ) : (
-                  <p className="text-gray-400">Response will appear here...</p>
+                  <p className="text-muted-foreground">Response will appear here...</p>
                 )}
               </div>
             </div>
@@ -334,7 +340,7 @@ export default function TestGraphQL() {
 
         {/* Test Credentials */}
         <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-          <h2 className="text-xl font-semibold text-white mb-4">📚 Test Credentials</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-4">📚 Test Credentials</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { role: 'Admin', email: 'admin@nextphoton.com', password: 'Admin@123456' },
@@ -345,8 +351,8 @@ export default function TestGraphQL() {
               { role: 'Intern', email: 'jessica.intern@nextphoton.com', password: 'Intern@123' },
             ].map((cred) => (
               <div key={cred.email} className="bg-white/5 rounded-lg p-3">
-                <div className="font-semibold text-blue-300">{cred.role}</div>
-                <div className="text-sm text-gray-300 mt-1">
+                <div className="font-semibold text-primary">{cred.role}</div>
+                <div className="text-sm text-muted-foreground mt-1">
                   <div>📧 {cred.email}</div>
                   <div>🔑 {cred.password}</div>
                 </div>
@@ -360,7 +366,7 @@ export default function TestGraphQL() {
                     setVariables(JSON.stringify(loginVars, null, 2));
                     toast.success(`${cred.role} credentials loaded!`);
                   }}
-                  className="mt-2 px-3 py-1 bg-blue-600/20 text-blue-300 rounded hover:bg-blue-600/30 transition-colors text-sm"
+                  className="mt-2 px-3 py-1 bg-primary/20 text-primary rounded hover:bg-primary/30 transition-colors text-sm"
                 >
                   Use Credentials
                 </button>

@@ -93,7 +93,7 @@ export function DashboardSidebar() {
                 key={group.title}
                 className={`py-2 overflow-hidden ${groupIndex === 0 ? "mt-2" : ""}`}
               >
-                <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground dark:text-gray-500">
+                <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
                   {group.title}
                 </h3>
                 <SidebarMenu>
