@@ -1,98 +1,281 @@
 @import "tailwindcss";
 
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
+/* Theme CSS Variables */
+@layer base {
+  :root {
+    /* Default theme (Celeste) - RGB values for Tailwind alpha support */
+    --background: 240 248 255;
+    --foreground: 2 71 159;
+    --card: 230 242 255;
+    --card-foreground: 30 41 59;
+    --primary: 0 82 255;
+    --primary-foreground: 255 255 255;
+    --secondary: 14 165 233;
+    --secondary-foreground: 255 255 255;
+    --accent: 56 189 248;
+    --accent-foreground: 12 74 110;
+    --muted: 204 230 255;
+    --muted-foreground: 100 116 139;
+    --border: 179 217 255;
+    --selection: 186 230 253;
+    --link: 37 99 235;
+    --link-hover: 29 78 216;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --success: 34 197 94;
+    --success-foreground: 255 255 255;
+    --warning: 245 158 11;
+    --warning-foreground: 255 255 255;
+    
+    /* Glass morphism variables */
+    --glass-bg-opacity: 0.1;
+    --glass-border-opacity: 0.2;
+    --glass-blur: 12px;
+    --glass-hover-opacity: 0.15;
+    --glass-active-opacity: 0.2;
+    --glass-gradient-from: rgba(56, 189, 248, 0.1);
+    --glass-gradient-to: rgba(0, 82, 255, 0.05);
+    
+    /* Additional UI variables */
+    --radius: 0.5rem;
+    --input: var(--border);
+    --ring: var(--primary);
+    
+    /* Chart colors */
+    --chart-1: 12 76 122;
+    --chart-2: 0 149 199;
+    --chart-3: 0 196 159;
+    --chart-4: 84 78 195;
+    --chart-5: 189 53 88;
+    
+    /* Sidebar colors */
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+  }
+}
 
+/* Glass Morphism Base Styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  /* Theme-aware gradient background */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom right, 
+      var(--gradient-bg-from, #111827), 
+      var(--gradient-bg-via, #1e3a8a), 
+      var(--gradient-bg-to, #5b21b6));
+    z-index: -1;
+  }
+  
+  ::selection {
+    background-color: rgb(var(--selection) / 0.5);
+    color: rgb(var(--foreground));
+  }
+}
 
-/* @theme {
-  --color-lamaSky: #C3EBFA;
-  --color-lamaSkyLight: #EDF9FD;
-  --color-lamaPurple: #CFCEFF;
-  --color-lamaPurpleLight: #F1F0FF;
-  --color-lamaYellow: #FAE27C;
-  --color-lamaYellowLight: #FEFCE8;
-  --background: hsl(var(--background));
-  --foreground: hsl(var(--foreground));
-  --card: hsl(var(--card));
-  --card-foreground: hsl(var(--card-foreground));
-  --popover: hsl(var(--popover));
-  --popover-foreground: hsl(var(--popover-foreground));
-  --primary: hsl(var(--primary));
-  --primary-foreground: hsl(var(--primary-foreground));
-  --secondary: hsl(var(--secondary));
-  --secondary-foreground: hsl(var(--secondary-foreground));
-  --muted: hsl(var(--muted));
-  --muted-foreground: hsl(var(--muted-foreground));
-  --accent: hsl(var(--accent));
-  --accent-foreground: hsl(var(--accent-foreground));
-  --destructive: hsl(var(--destructive));
-  --destructive-foreground: hsl(var(--destructive-foreground));
-  --border: hsl(var(--border));
-  --input: hsl(var(--input));
-  --ring: hsl(var(--ring));
-  --chart-1: hsl(var(--chart-1));
-  --chart-2: hsl(var(--chart-2));
-  --chart-3: hsl(var(--chart-3));
-  --chart-4: hsl(var(--chart-4));
-  --chart-5: hsl(var(--chart-5));
-  --sidebar-background: hsl(var(--sidebar-background));
-  --sidebar-foreground: hsl(var(--sidebar-foreground));
-  --sidebar-primary: hsl(var(--sidebar-primary));
-  --sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --sidebar-accent: hsl(var(--sidebar-accent));
-  --sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --sidebar-border: hsl(var(--sidebar-border));
-  --sidebar-ring: hsl(var(--sidebar-ring));
+/* Glass Morphism Utilities */
+@layer components {
+  /* Base glass effect */
+  .glass {
+    background: rgb(var(--card) / var(--glass-bg-opacity));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgb(var(--border) / var(--glass-border-opacity));
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.15),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Glass card variant */
+  .glass-card {
+    @apply glass rounded-lg;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card:hover {
+    background: rgb(var(--card) / var(--glass-hover-opacity));
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px 0 rgba(31, 38, 135, 0.25),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Glass panel for larger areas */
+  .glass-panel {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--card) / var(--glass-bg-opacity)),
+      rgb(var(--background) / calc(var(--glass-bg-opacity) * 0.5))
+    );
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    border: 1px solid rgb(var(--border) / calc(var(--glass-border-opacity) * 0.8));
+    @apply rounded-xl;
+  }
+  
+  /* Glass button */
+  .glass-button {
+    @apply glass rounded-md px-4 py-2 font-medium transition-all;
+    background: rgb(var(--primary) / 0.1);
+    border-color: rgb(var(--primary) / 0.2);
+  }
+  
+  .glass-button:hover {
+    background: rgb(var(--primary) / 0.15);
+    transform: scale(1.02);
+  }
+  
+  .glass-button:active {
+    background: rgb(var(--primary) / 0.2);
+    transform: scale(0.98);
+  }
+  
+  /* Glass navigation */
+  .glass-nav {
+    background: rgb(var(--background) / 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgb(var(--border) / 0.1);
+  }
+  
+  /* Glass modal/overlay */
+  .glass-modal {
+    background: rgb(var(--background) / 0.2);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgb(var(--border) / 0.3);
+  }
+  
+  /* Glass input */
+  .glass-input {
+    background: rgb(var(--background) / 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--border) / 0.2);
+    @apply rounded-md px-3 py-2;
+  }
+  
+  .glass-input:focus {
+    background: rgb(var(--background) / 0.08);
+    border-color: rgb(var(--primary) / 0.5);
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--primary) / 0.1);
+  }
+}
 
-  --gradient-radial: radial-gradient(var(--tw-gradient-stops));
-  --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
+/* Theme transition animations */
+@layer utilities {
+  .theme-transition * {
+    @apply transition-colors duration-200 ease-in-out;
+  }
+  
+  /* Gradient backgrounds for different themes */
+  .gradient-celeste {
+    --gradient-bg-from: #111827;
+    --gradient-bg-via: #1e3a8a;
+    --gradient-bg-to: #5b21b6;
+  }
+  
+  .gradient-emerald {
+    --gradient-bg-from: #064e3b;
+    --gradient-bg-via: #047857;
+    --gradient-bg-to: #0d9488;
+  }
+  
+  .gradient-midnight {
+    --gradient-bg-from: #0f0a1f;
+    --gradient-bg-via: #2e1065;
+    --gradient-bg-to: #312e81;
+  }
+  
+  .gradient-storm {
+    --gradient-bg-from: #0f172a;
+    --gradient-bg-via: #1e3a8a;
+    --gradient-bg-to: #0e7490;
+  }
+  
+  .gradient-arctic {
+    --gradient-bg-from: #0e7490;
+    --gradient-bg-via: #0d9488;
+    --gradient-bg-to: #1e3a8a;
+  }
+  
+  .gradient-sunset {
+    --gradient-bg-from: #9a3412;
+    --gradient-bg-via: #b45309;
+    --gradient-bg-to: #a16207;
+  }
+  
+  .gradient-coral {
+    --gradient-bg-from: #9f1239;
+    --gradient-bg-via: #a21caf;
+    --gradient-bg-to: #be185d;
+  }
+  
+  .gradient-rose {
+    --gradient-bg-from: #be123c;
+    --gradient-bg-via: #dc2626;
+    --gradient-bg-to: #db2777;
+  }
+  
+  .gradient-mono {
+    --gradient-bg-from: #171717;
+    --gradient-bg-via: #262626;
+    --gradient-bg-to: #404040;
+  }
+  
+  .gradient-sepia {
+    --gradient-bg-from: #713f12;
+    --gradient-bg-via: #92400e;
+    --gradient-bg-to: #78350f;
+  }
+  
+  .gradient-hicon {
+    --gradient-bg-from: #f9fafb;
+    --gradient-bg-via: #ffffff;
+    --gradient-bg-to: #f3f4f6;
+  }
+}
 
-  --radius: var(--radius);
-  --borderRadius-lg: var(--radius);
-  --borderRadius-md: calc(var(--radius) - 2px);
-  --borderRadius-sm: calc(var(--radius) - 4px);
-} */
-
-/* Add any base styles or custom utilities here */
-
-/* // ... existing code ... */
-
-
-
-
+/* Scrollbar Styles */
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
   }
-
+  
   .scrollbar-track-transparent {
     background-color: transparent;
   }
-
+  
   .scrollbar-thumb-muted {
     background-color: rgba(255, 255, 255, 0.2);
   }
 }
 
-/* Hide scrollbar buttons (arrows) in WebKit-based browsers (Chrome, Edge, Safari) */
-.scrollbar-hide-buttons::-webkit-scrollbar-button {
-  display: none;
-  height: 0;
-  width: 0;
-}
-
-/* Hide scrollbar arrows (buttons) in WebKit browsers */
-::-webkit-scrollbar-button {
-  display: none !important;
-  height: 0 !important;
-  width: 0 !important;
-}
-
-/* General scrollbar settings */
+/* Custom scrollbar */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 100, 100, 0.3) transparent; /* Firefox fallback */
+  scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -106,74 +289,43 @@
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(120, 120, 120, 0.4);
-  border-radius: 0;
+  border-radius: 3px;
 }
 
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.15);
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 120, 120, 0.6);
 }
 
-/* Remove visual right edge line */
+/* Hide scrollbar buttons */
+::-webkit-scrollbar-button {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+/* Sidebar styles */
 .no-border-sidebar {
   border-right: none !important;
-  
   border-color: transparent !important;
   outline: none !important;
   box-shadow: none !important;
 }
 
-/* Ensure this also applies to sidebar track if needed */
 .no-border-sidebar::-webkit-scrollbar-track {
   border: none !important;
   background-color: transparent !important;
 }
 
-
-
-
-
-/* 
-.react-calendar {
-  width: 100% !important;
-  border: none !important;
-  font-family: "Inter", sans-serif !important;
-  background-color: white !important;
-  color: #222 !important;
-}
-.dark .react-calendar {
-  background-color: #1a202c !important;
-  color: #f3f4f6 !important;
-}
-
-.react-calendar__navigation__label__labelText {
-  font-weight: 600;
-}
-
-.react-calendar__tile--active {
-  background-color: #c3ebfa !important;
-  color: black !important;
-}
-.dark .react-calendar__tile--active {
-  background-color: #374151 !important;
-  color: #f3f4f6 !important;
-} */
-
-
-@layer base {
-  :root {
-   
-  
-  }
-  .dark {
- 
-  }
-}
-
-@layer base {
-  * {
-    /* @reference border-border; */
-  }
-  body {
-    @reference bg-background text-foreground;
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  .glass,
+  .glass-card,
+  .glass-panel,
+  .glass-button,
+  .glass-nav,
+  .glass-modal,
+  .glass-input {
+    background: rgb(var(--card) / 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 }
