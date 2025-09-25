@@ -162,13 +162,18 @@ async function seedPermissions() {
 /**
  * Create role-specific profile based on the role
  */
-async function createRoleProfile(tx: any, userId: string, role: string) {
+async function createRoleProfile(tx: any, userId: string, role: string, userName: string) {
+  // Split the full name into first and last name
+  const nameParts = userName.split(' ');
+  const firstName = nameParts[0] || 'First';
+  const lastName = nameParts.slice(1).join(' ') || 'Name';
+  
   const profileData = {
     id: generateId(),
     userId,
-    bio: '',
+    firstName,
+    lastName,
     phoneNumber: '',
-    address: '',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -178,10 +183,13 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
       await tx.learnerProfile.create({
         data: {
           ...profileData,
-          gradeLevel: 'Grade 10',
+          dateOfBirth: new Date('2008-01-01'), // Sample date for learner
+          currentGrade: 'Grade 10',
           school: 'NextPhoton Academy',
-          learningStyle: 'Visual',
-          interests: ['Mathematics', 'Science'],
+          learningStyle: 'visual',
+          preferredLanguage: 'English',
+          subjects: ['Mathematics', 'Science', 'English'],
+          targetExams: ['JEE', 'SAT'],
         },
       });
       break;
@@ -192,7 +200,6 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
           ...profileData,
           relationship: 'Parent',
           occupation: 'Professional',
-          emergencyContact: '+1234567890',
         },
       });
       break;
@@ -201,13 +208,13 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
       await tx.educatorProfile.create({
         data: {
           ...profileData,
+          dateOfBirth: new Date('1985-01-01'),
           qualifications: ['B.Ed', 'M.Sc'],
-          experience: 5,
           specializations: ['Mathematics', 'Physics'],
-          hourlyRate: 50,
-          availability: { monday: '9-5', tuesday: '9-5' },
-          rating: 4.5,
-          totalSessions: 0,
+          experience: 5,
+          documentsUploaded: [],
+          languages: ['English'],
+          availableTimings: { monday: '9-5', tuesday: '9-5' },
         },
       });
       break;
@@ -217,10 +224,8 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
         data: {
           ...profileData,
           department: 'Education Management',
-          supervisionLevel: 'SENIOR',
-          maxCaseload: 30,
-          currentCaseload: 0,
-          specializations: ['K-12', 'Special Education'],
+          specialization: ['K-12', 'Special Education'],
+          experience: 5,
         },
       });
       break;
@@ -229,10 +234,10 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
       await tx.employeeProfile.create({
         data: {
           ...profileData,
+          employeeId: `EMP${Date.now()}`,
           department: 'Operations',
           position: 'Platform Manager',
-          employeeId: `EMP${Date.now()}`,
-          startDate: new Date(),
+          joiningDate: new Date(),
         },
       });
       break;
@@ -242,10 +247,14 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
         data: {
           ...profileData,
           university: 'Tech University',
-          program: 'Computer Science',
+          major: 'Computer Science',
           year: 3,
           skills: ['JavaScript', 'TypeScript', 'React'],
+          department: 'Engineering',
+          internshipType: 'full-time',
           mentorId: null,
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
         },
       });
       break;
@@ -254,9 +263,7 @@ async function createRoleProfile(tx: any, userId: string, role: string) {
       await tx.adminProfile.create({
         data: {
           ...profileData,
-          department: 'System Administration',
-          accessLevel: 'FULL',
-          permissions: ['ALL'],
+          adminLevel: 'platform',
         },
       });
       break;
@@ -341,7 +348,7 @@ async function seedUsers() {
         });
 
         // Create role-specific profile
-        await createRoleProfile(tx, user.id, userData.role);
+        await createRoleProfile(tx, user.id, userData.role, userData.name);
 
         console.log(`✅ Created user: ${userData.name} (${userData.email}) - Role: ${userData.role}`);
       });

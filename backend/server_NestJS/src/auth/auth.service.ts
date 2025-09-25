@@ -194,7 +194,7 @@ export class AuthService {
         });
 
         // Create role-specific profile based on the role
-        await this.createRoleProfile(tx, newUser.id, registerDto.role);
+        await this.createRoleProfile(tx, newUser.id, registerDto.role, registerDto.name);
 
         return newUser;
       });
@@ -301,14 +301,20 @@ export class AuthService {
    * @param tx - Prisma transaction client
    * @param userId - User ID to create profile for
    * @param role - Role name determining which profile to create
+   * @param userName - User's full name to split into first and last
    */
-  private async createRoleProfile(tx: any, userId: string, role: string) {
+  private async createRoleProfile(tx: any, userId: string, role: string, userName: string) {
+    // Split the full name into first and last name
+    const nameParts = userName.split(' ');
+    const firstName = nameParts[0] || 'First';
+    const lastName = nameParts.slice(1).join(' ') || 'Name';
+    
     const profileData = {
       id: this.generateId(),
       userId,
-      bio: '',
+      firstName,
+      lastName,
       phoneNumber: '',
-      address: '',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -318,10 +324,13 @@ export class AuthService {
         await tx.learnerProfile.create({
           data: {
             ...profileData,
-            gradeLevel: '',
+            dateOfBirth: new Date('2000-01-01'),
+            currentGrade: '',
             school: '',
-            learningStyle: '',
-            interests: [],
+            learningStyle: 'visual',
+            preferredLanguage: 'English',
+            subjects: [],
+            targetExams: [],
           },
         });
         break;
@@ -332,7 +341,6 @@ export class AuthService {
             ...profileData,
             relationship: '',
             occupation: '',
-            emergencyContact: '',
           },
         });
         break;
@@ -342,12 +350,10 @@ export class AuthService {
           data: {
             ...profileData,
             qualifications: [],
-            experience: 0,
             specializations: [],
-            hourlyRate: 0,
-            availability: {},
-            rating: 0,
-            totalSessions: 0,
+            experience: 0,
+            documentsUploaded: [],
+            languages: ['English'],
           },
         });
         break;
@@ -357,10 +363,8 @@ export class AuthService {
           data: {
             ...profileData,
             department: '',
-            supervisionLevel: 'STANDARD',
-            maxCaseload: 20,
-            currentCaseload: 0,
-            specializations: [],
+            specialization: [],
+            experience: 0,
           },
         });
         break;
@@ -369,10 +373,10 @@ export class AuthService {
         await tx.employeeProfile.create({
           data: {
             ...profileData,
+            employeeId: `EMP${Date.now()}`,
             department: '',
             position: '',
-            employeeId: '',
-            startDate: new Date(),
+            joiningDate: new Date(),
           },
         });
         break;
@@ -382,10 +386,14 @@ export class AuthService {
           data: {
             ...profileData,
             university: '',
-            program: '',
+            major: '',
             year: 1,
             skills: [],
+            department: '',
+            internshipType: 'full-time',
             mentorId: null,
+            startDate: new Date(),
+            endDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
           },
         });
         break;
@@ -394,9 +402,7 @@ export class AuthService {
         await tx.adminProfile.create({
           data: {
             ...profileData,
-            department: 'Administration',
-            accessLevel: 'FULL',
-            permissions: [],
+            adminLevel: 'platform',
           },
         });
         break;
