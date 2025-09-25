@@ -47,26 +47,14 @@ export function ProfileDropdown() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-lg",
-          "bg-card/10 backdrop-blur-sm border border-border/20",
-          "hover:bg-card/15 hover:border-border/30",
+          "w-10 h-10 rounded-full flex items-center justify-center",
+          "bg-primary/10 backdrop-blur-sm border border-white/10",
+          "hover:bg-primary/15 hover:border-white/15",
           "transition-all duration-200"
         )}
         aria-label="User menu"
       >
-        {/* User Avatar with Initials */}
-        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-          <span className="text-xs font-semibold text-primary">{user.initials}</span>
-        </div>
-        
-        {/* User Name */}
-        <span className="text-sm font-medium hidden sm:inline">{user.name}</span>
-        
-        {/* Dropdown Arrow */}
-        <ChevronDown className={cn(
-          "w-4 h-4 transition-transform duration-200",
-          isOpen && "rotate-180"
-        )} />
+        <span className="text-sm font-semibold">{user.initials}</span>
       </button>
 
       {isOpen && (

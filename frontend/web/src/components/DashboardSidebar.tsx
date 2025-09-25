@@ -76,12 +76,12 @@ export function DashboardSidebar() {
     <div className="flex flex-col h-full">
       {/* Fixed Header */}
       <div className="flex-shrink-0">
-        <SidebarHeader className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-card/10 backdrop-blur-sm border-b border-border/20">
+        <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-white/5 backdrop-blur-sm border-b border-white/10">
           <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer" onClick={() => router.push("/")}>
             <LogoComponent width={48} height={48} />
             <h2 className="text-lg font-bold hover:cursor-pointer text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">NextPhoton</h2>
           </span>
-        </SidebarHeader>
+        </div>
       </div>
 
       {/* Scrollable Content */}

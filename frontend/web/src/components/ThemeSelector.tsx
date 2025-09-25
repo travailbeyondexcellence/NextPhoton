@@ -70,8 +70,8 @@ export function ThemeSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center justify-center p-2 rounded-lg",
-          "bg-card/10 backdrop-blur-sm border border-border/20",
-          "hover:bg-card/15 hover:border-border/30",
+          "bg-white/5 backdrop-blur-sm border border-white/10",
+          "hover:bg-white/10 hover:border-white/15",
           "transition-all duration-200"
         )}
         aria-label="Select theme"

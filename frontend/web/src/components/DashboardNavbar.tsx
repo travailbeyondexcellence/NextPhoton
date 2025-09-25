@@ -7,11 +7,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export function DashboardNavbar() {
   return (
-    <GlassNavbar className="h-16 px-4 flex items-center" sticky={true}>
-      <div className="w-full flex items-center justify-between">
+    <div className="h-16 w-full border-b border-white/10">
+      <div className="h-full px-4 flex items-center justify-between">
         {/* Left: Sidebar trigger + title */}
         <div className="flex items-center gap-4">
-          <SidebarTrigger className="text-foreground hover:bg-card/10 rounded-md p-2 transition-colors" />
+          <SidebarTrigger className="text-foreground hover:bg-white/5 rounded-md p-2 transition-colors" />
           <h2 className="text-lg font-semibold text-foreground">Dashboard</h2>
         </div>
 
@@ -21,6 +21,6 @@ export function DashboardNavbar() {
           <ProfileDropdown />
         </div>
       </div>
-    </GlassNavbar>
+    </div>
   );
 }

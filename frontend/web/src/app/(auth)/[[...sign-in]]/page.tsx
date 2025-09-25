@@ -2,7 +2,7 @@
 
 import { Eye, EyeOff } from "lucide-react"
 import { useState } from "react";
-import { GlassCard, GlassButton } from "@/components/glass";
+import { GlassButton } from "@/components/glass";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -85,7 +85,7 @@ export default function SignIn() {
       {/* Glass background effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/10 to-secondary/20 blur-3xl" />
       
-      <GlassCard className="w-full max-w-md mx-auto p-8 relative z-10" variant="hover" blur="lg" gradient>
+      <div className="w-full max-w-md mx-auto p-8 relative z-10 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20">
         <div className="space-y-6">
           {/* Header */}
           <div className="space-y-2 text-center">
@@ -183,7 +183,7 @@ export default function SignIn() {
             </p>
           </div>
         </div>
-      </GlassCard>
+      </div>
     </div>
   )
 }
