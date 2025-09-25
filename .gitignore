@@ -1,5 +1,11 @@
 # Root
 .env
+.env.development
+.env.production
+.env.local
+.env*.local
+# Keep the example file
+!.env.example
 .turbo
 node_modules/
 pnpm-lock.yaml
