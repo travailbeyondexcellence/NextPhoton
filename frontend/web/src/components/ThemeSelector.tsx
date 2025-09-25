@@ -68,93 +68,45 @@ export function ThemeSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 max-h-[70vh] overflow-y-auto custom-scrollbar z-50">
-          <GlassCard className="p-2" blur="xl">
-            <div className="space-y-1">
-              {/* Theme groups */}
-              <ThemeGroup
-                title="Light Themes"
-                themes={themes.filter(t => ['celeste', 'emerald', 'arctic', 'sunset'].includes(t.key))}
-                currentTheme={currentTheme}
-                onSelect={(key) => {
-                  changeTheme(key as any);
-                  setIsOpen(false);
-                }}
-              />
-              
-              <div className="my-2 border-t border-border/20" />
-              
-              <ThemeGroup
-                title="Dark Themes"
-                themes={themes.filter(t => ['emnight', 'midnight', 'storm', 'mono'].includes(t.key))}
-                currentTheme={currentTheme}
-                onSelect={(key) => {
-                  changeTheme(key as any);
-                  setIsOpen(false);
-                }}
-              />
-              
-              <div className="my-2 border-t border-border/20" />
-              
-              <ThemeGroup
-                title="Special Themes"
-                themes={themes.filter(t => ['coral', 'rosegarden', 'sepia', 'hicon'].includes(t.key))}
-                currentTheme={currentTheme}
-                onSelect={(key) => {
-                  changeTheme(key as any);
-                  setIsOpen(false);
-                }}
-              />
+        <div className="absolute right-0 mt-2 w-96 max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-50">
+          <GlassCard className="p-4" blur="xl">
+            <div className="grid grid-cols-2 gap-2">
+              {/* Two column layout - themes alternate left/right based on order */}
+              {themes.map((theme) => (
+                <button
+                  key={theme.key}
+                  onClick={() => {
+                    changeTheme(theme.key as any);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    "text-left p-3 rounded-lg",
+                    "bg-card/10 backdrop-blur-sm border border-border/20",
+                    "hover:bg-card/20 hover:border-border/30",
+                    "transition-all duration-200",
+                    currentTheme === theme.key && "bg-primary/20 border-primary/40"
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div 
+                      className="w-5 h-5 rounded-full border border-border/50"
+                      style={{ backgroundColor: theme.backgroundColor }}
+                    />
+                    <div 
+                      className="w-5 h-5 rounded-full border border-border/50"
+                      style={{ backgroundColor: theme.primaryColor }}
+                    />
+                  </div>
+                  <div className="font-medium text-sm">{theme.name}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                    {theme.description}
+                  </div>
+                </button>
+              ))}
             </div>
           </GlassCard>
         </div>
       )}
-    </div>
-  );
-}
-
-interface ThemeGroupProps {
-  title: string;
-  themes: any[];
-  currentTheme: string;
-  onSelect: (key: string) => void;
-}
-
-function ThemeGroup({ title, themes, currentTheme, onSelect }: ThemeGroupProps) {
-  return (
-    <div>
-      <div className="px-2 py-1 text-xs font-medium text-muted-foreground">{title}</div>
-      {themes.map((theme) => (
-        <button
-          key={theme.key}
-          onClick={() => onSelect(theme.key)}
-          className={cn(
-            "w-full text-left px-3 py-2 rounded-md",
-            "hover:bg-card/10 transition-colors",
-            currentTheme === theme.key && "bg-primary/10 border border-primary/20"
-          )}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-lg">{theme.name.split(' ')[0]}</span>
-                <span className="font-medium text-sm">{theme.name.split(' ').slice(1).join(' ')}</span>
-              </div>
-              <div className="text-xs text-muted-foreground mt-0.5">{theme.description}</div>
-            </div>
-            <div className="flex gap-1 ml-2">
-              <div 
-                className="w-4 h-4 rounded-full border border-border/50"
-                style={{ backgroundColor: theme.backgroundColor }}
-              />
-              <div 
-                className="w-4 h-4 rounded-full border border-border/50"
-                style={{ backgroundColor: theme.primaryColor }}
-              />
-            </div>
-          </div>
-        </button>
-      ))}
     </div>
   );
 }
