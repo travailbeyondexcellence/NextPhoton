@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 // If your Prisma file is located elsewhere, you can change the path
 // import { PrismaClient } from "../../../shared/db/index";
 
-import { prisma } from "../../../shared/db"; // Import the prisma singleton from shared
+import { prisma } from "../../../../shared/db"; // Import the prisma singleton from shared
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {

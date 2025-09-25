@@ -17,7 +17,7 @@
 
 import path from 'path';
 import dotenv from 'dotenv';
-import { prisma } from '../../../shared/db'; // ✅ import default
+import { prisma } from '../../../../shared/db'; // ✅ import default
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
