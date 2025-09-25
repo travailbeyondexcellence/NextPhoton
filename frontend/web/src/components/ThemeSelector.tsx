@@ -69,7 +69,7 @@ export function ThemeSelector() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-96 max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-50">
-          <GlassCard className="p-4" blur="xl">
+          <div className="bg-background/95 backdrop-blur-xl rounded-lg p-4 border border-border/30 shadow-2xl">
             <div className="grid grid-cols-2 gap-2">
               {/* Two column layout - themes alternate left/right based on order */}
               {themes.map((theme) => (
@@ -81,10 +81,10 @@ export function ThemeSelector() {
                   }}
                   className={cn(
                     "text-left p-3 rounded-lg",
-                    "bg-card/10 backdrop-blur-sm border border-border/20",
-                    "hover:bg-card/20 hover:border-border/30",
+                    "bg-card/20 backdrop-blur-sm border border-border/30",
+                    "hover:bg-card/30 hover:border-border/40",
                     "transition-all duration-200",
-                    currentTheme === theme.key && "bg-primary/20 border-primary/40"
+                    currentTheme === theme.key && "bg-primary/30 border-primary/50"
                   )}
                 >
                   <div className="flex items-center gap-2 mb-2">
@@ -104,7 +104,7 @@ export function ThemeSelector() {
                 </button>
               ))}
             </div>
-          </GlassCard>
+          </div>
         </div>
       )}
     </div>

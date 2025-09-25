@@ -73,24 +73,20 @@ export function DashboardSidebar() {
   return (
 
 
-    <div >
-      {/* Sidebar content */}
-
-      <ShadcnSidebar collapsible="offcanvas" className="px-0 pl-0 ml-0 flex justify-start">
-
-        {/* Sidebar Header */}
-        <SidebarHeader className={`px-0 pl-4 ml-0 flex h-16 justify-start :hover:cursor-pointer ${sidebarHeaderBackground}`} >
-
+    <div className="flex flex-col h-full">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0">
+        <SidebarHeader className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-card/10 backdrop-blur-sm border-b border-border/20">
           <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer" onClick={() => router.push("/")}>
             <LogoComponent width={48} height={48} />
-            <h2 className="text-lg font-bold hover:cursor-pointer text-muted-foreground text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500"> Next Photon </h2>
+            <h2 className="text-lg font-bold hover:cursor-pointer text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">NextPhoton</h2>
           </span>
-
-
         </SidebarHeader>
-        <SidebarContent >
+      </div>
 
-          <SimpleBar className="w-56 ml-4" style={{ maxHeight: '100vh' }}>
+      {/* Scrollable Content */}
+      <div className="flex-1 overflow-hidden">
+        <SimpleBar className="h-full w-full px-2" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
             
             {adminMenu.map((group, groupIndex) => (
               <div
@@ -177,11 +173,7 @@ export function DashboardSidebar() {
               </div>
             ))} 
         </SimpleBar>
-            
-
-        </SidebarContent>
-      </ShadcnSidebar>
-
+      </div>
     </div>
   )
 } 

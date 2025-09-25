@@ -9,14 +9,12 @@ import { useState } from "react"
 
 export function DashboardNavbar() {
   return (
-    <GlassNavbar className="h-16 px-4" sticky={true}>
-      <div className="h-full flex items-center justify-between">
+    <GlassNavbar className="h-16 px-4 flex items-center" sticky={true}>
+      <div className="w-full flex items-center justify-between">
         {/* Left: Sidebar trigger + title */}
         <div className="flex items-center gap-4 min-w-0">
           {/* SidebarTrigger with glass effect */}
-          <div className="rounded-md">
-            <SidebarTrigger className="text-foreground hover:bg-card/10 rounded-md p-2 transition-colors" />
-          </div>
+          <SidebarTrigger className="text-foreground hover:bg-card/10 rounded-md p-2 transition-colors" />
           <h2 className="text-lg font-semibold truncate text-foreground">Dashboard</h2>
         </div>
 
@@ -26,7 +24,7 @@ export function DashboardNavbar() {
           <Button 
             variant="ghost" 
             size="icon"
-            className="bg-card/10 backdrop-blur-sm border border-border/20 hover:bg-card/15"
+            className="bg-card/10 backdrop-blur-sm border border-border/20 hover:bg-card/15 flex items-center justify-center"
           >
             <Bell className="h-5 w-5 text-foreground" />
           </Button>

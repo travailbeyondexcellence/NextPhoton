@@ -21,7 +21,7 @@ const AdminPage = ({
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {/* Total Users Card */}
-        <div className="bg-card/10 backdrop-blur-sm rounded-lg p-6 border border-border/20 hover:bg-card/15 transition-all">
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Total Users</div>
             <div className="text-primary">📊</div>
@@ -31,7 +31,7 @@ const AdminPage = ({
         </div>
 
         {/* Active Sessions Card */}
-        <div className="bg-card/10 backdrop-blur-sm rounded-lg p-6 border border-border/20 hover:bg-card/15 transition-all">
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Active Sessions</div>
             <div className="text-success">🟢</div>
@@ -41,7 +41,7 @@ const AdminPage = ({
         </div>
 
         {/* Total Courses Card */}
-        <div className="bg-card/10 backdrop-blur-sm rounded-lg p-6 border border-border/20 hover:bg-card/15 transition-all">
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Total Courses</div>
             <div className="text-secondary">📚</div>
@@ -51,7 +51,7 @@ const AdminPage = ({
         </div>
 
         {/* Revenue Card */}
-        <div className="bg-card/10 backdrop-blur-sm rounded-lg p-6 border border-border/20 hover:bg-card/15 transition-all">
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Monthly Revenue</div>
             <div className="text-accent">💰</div>
@@ -65,7 +65,7 @@ const AdminPage = ({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activities */}
         <div className="lg:col-span-2">
-          <div className="bg-card/10 backdrop-blur-sm rounded-lg p-6 border border-border/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
             <h2 className="text-xl font-semibold mb-4">Recent Activities</h2>
             <div className="space-y-3">
               {[
@@ -75,7 +75,7 @@ const AdminPage = ({
                 { user: "Admin", action: "System backup completed", time: "2 hours ago", icon: "💾" },
                 { user: "Robert Guardian", action: "Viewed progress report", time: "3 hours ago", icon: "📊" },
               ].map((activity, index) => (
-                <div key={index} className="flex items-center gap-4 p-3 bg-card/5 rounded-lg hover:bg-card/10 transition-all">
+                <div key={index} className="flex items-center gap-4 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-all">
                   <div className="text-2xl">{activity.icon}</div>
                   <div className="flex-1">
                     <div className="font-medium">{activity.user}</div>
@@ -90,24 +90,24 @@ const AdminPage = ({
 
         {/* Quick Actions */}
         <div className="lg:col-span-1">
-          <div className="bg-card/10 backdrop-blur-sm rounded-lg p-6 border border-border/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <button className="w-full p-3 bg-primary/10 text-primary rounded-lg border border-primary/20 hover:bg-primary/15 transition-all text-left">
+              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
                 <div className="font-medium">Add New User</div>
-                <div className="text-xs opacity-80">Create educator or learner account</div>
+                <div className="text-xs text-muted-foreground">Create educator or learner account</div>
               </button>
-              <button className="w-full p-3 bg-secondary/10 text-secondary rounded-lg border border-secondary/20 hover:bg-secondary/15 transition-all text-left">
+              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
                 <div className="font-medium">Create Course</div>
-                <div className="text-xs opacity-80">Set up new educational content</div>
+                <div className="text-xs text-muted-foreground">Set up new educational content</div>
               </button>
-              <button className="w-full p-3 bg-accent/10 text-accent rounded-lg border border-accent/20 hover:bg-accent/15 transition-all text-left">
+              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
                 <div className="font-medium">View Reports</div>
-                <div className="text-xs opacity-80">Analytics and performance metrics</div>
+                <div className="text-xs text-muted-foreground">Analytics and performance metrics</div>
               </button>
-              <button className="w-full p-3 bg-warning/10 text-warning rounded-lg border border-warning/20 hover:bg-warning/15 transition-all text-left">
+              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
                 <div className="font-medium">System Settings</div>
-                <div className="text-xs opacity-80">Configure platform preferences</div>
+                <div className="text-xs text-muted-foreground">Configure platform preferences</div>
               </button>
             </div>
           </div>
