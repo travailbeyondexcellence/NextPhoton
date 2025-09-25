@@ -81,7 +81,7 @@ export function ThemeSelector() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-50">
-          <div className="bg-background/98 backdrop-blur-xl rounded-xl p-5 border border-border/40 shadow-2xl">
+          <div className="bg-white/10 backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
             <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
             <div className="grid grid-cols-2 gap-3">
               {/* Two column layout - themes alternate left/right based on order */}
@@ -96,7 +96,7 @@ export function ThemeSelector() {
                     "text-left p-3 rounded-lg relative overflow-hidden",
                     "bg-white/5 backdrop-blur-sm border",
                     currentTheme === theme.key 
-                      ? "border-primary/60 bg-primary/10" 
+                      ? "border-white/30 bg-white/15" 
                       : "border-white/10 hover:border-white/20 hover:bg-white/10",
                     "transition-all duration-200"
                   )}

@@ -23,34 +23,38 @@ const Educators = () => {
   };
 
   return (
-    <div>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Educators</h1>
-          <div className="buttons group "><button
+    <div className="min-h-full">
+      {/* Header Section */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-foreground mb-2">Educators</h1>
+        <p className="text-muted-foreground">Manage and monitor all educators on the platform</p>
+      </div>
+
+      {/* Controls Bar */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <button
             onClick={toggleView}
-            className="p-2 bg-gray-100 rounded hover:bg-gray-200"
+            className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all"
             title="Toggle View"
           >
             {view === "list" ? <LayoutGrid size={20} /> : <List size={20} />}
           </button>
-            <button className="ml-2 mr-2" onClick ={() => router.push(`${pathname}/createNewEducator`)}>
+          <button 
+            className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all" 
+            onClick={() => router.push(`${pathname}/createNewEducator`)}
+          >
             <UserPlus size={20} />
           </button>
-        
         </div>
-          
-        </div>
-
-        {view === "list" ? (
-          <EducatorsList_forAdmin />
-        ) : (
-          <EducatorsCardsView_forAdmin />
-        )}
       </div>
 
-      {/* Following Educator card is kept only for development purposes and testing the views */}
-      {/* <EducatorCard_forAdmin /> */}
+      {/* Content Area */}
+      {view === "list" ? (
+        <EducatorsList_forAdmin />
+      ) : (
+        <EducatorsCardsView_forAdmin />
+      )}
     </div>
   );
 };

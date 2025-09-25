@@ -39,46 +39,46 @@ const EducatorsList_forAdmin = () => {
 
 
   return (
-    <div className="bg-white shadow rounded-lg overflow-x-auto">
+    <div className="bg-white/10 backdrop-blur-sm rounded-lg overflow-x-auto border border-white/20">
       <table className="min-w-full text-sm text-left">
-        <thead className="bg-gray-100">
+        <thead className="bg-white/5 border-b border-white/10">
           <tr>
-            <th className="px-4 py-3">Photo</th>
-            <th className="px-4 py-3">Name</th>
-            <th className="px-4 py-3">Subjects</th>
-            <th className="px-4 py-3">Exams</th>
-            <th className="px-4 py-3">Experience</th>
-            <th className="px-4 py-3">Students</th>
-            <th className="px-4 py-3">Hours</th>
-            <th className="px-4 py-3">Actions</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Photo</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Name</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Subjects</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Exams</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Experience</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Students</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Hours</th>
+            <th className="px-4 py-3 text-muted-foreground font-medium">Actions</th>
           </tr>
         </thead>
         <tbody>
           {educators.map((edu) => (
-            <tr key={edu.id} className="border-t hover:bg-gray-50 transition">
+            <tr key={edu.id} className="border-t border-white/10 hover:bg-white/5 transition-all">
               <td className="px-4 py-3">
                 <Image
                   src={edu.profileImage || '/default-avatar.png'}
                   alt={edu.name}
                   width={40}
                   height={40}
-                  className="rounded-full object-cover"
+                  className="rounded-full object-cover border border-white/10"
                 />
               </td>
               <td className="px-4 py-3">
-                <div className="font-semibold">{edu.name}</div>
-                <div className="text-gray-500 text-xs">{edu.username}</div>
+                <div className="font-semibold text-foreground">{edu.name}</div>
+                <div className="text-muted-foreground text-xs">{edu.username}</div>
               </td>
-              <td className="px-4 py-3">{edu.subjects.join(', ')}</td>
-              <td className="px-4 py-3">{edu.exams.join(', ')}</td>
-              <td className="px-4 py-3">{edu.yearsWithNextPhoton} yrs</td>
-              <td className="px-4 py-3">{edu.studentsTaught}</td>
-              <td className="px-4 py-3">{edu.hoursTaught}</td>
+              <td className="px-4 py-3 text-foreground">{edu.subjects.join(', ')}</td>
+              <td className="px-4 py-3 text-foreground">{edu.exams.join(', ')}</td>
+              <td className="px-4 py-3 text-foreground">{edu.yearsWithNextPhoton} yrs</td>
+              <td className="px-4 py-3 text-foreground">{edu.studentsTaught}</td>
+              <td className="px-4 py-3 text-foreground">{edu.hoursTaught}</td>
               <td className="px-4 py-3 flex gap-2">
-                <button className="text-blue-600 hover:text-blue-800">
+                <button className="text-primary hover:text-primary/80 transition-colors">
                   <Pencil size={16} />
                 </button>
-                <button className="text-red-600 hover:text-red-800">
+                <button className="text-destructive hover:text-destructive/80 transition-colors">
                   <Trash2 size={16} />
                 </button>
               </td>

@@ -59,9 +59,9 @@ export function ProfileDropdown() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 z-50">
-          <div className="bg-background/98 backdrop-blur-xl rounded-xl border border-border/40 shadow-2xl overflow-hidden">
+          <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 shadow-2xl overflow-hidden">
             {/* User Info Header */}
-            <div className="p-4 border-b border-border/20">
+            <div className="p-4 border-b border-white/10">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                   <span className="text-lg font-semibold text-primary">{user.initials}</span>
@@ -124,7 +124,7 @@ export function ProfileDropdown() {
               </button>
 
               {/* Divider */}
-              <div className="my-2 border-t border-border/20" />
+              <div className="my-2 border-t border-white/10" />
 
               <button
                 onClick={() => {

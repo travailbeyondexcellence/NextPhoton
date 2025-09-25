@@ -51,7 +51,7 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
   const router = useRouter();
 
   return (
-    <div className="relative flex flex-col xl:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted dark:bg-gray-900 dark:text-gray-100 dark:border-gray-800 w-full max-w-4xl cursor-pointer hover:scale-[1.015] transition-transform duration-300">
+    <div className="relative flex flex-col xl:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 w-full cursor-pointer hover:bg-white/15 hover:border-white/30 transition-all duration-300">
       {/* Price Tag */}
       <div
         className={`absolute top-2 right-2 text-xs font-semibold px-3 py-1 rounded ${getPriceTagColor(educator.priceTier)}`}
@@ -65,17 +65,17 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
         alt={educator.name}
         width={240}
         height={192}
-        className="w-full md:w-56 object-cover bg-muted dark:bg-gray-800 hover:scale-[1.05] transition-transform duration-300"
+        className="w-full md:w-56 object-cover bg-white/5"
       />
 
       {/* Info Section */}
       <div className="flex-1 p-3 space-y-2">
-        <div className="text-xl font-semibold">{educator.name}</div>
-        <div className="text-sm text-muted-foreground dark:text-gray-400">
+        <div className="text-xl font-semibold text-foreground">{educator.name}</div>
+        <div className="text-sm text-muted-foreground">
           {educator.username || educator.emailFallback}
         </div>
-        <p className="text-sm italic">{educator.intro}</p>
-        <div className="text-sm">
+        <p className="text-sm italic text-foreground">{educator.intro}</p>
+        <div className="text-sm text-foreground">
           <span className="font-semibold text-muted-foreground">Qualification:</span>{" "}
           {educator.qualification}
         </div>
@@ -112,25 +112,25 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
         {/* Buttons */}
         <div className="flex gap-3 pt-1">
           <button
-            className="bg-primary text-white px-4 py-1.5 rounded-md dark:bg-slate-500 dark:text-slate-900"
+            className="bg-primary/20 text-primary px-4 py-1.5 rounded-md border border-primary/30 hover:bg-primary/30 transition-all"
             onClick={() => router.push(`/admin/educators/${educator.id}`)}
           >
             View Profile
           </button>
-          <button className="border px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800">
+          <button className="bg-white/5 px-4 py-1.5 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground">
             Message
           </button>
-          <button className="border px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800">
+          <button className="bg-white/5 px-4 py-1.5 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground">
             Call
           </button>
         </div>
 
         {/* Footer */}
-        <div className="footer-container bg-gray-200 dark:bg-gray-700 flex items-center justify-between p-1 ml-2 rounded-sm text-sm font-semibold">
+        <div className="footer-container bg-white/5 flex items-center justify-between p-2 rounded-md text-sm font-semibold border border-white/10">
           <span className="text-muted-foreground px-2">Demo Lecture(s)</span>
-          <div className="border px-3 py-1 rounded bg-muted dark:bg-gray-800">
+          <div className="px-3 py-1 rounded bg-white/5 border border-white/10">
             <span className="text-muted-foreground">Subjects:</span>{" "}
-            {educator.subjects.join(", ")}
+            <span className="text-foreground">{educator.subjects.join(", ")}</span>
           </div>
         </div>
       </div>
