@@ -2,14 +2,14 @@
 {
   "name": "next-photon-Zen-EduCare-Management-System",
   "private": true,
-  "packageManager": "npm@11.3.0",
+  "packageManager": "bun@1.1.38",
   "workspaces": [
-    "client",
-    "server",
+    "frontend/web",
+    "backend/server_NestJS",
     "shared/*"
   ],
   "scripts": {
-    "start:all": "turbo run dev --filter=client... --filter=server... --parallel --output-logs=full",
+    "start:all": "turbo run dev --filter=frontend-web... --filter=backend-server... --parallel --output-logs=full",
     "build": "turbo run build",
     "prisma:generate": "npx prisma generate --schema=shared/prisma",
     "prisma:push": "npx prisma db push --schema=shared/prisma && npx prisma generate --schema=shared/prisma",

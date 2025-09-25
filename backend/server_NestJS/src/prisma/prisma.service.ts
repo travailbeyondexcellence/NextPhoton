@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { prisma } from '../../../../shared/db/index';
+import { prisma } from '../../../../../shared/db/index';
 
 /**
  * Prisma Service for NestJS Server
