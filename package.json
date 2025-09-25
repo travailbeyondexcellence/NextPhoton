@@ -17,13 +17,14 @@
     "install:shared": "cd shared && bun install",
     "start:all": "turbo run dev --filter=frontend-web... --filter=backend-server... --parallel --output-logs=full",
     "build": "turbo run build",
-    "prisma:generate": "bunx prisma generate --schema=shared/prisma/schema.prisma",
-    "prisma:push": "bunx prisma db push --schema=shared/prisma/schema.prisma && bunx prisma generate --schema=shared/prisma/schema.prisma",
-    "prisma:migrate": "bunx prisma migrate dev --name your_change_name --schema=shared/prisma/schema.prisma",
-    "prisma:deployprod": "bunx prisma migrate deploy --schema=shared/prisma/schema.prisma",
-    "prisma:studio": "bunx prisma studio --schema=shared/prisma/schema.prisma",
+    "prisma:generate": "bunx prisma generate --schema=shared/prisma/schema",
+    "prisma:push": "bunx prisma db push --schema=shared/prisma/schema && bunx prisma generate --schema=shared/prisma/schema",
+    "prisma:migrate": "bunx prisma migrate dev --name your_change_name --schema=shared/prisma/schema",
+    "prisma:deployprod": "bunx prisma migrate deploy --schema=shared/prisma/schema",
+    "prisma:studio": "bunx prisma studio --schema=shared/prisma/schema",
     "test:db": "bunx tsx shared/db/test-connection.ts",
-    "test:prisma": "bun run test:db"
+    "test:prisma": "bun run test:db",
+    "seed:auth": "cd backend/server_NestJS && bun run seed:auth"
   },
   "devDependencies": {
     "@better-auth/cli": "^1.2.8",
