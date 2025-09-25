@@ -385,10 +385,9 @@ export class AuthService {
         await tx.internProfile.create({
           data: {
             ...profileData,
-            university: '',
-            major: '',
-            year: 1,
-            skills: [],
+            institution: '',
+            course: '',
+            year: '1',
             department: '',
             internshipType: 'full-time',
             mentorId: null,
