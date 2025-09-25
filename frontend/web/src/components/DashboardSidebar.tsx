@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image";
+import { LogoComponent } from "./LogoComponent";
 
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -80,15 +81,9 @@ export function DashboardSidebar() {
         {/* Sidebar Header */}
         <SidebarHeader className={`px-0 pl-4 ml-0 flex h-16 justify-start :hover:cursor-pointer ${sidebarHeaderBackground}`} >
 
-          <span className="pl-0 p-0 flex items-center gap-2 justify-start :hover:cursor-pointer" onClick={() => router.push("/")}>
-            <Image
-              src="/PhotonLogo/PhotonEarth.png"
-              alt="Photon Logo"
-              width={48}
-              height={48}
-              // className="rounded-full w-12 h-12"
-            />
-            <h2 className="text-lg font-bold :hover:cursor-pointer text-muted-foreground text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500"> Next Photon </h2>
+          <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer" onClick={() => router.push("/")}>
+            <LogoComponent width={48} height={48} />
+            <h2 className="text-lg font-bold hover:cursor-pointer text-muted-foreground text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500"> Next Photon </h2>
           </span>
 
 

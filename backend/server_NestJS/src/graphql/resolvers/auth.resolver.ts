@@ -3,7 +3,7 @@ import { UseGuards } from '@nestjs/common';
 import { AuthService } from '../../auth/auth.service';
 import { LoginDto } from '../../auth/dto/login.dto';
 import { RegisterDto } from '../../auth/dto/register.dto';
-import { GqlAuthGuard } from '../guards/gql-auth.guard';
+import { GqlJwtAuthGuard } from '../../auth/guards/gql-jwt-auth.guard';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 /**
@@ -99,7 +99,7 @@ export class AuthResolver {
   @Mutation(() => LogoutResponse, { 
     description: 'Logout current user' 
   })
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlJwtAuthGuard)
   async logout(@Context() context): Promise<LogoutResponse> {
     const user = context.req.user;
     return await this.authService.logout(user.id);
@@ -113,7 +113,7 @@ export class AuthResolver {
     description: 'Get current authenticated user',
     nullable: true 
   })
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlJwtAuthGuard)
   async currentUser(@Context() context): Promise<AuthUser> {
     const user = context.req.user;
     return {
