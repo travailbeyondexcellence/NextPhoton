@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { GraphqlModule } from './graphql/graphql.module';
+import { AuthModule } from './auth/auth.module';
 
 /**
  * Application Root Module
@@ -11,6 +12,7 @@ import { GraphqlModule } from './graphql/graphql.module';
  * all feature modules including REST API endpoints and GraphQL.
  * 
  * Features:
+ * - JWT Authentication through Auth module
  * - REST API through Users module
  * - GraphQL API through GraphQL module
  * - Shared services and utilities
@@ -18,6 +20,7 @@ import { GraphqlModule } from './graphql/graphql.module';
  */
 @Module({
   imports: [
+    AuthModule,     // JWT Authentication and authorization
     UsersModule,    // REST API endpoints for user management
     GraphqlModule,  // GraphQL endpoint with resolvers and schema
   ],

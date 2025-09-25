@@ -1,7 +1,16 @@
+/**
+ * DEPRECATED: Use GqlJwtAuthGuard from auth module instead
+ * This file is kept for backward compatibility but should not be used
+ * 
+ * Import the new guard:
+ * import { GqlJwtAuthGuard } from '../auth/guards/gql-jwt-auth.guard';
+ */
+
 import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 /**
+ * @deprecated Use GqlJwtAuthGuard from auth module instead
  * GraphQL Authentication Guard
  * 
  * This guard ensures that GraphQL operations are authenticated by checking
@@ -33,13 +42,8 @@ export class GqlAuthGuard implements CanActivate {
       throw new UnauthorizedException('Request context not found');
     }
 
-    // TODO: Integrate with Better-auth session validation
-    // For now, we'll check for a simple user property on the request
-    // In production, this should validate the session token and load user data
-    
-    // Placeholder authentication logic
-    // Replace with actual Better-auth integration
-    const user = req.user; // This would be set by session middleware
+    // Check for user set by JWT middleware
+    const user = req.user;
     
     if (!user) {
       throw new UnauthorizedException('Authentication required. Please log in to access this resource.');

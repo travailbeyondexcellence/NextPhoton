@@ -50,14 +50,17 @@ NextPhoton is an "Uber for Educators" platform focused on **micromanagement and 
 ### Package Manager: Bun
 This project uses **Bun** as the package manager. Install Bun from https://bun.sh
 
-### Root-level commands (from `/root/ZenTech/NextPhoton/`):
-- `bun install` or `bun run install:all` - Install all dependencies in all workspaces
-- `bun install.js` - Cross-platform install script
+### Root-level commands (from repository root):
+- `bun install` - Install dependencies in root and all workspaces
+- `bun run web` - Start Next.js frontend development server
+- `bun run server` - Start NestJS backend development server
 - `bun run start:all` - Start both frontend and backend in parallel using Turbo
 - `bun run build` - Build all packages using Turbo
-- `bunx prisma push --schema=shared/prisma` - Push schema changes to database
-- `bunx prisma migrate dev --schema=shared/prisma` - Create and apply migration
-- `bunx prisma studio --schema=shared/prisma` - Open Prisma Studio
+- `bun run prisma:generate` - Generate Prisma client from schema
+- `bun run prisma:push` - Push schema changes to database and generate client
+- `bun run prisma:migrate` - Create and apply new migration
+- `bun run prisma:studio` - Open Prisma Studio for database management
+- `bun run test:db` - Test database connection
 
 ### Frontend commands (from `frontend/web/`):
 - `bun run dev` - Start Next.js development server
@@ -76,12 +79,27 @@ This project uses **Bun** as the package manager. Install Bun from https://bun.s
 ## Architecture Overview
 
 ### Monorepo Structure
-- **Turbo-managed monorepo** with workspaces:
-  - `frontend/web` - Next.js application
-  - `backend/server_NestJS` - NestJS server
-  - `shared/*` - Shared utilities and Prisma schema
-- **Frontend**: Next.js 15 with App Router, Tailwind CSS v4, TypeScript
-- **Backend**: NestJS with Express, TypeScript
+```
+NextPhoton/
+├── frontend/
+│   ├── web/                 # Next.js 15 web application
+│   ├── desktop/             # (Future) Desktop application
+│   └── mobile/              # (Future) Mobile application
+├── backend/
+│   └── server_NestJS/       # NestJS API server with GraphQL
+├── shared/
+│   ├── prisma/              # Centralized Prisma schema
+│   │   └── schema.prisma    # Single source of truth for database
+│   └── db/                  # Database utilities
+│       └── index.ts         # Singleton Prisma client
+├── Project_Docs/            # Project documentation
+├── package.json             # Root workspace configuration
+├── turbo.json              # Turbo configuration
+└── tsconfig.base.json      # Base TypeScript configuration
+```
+
+- **Frontend**: Next.js 15 with App Router, Tailwind CSS v4, TypeScript, Better-Auth
+- **Backend**: NestJS with GraphQL, Express, TypeScript, JWT authentication
 - **Shared**: Prisma schema, database utilities, shared types
 
 ### Key Technologies
@@ -117,11 +135,12 @@ frontend/web/lib/prisma.ts                  # ❌ Separate client
 backend/server_NestJS/prisma.service.ts     # ❌ Separate client
 ```
 
-#### Key Prisma Commands:
-- `bunx prisma generate --schema=shared/prisma` - Generate client from shared schema
-- `bun run prisma:push` - Push schema + generate client
-- `bun run test:db` - Validate Prisma connection and setup
-- `bunx prisma studio --schema=shared/prisma` - Open database management UI
+#### Key Prisma Commands (run from root):
+- `bun run prisma:generate` - Generate Prisma client
+- `bun run prisma:push` - Push schema changes and regenerate client
+- `bun run prisma:migrate` - Create new migration
+- `bun run prisma:studio` - Open Prisma Studio UI
+- `bun run test:db` - Test database connection
 
 ### Multi-tenant Architecture
 - Application implements **ABAC (Attribute-Based Access Control)**
@@ -135,20 +154,51 @@ backend/server_NestJS/prisma.service.ts     # ❌ Separate client
 - Auth client utilities in `client/src/lib/auth-client.ts`
 
 ### Important File Locations
-- **Prisma client**: `shared/db/index.ts` - ALWAYS import from here
-- **Prisma service**: `backend/server_NestJS/src/prisma/prisma.service.ts` - NestJS wrapper
-- **Prisma tests**: `shared/db/test-connection.ts` - Connection validation
-- Auth schemas: `frontend/web/src/lib/auth-schema.ts`
-- Form validation: `frontend/web/src/lib/formValidationSchemas.ts`
-- Global state: `frontend/web/src/statestore/store.ts`
+
+#### Database & Prisma:
+- **Prisma Schema**: `shared/prisma/schema.prisma` - Single source of truth
+- **Prisma Client**: `shared/db/index.ts` - Centralized client (ALWAYS import from here)
+- **Backend Service**: `backend/server_NestJS/src/prisma/prisma.service.ts` - NestJS wrapper
+- **Connection Test**: `shared/db/test-connection.ts` - Database validation
+
+#### Frontend (Next.js):
+- **Auth Config**: `frontend/web/src/lib/auth.ts` - Better-auth setup
+- **Auth Schemas**: `frontend/web/src/lib/auth-schema.ts` - Authentication types
+- **Form Validation**: `frontend/web/src/lib/formValidationSchemas.ts` - Zod schemas
+- **Global State**: `frontend/web/src/statestore/store.ts` - Zustand store
+- **Route Access**: `frontend/web/src/lib/routeAccessMap.ts` - ABAC route control
+
+#### Backend (NestJS):
+- **Main Entry**: `backend/server_NestJS/src/main.ts` - Server bootstrap
+- **App Module**: `backend/server_NestJS/src/app.module.ts` - Root module
+- **GraphQL Config**: `backend/server_NestJS/src/graphql/*` - GraphQL resolvers
+- **Auth Module**: `backend/server_NestJS/src/auth/*` - JWT authentication
 
 ### Development Notes
-- Always use `bun` as package manager (BUT NEVER RUN INSTALL COMMANDS YOURSELF)
-- **Prisma Architecture**: Use centralized client from `shared/db/index.ts` - NEVER create separate Prisma clients
-- Prisma schema changes: TELL USER to run `bun run prisma:push` from root
-- Testing Prisma: TELL USER to run `bun run test:db` after schema changes
-- Starting servers: TELL USER to run `bun run start:all` - NEVER RUN IT YOURSELF
-- The project uses strict TypeScript enforcement across all packages
+
+#### Package Management:
+- **Package Manager**: Bun (v1.2.21+)
+- **Workspaces**: Managed by Bun workspaces in root package.json
+- **Dependencies**: Each workspace has its own package.json
+- **Installation**: User runs `bun install` from root (NEVER RUN THIS YOURSELF)
+
+#### Database Architecture:
+- **Single Schema**: One Prisma schema at `shared/prisma/schema.prisma`
+- **Shared Client**: Import from `shared/db/index.ts` everywhere
+- **NEVER**: Create separate Prisma clients or duplicate schemas
+- **Migrations**: User manages with `bun run prisma:migrate`
+
+#### Development Workflow:
+- **Start Frontend**: User runs `bun run web` from root
+- **Start Backend**: User runs `bun run server` from root
+- **Start Both**: User runs `bun run start:all` from root
+- **Generate Types**: User runs `bun run prisma:generate` after schema changes
+
+#### Code Standards:
+- Strict TypeScript enforcement
+- Elaborate commenting for AI agents and future developers
+- Follow existing patterns in codebase
+- Use existing libraries (check package.json first)
 
 ## ⚠️ FINAL REMINDER - CRITICAL ⚠️
 **NEVER EVER RUN:**
