@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "email": "admin@nextphoton.com",
+      "password": "Admin@123456",
+      "name": "System Administrator",
+      "role": "admin",
+      "description": "Full system administrator with complete access"
+    },
+    {
+      "email": "john.educator@nextphoton.com",
+      "password": "Educator@123",
+      "name": "John Smith",
+      "role": "educator",
+      "description": "Experienced educator specializing in mathematics and science"
+    },
+    {
+      "email": "sarah.ecm@nextphoton.com",
+      "password": "EcManager@123",
+      "name": "Sarah Johnson",
+      "role": "ecm",
+      "description": "EduCare Manager overseeing learner progress and educator coordination"
+    },
+    {
+      "email": "mike.learner@nextphoton.com",
+      "password": "Learner@123",
+      "name": "Mike Wilson",
+      "role": "learner",
+      "description": "Grade 10 student enrolled in advanced mathematics program"
+    },
+    {
+      "email": "emma.learner@nextphoton.com",
+      "password": "Learner@456",
+      "name": "Emma Davis",
+      "role": "learner",
+      "description": "Grade 8 student with focus on language arts"
+    },
+    {
+      "email": "robert.guardian@nextphoton.com",
+      "password": "Guardian@123",
+      "name": "Robert Wilson",
+      "role": "guardian",
+      "description": "Parent/Guardian of Mike Wilson, actively monitoring progress"
+    },
+    {
+      "email": "linda.guardian@nextphoton.com",
+      "password": "Guardian@456",
+      "name": "Linda Davis",
+      "role": "guardian",
+      "description": "Parent/Guardian of Emma Davis"
+    },
+    {
+      "email": "alex.employee@nextphoton.com",
+      "password": "Employee@123",
+      "name": "Alex Thompson",
+      "role": "employee",
+      "description": "Operations team member managing platform infrastructure"
+    },
+    {
+      "email": "jessica.intern@nextphoton.com",
+      "password": "Intern@123",
+      "name": "Jessica Brown",
+      "role": "intern",
+      "description": "Computer Science intern assisting with platform development"
+    },
+    {
+      "email": "david.educator@nextphoton.com",
+      "password": "Educator@456",
+      "name": "David Martinez",
+      "role": "educator",
+      "description": "Part-time educator specializing in language and literature"
+    },
+    {
+      "email": "admin2@nextphoton.com",
+      "password": "Admin2@123456",
+      "name": "Secondary Admin",
+      "role": "admin",
+      "description": "Backup administrator with full system access"
+    },
+    {
+      "email": "test.learner@nextphoton.com",
+      "password": "TestLearner@123",
+      "name": "Test Learner",
+      "role": "learner",
+      "description": "Test account for learner functionality"
+    }
+  ],
+  "notes": {
+    "warning": "This file contains test credentials and should NEVER be used in production!",
+    "purpose": "Development and testing purposes only",
+    "security": "All passwords meet the required complexity: uppercase, lowercase, number, and special character",
+    "deletion": "This file should be deleted before deploying to production"
+  }
+}

@@ -1,0 +1,25 @@
+// Main Prisma Schema File - NextPhoton EduCare Management System
+// This is the main configuration file for multi-file schema support
+// Prisma 6.7.0+ has multi-file schema support as Generally Available
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// All models are automatically loaded from other .prisma files in this directory
+// Files are organized by domain:
+// - auth.prisma - Authentication models (User, Session, Account, Verification)
+// - roles-permissions.prisma - ABAC system (Role, Permission, UserRole, etc.)
+// - user-profiles.prisma - All role-specific profiles
+// - academic-system.prisma - Curriculum, assessments, subjects
+// - session-management.prisma - Learning sessions and bookings
+// - monitoring-progress.prisma - ECM monitoring and progress tracking
+// - financial-system.prisma - Payments, invoicing, rate management
+// - communication.prisma - Messaging and notifications
+// - analytics-reporting.prisma - Business intelligence and reporting

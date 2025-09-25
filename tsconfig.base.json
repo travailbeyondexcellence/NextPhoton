@@ -10,7 +10,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "include": ["client", "shared"]
+    "include": ["frontend/web", "backend/server_NestJS", "shared"]
 
   }
 }
