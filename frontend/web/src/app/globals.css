@@ -27,14 +27,23 @@
     --warning: 245 158 11;
     --warning-foreground: 255 255 255;
     
-    /* Glass morphism variables */
-    --glass-bg-opacity: 0.1;
+    /* Background gradient - populated from themes.json */
+    --gradient-from: 17 24 39;
+    --gradient-via: 30 58 138;
+    --gradient-to: 91 33 182;
+    
+    /* Glass properties - populated from themes.json */
+    --glass-opacity: 0.1;
     --glass-border-opacity: 0.2;
-    --glass-blur: 12px;
+    --glass-blur: 12;
     --glass-hover-opacity: 0.15;
     --glass-active-opacity: 0.2;
-    --glass-gradient-from: rgba(56, 189, 248, 0.1);
-    --glass-gradient-to: rgba(0, 82, 255, 0.05);
+    
+    /* Gradient overlay - populated from themes.json */
+    --gradient-overlay-from: 56 189 248;
+    --gradient-overlay-to: 0 82 255;
+    --gradient-overlay-from-opacity: 0.1;
+    --gradient-overlay-to-opacity: 0.05;
     
     /* Additional UI variables */
     --radius: 0.5rem;
@@ -81,9 +90,9 @@
     right: 0;
     bottom: 0;
     background: linear-gradient(to bottom right, 
-      var(--gradient-bg-from, #111827), 
-      var(--gradient-bg-via, #1e3a8a), 
-      var(--gradient-bg-to, #5b21b6));
+      rgb(var(--gradient-from)),
+      rgb(var(--gradient-via)),
+      rgb(var(--gradient-to)));
     z-index: -1;
   }
   
@@ -97,9 +106,9 @@
 @layer components {
   /* Base glass effect */
   .glass {
-    background: rgb(var(--card) / var(--glass-bg-opacity));
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    background: rgb(var(--card) / var(--glass-opacity));
+    backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
     border: 1px solid rgb(var(--border) / var(--glass-border-opacity));
     box-shadow: 
       0 8px 32px 0 rgba(31, 38, 135, 0.15),
@@ -124,11 +133,11 @@
   .glass-panel {
     background: linear-gradient(
       135deg,
-      rgb(var(--card) / var(--glass-bg-opacity)),
-      rgb(var(--background) / calc(var(--glass-bg-opacity) * 0.5))
+      rgb(var(--card) / var(--glass-opacity)),
+      rgb(var(--background) / calc(var(--glass-opacity) * 0.5))
     );
-    backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
-    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5px));
     border: 1px solid rgb(var(--border) / calc(var(--glass-border-opacity) * 0.8));
     @apply rounded-xl;
   }
@@ -189,71 +198,16 @@
     @apply transition-colors duration-200 ease-in-out;
   }
   
-  /* Gradient backgrounds for different themes */
-  .gradient-celeste {
-    --gradient-bg-from: #111827;
-    --gradient-bg-via: #1e3a8a;
-    --gradient-bg-to: #5b21b6;
+  /* Gradient animations */
+  .gradient-animate {
+    background-size: 200% 200%;
+    animation: gradient-shift 15s ease infinite;
   }
   
-  .gradient-emerald {
-    --gradient-bg-from: #064e3b;
-    --gradient-bg-via: #047857;
-    --gradient-bg-to: #0d9488;
-  }
-  
-  .gradient-midnight {
-    --gradient-bg-from: #0f0a1f;
-    --gradient-bg-via: #2e1065;
-    --gradient-bg-to: #312e81;
-  }
-  
-  .gradient-storm {
-    --gradient-bg-from: #0f172a;
-    --gradient-bg-via: #1e3a8a;
-    --gradient-bg-to: #0e7490;
-  }
-  
-  .gradient-arctic {
-    --gradient-bg-from: #0e7490;
-    --gradient-bg-via: #0d9488;
-    --gradient-bg-to: #1e3a8a;
-  }
-  
-  .gradient-sunset {
-    --gradient-bg-from: #9a3412;
-    --gradient-bg-via: #b45309;
-    --gradient-bg-to: #a16207;
-  }
-  
-  .gradient-coral {
-    --gradient-bg-from: #9f1239;
-    --gradient-bg-via: #a21caf;
-    --gradient-bg-to: #be185d;
-  }
-  
-  .gradient-rose {
-    --gradient-bg-from: #be123c;
-    --gradient-bg-via: #dc2626;
-    --gradient-bg-to: #db2777;
-  }
-  
-  .gradient-mono {
-    --gradient-bg-from: #171717;
-    --gradient-bg-via: #262626;
-    --gradient-bg-to: #404040;
-  }
-  
-  .gradient-sepia {
-    --gradient-bg-from: #713f12;
-    --gradient-bg-via: #92400e;
-    --gradient-bg-to: #78350f;
-  }
-  
-  .gradient-hicon {
-    --gradient-bg-from: #f9fafb;
-    --gradient-bg-via: #ffffff;
-    --gradient-bg-to: #f3f4f6;
+  @keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 }
 

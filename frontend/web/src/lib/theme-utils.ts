@@ -84,30 +84,37 @@ export function applyTheme(themeKey: ThemeKey): void {
   
   // Apply glass-specific variables
   if (theme.glass) {
-    root.style.setProperty('--glass-bg-opacity', theme.glass.cardOpacity.toString());
+    // Apply glass opacity values
+    root.style.setProperty('--glass-opacity', theme.glass.cardOpacity.toString());
     root.style.setProperty('--glass-border-opacity', theme.glass.borderOpacity.toString());
     root.style.setProperty('--glass-hover-opacity', theme.glass.hoverOpacity.toString());
+    root.style.setProperty('--glass-active-opacity', theme.glass.activeOpacity?.toString() || '0.2');
     
-    // Set blur intensity
-    const blurMap = {
-      'none': '0px',
-      'sm': '8px',
-      'md': '12px',
-      'lg': '16px',
-      'xl': '24px'
-    };
-    root.style.setProperty('--glass-blur', blurMap[theme.glass.blurIntensity as keyof typeof blurMap] || '12px');
+    // Set blur intensity as a numeric value (will be multiplied by 1px in CSS)
+    root.style.setProperty('--glass-blur', theme.glass.blurIntensity.toString());
     
-    // Apply gradient overlay
-    if (theme.glass.gradientOverlay) {
-      root.style.setProperty('--glass-gradient-from', theme.glass.gradientOverlay.from);
-      root.style.setProperty('--glass-gradient-to', theme.glass.gradientOverlay.to);
+    // Apply background gradient colors from themes.json
+    if (theme.glass.backgroundGradientFrom) {
+      root.style.setProperty('--gradient-from', hexToRgb(theme.glass.backgroundGradientFrom));
+    }
+    if (theme.glass.backgroundGradientVia) {
+      root.style.setProperty('--gradient-via', hexToRgb(theme.glass.backgroundGradientVia));
+    }
+    if (theme.glass.backgroundGradientTo) {
+      root.style.setProperty('--gradient-to', hexToRgb(theme.glass.backgroundGradientTo));
     }
     
-    // Apply background gradient class
-    root.className = root.className.replace(/gradient-\w+/g, '');
-    const gradientClass = `gradient-${themeKey.replace('emnight', 'emerald').replace('rosegarden', 'rose')}`;
-    root.classList.add(gradientClass);
+    // Apply gradient overlay colors and opacities
+    if (theme.glass.gradientOverlayFrom) {
+      root.style.setProperty('--gradient-overlay-from', hexToRgb(theme.glass.gradientOverlayFrom));
+      root.style.setProperty('--gradient-overlay-from-opacity', 
+        theme.glass.gradientOverlayFromOpacity?.toString() || '0.1');
+    }
+    if (theme.glass.gradientOverlayTo) {
+      root.style.setProperty('--gradient-overlay-to', hexToRgb(theme.glass.gradientOverlayTo));
+      root.style.setProperty('--gradient-overlay-to-opacity', 
+        theme.glass.gradientOverlayToOpacity?.toString() || '0.05');
+    }
   }
   
   // Save to localStorage

@@ -1,6 +1,6 @@
 {
   "colorDefinitions": {
-    "_comment": "Each theme needs these color values defined with glassmorphism enhancements",
+    "_comment": "All theme values including gradients are defined here as the single source of truth",
     "required": [
       "background",
       "foreground",
@@ -56,15 +56,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-gray-900 via-blue-900 to-violet-900",
+        "backgroundGradientFrom": "#111827",
+        "backgroundGradientVia": "#1e3a8a",
+        "backgroundGradientTo": "#5b21b6",
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
-        "blurIntensity": "sm",
+        "blurIntensity": 12,
         "hoverOpacity": 0.15,
-        "gradientOverlay": {
-          "from": "rgba(56, 189, 248, 0.1)",
-          "to": "rgba(0, 82, 255, 0.05)"
-        }
+        "activeOpacity": 0.2,
+        "gradientOverlayFrom": "#38bdf8",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#0052FF",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#0ea5e9",
@@ -102,15 +105,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-emerald-950 via-green-900 to-teal-900",
+        "backgroundGradientFrom": "#064e3b",
+        "backgroundGradientVia": "#047857",
+        "backgroundGradientTo": "#0d9488",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
-        "blurIntensity": "sm",
+        "blurIntensity": 8,
         "hoverOpacity": 0.12,
-        "gradientOverlay": {
-          "from": "rgba(52, 211, 153, 0.1)",
-          "to": "rgba(5, 150, 105, 0.05)"
-        }
+        "activeOpacity": 0.16,
+        "gradientOverlayFrom": "#34d399",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#059669",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#10b981",
@@ -148,15 +154,18 @@
         "warningForeground": "#451a03"
       },
       "glass": {
-        "backgroundGradient": "from-black via-emerald-950 to-green-950",
+        "backgroundGradientFrom": "#000000",
+        "backgroundGradientVia": "#064e3b",
+        "backgroundGradientTo": "#052e16",
         "cardOpacity": 0.12,
         "borderOpacity": 0.25,
-        "blurIntensity": "md",
+        "blurIntensity": 16,
         "hoverOpacity": 0.18,
-        "gradientOverlay": {
-          "from": "rgba(110, 231, 183, 0.1)",
-          "to": "rgba(16, 185, 129, 0.05)"
-        }
+        "activeOpacity": 0.22,
+        "gradientOverlayFrom": "#6ee7b7",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#10b981",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#34d399",
@@ -194,15 +203,18 @@
         "warningForeground": "#000000"
       },
       "glass": {
-        "backgroundGradient": "from-slate-950 via-purple-950 to-indigo-950",
+        "backgroundGradientFrom": "#0f0a1f",
+        "backgroundGradientVia": "#2e1065",
+        "backgroundGradientTo": "#312e81",
         "cardOpacity": 0.15,
         "borderOpacity": 0.3,
-        "blurIntensity": "lg",
+        "blurIntensity": 20,
         "hoverOpacity": 0.2,
-        "gradientOverlay": {
-          "from": "rgba(139, 92, 246, 0.15)",
-          "to": "rgba(99, 102, 241, 0.05)"
-        }
+        "activeOpacity": 0.25,
+        "gradientOverlayFrom": "#8b5cf6",
+        "gradientOverlayFromOpacity": 0.15,
+        "gradientOverlayTo": "#6366f1",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#8b5cf6",
@@ -240,15 +252,18 @@
         "warningForeground": "#422006"
       },
       "glass": {
-        "backgroundGradient": "from-slate-950 via-blue-950 to-cyan-950",
+        "backgroundGradientFrom": "#0f172a",
+        "backgroundGradientVia": "#1e3a8a",
+        "backgroundGradientTo": "#0e7490",
         "cardOpacity": 0.12,
         "borderOpacity": 0.25,
-        "blurIntensity": "md",
+        "blurIntensity": 16,
         "hoverOpacity": 0.18,
-        "gradientOverlay": {
-          "from": "rgba(96, 165, 250, 0.15)",
-          "to": "rgba(59, 130, 246, 0.05)"
-        }
+        "activeOpacity": 0.22,
+        "gradientOverlayFrom": "#60a5fa",
+        "gradientOverlayFromOpacity": 0.15,
+        "gradientOverlayTo": "#3b82f6",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#60a5fa",
@@ -286,15 +301,18 @@
         "warningForeground": "#451a03"
       },
       "glass": {
-        "backgroundGradient": "from-cyan-900 via-teal-900 to-blue-900",
+        "backgroundGradientFrom": "#0e7490",
+        "backgroundGradientVia": "#0d9488",
+        "backgroundGradientTo": "#1e3a8a",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
-        "blurIntensity": "sm",
+        "blurIntensity": 8,
         "hoverOpacity": 0.12,
-        "gradientOverlay": {
-          "from": "rgba(94, 234, 212, 0.1)",
-          "to": "rgba(20, 184, 166, 0.05)"
-        }
+        "activeOpacity": 0.16,
+        "gradientOverlayFrom": "#5eead4",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#14b8a6",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#06b6d4",
@@ -332,15 +350,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-orange-900 via-amber-900 to-yellow-900",
+        "backgroundGradientFrom": "#9a3412",
+        "backgroundGradientVia": "#b45309",
+        "backgroundGradientTo": "#a16207",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
-        "blurIntensity": "sm",
+        "blurIntensity": 8,
         "hoverOpacity": 0.12,
-        "gradientOverlay": {
-          "from": "rgba(251, 191, 36, 0.1)",
-          "to": "rgba(245, 158, 11, 0.05)"
-        }
+        "activeOpacity": 0.16,
+        "gradientOverlayFrom": "#fbbf24",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#f59e0b",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#fb923c",
@@ -378,15 +399,18 @@
         "warningForeground": "#422006"
       },
       "glass": {
-        "backgroundGradient": "from-pink-900 via-fuchsia-900 to-rose-900",
+        "backgroundGradientFrom": "#9f1239",
+        "backgroundGradientVia": "#a21caf",
+        "backgroundGradientTo": "#be185d",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
-        "blurIntensity": "sm",
+        "blurIntensity": 8,
         "hoverOpacity": 0.12,
-        "gradientOverlay": {
-          "from": "rgba(249, 168, 212, 0.1)",
-          "to": "rgba(236, 72, 153, 0.05)"
-        }
+        "activeOpacity": 0.16,
+        "gradientOverlayFrom": "#f9a8d4",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#ec4899",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#f472b6",
@@ -424,15 +448,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-rose-900 via-red-900 to-pink-900",
+        "backgroundGradientFrom": "#be123c",
+        "backgroundGradientVia": "#dc2626",
+        "backgroundGradientTo": "#db2777",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
-        "blurIntensity": "sm",
+        "blurIntensity": 8,
         "hoverOpacity": 0.12,
-        "gradientOverlay": {
-          "from": "rgba(254, 36, 79, 0.1)",
-          "to": "rgba(249, 42, 83, 0.05)"
-        }
+        "activeOpacity": 0.16,
+        "gradientOverlayFrom": "#FE244F",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#F92A53",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#FE244F",
@@ -470,15 +497,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-gray-950 via-neutral-950 to-zinc-950",
+        "backgroundGradientFrom": "#171717",
+        "backgroundGradientVia": "#262626",
+        "backgroundGradientTo": "#404040",
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
-        "blurIntensity": "md",
+        "blurIntensity": 16,
         "hoverOpacity": 0.15,
-        "gradientOverlay": {
-          "from": "rgba(82, 82, 82, 0.1)",
-          "to": "rgba(26, 26, 26, 0.05)"
-        }
+        "activeOpacity": 0.2,
+        "gradientOverlayFrom": "#525252",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#1a1a1a",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#525252",
@@ -516,15 +546,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-amber-950 via-yellow-950 to-orange-950",
+        "backgroundGradientFrom": "#713f12",
+        "backgroundGradientVia": "#92400e",
+        "backgroundGradientTo": "#78350f",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
-        "blurIntensity": "sm",
+        "blurIntensity": 8,
         "hoverOpacity": 0.12,
-        "gradientOverlay": {
-          "from": "rgba(161, 136, 127, 0.1)",
-          "to": "rgba(121, 85, 72, 0.05)"
-        }
+        "activeOpacity": 0.16,
+        "gradientOverlayFrom": "#a1887f",
+        "gradientOverlayFromOpacity": 0.1,
+        "gradientOverlayTo": "#795548",
+        "gradientOverlayToOpacity": 0.05
       },
       "progressGradient": {
         "from": "#a1887f",
@@ -562,15 +595,18 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradient": "from-gray-100 via-white to-gray-50",
+        "backgroundGradientFrom": "#f9fafb",
+        "backgroundGradientVia": "#ffffff",
+        "backgroundGradientTo": "#f3f4f6",
         "cardOpacity": 0.05,
         "borderOpacity": 0.8,
-        "blurIntensity": "none",
+        "blurIntensity": 0,
         "hoverOpacity": 0.08,
-        "gradientOverlay": {
-          "from": "rgba(0, 0, 0, 0.05)",
-          "to": "rgba(0, 0, 0, 0.02)"
-        }
+        "activeOpacity": 0.1,
+        "gradientOverlayFrom": "#000000",
+        "gradientOverlayFromOpacity": 0.05,
+        "gradientOverlayTo": "#000000",
+        "gradientOverlayToOpacity": 0.02
       },
       "progressGradient": {
         "from": "#666666",
