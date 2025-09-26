@@ -6,74 +6,74 @@ import { educator, educatorReviews, adminNotes } from "../app/(dashboard)/admin/
 
 const EducatorProfile_forAdmin = () => {
     return (
-        <div className="min-h-screen bg-slate-100 dark:bg-[#0f172a] text-slate-900 dark:text-white p-6 space-y-6 rounded-xl min-w-800 mx-auto max-w-[1200px]">
+        <div className="min-h-screen p-4 md:p-6 space-y-4 md:space-y-6 mx-auto max-w-[1200px]">
               
             
           {/* Header */}
-          <div className="text-2xl font-semibold flex items-center gap-2">
-                <span className="bg-slate-200 dark:bg-slate-800 p-2 rounded-full text-muted-foreground"> { <User/>}</span>
-            EduCator Profile
+          <div className="text-xl md:text-2xl font-semibold flex items-center gap-2">
+                <span className="bg-white/10 backdrop-blur-sm p-2 rounded-full text-muted-foreground border border-white/20"> { <User/>}</span>
+            <span className="text-foreground">Educator Profile</span>
           </div>
     
           {/* Profile Overview */}
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-slate-200 dark:bg-slate-800 rounded-xl p-6 flex items-center gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 border border-white/20">
               <Image
                 src={educator.profileImage}
                 alt={educator.name}
                 width={120}
                 height={120}
-                className="rounded-xl object-cover border-4 border-blue-400 dark:border-blue-500"
+                className="rounded-xl object-cover border-4 border-primary/50"
               />
-              <div>
-                <h2 className="text-xl font-semibold">{educator.name}</h2>
-                <p className="text-sm text-blue-600 dark:text-blue-400">{educator.username}</p>
-                <p className="mt-2 text-sm text-slate-700 dark:text-gray-300">{educator.intro}</p>
+              <div className="text-center sm:text-left">
+                <h2 className="text-lg md:text-xl font-semibold text-foreground">{educator.name}</h2>
+                <p className="text-sm text-primary">{educator.username}</p>
+                <p className="mt-2 text-xs md:text-sm text-muted-foreground">{educator.intro}</p>
               </div>
             </div>
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl p-6 text-center">
-              <p className="text-lg font-semibold">
+            <div className="bg-gradient-to-r from-primary to-secondary rounded-xl p-4 md:p-6 text-center flex flex-col justify-center backdrop-blur-sm border border-white/20">
+              <p className="text-base md:text-lg font-semibold text-primary-foreground">
                 Dedicated to helping students crack <span className="font-bold">JEE</span> and <span className="font-bold">NEET</span>
               </p>
-              <p className="text-sm text-white/80 mt-1">20+ years of educational excellence</p>
+              <p className="text-xs md:text-sm text-primary-foreground/80 mt-1">20+ years of educational excellence</p>
             </div>
           </div>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Stats */}
-          <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
-            <h3 className="font-medium text-lg mb-4">Educator Stats</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center p-4">
+          <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
+            <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Educator Stats</h3>
+            <div className="grid grid-cols-3 gap-2 md:gap-6 text-center p-2 md:p-4">
               <div>
-                <p className="text-2xl font-bold">{educator.yearsWithNextPhoton}+</p>
-                <p className="text-sm text-slate-500 dark:text-gray-400">Years with NextPhoton</p>
+                <p className="text-xl md:text-2xl font-bold text-primary">{educator.yearsWithNextPhoton}+</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Years with NextPhoton</p>
               </div>
               <div>
-                <p className="text-2xl font-bold">{educator.studentsTaught}</p>
-                <p className="text-sm text-slate-500 dark:text-gray-400">Students Taught</p>
+                <p className="text-xl md:text-2xl font-bold text-primary">{educator.studentsTaught}</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Students Taught</p>
               </div>
               <div>
-                <p className="text-2xl font-bold">{educator.hoursTaught}</p>
-                <p className="text-sm text-slate-500 dark:text-gray-400">Hours Taught</p>
+                <p className="text-xl md:text-2xl font-bold text-primary">{educator.hoursTaught}</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Hours Taught</p>
               </div>
             </div>
             </div>
 
           
         {/* Subjects */}
-<div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
-  <h3 className="font-medium text-lg mb-4">Subjects</h3>
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center p-4">
+<div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
+  <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Subjects</h3>
+  <div className="grid grid-cols-2 gap-4 md:gap-6 text-center p-2 md:p-4">
     
     {/* Physics */}
     <div className="flex flex-col items-center justify-center space-y-2">
-    <Atom />
-      <p className="text-sm font-semibold">Physics</p>
+    <Atom className="text-primary" size={24} />
+      <p className="text-xs md:text-sm font-semibold text-foreground">Physics</p>
     </div>
 
     {/* Mathematics */}
     <div className="flex flex-col items-center justify-center space-y-2">
-    <Dice5 />
-      <p className="text-sm font-semibold">Mathematics</p>
+    <Dice5 className="text-primary" size={24} />
+      <p className="text-xs md:text-sm font-semibold text-foreground">Mathematics</p>
     </div>
     
   </div>
@@ -84,41 +84,41 @@ const EducatorProfile_forAdmin = () => {
                 </div>
             
              {/* Additional Details */}
-      <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl space-y-3">
-        <h3 className="font-medium text-lg mb-2">Additional Details</h3>
-        <p><span className="font-semibold">Qualification:</span> {educator.qualification}</p>
-        <p><span className="font-semibold">Subjects:</span> {educator.subjects.join(", ")}</p>
-        <p><span className="font-semibold">Levels Taught At:</span> {educator.levels.join(", ")}</p>
-        <p><span className="font-semibold">Exam Tags:</span> {educator.exams.join(", ")}</p>
-        <p><span className="font-semibold">Price Tier:</span> {educator.priceTier}</p>
+      <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl space-y-2 md:space-y-3 border border-white/20">
+        <h3 className="font-medium text-base md:text-lg mb-2 text-foreground">Additional Details</h3>
+        <p className="text-xs md:text-sm"><span className="font-semibold text-foreground">Qualification:</span> <span className="text-muted-foreground">{educator.qualification}</span></p>
+        <p className="text-xs md:text-sm"><span className="font-semibold text-foreground">Subjects:</span> <span className="text-muted-foreground">{educator.subjects.join(", ")}</span></p>
+        <p className="text-xs md:text-sm"><span className="font-semibold text-foreground">Levels Taught At:</span> <span className="text-muted-foreground">{educator.levels.join(", ")}</span></p>
+        <p className="text-xs md:text-sm"><span className="font-semibold text-foreground">Exam Tags:</span> <span className="text-muted-foreground">{educator.exams.join(", ")}</span></p>
+        <p className="text-xs md:text-sm"><span className="font-semibold text-foreground">Price Tier:</span> <span className="text-muted-foreground">{educator.priceTier}</span></p>
       </div>
     
           {/* Reviews Section */}
-          <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
-            <h3 className="font-medium text-lg mb-4">Student Reviews</h3>
-            <div className="space-y-4">
+          <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
+            <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Student Reviews</h3>
+            <div className="space-y-3 md:space-y-4">
               {educatorReviews.map((review, index) => (
-                <div key={index} className="bg-slate-100 dark:bg-slate-700 p-4 rounded-md">
-                  <div className="flex justify-between text-sm font-semibold">
-                    <span>{review.studentName}</span>
-                    <span className="text-yellow-500 dark:text-yellow-400">{"★".repeat(review.rating)}</span>
+                <div key={index} className="bg-white/5 p-3 md:p-4 rounded-md border border-white/10">
+                  <div className="flex flex-col sm:flex-row sm:justify-between text-xs md:text-sm font-semibold gap-1">
+                    <span className="text-foreground">{review.studentName}</span>
+                    <span className="text-warning">{"★".repeat(review.rating)}</span>
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-gray-400 mb-2">{review.date} ({review.exam})</div>
-                  <p className="text-sm text-slate-700 dark:text-gray-300">{review.comment}</p>
+                  <div className="text-xs text-muted-foreground mb-2">{review.date} ({review.exam})</div>
+                  <p className="text-xs md:text-sm text-muted-foreground">{review.comment}</p>
                 </div>
               ))}
             </div>
           </div>
     
           {/* Admin Notes */}
-          <div className="bg-slate-200 dark:bg-slate-800 p-6 rounded-xl">
-            <h3 className="font-medium text-lg mb-4">Admin Notes</h3>
-            <ul className="space-y-3 text-sm text-slate-700 dark:text-gray-300">
+          <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
+            <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Admin Notes</h3>
+            <ul className="space-y-3 text-xs md:text-sm">
               {adminNotes.map((note, idx) => (
-                <li key={idx} className="border-l-4 border-blue-400 dark:border-blue-500 pl-4">
-                  <p className="text-slate-900 dark:text-white font-semibold">{note.author}</p>
-                  <p className="text-xs text-slate-500 dark:text-gray-500 mb-1">{note.timestamp}</p>
-                  <p>{note.note}</p>
+                <li key={idx} className="border-l-4 border-primary pl-3 md:pl-4">
+                  <p className="text-foreground font-semibold">{note.author}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{note.timestamp}</p>
+                  <p className="text-muted-foreground">{note.note}</p>
                 </li>
               ))}
             </ul>
