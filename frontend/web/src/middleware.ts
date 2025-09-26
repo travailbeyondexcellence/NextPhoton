@@ -14,11 +14,21 @@ import type { NextRequest } from 'next/server';
  * Define public routes that don't require authentication
  */
 const publicRoutes = [
-  '/',
   '/sign-in',
   '/sign-up',
   '/forgot-password',
   '/reset-password',
+];
+
+/**
+ * Routes that should be accessible to all authenticated users
+ */
+const authenticatedRoutes = [
+  '/profile',
+  '/settings',
+  '/logout',
+  '/NextPhotonSettings',
+  '/TRAVAIL-PRACTISE-EXAMS',
 ];
 
 /**
@@ -43,6 +53,9 @@ export function middleware(request: NextRequest) {
   // Check if route is public
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
 
+  // Check if route is accessible to all authenticated users
+  const isAuthenticatedRoute = authenticatedRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
+
   // Get JWT token from cookies (we'll set this when user logs in)
   const token = request.cookies.get('nextphoton_jwt_token');
   
@@ -63,12 +76,29 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Handle root path for authenticated users
+  if (pathname === '/' && isAuthenticated) {
+    // Redirect authenticated users from root to their dashboard
+    if (userRoles.length > 0) {
+      const primaryRole = userRoles[0];
+      const dashboardUrl = new URL(`/${primaryRole}`, request.url);
+      return NextResponse.redirect(dashboardUrl);
+    }
+    // Default redirect if no role
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
   // Handle authentication logic
-  if (!isAuthenticated && !isPublicRoute) {
+  if (!isAuthenticated && !isPublicRoute && pathname !== '/') {
     // User is not authenticated and trying to access protected route
     const signInUrl = new URL('/sign-in', request.url);
     signInUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(signInUrl);
+  }
+
+  // Allow authenticated users to access common authenticated routes
+  if (isAuthenticated && isAuthenticatedRoute) {
+    return NextResponse.next();
   }
 
   if (isAuthenticated && (pathname === '/sign-in' || pathname === '/sign-up')) {

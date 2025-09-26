@@ -40,7 +40,7 @@ export const adminMenu: SidebarGroup[] = [
       // ________________________Dashboards, Lists and OverView_______________________________
     
     
-      { icon: Home, label: "Home", href: "/" },
+      { icon: Home, label: "Home", href: "/admin" },
       { icon: Users, label: "Educators", href: "/admin/educators" },
       { icon: GraduationCap, label: "Learners", href: "/admin/learners" },
       { icon: User, label: "Guardians", href: "/admin/guardians" },
@@ -52,7 +52,7 @@ export const adminMenu: SidebarGroup[] = [
 
 
       {
-        icon: BookOpen, label: "Academic Plans", href: "/admin/AcademicPlans", children: [
+        icon: BookOpen, label: "Academic Plans", href: "/admin/academicplans", children: [
           { icon: BookOpen, label: "Premade Plans", href: "/admin/academicplans/premade" },
           { icon: BookOpen, label: "Assigned Plans", href: "/admin/academicplans/assigned" },
           { icon: BookOpen, label: "Executed Plans", href: "/admin/academicplans/executed" },
