@@ -57,7 +57,7 @@ export function HeroSection() {
         ))}
       </div>
 
-      <div className="container mx-auto px-6 py-20 relative z-10">
+      <div className="container mx-auto px-6 pt-32 pb-20 relative z-10">
         <StaggerChildren className="max-w-5xl mx-auto text-center">
           {/* Logo and badge */}
           <StaggerItem className="flex justify-center mb-6">
@@ -66,7 +66,7 @@ export function HeroSection() {
               whileHover={{ scale: 1.05 }}
             >
               <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span className="text-sm font-medium">Revolutionizing Education Management</span>
+              <span className="text-sm font-medium text-white">Revolutionizing Education Management</span>
             </motion.div>
           </StaggerItem>
 
@@ -79,16 +79,16 @@ export function HeroSection() {
 
           {/* Subheading */}
           <StaggerItem>
-            <h2 className="text-2xl md:text-4xl font-semibold mb-6 text-foreground/90">
+            <h2 className="text-2xl md:text-4xl font-semibold mb-6 text-white/90">
               The Uber for Educators
             </h2>
           </StaggerItem>
 
           {/* Description */}
           <StaggerItem>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            <p className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-8">
               Transform education with our comprehensive management platform. 
-              Focus on what matters - <span className="font-semibold text-foreground">micromanagement and outside-classroom monitoring</span> - 
+              Focus on what matters - <span className="font-semibold text-white">micromanagement and outside-classroom monitoring</span> - 
               while we handle the rest.
             </p>
           </StaggerItem>
@@ -100,21 +100,21 @@ export function HeroSection() {
               whileHover={{ scale: 1.05 }}
             >
               <div className="text-3xl font-bold text-teal-500">10K+</div>
-              <div className="text-sm text-muted-foreground">Active Learners</div>
+              <div className="text-sm text-white/60">Active Learners</div>
             </motion.div>
             <motion.div 
               className="text-center"
               whileHover={{ scale: 1.05 }}
             >
               <div className="text-3xl font-bold text-blue-500">500+</div>
-              <div className="text-sm text-muted-foreground">Expert Educators</div>
+              <div className="text-sm text-white/60">Expert Educators</div>
             </motion.div>
             <motion.div 
               className="text-center"
               whileHover={{ scale: 1.05 }}
             >
               <div className="text-3xl font-bold text-purple-500">95%</div>
-              <div className="text-sm text-muted-foreground">Success Rate</div>
+              <div className="text-sm text-white/60">Success Rate</div>
             </motion.div>
           </StaggerItem>
 
@@ -137,7 +137,7 @@ export function HeroSection() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <button className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 font-semibold text-lg hover:bg-white/20 transition-colors">
+              <button className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 font-semibold text-lg text-white hover:bg-white/20 transition-colors">
                 <Play className="w-5 h-5" />
                 Watch Demo
               </button>
@@ -146,15 +146,15 @@ export function HeroSection() {
 
           {/* Trust badges */}
           <StaggerItem className="flex items-center justify-center gap-8 opacity-60">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-white">
               <Users className="w-5 h-5" />
               <span className="text-sm">Trusted by Parents</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-white">
               <BookOpen className="w-5 h-5" />
               <span className="text-sm">Expert Curriculum</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-white">
               <TrendingUp className="w-5 h-5" />
               <span className="text-sm">Proven Results</span>
             </div>

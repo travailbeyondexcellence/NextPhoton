@@ -92,7 +92,7 @@ export function PricingSection() {
               <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"> Perfect Plan</span>
             </h2>
             
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-white/70 max-w-2xl mx-auto">
               Start free and scale as you grow. All plans include core features with no hidden fees.
             </p>
           </div>
@@ -123,19 +123,19 @@ export function PricingSection() {
                     <div className={`p-2 rounded-lg bg-gradient-to-r ${plan.color} bg-opacity-10`}>
                       <plan.icon className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold">{plan.name}</h3>
+                    <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
                   </div>
 
                   {/* Description */}
-                  <p className="text-muted-foreground mb-6">
+                  <p className="text-white/70 mb-6">
                     {plan.description}
                   </p>
 
                   {/* Price */}
                   <div className="mb-8">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-4xl font-bold">{plan.price}</span>
-                      <span className="text-muted-foreground">/{plan.period}</span>
+                      <span className="text-4xl font-bold text-white">{plan.price}</span>
+                      <span className="text-white/60">/{plan.period}</span>
                     </div>
                   </div>
 
@@ -144,7 +144,7 @@ export function PricingSection() {
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                        <span className="text-sm text-white/80">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -174,21 +174,21 @@ export function PricingSection() {
         {/* Additional info */}
         <ScrollReveal delay={0.3}>
           <div className="mt-16 text-center">
-            <p className="text-muted-foreground mb-4">
+            <p className="text-white/70 mb-4">
               All plans include a 14-day free trial. No credit card required.
             </p>
             <div className="flex items-center justify-center gap-8">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-                <span className="text-sm">Cancel anytime</span>
+                <span className="text-sm text-white/80">Cancel anytime</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-                <span className="text-sm">No setup fees</span>
+                <span className="text-sm text-white/80">No setup fees</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-500" />
-                <span className="text-sm">Instant access</span>
+                <span className="text-sm text-white/80">Instant access</span>
               </div>
             </div>
           </div>

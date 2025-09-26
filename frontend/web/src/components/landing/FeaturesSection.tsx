@@ -84,7 +84,7 @@ export function FeaturesSection() {
               <span className="bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent"> Transform Education</span>
             </h2>
             
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-white/70 max-w-2xl mx-auto">
               Our comprehensive platform provides all the tools necessary for effective education management, 
               from classroom monitoring to performance analytics.
             </p>
@@ -109,10 +109,10 @@ export function FeaturesSection() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
+                <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-muted-foreground">
+                <p className="text-white/70">
                   {feature.description}
                 </p>
 
@@ -141,11 +141,11 @@ export function FeaturesSection() {
                   <span className="text-sm font-medium text-primary">Advanced Technology</span>
                 </div>
                 
-                <h3 className="text-3xl font-bold mb-4">
+                <h3 className="text-3xl font-bold mb-4 text-white">
                   Powered by Modern Tech Stack
                 </h3>
                 
-                <p className="text-muted-foreground mb-6">
+                <p className="text-white/70 mb-6">
                   Built with Next.js 15, NestJS, and PostgreSQL for maximum performance and reliability. 
                   Our platform scales with your needs, from small tutoring centers to large educational institutions.
                 </p>
@@ -153,19 +153,19 @@ export function FeaturesSection() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-teal-500" />
-                    <span className="text-sm">Real-time Updates</span>
+                    <span className="text-sm text-white/80">Real-time Updates</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Target className="w-5 h-5 text-blue-500" />
-                    <span className="text-sm">Goal Tracking</span>
+                    <span className="text-sm text-white/80">Goal Tracking</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Globe className="w-5 h-5 text-purple-500" />
-                    <span className="text-sm">Cloud-Based</span>
+                    <span className="text-sm text-white/80">Cloud-Based</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <BookCheck className="w-5 h-5 text-green-500" />
-                    <span className="text-sm">Smart Curriculum</span>
+                    <span className="text-sm text-white/80">Smart Curriculum</span>
                   </div>
                 </div>
               </div>

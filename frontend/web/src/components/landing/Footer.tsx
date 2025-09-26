@@ -71,21 +71,21 @@ export function Footer() {
               </span>
             </div>
             
-            <p className="text-muted-foreground mb-6">
+            <p className="text-white/70 mb-6">
               Revolutionizing education management with cutting-edge technology and comprehensive monitoring solutions.
             </p>
 
             {/* Contact info */}
             <div className="space-y-2">
-              <a href="mailto:hello@nextphoton.com" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="mailto:hello@nextphoton.com" className="flex items-center gap-2 text-sm text-white/60 hover:text-primary transition-colors">
                 <Mail className="w-4 h-4" />
                 hello@nextphoton.com
               </a>
-              <a href="tel:+919876543210" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="tel:+919876543210" className="flex items-center gap-2 text-sm text-white/60 hover:text-primary transition-colors">
                 <Phone className="w-4 h-4" />
                 +91 98765 43210
               </a>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-white/60">
                 <MapPin className="w-4 h-4" />
                 Bangalore, India
               </div>
@@ -102,7 +102,7 @@ export function Footer() {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <social.icon className="w-5 h-5" />
+                  <social.icon className="w-5 h-5 text-white/80" />
                 </motion.a>
               ))}
             </div>
@@ -112,13 +112,13 @@ export function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:col-span-4 gap-8">
             {/* Product */}
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="font-semibold mb-4 text-white">Product</h3>
               <ul className="space-y-2">
                 {footerLinks.product.map((link, index) => (
                   <li key={index}>
                     <Link 
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm text-white/60 hover:text-primary transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -129,13 +129,13 @@ export function Footer() {
 
             {/* Company */}
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
+              <h3 className="font-semibold mb-4 text-white">Company</h3>
               <ul className="space-y-2">
                 {footerLinks.company.map((link, index) => (
                   <li key={index}>
                     <Link 
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm text-white/60 hover:text-primary transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -146,13 +146,13 @@ export function Footer() {
 
             {/* Resources */}
             <div>
-              <h3 className="font-semibold mb-4">Resources</h3>
+              <h3 className="font-semibold mb-4 text-white">Resources</h3>
               <ul className="space-y-2">
                 {footerLinks.resources.map((link, index) => (
                   <li key={index}>
                     <Link 
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm text-white/60 hover:text-primary transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -163,13 +163,13 @@ export function Footer() {
 
             {/* Legal */}
             <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
+              <h3 className="font-semibold mb-4 text-white">Legal</h3>
               <ul className="space-y-2">
                 {footerLinks.legal.map((link, index) => (
                   <li key={index}>
                     <Link 
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                      className="text-sm text-white/60 hover:text-primary transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -184,14 +184,14 @@ export function Footer() {
         <div className="py-8 border-t border-white/10 mb-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
-              <h3 className="font-semibold mb-1">Subscribe to our newsletter</h3>
-              <p className="text-sm text-muted-foreground">Get updates on new features and educational insights</p>
+              <h3 className="font-semibold mb-1 text-white">Subscribe to our newsletter</h3>
+              <p className="text-sm text-white/60">Get updates on new features and educational insights</p>
             </div>
             <form className="flex gap-2 w-full md:w-auto">
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-white placeholder:text-white/40"
               />
               <motion.button
                 type="submit"
@@ -207,10 +207,10 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t border-white/10">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-white/60">
             © {new Date().getFullYear()} NextPhoton. All rights reserved.
           </p>
-          <p className="text-sm text-muted-foreground flex items-center gap-1">
+          <p className="text-sm text-white/60 flex items-center gap-1">
             Made with <Heart className="w-4 h-4 text-red-500 fill-red-500" /> in India
           </p>
         </div>

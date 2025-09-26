@@ -83,7 +83,7 @@ export function TestimonialsSection() {
               <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent"> Thousands</span>
             </h2>
             
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-white/70 max-w-2xl mx-auto">
               See what educators, parents, and students are saying about their experience with NextPhoton.
             </p>
           </div>
@@ -103,7 +103,7 @@ export function TestimonialsSection() {
                   <Quote className="w-8 h-8 text-primary/20 mb-4" />
                   
                   {/* Content */}
-                  <p className="text-muted-foreground mb-6 italic">
+                  <p className="text-white/70 mb-6 italic">
                     "{testimonial.content}"
                   </p>
 
@@ -122,13 +122,13 @@ export function TestimonialsSection() {
                   {/* Author */}
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                      <span className="text-lg font-semibold">
+                      <span className="text-lg font-semibold text-white">
                         {testimonial.name.split(' ').map(n => n[0]).join('')}
                       </span>
                     </div>
                     <div>
-                      <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-sm text-white/60">{testimonial.role}</div>
                     </div>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export function TestimonialsSection() {
               <div className="text-4xl font-bold bg-gradient-to-r from-teal-500 to-cyan-500 bg-clip-text text-transparent mb-2">
                 98%
               </div>
-              <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
+              <div className="text-sm text-white/70">Satisfaction Rate</div>
             </motion.div>
             <motion.div 
               className="text-center"
@@ -156,7 +156,7 @@ export function TestimonialsSection() {
               <div className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent mb-2">
                 4.9/5
               </div>
-              <div className="text-sm text-muted-foreground">Average Rating</div>
+              <div className="text-sm text-white/70">Average Rating</div>
             </motion.div>
             <motion.div 
               className="text-center"
@@ -165,7 +165,7 @@ export function TestimonialsSection() {
               <div className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
                 50K+
               </div>
-              <div className="text-sm text-muted-foreground">Happy Users</div>
+              <div className="text-sm text-white/70">Happy Users</div>
             </motion.div>
             <motion.div 
               className="text-center"
@@ -174,7 +174,7 @@ export function TestimonialsSection() {
               <div className="text-4xl font-bold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-2">
                 24/7
               </div>
-              <div className="text-sm text-muted-foreground">Support Available</div>
+              <div className="text-sm text-white/70">Support Available</div>
             </motion.div>
           </div>
         </ScrollReveal>

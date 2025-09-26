@@ -3,6 +3,7 @@ import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { Footer } from "@/components/landing/Footer";
+import { Navbar } from "@/components/landing/Navbar";
 
 /**
  * Main landing page for NextPhoton
@@ -11,6 +12,9 @@ import { Footer } from "@/components/landing/Footer";
 export default function LandingPage() {
   return (
     <div className="min-h-screen">
+      {/* Navbar */}
+      <Navbar />
+      
       {/* Hero Section with main CTA */}
       <HeroSection />
       
