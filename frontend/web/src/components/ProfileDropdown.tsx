@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
-import { 
-  User, 
-  Settings, 
-  LogOut, 
-  Bell, 
+import {
+  User,
+  Settings,
+  LogOut,
+  Bell,
   HelpCircle,
-  ChevronDown 
+  ChevronDown
 } from 'lucide-react';
 
 /**
@@ -19,6 +21,7 @@ import {
 export function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Mock user data - replace with actual user data from auth context
   const user = {
@@ -127,10 +130,17 @@ export function ProfileDropdown() {
               <div className="my-2 border-t border-white/10" />
 
               <button
-                onClick={() => {
-                  // Handle logout
-                  console.log('Logging out...');
-                  // Add actual logout logic here
+                onClick={async () => {
+                  // Perform logout directly using authClient - same as logout page
+                  try {
+                    await authClient.signOut();
+                    // Redirect to sign-in page after successful logout
+                    router.push('/sign-in');
+                  } catch (error) {
+                    console.error("Logout error:", error);
+                    // Still redirect even if logout fails
+                    router.push('/sign-in');
+                  }
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-destructive/10 transition-colors text-left text-destructive"
