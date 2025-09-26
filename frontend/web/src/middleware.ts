@@ -18,6 +18,36 @@ const publicRoutes = [
   '/sign-up',
   '/forgot-password',
   '/reset-password',
+  // Landing pages - Product
+  '/features',
+  '/pricing',
+  '/testimonials',
+  '/demo',
+  // Landing pages - Company
+  '/about',
+  '/careers',
+  '/blog',
+  '/press',
+  // Landing pages - Resources
+  '/documentation',
+  '/help-center',
+  '/community',
+  '/contact',
+  // Landing pages - Legal
+  '/privacy',
+  '/terms',
+  '/security',
+  '/compliance',
+  // Product routes
+  '/product',
+  // Company routes
+  '/company',
+  // Resources routes
+  '/resources',
+  // Legal routes
+  '/legal',
+  // Public routes in (public) folder
+  '/faqs',
 ];
 
 /**
