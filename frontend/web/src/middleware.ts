@@ -21,6 +21,17 @@ const publicRoutes = [
 ];
 
 /**
+ * Routes that should be accessible to all authenticated users
+ */
+const authenticatedRoutes = [
+  '/profile',
+  '/settings',
+  '/logout',
+  '/NextPhotonSettings',
+  '/TRAVAIL-PRACTISE-EXAMS',
+];
+
+/**
  * Define role-based route access
  */
 const roleBasedRoutes: Record<string, string[]> = {
@@ -41,6 +52,9 @@ export function middleware(request: NextRequest) {
 
   // Check if route is public
   const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
+
+  // Check if route is accessible to all authenticated users
+  const isAuthenticatedRoute = authenticatedRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
 
   // Get JWT token from cookies (we'll set this when user logs in)
   const token = request.cookies.get('nextphoton_jwt_token');
@@ -80,6 +94,11 @@ export function middleware(request: NextRequest) {
     const signInUrl = new URL('/sign-in', request.url);
     signInUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(signInUrl);
+  }
+
+  // Allow authenticated users to access common authenticated routes
+  if (isAuthenticated && isAuthenticatedRoute) {
+    return NextResponse.next();
   }
 
   if (isAuthenticated && (pathname === '/sign-in' || pathname === '/sign-up')) {

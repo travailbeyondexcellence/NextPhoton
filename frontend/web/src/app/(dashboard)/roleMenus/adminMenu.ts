@@ -52,7 +52,7 @@ export const adminMenu: SidebarGroup[] = [
 
 
       {
-        icon: BookOpen, label: "Academic Plans", href: "/admin/AcademicPlans", children: [
+        icon: BookOpen, label: "Academic Plans", href: "/admin/academicplans", children: [
           { icon: BookOpen, label: "Premade Plans", href: "/admin/academicplans/premade" },
           { icon: BookOpen, label: "Assigned Plans", href: "/admin/academicplans/assigned" },
           { icon: BookOpen, label: "Executed Plans", href: "/admin/academicplans/executed" },
