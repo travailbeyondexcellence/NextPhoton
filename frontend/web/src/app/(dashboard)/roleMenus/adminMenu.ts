@@ -40,7 +40,7 @@ export const adminMenu: SidebarGroup[] = [
       // ________________________Dashboards, Lists and OverView_______________________________
     
     
-      { icon: Home, label: "Home", href: "/" },
+      { icon: Home, label: "Home", href: "/admin" },
       { icon: Users, label: "Educators", href: "/admin/educators" },
       { icon: GraduationCap, label: "Learners", href: "/admin/learners" },
       { icon: User, label: "Guardians", href: "/admin/guardians" },
