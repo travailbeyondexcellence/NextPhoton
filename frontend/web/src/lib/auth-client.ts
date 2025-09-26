@@ -81,42 +81,96 @@ class AuthClient {
   }
 
   /**
-   * Store authentication data in localStorage
+   * Store authentication data in both localStorage and cookies
+   * Cookies are needed for Next.js middleware to check authentication
    */
   private storeAuthData(token: string, user: User): void {
     if (typeof window !== 'undefined') {
+      // Store in localStorage for client-side access
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+      // Store in cookies for middleware access
+      // Using 7-day expiry for cookies
+      const maxAge = 60 * 60 * 24 * 7; // 7 days in seconds
+
+      // Set JWT token cookie
+      document.cookie = `nextphoton_jwt_token=${token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+
+      // Set user data cookie (with roles for middleware role-based routing)
+      const userData = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        roles: user.roles
+      };
+      document.cookie = `nextphoton_user=${encodeURIComponent(JSON.stringify(userData))}; path=/; max-age=${maxAge}; SameSite=Lax`;
     }
   }
 
   /**
-   * Clear authentication data from localStorage
+   * Clear authentication data from both localStorage and cookies
    */
   private clearAuthData(): void {
     if (typeof window !== 'undefined') {
+      // Clear localStorage
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
+
+      // Clear cookies by setting them to expire immediately
+      document.cookie = 'nextphoton_jwt_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
+      document.cookie = 'nextphoton_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax';
     }
   }
 
   /**
-   * Get stored authentication token
+   * Get stored authentication token from localStorage or cookies
    */
   private getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(TOKEN_KEY);
+      // Try localStorage first
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (token) return token;
+
+      // Fallback to cookies
+      const cookies = document.cookie.split(';');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'nextphoton_jwt_token') {
+          return value;
+        }
+      }
     }
     return null;
   }
 
   /**
-   * Get stored user data
+   * Get stored user data from localStorage or cookies
    */
   private getStoredUser(): User | null {
     if (typeof window !== 'undefined') {
+      // Try localStorage first
       const userData = localStorage.getItem(USER_KEY);
-      return userData ? JSON.parse(userData) : null;
+      if (userData) {
+        try {
+          return JSON.parse(userData);
+        } catch (e) {
+          console.error('Failed to parse user data from localStorage');
+        }
+      }
+
+      // Fallback to cookies
+      const cookies = document.cookie.split(';');
+      for (const cookie of cookies) {
+        const [name, value] = cookie.trim().split('=');
+        if (name === 'nextphoton_user') {
+          try {
+            return JSON.parse(decodeURIComponent(value));
+          } catch (e) {
+            console.error('Failed to parse user data from cookie');
+          }
+        }
+      }
     }
     return null;
   }
