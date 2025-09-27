@@ -97,14 +97,14 @@ export function DashboardSidebar() {
                 <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
                   {group.title}
                 </h3>
-                <SidebarMenu>
+                <SidebarMenu className="space-y-1">
                   {group.items.map((item, itemIndex) => {
                     const isActive = pathname === item.href
                     const Icon = item.icon // Store the icon component
 
                     if (item.children) {
                       return (
-                        <Collapsible key={itemIndex} className="px-2" open={openStates[groupIndex][itemIndex]}
+                        <Collapsible key={itemIndex} className="" open={openStates[groupIndex][itemIndex]}
                           onOpenChange={() =>
                             setOpenStates((prev) =>
                               prev.map((groupArr, gIdx) =>
@@ -116,32 +116,41 @@ export function DashboardSidebar() {
                               )
                             )
                           }>
-                          <CollapsibleTrigger className="flex items-center justify-between w-[90%] text-sm py-2 font-medium">
-                            <span className="flex items-center gap-2 ">
-                              <item.icon size={20} className="mr-2" /> {item.label}
+                          <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-white/5 rounded-md transition-colors">
+                            <span className="flex items-center gap-2">
+                              <item.icon size={20} /> 
+                              {item.label}
                             </span>
-
-                            <ChevronRightSquare
-                              size={16}
-                              className={`transition-transform duration-300 ${openStates[groupIndex][itemIndex] ? "rotate-90" : "rotate-0"
-                                }`}
-                            />
+                            
+                            <div className="p-1 hover:bg-white/10 rounded">
+                              {openStates[groupIndex][itemIndex] ? (
+                                <Minus size={16} className="text-muted-foreground" />
+                              ) : (
+                                <Plus size={16} className="text-muted-foreground" />
+                              )}
+                            </div>
                           </CollapsibleTrigger>
-                          <CollapsibleContent className="pl-4">
-                            {item.children.map((subItem, subIndex) => (
-                              <Link
-                                key={subIndex}
-                                href={subItem.href || "#"}
-                                className="flex items-center gap-2 py-2 text-sm text-muted-foreground hover:text-foreground"
-                              >
-                                <Icon size={16} />
-                                <span className="">
-
-
-                                  {subItem.label}
-                                </span>
-                              </Link>
-                            ))}
+                          <CollapsibleContent className="mt-1">
+                            <div className="ml-6 space-y-1">
+                              {item.children.map((subItem, subIndex) => {
+                                const isSubActive = pathname === subItem.href
+                                return (
+                                  <Link
+                                    key={subIndex}
+                                    href={subItem.href || "#"}
+                                    className={cn(
+                                      "flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
+                                      "bg-white/5 hover:bg-white/10",
+                                      "text-muted-foreground hover:text-foreground",
+                                      isSubActive && "bg-white/10 text-foreground font-medium"
+                                    )}
+                                  >
+                                    <Icon size={16} />
+                                    <span>{subItem.label}</span>
+                                  </Link>
+                                )
+                              })}
+                            </div>
                           </CollapsibleContent>
                         </Collapsible>
                       )
