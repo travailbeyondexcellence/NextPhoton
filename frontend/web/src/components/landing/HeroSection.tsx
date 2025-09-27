@@ -12,6 +12,21 @@ import { LogoComponent } from "../LogoComponent";
  * Features animated content with glassmorphism design
  */
 export function HeroSection() {
+  // Deterministic pseudo-random number generator for consistent server/client rendering
+  const getPseudoRandom = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  // Pre-calculated particle positions to avoid hydration mismatch
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    left: getPseudoRandom(i * 2) * 100,
+    top: getPseudoRandom(i * 3) * 100,
+    duration: 3 + getPseudoRandom(i * 5) * 2,
+    delay: getPseudoRandom(i * 7) * 2,
+  }));
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Animated background gradient */}
@@ -34,13 +49,13 @@ export function HeroSection() {
 
       {/* Floating particles */}
       <div className="absolute inset-0 -z-5">
-        {[...Array(20)].map((_, i) => (
+        {particles.map((particle) => (
           <motion.div
-            key={i}
+            key={particle.id}
             className="absolute w-2 h-2 bg-white/20 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
             animate={{
               y: [-20, 20, -20],
@@ -48,9 +63,9 @@ export function HeroSection() {
               opacity: [0.2, 0.5, 0.2],
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: particle.delay,
               ease: "easeInOut",
             }}
           />
@@ -125,7 +140,7 @@ export function HeroSection() {
               whileTap={{ scale: 0.95 }}
             >
               <Link
-                href="/signup"
+                href="/sign-up"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white font-semibold text-lg hover:shadow-2xl hover:shadow-blue-500/25 transition-shadow"
               >
                 Get Started Free

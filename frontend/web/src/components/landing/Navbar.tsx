@@ -259,7 +259,7 @@ export function Navbar() {
                 Sign In
               </Link>
               <Link
-                href="/signup"
+                href="/sign-up"
                 className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Get Started
@@ -319,7 +319,7 @@ export function Navbar() {
                     Sign In
                   </Link>
                   <Link
-                    href="/signup"
+                    href="/sign-up"
                     className="w-full px-4 py-2 text-center text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
                   >
                     Get Started

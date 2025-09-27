@@ -75,7 +75,7 @@ export default function SignUp() {
             
             // Redirect to signin page after a short delay
             setTimeout(() => {
-                window.location.href = '/signin';
+                window.location.href = '/sign-in';
             }, 1500);
         }
     }
