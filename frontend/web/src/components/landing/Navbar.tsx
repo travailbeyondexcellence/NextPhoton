@@ -138,7 +138,7 @@ export function Navbar() {
                         section.isTwoColumn ? "left-1/2 -translate-x-1/2 w-[540px]" : "left-0 w-[320px]"
                       )}
                     >
-                      <div className="bg-white/10 backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
+                      <div className="bg-background backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
                         {section.isTwoColumn && section.columnTitles ? (
                           // Two-column layout for About Us
                           <div>
@@ -258,12 +258,6 @@ export function Navbar() {
               >
                 Sign In
               </Link>
-              <Link
-                href="/sign-up"
-                className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-              >
-                Get Started
-              </Link>
             </div>
 
             {/* Mobile Menu Toggle */}
@@ -317,12 +311,6 @@ export function Navbar() {
                     className="w-full px-4 py-2 text-center text-sm font-medium text-foreground/80 hover:text-foreground transition-colors"
                   >
                     Sign In
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    className="w-full px-4 py-2 text-center text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    Get Started
                   </Link>
                 </div>
               </div>

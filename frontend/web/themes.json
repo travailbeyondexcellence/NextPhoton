@@ -350,9 +350,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#ffcc00",
-        "backgroundGradientVia": "#ffd700",
-        "backgroundGradientTo": "#ffe135",
+        "backgroundGradientFrom": "#FF0000",
+        "backgroundGradientVia": "#FF7F00",
+        "backgroundGradientTo": "#FFFF00",
         "cardOpacity": 0.024,
         "borderOpacity": 0.045,
         "blurIntensity": 8,

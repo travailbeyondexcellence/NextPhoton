@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ThemeSelector } from '@/components/ThemeSelector';
 import { LogoComponent } from '@/components/LogoComponent';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
@@ -57,15 +58,15 @@ export default function SignInPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md px-4"
+        className="w-full max-w-[456px] px-4"
       >
         {/* Glass morphism card */}
-        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
+        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 shadow-2xl">
           {/* Logo and Brand */}
-          <div className="mb-6">
+          <div className="mb-4">
             <Link href="/" className="flex items-center justify-center gap-3 group">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-primary/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all">
+                <div className="w-10 h-10 bg-primary/10 backdrop-blur-sm rounded-lg flex items-center justify-center group-hover:bg-primary/20 transition-all">
                   <LogoComponent width={24} height={24} />
                 </div>
               </div>
@@ -83,7 +84,7 @@ export default function SignInPage() {
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-destructive/10 backdrop-blur-sm text-destructive px-4 py-3 rounded-xl text-sm border border-destructive/20"
+                className="bg-destructive/10 backdrop-blur-sm text-destructive px-4 py-3 rounded-xl text-sm"
               >
                 {error}
               </motion.div>
@@ -102,7 +103,12 @@ export default function SignInPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all autofill:bg-background/50 autofill:text-foreground"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all autofill:bg-background/50 autofill:text-foreground"
+                  style={{
+                    WebkitTextFillColor: 'var(--foreground) !important',
+                    WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',
+                    transition: 'background-color 5000s ease-in-out 0s',
+                  }}
                   placeholder="Enter your email"
                   autoComplete="email"
                 />
@@ -122,7 +128,12 @@ export default function SignInPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-11 pr-12 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all autofill:bg-background/50 autofill:text-foreground"
+                  className="w-full pl-11 pr-12 py-3 rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all autofill:bg-background/50 autofill:text-foreground"
+                  style={{
+                    WebkitTextFillColor: 'var(--foreground) !important',
+                    WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',
+                    transition: 'background-color 5000s ease-in-out 0s',
+                  }}
                   placeholder="Enter your password"
                   autoComplete="current-password"
                 />
@@ -141,7 +152,7 @@ export default function SignInPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl border-2 border-primary hover:bg-primary/90 hover:border-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
@@ -160,8 +171,10 @@ export default function SignInPage() {
             <div className="flex gap-3">
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 border border-input rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
-                onClick={() => {/* TODO: Implement Facebook login */}}
+                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                onClick={() => {
+                  toast.info("This feature is coming soon");
+                }}
               >
                 <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -170,8 +183,10 @@ export default function SignInPage() {
               </button>
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 border border-input rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
-                onClick={() => {/* TODO: Implement Google login */}}
+                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                onClick={() => {
+                  toast.info("This feature is coming soon");
+                }}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -195,7 +210,7 @@ export default function SignInPage() {
           <div className="flex justify-between items-center text-sm">
             <Link
               href="/forgot-password"
-              className="text-muted-foreground hover:text-primary transition-all duration-200 hover:scale-105 hover:translate-x-1"
+              className="inline-block px-4 py-2 bg-muted/20 hover:bg-muted/30 text-foreground rounded-xl transition-all duration-200 hover:scale-105"
             >
               Forgot Password?
             </Link>
@@ -203,7 +218,7 @@ export default function SignInPage() {
               <span className="text-muted-foreground">New here? </span>
               <Link 
                 href="/sign-up" 
-                className="text-primary hover:text-primary/80 font-medium transition-all duration-200 hover:scale-105 hover:translate-x-1"
+                className="inline-block px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-xl font-medium transition-all duration-200 hover:scale-105"
               >
                 Sign Up Now
               </Link>

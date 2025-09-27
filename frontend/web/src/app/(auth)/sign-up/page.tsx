@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { LogoComponent } from "@/components/LogoComponent";
 import { ThemeSelector } from "@/components/ThemeSelector";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, User } from "lucide-react";
 import { toast } from "sonner";
 
 // Form validation schema
@@ -90,41 +90,49 @@ export default function SignUpPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md px-4"
+        className="w-full max-w-[456px] px-4"
       >
         {/* Glass morphism card */}
-        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-10 border border-white/20 shadow-2xl">
+        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
           {/* Logo and Brand */}
-          <div className="mb-10">
-            <Link href="/" className="flex items-center gap-3 group">
+          <div className="mb-4">
+            <Link href="/" className="flex items-center justify-center gap-3 group">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-primary/10 backdrop-blur-sm rounded-xl flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all">
-                  <LogoComponent width={28} height={28} />
+                <div className="w-10 h-10 bg-primary/10 backdrop-blur-sm rounded-lg flex items-center justify-center border border-primary/20 group-hover:bg-primary/20 transition-all">
+                  <LogoComponent width={24} height={24} />
                 </div>
               </div>
-              <span className="text-2xl font-bold text-foreground group-hover:text-primary transition-colors">NextPhoton</span>
+              <span className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">NextPhoton</span>
             </Link>
           </div>
 
           {/* Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-semibold text-foreground">Create Account</h2>
-            <p className="text-lg text-muted-foreground mt-1">to get started now!</p>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-semibold text-foreground">Create Account to get started now!</h2>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                 Full Name
               </label>
-              <input
-                id="name"
-                type="text"
-                className="w-full px-4 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                placeholder="Enter your full name"
-                {...register("name")}
-              />
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  id="name"
+                  type="text"
+                  className="w-full pl-11 pr-4 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all autofill:bg-background/50 autofill:text-foreground [&:-webkit-autofill]:bg-background/50 [&:-webkit-autofill]:text-foreground"
+                  style={{
+                    WebkitTextFillColor: 'var(--foreground) !important',
+                    WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',
+                    transition: 'background-color 5000s ease-in-out 0s',
+                  }}
+                  placeholder="Enter your full name"
+                  autoComplete="name"
+                  {...register("name")}
+                />
+              </div>
               {errors.name && (
                 <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
               )}
@@ -222,7 +230,7 @@ export default function SignUpPage() {
             <div className="flex gap-3">
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 border border-input rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
                 onClick={() => {/* TODO: Implement Facebook signup */}}
               >
                 <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
@@ -232,7 +240,7 @@ export default function SignUpPage() {
               </button>
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 border border-input rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
                 onClick={() => {/* TODO: Implement Google signup */}}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
