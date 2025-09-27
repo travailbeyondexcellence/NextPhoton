@@ -165,12 +165,15 @@ export function DashboardSidebar() {
                           } : undefined}
                         >
                           {item.hasSecondaryDrawer ? (
-                            <>
-                              <span className="mr-2">
-                                <Icon size={20} />
-                              </span>
-                              {item.label}
-                            </>
+                            <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center">
+                                <span className="mr-2">
+                                  <Icon size={20} />
+                                </span>
+                                {item.label}
+                              </div>
+                              <ChevronRight size={16} className="text-muted-foreground" />
+                            </div>
                           ) : (
                             <Link href={item.href}>
                               <span className="mr-2">
