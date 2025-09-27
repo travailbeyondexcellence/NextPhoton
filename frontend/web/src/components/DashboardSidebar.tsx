@@ -22,7 +22,7 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 
-import { ChevronDown, ChevronRightSquare } from "lucide-react";
+import { ChevronDown, ChevronRightSquare, ChevronRight } from "lucide-react";
 
 import 'simplebar-react/dist/simplebar.min.css';
 import SimpleBar from 'simplebar-react';
@@ -31,7 +31,7 @@ import SimpleBar from 'simplebar-react';
 import { useState, useEffect } from "react"
 
 import { adminMenu } from "@/app/(dashboard)/roleMenus/adminMenu"
-
+import { useStore } from "@/statestore/store"
 
 import { useTheme } from "next-themes";
 
@@ -58,6 +58,7 @@ export function DashboardSidebar() {
 
   const pathname = usePathname()
   const router = useRouter()
+  const { openSecondarySidebar } = useStore()
 
 
 
@@ -151,19 +152,33 @@ export function DashboardSidebar() {
                     return (
                       <SidebarMenuItem key={item.href}>
                         <SidebarMenuButton
-                          asChild
+                          asChild={!item.hasSecondaryDrawer}
                           data-active={isActive}
                           className={cn(
                             "w-full justify-start",
                             isActive && "bg-muted font-medium"
                           )}
+                          onClick={item.hasSecondaryDrawer ? (e) => {
+                            e.preventDefault()
+                            openSecondarySidebar(item.secondaryDrawerKey || '')
+                            router.push(item.href)
+                          } : undefined}
                         >
-                          <Link href={item.href}>
-                            <span className="mr-2">
-                              <Icon size={20} />
-                            </span>
-                            {item.label}
-                          </Link>
+                          {item.hasSecondaryDrawer ? (
+                            <>
+                              <span className="mr-2">
+                                <Icon size={20} />
+                              </span>
+                              {item.label}
+                            </>
+                          ) : (
+                            <Link href={item.href}>
+                              <span className="mr-2">
+                                <Icon size={20} />
+                              </span>
+                              {item.label}
+                            </Link>
+                          )}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     )

@@ -25,6 +25,8 @@ export interface SidebarItem {
   label: string;
   href: string;
   children?: SidebarItem[];
+  hasSecondaryDrawer?: boolean;
+  secondaryDrawerKey?: string;
 }
 
 export interface SidebarGroup {
@@ -65,13 +67,13 @@ export const adminMenu: SidebarGroup[] = [
       { icon: FileText, label: "Exams", href: "/TRAVAIL-PRACTISE-EXAMS/admin/TRAVAIL-EXAMS" }, // This will open travail.photonecademy.com/exams for the student, and the student will be able to see the exams that are assigned to them.
       // For the admin, it will populate the dashboard with all the exams that are assigned to the students, the exams the students have given recently and the practise that the students have done recently.
       { icon: ClipboardList, label: "Home Tasks", href: "/admin/HomeTasks" },
-      { icon: FileText, label: "Performance", href: "/admin/performance" },
+      { icon: FileText, label: "Performance", href: "/admin/performance", hasSecondaryDrawer: true, secondaryDrawerKey: "analytics" },
       // For the academic performance of the students+
 
       // __________________________________Messaging________________________________________
    
       { icon: PackageCheck, label: "EduCare Tasks", href: "/admin/EducareTasks" },
-      { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications" },
+      { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications", hasSecondaryDrawer: true, secondaryDrawerKey: "messaging" },
       { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
       { icon: Settings, label: "NextPhoton Settings", href: "/NextPhotonSettings" },
     ],

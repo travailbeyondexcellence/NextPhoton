@@ -3,6 +3,7 @@
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
+import { SecondarySidebarDrawer } from "@/components/SecondarySidebarDrawer";
 import { useState, useEffect } from "react";
 
 // Outer wrapper with SidebarProvider
@@ -55,6 +56,9 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+
+      {/* Secondary Sidebar Drawer */}
+      <SecondarySidebarDrawer />
     </div>
   );
 }
