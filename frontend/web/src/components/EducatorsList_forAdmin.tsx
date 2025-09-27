@@ -5,6 +5,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Pencil, Trash2 } from 'lucide-react';
 import { educator as singleEducator } from '../app/(dashboard)/admin/educators/[educatorID]/dummyData'; // adjust import as per your structure
+import { getInitials } from '@/lib/utils';
 
 import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1.ts';
 
@@ -57,13 +58,21 @@ const EducatorsList_forAdmin = () => {
           {educators.map((edu) => (
             <tr key={edu.id} className="border-t border-white/10 hover:bg-white/5 transition-all">
               <td className="px-4 py-3">
-                <Image
-                  src={edu.profileImage || '/default-avatar.png'}
-                  alt={edu.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full object-cover border border-white/10"
-                />
+                {edu.profileImage ? (
+                  <Image
+                    src={edu.profileImage}
+                    alt={edu.name}
+                    width={40}
+                    height={40}
+                    className="rounded-full object-cover border border-white/10"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-primary">
+                      {getInitials(edu.name)}
+                    </span>
+                  </div>
+                )}
               </td>
               <td className="px-4 py-3">
                 <div className="font-semibold text-foreground">{edu.name}</div>

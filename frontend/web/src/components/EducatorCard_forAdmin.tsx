@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getInitials } from "@/lib/utils";
 
 import { educator as defaultEducator } from "@/app/(dashboard)/admin/educators/[educatorID]/dummyData";
 
@@ -60,13 +61,23 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
       </div>
 
       {/* Educator Image */}
-      <Image
-        src={educator.profileImage}
-        alt={educator.name}
-        width={240}
-        height={192}
-        className="w-full md:w-56 object-cover bg-white/5"
-      />
+      {educator.profileImage ? (
+        <Image
+          src={educator.profileImage}
+          alt={educator.name}
+          width={240}
+          height={192}
+          className="w-full md:w-56 object-cover bg-white/5"
+        />
+      ) : (
+        <div className="w-full md:w-56 h-48 bg-primary/10 flex items-center justify-center border-r border-white/10">
+          <div className="w-24 h-24 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center">
+            <span className="text-3xl font-bold text-primary">
+              {getInitials(educator.name)}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Info Section */}
       <div className="flex-1 p-3 space-y-2">
