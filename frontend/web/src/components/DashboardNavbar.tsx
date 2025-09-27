@@ -7,7 +7,12 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export function DashboardNavbar() {
   return (
-    <div className="h-16 w-full border-b border-white/10">
+    <div 
+      className="h-16 w-full border-b border-white/10 backdrop-blur-xl"
+      style={{
+        background: `linear-gradient(135deg, rgb(var(--dashboard-header-gradient-from)) 0%, rgb(var(--dashboard-header-gradient-via)) 50%, rgb(var(--dashboard-header-gradient-to)) 100%)`
+      }}
+    >
       <div className="h-full px-4 flex items-center justify-between">
         {/* Left: Sidebar trigger + title */}
         <div className="flex items-center gap-4">

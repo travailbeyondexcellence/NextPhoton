@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
           transition={{ duration: 0.5 }}
           className="w-full max-w-[456px] px-4"
         >
-          <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl text-center">
+          <div className="glass-card p-8 rounded-3xl text-center">
             {/* Logo and Brand */}
             <div className="mb-6">
               <Link href="/" className="flex items-center justify-center gap-3 group">
@@ -140,7 +140,7 @@ export default function ForgotPasswordPage() {
         className="w-full max-w-[456px] px-4"
       >
         {/* Glass morphism card */}
-        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
+        <div className="glass-card p-8 rounded-3xl">
           {/* Logo and Brand */}
           <div className="mb-6">
             <Link href="/" className="flex items-center justify-center gap-3 group">
@@ -170,7 +170,7 @@ export default function ForgotPasswordPage() {
                 <input
                   id="email"
                   type="email"
-                  className="w-full pl-11 pr-4 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  className="w-full pl-11 pr-4 py-3 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{
                     WebkitTextFillColor: 'var(--foreground) !important',
                     WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',

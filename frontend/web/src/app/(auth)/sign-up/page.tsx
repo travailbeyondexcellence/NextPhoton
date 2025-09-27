@@ -93,7 +93,7 @@ export default function SignUpPage() {
         className="w-full max-w-[456px] px-4"
       >
         {/* Glass morphism card */}
-        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
+        <div className="glass-card p-8 rounded-3xl">
           {/* Logo and Brand */}
           <div className="mb-4">
             <Link href="/" className="flex items-center justify-center gap-3 group">
@@ -122,7 +122,7 @@ export default function SignUpPage() {
                 <input
                   id="name"
                   type="text"
-                  className="w-full pl-11 pr-4 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all autofill:bg-background/50 autofill:text-foreground [&:-webkit-autofill]:bg-background/50 [&:-webkit-autofill]:text-foreground"
+                  className="w-full pl-11 pr-4 py-3 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{
                     WebkitTextFillColor: 'var(--foreground) !important',
                     WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',
@@ -146,7 +146,7 @@ export default function SignUpPage() {
               <input
                 id="email"
                 type="email"
-                className="w-full px-4 py-3 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                className="w-full px-4 py-3 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                 placeholder="Enter your email"
                 {...register("email")}
               />
@@ -164,7 +164,7 @@ export default function SignUpPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 pr-12 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  className="w-full px-4 py-3 pr-12 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   placeholder="Create a strong password"
                   {...register("password")}
                 />
@@ -190,7 +190,7 @@ export default function SignUpPage() {
                 <input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
-                  className="w-full px-4 py-3 pr-12 border border-input rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                  className="w-full px-4 py-3 pr-12 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   placeholder="Confirm your password"
                   {...register("confirmPassword")}
                 />
@@ -230,7 +230,7 @@ export default function SignUpPage() {
             <div className="flex gap-3">
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                className="flex-1 py-3 px-4 glass-button bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
                 onClick={() => {/* TODO: Implement Facebook signup */}}
               >
                 <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
@@ -240,7 +240,7 @@ export default function SignUpPage() {
               </button>
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                className="flex-1 py-3 px-4 glass-button bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
                 onClick={() => {/* TODO: Implement Google signup */}}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">

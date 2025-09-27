@@ -67,7 +67,13 @@
         "gradientOverlayFrom": "#38bdf8",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#0052FF",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#0056b3",
+        "sidebarGradientVia": "#6fa4d8",
+        "sidebarGradientTo": "#0056b3",
+        "dashboardHeaderGradientFrom": "#004d99",
+        "dashboardHeaderGradientVia": "#5c8ec2",
+        "dashboardHeaderGradientTo": "#004d99"
       },
       "progressGradient": {
         "from": "#0ea5e9",
@@ -116,7 +122,13 @@
         "gradientOverlayFrom": "#34d399",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#059669",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#03382a",
+        "sidebarGradientVia": "#025640",
+        "sidebarGradientTo": "#086a5d",
+        "dashboardHeaderGradientFrom": "#022419",
+        "dashboardHeaderGradientVia": "#02402f",
+        "dashboardHeaderGradientTo": "#065449"
       },
       "progressGradient": {
         "from": "#10b981",
@@ -165,7 +177,13 @@
         "gradientOverlayFrom": "#6ee7b7",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#10b981",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#000000",
+        "sidebarGradientVia": "#03382a",
+        "sidebarGradientTo": "#021f0e",
+        "dashboardHeaderGradientFrom": "#000000",
+        "dashboardHeaderGradientVia": "#022419",
+        "dashboardHeaderGradientTo": "#01170a"
       },
       "progressGradient": {
         "from": "#34d399",
@@ -214,7 +232,13 @@
         "gradientOverlayFrom": "#8b5cf6",
         "gradientOverlayFromOpacity": 0.15,
         "gradientOverlayTo": "#6366f1",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#0a0513",
+        "sidebarGradientVia": "#1a0a3f",
+        "sidebarGradientTo": "#1f1a57",
+        "dashboardHeaderGradientFrom": "#060309",
+        "dashboardHeaderGradientVia": "#14062d",
+        "dashboardHeaderGradientTo": "#181345"
       },
       "progressGradient": {
         "from": "#8b5cf6",
@@ -263,7 +287,13 @@
         "gradientOverlayFrom": "#60a5fa",
         "gradientOverlayFromOpacity": 0.15,
         "gradientOverlayTo": "#3b82f6",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#0a0e1a",
+        "sidebarGradientVia": "#14255a",
+        "sidebarGradientTo": "#094757",
+        "dashboardHeaderGradientFrom": "#050711",
+        "dashboardHeaderGradientVia": "#0f1a42",
+        "dashboardHeaderGradientTo": "#06343f"
       },
       "progressGradient": {
         "from": "#60a5fa",
@@ -312,7 +342,13 @@
         "gradientOverlayFrom": "#5eead4",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#14b8a6",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#094757",
+        "sidebarGradientVia": "#086a5d",
+        "sidebarGradientTo": "#14255a",
+        "dashboardHeaderGradientFrom": "#06343f",
+        "dashboardHeaderGradientVia": "#065449",
+        "dashboardHeaderGradientTo": "#0f1a42"
       },
       "progressGradient": {
         "from": "#06b6d4",
@@ -361,7 +397,13 @@
         "gradientOverlayFrom": "#fef08a",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#facc15",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#CC0000",
+        "sidebarGradientVia": "#CC5500",
+        "sidebarGradientTo": "#CCAA00",
+        "dashboardHeaderGradientFrom": "#990000",
+        "dashboardHeaderGradientVia": "#994400",
+        "dashboardHeaderGradientTo": "#998800"
       },
       "progressGradient": {
         "from": "#fde047",
@@ -410,7 +452,13 @@
         "gradientOverlayFrom": "#FF5BFC",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#FF1493",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#CC0F6F",
+        "sidebarGradientVia": "#CC49CA",
+        "sidebarGradientTo": "#CC0F78",
+        "dashboardHeaderGradientFrom": "#990A53",
+        "dashboardHeaderGradientVia": "#9936A6",
+        "dashboardHeaderGradientTo": "#990A5A"
       },
       "progressGradient": {
         "from": "#FF5BFC",
@@ -459,7 +507,13 @@
         "gradientOverlayFrom": "#FE244F",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#F92A53",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#7a0a1e",
+        "sidebarGradientVia": "#a11919",
+        "sidebarGradientTo": "#a11956",
+        "dashboardHeaderGradientFrom": "#5c0716",
+        "dashboardHeaderGradientVia": "#7a1212",
+        "dashboardHeaderGradientTo": "#7a1240"
       },
       "progressGradient": {
         "from": "#FE244F",
@@ -508,7 +562,13 @@
         "gradientOverlayFrom": "#525252",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#1a1a1a",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#0d0d0d",
+        "sidebarGradientVia": "#1a1a1a",
+        "sidebarGradientTo": "#2a2a2a",
+        "dashboardHeaderGradientFrom": "#0a0a0a",
+        "dashboardHeaderGradientVia": "#141414",
+        "dashboardHeaderGradientTo": "#1f1f1f"
       },
       "progressGradient": {
         "from": "#525252",
@@ -557,7 +617,13 @@
         "gradientOverlayFrom": "#6f4e37",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#5d4037",
-        "gradientOverlayToOpacity": 0.05
+        "gradientOverlayToOpacity": 0.05,
+        "sidebarGradientFrom": "#7a6a54",
+        "sidebarGradientVia": "#c2aa91",
+        "sidebarGradientTo": "#b5a090",
+        "dashboardHeaderGradientFrom": "#5c503f",
+        "dashboardHeaderGradientVia": "#a89a85",
+        "dashboardHeaderGradientTo": "#9a8878"
       },
       "progressGradient": {
         "from": "#a1887f",
@@ -606,7 +672,13 @@
         "gradientOverlayFrom": "#000000",
         "gradientOverlayFromOpacity": 0.05,
         "gradientOverlayTo": "#000000",
-        "gradientOverlayToOpacity": 0.02
+        "gradientOverlayToOpacity": 0.02,
+        "sidebarGradientFrom": "#e5e5e5",
+        "sidebarGradientVia": "#f0f0f0",
+        "sidebarGradientTo": "#e0e0e0",
+        "dashboardHeaderGradientFrom": "#d0d0d0",
+        "dashboardHeaderGradientVia": "#e0e0e0",
+        "dashboardHeaderGradientTo": "#d5d5d5"
       },
       "progressGradient": {
         "from": "#666666",

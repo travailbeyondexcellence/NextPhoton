@@ -32,10 +32,13 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         className={`
           sidebar fixed top-0 left-0 h-screen p-0 w-72 z-50 
           transition-transform duration-300 ease-in-out
-          bg-white/5 backdrop-blur-xl border-r border-white/10
+          backdrop-blur-xl border-r border-white/10
           overflow-y-auto
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
+        style={{
+          background: `linear-gradient(135deg, rgb(var(--sidebar-gradient-from)) 0%, rgb(var(--sidebar-gradient-via)) 50%, rgb(var(--sidebar-gradient-to)) 100%)`
+        }}
       >
         <DashboardSidebar />
       </aside>

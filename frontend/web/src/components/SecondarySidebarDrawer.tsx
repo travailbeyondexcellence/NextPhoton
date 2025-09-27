@@ -67,12 +67,15 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
         aria-label="Secondary options"
         className={cn(
           "fixed top-0 left-72 h-screen w-72 z-[60]",
-          "bg-white/5 backdrop-blur-xl border-r border-white/10",
+          "backdrop-blur-xl border-r border-white/10",
           "transition-transform duration-300 ease-in-out",
           "focus:outline-none",
           isSecondarySidebarOpen ? "translate-x-0" : "-translate-x-full",
           className
         )}
+        style={{
+          background: `linear-gradient(135deg, rgb(var(--sidebar-gradient-from)) 0%, rgb(var(--sidebar-gradient-via)) 50%, rgb(var(--sidebar-gradient-to)) 100%)`
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">

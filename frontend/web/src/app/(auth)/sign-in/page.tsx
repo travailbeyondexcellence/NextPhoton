@@ -61,7 +61,7 @@ export default function SignInPage() {
         className="w-full max-w-[456px] px-4"
       >
         {/* Glass morphism card */}
-        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 shadow-2xl">
+        <div className="glass-card p-8 rounded-3xl">
           {/* Logo and Brand */}
           <div className="mb-4">
             <Link href="/" className="flex items-center justify-center gap-3 group">
@@ -103,7 +103,7 @@ export default function SignInPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all autofill:bg-background/50 autofill:text-foreground"
+                  className="w-full pl-11 pr-4 py-3 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{
                     WebkitTextFillColor: 'var(--foreground) !important',
                     WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',
@@ -128,7 +128,7 @@ export default function SignInPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full pl-11 pr-12 py-3 rounded-xl bg-background/50 backdrop-blur-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all autofill:bg-background/50 autofill:text-foreground"
+                  className="w-full pl-11 pr-12 py-3 glass-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   style={{
                     WebkitTextFillColor: 'var(--foreground) !important',
                     WebkitBoxShadow: '0 0 0 1000px var(--background) inset !important',
@@ -171,7 +171,7 @@ export default function SignInPage() {
             <div className="flex gap-3">
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                className="flex-1 py-3 px-4 glass-button bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
                 onClick={() => {
                   toast.info("This feature is coming soon");
                 }}
@@ -183,7 +183,7 @@ export default function SignInPage() {
               </button>
               <button
                 type="button"
-                className="flex-1 py-3 px-4 bg-muted/50 hover:bg-muted/70 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
+                className="flex-1 py-3 px-4 glass-button bg-primary/5 hover:bg-primary/10 border border-primary/10 rounded-xl transition-all duration-200 flex items-center justify-center gap-3 group text-sm font-medium hover:scale-[1.02] hover:shadow-md"
                 onClick={() => {
                   toast.info("This feature is coming soon");
                 }}
@@ -210,7 +210,7 @@ export default function SignInPage() {
           <div className="flex justify-between items-center text-sm">
             <Link
               href="/forgot-password"
-              className="inline-block px-4 py-2 bg-muted/20 hover:bg-muted/30 text-foreground rounded-xl transition-all duration-200 hover:scale-105"
+              className="inline-block px-4 py-2 glass-button bg-card/20 hover:bg-card/30 border border-border/20 text-foreground rounded-xl transition-all duration-200 hover:scale-105"
             >
               Forgot Password?
             </Link>
