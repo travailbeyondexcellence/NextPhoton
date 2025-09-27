@@ -8,7 +8,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 export function DashboardNavbar() {
   return (
     <div 
-      className="h-16 w-full border-b border-white/10 backdrop-blur-xl"
+      className="h-16 w-full border-b border-white/10 backdrop-blur-xl relative z-40"
       style={{
         background: `linear-gradient(135deg, rgb(var(--dashboard-header-gradient-from)) 0%, rgb(var(--dashboard-header-gradient-via)) 50%, rgb(var(--dashboard-header-gradient-to)) 100%)`
       }}

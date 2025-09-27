@@ -52,7 +52,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         `}
       >
         <DashboardNavbar />
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto relative z-10">
           {/* Glass panel wrapper for content */}
           <div className="relative">
             {children}

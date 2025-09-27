@@ -70,10 +70,21 @@ export function ThemeSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center justify-center p-2 rounded-lg",
-          "bg-white/5 backdrop-blur-sm border border-white/10",
-          "hover:bg-white/10 hover:border-white/15",
+          "border border-white/10",
+          "hover:border-white/15",
           "transition-all duration-200"
         )}
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+        }}
         aria-label="Select theme"
       >
         <Palette className="w-5 h-5" />
@@ -81,7 +92,15 @@ export function ThemeSelector() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-[9999]">
-          <div className="bg-white/10 backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
+          <div 
+            className="rounded-xl p-5 border border-white/20 shadow-2xl"
+            style={{
+              background: 'linear-gradient(135deg, rgb(var(--gradient-from)) 0%, rgb(var(--gradient-via)) 50%, rgb(var(--gradient-to)) 100%)',
+              opacity: '0.95',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)'
+            }}
+          >
             <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
             <div className="grid grid-cols-2 gap-3">
               {/* Two column layout - themes alternate left/right based on order */}
@@ -93,13 +112,29 @@ export function ThemeSelector() {
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "text-left p-3 rounded-lg relative overflow-hidden",
-                    "bg-white/5 backdrop-blur-sm border",
+                    "text-left p-3 rounded-lg relative overflow-hidden border",
                     currentTheme === theme.key 
-                      ? "border-white/30 bg-white/15" 
-                      : "border-white/10 hover:border-white/20 hover:bg-white/10",
+                      ? "border-white/30" 
+                      : "border-white/10 hover:border-white/20",
                     "transition-all duration-200"
                   )}
+                  style={{
+                    backgroundColor: currentTheme === theme.key 
+                      ? 'rgba(255, 255, 255, 0.15)' 
+                      : 'rgba(255, 255, 255, 0.05)',
+                    backdropFilter: 'blur(4px)',
+                    WebkitBackdropFilter: 'blur(4px)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentTheme !== theme.key) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (currentTheme !== theme.key) {
+                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                    }
+                  }}
                 >
                   {/* Theme icon/graphic */}
                   <div className="absolute -left-2 -top-2 text-6xl opacity-20">
