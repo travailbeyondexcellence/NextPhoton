@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeSelector } from "@/components/ThemeSelector";
+import { LogoComponent } from "@/components/LogoComponent";
 
 /**
  * Navigation structure for the landing pages
@@ -60,16 +61,6 @@ const navigation = {
     isTwoColumn: true,
     columnTitles: { company: "Company", resources: "Resources" },
   },
-  legal: {
-    name: "Legal",
-    items: [
-      { name: "Privacy", href: "/legal/privacy", icon: Shield, description: "Your privacy matters" },
-      { name: "Terms", href: "/legal/terms", icon: ScrollText, description: "Terms of service" },
-      { name: "Security", href: "/legal/security", icon: Lock, description: "How we protect your data" },
-      { name: "Compliance", href: "/legal/compliance", icon: FileCheck, description: "Regulatory compliance" },
-    ],
-    isTwoColumn: false,
-  },
 };
 
 export function Navbar() {
@@ -101,14 +92,20 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold"
+            className="flex items-center gap-3"
           >
-            <motion.span
-              className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
+            <motion.div
               whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-3"
             >
-              NextPhoton
-            </motion.span>
+              {/* Logo with background for visibility */}
+              <div className="w-10 h-10 flex items-center justify-center bg-white/10 rounded-lg p-1">
+                <LogoComponent width={32} height={32} />
+              </div>
+              <span className="text-xl font-bold text-foreground">
+                NextPhoton
+              </span>
+            </motion.div>
           </Link>
 
           {/* Desktop Navigation */}
