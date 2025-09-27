@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
 import { Copy, RefreshCw } from "lucide-react"
 import { getCurrentTheme, getTheme } from "@/lib/theme-utils"
 import { toast } from "sonner"
@@ -23,6 +24,8 @@ export default function GradientsTestPage() {
     via: "#FF5BFC", 
     to: "#FF1496",
   })
+  
+  const [opacity, setOpacity] = useState(100) // Opacity percentage (0-100)
 
   useEffect(() => {
     const updateTheme = () => {
@@ -48,7 +51,18 @@ export default function GradientsTestPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const generateGradientCSS = (gradient: typeof experimentalGradient) => {
+  const generateGradientCSS = (gradient: typeof experimentalGradient, includeOpacity = false) => {
+    if (includeOpacity && opacity < 100) {
+      // Convert hex to rgba with opacity
+      const hexToRgba = (hex: string, alpha: number) => {
+        const r = parseInt(hex.slice(1, 3), 16)
+        const g = parseInt(hex.slice(3, 5), 16)
+        const b = parseInt(hex.slice(5, 7), 16)
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`
+      }
+      const alpha = opacity / 100
+      return `background: linear-gradient(to bottom right, ${hexToRgba(gradient.from, alpha)}, ${hexToRgba(gradient.via, alpha)}, ${hexToRgba(gradient.to, alpha)});`
+    }
     return `background: linear-gradient(to bottom right, ${gradient.from}, ${gradient.via}, ${gradient.to});`
   }
 
@@ -154,7 +168,9 @@ export default function GradientsTestPage() {
             <div 
               className="h-56 rounded-lg border border-border relative overflow-hidden"
               style={{
-                background: `linear-gradient(to bottom right, ${experimentalGradient.from}, ${experimentalGradient.via}, ${experimentalGradient.to})`
+                background: opacity < 100 
+                  ? `linear-gradient(to bottom right, ${experimentalGradient.from}${Math.round(opacity * 2.55).toString(16).padStart(2, '0')}, ${experimentalGradient.via}${Math.round(opacity * 2.55).toString(16).padStart(2, '0')}, ${experimentalGradient.to}${Math.round(opacity * 2.55).toString(16).padStart(2, '0')})` 
+                  : `linear-gradient(to bottom right, ${experimentalGradient.from}, ${experimentalGradient.via}, ${experimentalGradient.to})`
               }}
             >
               <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
@@ -225,12 +241,25 @@ export default function GradientsTestPage() {
                   />
                 </div>
               </div>
+              
+              <div className="space-y-1">
+                <Label htmlFor="opacity">Opacity: {opacity}%</Label>
+                <Slider
+                  id="opacity"
+                  value={[opacity]}
+                  onValueChange={(value) => setOpacity(value[0])}
+                  min={0}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
             </div>
 
             {/* Controls */}
             <div className="flex gap-2">
               <Button
-                onClick={() => copyToClipboard(generateGradientCSS(experimentalGradient))}
+                onClick={() => copyToClipboard(generateGradientCSS(experimentalGradient, true))}
                 className="flex-1"
               >
                 <Copy className="w-4 h-4 mr-2" />
@@ -252,7 +281,7 @@ export default function GradientsTestPage() {
       <Card className="glass">
         <CardHeader>
           <CardTitle>Generated CSS</CardTitle>
-          <CardDescription>Copy this CSS to share with Claude for theme updates</CardDescription>
+          <CardDescription>Copy this CSS to share with any developer or AI agent for theme updates</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="bg-muted/30 p-4 rounded-lg font-mono text-sm">
@@ -264,11 +293,11 @@ export default function GradientsTestPage() {
             <div>
               <span className="text-muted-foreground">// Experimental gradient:</span>
               <br />
-              <code className="text-primary">{generateGradientCSS(experimentalGradient)}</code>
+              <code className="text-primary">{generateGradientCSS(experimentalGradient, true)}</code>
             </div>
           </div>
           <Button
-            onClick={() => copyToClipboard(`// Current gradient:\n${generateGradientCSS(currentGradient)}\n\n// Experimental gradient:\n${generateGradientCSS(experimentalGradient)}`)}
+            onClick={() => copyToClipboard(`// Current gradient:\n${generateGradientCSS(currentGradient)}\n\n// Experimental gradient:\n${generateGradientCSS(experimentalGradient, true)}`)} 
             className="mt-3 w-full"
             variant="outline"
           >
