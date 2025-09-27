@@ -3,7 +3,9 @@
 
 import React from 'react';
 import GuardianCard_forAdmin from './GuardianCard_forAdmin';
-import { guardians } from '@/app/(dashboard)/admin/guardians/guardiansDummyData';
+import guardiansData from '../../../mock-data/guardians.json';
+
+const guardians = guardiansData.data;
 
 const GuardiansCardsView_forAdmin = () => {
     return (

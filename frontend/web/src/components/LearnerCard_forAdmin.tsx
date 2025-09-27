@@ -15,7 +15,9 @@ import {
     Award,
     AlertCircle
 } from 'lucide-react';
-import type { Learner } from '@/app/(dashboard)/admin/learners/learnersDummyData';
+import learnersData from '../../../mock-data/learners.json';
+
+type Learner = typeof learnersData.data[0];
 
 const LearnerCard_forAdmin = ({ learner }: { learner: Learner }) => {
     const router = useRouter();

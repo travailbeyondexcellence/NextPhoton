@@ -18,7 +18,9 @@ import {
     GraduationCap,
     Briefcase
 } from 'lucide-react';
-import type { Guardian } from '@/app/(dashboard)/admin/guardians/guardiansDummyData';
+import guardiansData from '../../../mock-data/guardians.json';
+
+type Guardian = typeof guardiansData.data[0];
 
 const GuardianCard_forAdmin = ({ guardian }: { guardian: Guardian }) => {
     const router = useRouter();

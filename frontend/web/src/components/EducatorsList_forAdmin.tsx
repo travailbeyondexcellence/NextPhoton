@@ -4,14 +4,12 @@ import { useState } from 'react';
 
 import Image from 'next/image';
 import { Pencil, Trash2 } from 'lucide-react';
-import { educator as singleEducator } from '../app/(dashboard)/admin/educators/[educatorID]/dummyData'; // adjust import as per your structure
 import { getInitials } from '@/lib/utils';
+import educatorsData from '../../mock-data/educators.json';
 
-import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1.ts';
+const educatorsArr = educatorsData.data;
 
-const educatorsArr = [...educators];
-
-type Educator = typeof singleEducator;
+type Educator = typeof educatorsData.data[0];
 
 // const educators: Educator[] = [
 //   singleEducator,

@@ -4,7 +4,9 @@ import Image from "next/image";
 import { User, Atom, Dice5 } from 'lucide-react';
 import { useState } from 'react';
 import { getInitials } from '@/lib/utils';
-import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1';
+import educatorsData from '../../../mock-data/educators.json';
+
+const educators = educatorsData.data;
 
 interface EducatorProfileProps {
     educatorId: string;

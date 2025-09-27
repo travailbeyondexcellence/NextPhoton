@@ -5,7 +5,9 @@ import React, { useState } from 'react';
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getInitials } from '@/lib/utils';
-import { guardians } from '@/app/(dashboard)/admin/guardians/guardiansDummyData';
+import guardiansData from '../../../mock-data/guardians.json';
+
+const guardians = guardiansData.data;
 
 // Icons
 import { 

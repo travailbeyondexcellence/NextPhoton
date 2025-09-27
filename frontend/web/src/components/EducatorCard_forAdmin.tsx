@@ -3,9 +3,9 @@ import Image from "next/image";
 import { getInitials } from "@/lib/utils";
 import { useState } from "react";
 
-import { educator as defaultEducator } from "@/app/(dashboard)/admin/educators/[educatorID]/dummyData";
+import educatorsData from '../../../mock-data/educators.json';
 
-type Educator = typeof defaultEducator;
+type Educator = typeof educatorsData.data[0];
 
 // type Educator = {
 //   id: string;

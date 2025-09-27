@@ -13,7 +13,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git config:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,11 +2,9 @@
 
 import React, { useState } from 'react';
 import EducatorCard_forAdmin from './EducatorCard_forAdmin';
-import { educator as educator1 } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData';
+import educatorsData from '../../mock-data/educators.json';
 
-import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1.ts';
-
-const educatorsArr = [...educators];
+const educatorsArr = educatorsData.data;
 
 // const dummyEducators = [
 //   educator1,

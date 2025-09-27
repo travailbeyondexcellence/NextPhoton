@@ -3,7 +3,9 @@
 
 import React from 'react';
 import LearnerCard_forAdmin from './LearnerCard_forAdmin';
-import { learners } from '@/app/(dashboard)/admin/learners/learnersDummyData';
+import learnersData from '../../../mock-data/learners.json';
+
+const learners = learnersData.data;
 
 const LearnersCardsView_forAdmin = () => {
     return (
