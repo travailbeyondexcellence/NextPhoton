@@ -1,21 +1,15 @@
 "use client";
 
 import React from "react";
-
 import { useRouter, usePathname } from 'next/navigation';
-
 import { useState } from "react";
 import EducatorsCardsView_forAdmin from "@/components/EducatorsCardsView_forAdmin";
 import EducatorsList_forAdmin from "@/components/EducatorsList_forAdmin";
-import { LayoutGrid, List, UserPlus } from "lucide-react";
-
-import EducatorCard_forAdmin from "@/components/EducatorCard_forAdmin";
+import { LayoutGrid, List, UserPlus, User } from "lucide-react";
 
 const Educators = () => {
-
   const router = useRouter();
-  const pathname = usePathname()
-
+  const pathname = usePathname();
   const [view, setView] = useState<"list" | "card">("list");
 
   const toggleView = () => {
@@ -23,38 +17,44 @@ const Educators = () => {
   };
 
   return (
-    <div className="min-h-full">
-      {/* Header Section */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Educators</h1>
-        <p className="text-muted-foreground">Manage and monitor all educators on the platform</p>
-      </div>
+    <div className="min-h-screen">
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-full text-primary border border-white/20">
+              <User size={24} />
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Educators</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleView}
+              className="p-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 border border-white/20 transition-all"
+              title={view === "list" ? "Switch to Card View" : "Switch to List View"}
+            >
+              {view === "list" ? <LayoutGrid size={20} /> : <List size={20} />}
+            </button>
+            <button 
+              className="p-2 bg-primary/20 backdrop-blur-sm rounded-lg hover:bg-primary/30 border border-primary/30 text-primary transition-all flex items-center gap-2 px-4"
+              onClick={() => router.push(`${pathname}/createNewEducator`)}
+            >
+              <UserPlus size={20} />
+              <span className="text-sm font-medium">Add Educator</span>
+            </button>
+          </div>
+        </div>
 
-      {/* Controls Bar */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={toggleView}
-            className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all"
-            title="Toggle View"
-          >
-            {view === "list" ? <LayoutGrid size={20} /> : <List size={20} />}
-          </button>
-          <button 
-            className="p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 transition-all" 
-            onClick={() => router.push(`${pathname}/createNewEducator`)}
-          >
-            <UserPlus size={20} />
-          </button>
+        {/* View Toggle */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+          {view === "list" ? (
+            <EducatorsList_forAdmin initialView="table" />
+          ) : (
+            <div className="p-6">
+              <EducatorsCardsView_forAdmin />
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Content Area */}
-      {view === "list" ? (
-        <EducatorsList_forAdmin />
-      ) : (
-        <EducatorsCardsView_forAdmin />
-      )}
     </div>
   );
 };
