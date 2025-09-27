@@ -25,17 +25,27 @@ export default function GradientsTestPage() {
   })
 
   useEffect(() => {
-    const themeName = getCurrentTheme()
-    setCurrentTheme(themeName)
-    
-    const theme = getTheme(themeName as any)
-    if (theme?.glass) {
-      setCurrentGradient({
-        from: theme.glass.backgroundGradientFrom || "",
-        via: theme.glass.backgroundGradientVia || "",
-        to: theme.glass.backgroundGradientTo || "",
-      })
+    const updateTheme = () => {
+      const themeName = getCurrentTheme()
+      setCurrentTheme(themeName)
+      
+      const theme = getTheme(themeName as any)
+      if (theme?.glass) {
+        setCurrentGradient({
+          from: theme.glass.backgroundGradientFrom || "",
+          via: theme.glass.backgroundGradientVia || "",
+          to: theme.glass.backgroundGradientTo || "",
+        })
+      }
     }
+
+    // Initial load
+    updateTheme()
+
+    // Listen for theme changes
+    const interval = setInterval(updateTheme, 500)
+    
+    return () => clearInterval(interval)
   }, [])
 
   const generateGradientCSS = (gradient: typeof experimentalGradient) => {
@@ -78,14 +88,14 @@ export default function GradientsTestPage() {
           <CardContent className="space-y-4">
             {/* Current Gradient Preview */}
             <div 
-              className="h-32 rounded-lg border border-border relative overflow-hidden"
+              className="h-48 rounded-lg border border-border relative overflow-hidden"
               style={{
                 background: `linear-gradient(to bottom right, ${currentGradient.from}, ${currentGradient.via}, ${currentGradient.to})`
               }}
             >
               <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
                 <span className="text-white font-medium text-sm bg-black/50 px-3 py-1 rounded">
-                  Live Preview
+                  Current Theme Preview
                 </span>
               </div>
             </div>
@@ -142,7 +152,7 @@ export default function GradientsTestPage() {
           <CardContent className="space-y-4">
             {/* Experimental Gradient Preview */}
             <div 
-              className="h-32 rounded-lg border border-border relative overflow-hidden"
+              className="h-56 rounded-lg border border-border relative overflow-hidden"
               style={{
                 background: `linear-gradient(to bottom right, ${experimentalGradient.from}, ${experimentalGradient.via}, ${experimentalGradient.to})`
               }}

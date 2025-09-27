@@ -65,7 +65,7 @@ export function ThemeSelector() {
   const currentThemeData = themes.find(t => t.key === currentTheme);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-[9999]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
@@ -80,7 +80,7 @@ export function ThemeSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-50">
+        <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-[9999]">
           <div className="bg-white/10 backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
             <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
             <div className="grid grid-cols-2 gap-3">

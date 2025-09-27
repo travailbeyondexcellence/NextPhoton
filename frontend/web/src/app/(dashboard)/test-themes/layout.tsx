@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { ThemeSelector } from "@/components/ThemeSelector"
 
 export default function TestThemesLayout({
   children,
@@ -27,20 +26,12 @@ export default function TestThemesLayout({
       {/* Header */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">
-                Theme Testing Laboratory
-              </h1>
-              <p className="text-muted-foreground text-sm">
-                Test and experiment with different theme components and configurations
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">Switch Theme:</span>
-              <ThemeSelector />
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Theme Testing Laboratory
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Test and experiment with different theme components and configurations
+          </p>
         </div>
       </div>
 

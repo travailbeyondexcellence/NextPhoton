@@ -78,9 +78,13 @@ export function DashboardSidebar() {
       {/* Fixed Header */}
       <div className="flex-shrink-0">
         <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-white/5 backdrop-blur-sm border-b border-white/10">
-          <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer" onClick={() => router.push("/")}>
-            <LogoComponent width={48} height={48} />
-            <h2 className="text-lg font-bold hover:cursor-pointer text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500">NextPhoton</h2>
+          <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer group transition-all duration-300 ease-out hover:scale-105" onClick={() => router.push("/")}>
+            <div className="transition-all duration-300 ease-out group-hover:rotate-3 group-hover:drop-shadow-lg">
+              <LogoComponent width={48} height={48} />
+            </div>
+            <h2 className="text-lg font-bold hover:cursor-pointer text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500 transition-all duration-300 ease-out group-hover:from-teal-400 group-hover:to-blue-400 group-hover:drop-shadow-sm">
+              NextPhoton
+            </h2>
           </span>
         </div>
       </div>
@@ -94,7 +98,7 @@ export function DashboardSidebar() {
                 key={group.title}
                 className={`py-2 overflow-hidden ${groupIndex === 0 ? "mt-2" : ""}`}
               >
-                <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground">
+                <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out cursor-default">
                   {group.title}
                 </h3>
                 <SidebarMenu className="space-y-1">
@@ -116,17 +120,17 @@ export function DashboardSidebar() {
                               )
                             )
                           }>
-                          <CollapsibleTrigger className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-white/5 rounded-md transition-colors">
-                            <span className="flex items-center gap-2">
-                              <item.icon size={20} /> 
-                              {item.label}
+                          <CollapsibleTrigger className="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-white/10 hover:backdrop-blur-sm rounded-md transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-sm">
+                            <span className="flex items-center gap-2 transition-all duration-200 ease-out group-hover:translate-x-1">
+                              <item.icon size={20} className="transition-all duration-200 ease-out group-hover:scale-110 group-hover:text-primary" /> 
+                              <span className="transition-colors duration-200 ease-out group-hover:text-foreground">{item.label}</span>
                             </span>
                             
-                            <div className="p-1 hover:bg-white/10 rounded">
+                            <div className="p-1 hover:bg-white/20 rounded transition-all duration-200 ease-out hover:scale-110">
                               {openStates[groupIndex][itemIndex] ? (
-                                <Minus size={16} className="text-muted-foreground" />
+                                <Minus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:rotate-90" />
                               ) : (
-                                <Plus size={16} className="text-muted-foreground" />
+                                <Plus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:rotate-90" />
                               )}
                             </div>
                           </CollapsibleTrigger>
