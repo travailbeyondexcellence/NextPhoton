@@ -388,7 +388,7 @@
       "glass": {
         "backgroundGradientFrom": "#FF0000",
         "backgroundGradientVia": "#FF7F00",
-        "backgroundGradientTo": "#FFFF00",
+        "backgroundGradientTo": "#FF0900",
         "cardOpacity": 0.024,
         "borderOpacity": 0.045,
         "blurIntensity": 8,
@@ -398,9 +398,9 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#facc15",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#CC0000",
-        "sidebarGradientVia": "#CC5500",
-        "sidebarGradientTo": "#CCAA00",
+        "sidebarGradientFrom": "#FF0000",
+        "sidebarGradientVia": "#FF7F00",
+        "sidebarGradientTo": "#FF7700",
         "dashboardHeaderGradientFrom": "#990000",
         "dashboardHeaderGradientVia": "#994400",
         "dashboardHeaderGradientTo": "#998800"
@@ -441,9 +441,9 @@
         "warningForeground": "#422006"
       },
       "glass": {
-        "backgroundGradientFrom": "#FF1493",
-        "backgroundGradientVia": "#FF5BFC",
-        "backgroundGradientTo": "#FF1496",
+        "backgroundGradientFrom": "#FF8AC9",
+        "backgroundGradientVia": "#FFADFD",
+        "backgroundGradientTo": "#FF8ACB",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -453,12 +453,12 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#FF1493",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#CC0F6F",
-        "sidebarGradientVia": "#CC49CA",
-        "sidebarGradientTo": "#CC0F78",
-        "dashboardHeaderGradientFrom": "#990A53",
-        "dashboardHeaderGradientVia": "#9936A6",
-        "dashboardHeaderGradientTo": "#990A5A"
+        "sidebarGradientFrom": "#FF1493",
+        "sidebarGradientVia": "#FF5BFC",
+        "sidebarGradientTo": "#FF1496",
+        "dashboardHeaderGradientFrom": "#FF1493",
+        "dashboardHeaderGradientVia": "#FF5BFC",
+        "dashboardHeaderGradientTo": "#FF1496"
       },
       "progressGradient": {
         "from": "#FF5BFC",
