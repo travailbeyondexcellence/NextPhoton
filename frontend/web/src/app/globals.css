@@ -286,6 +286,46 @@
   display: none;
 }
 
+/* SimpleBar scrollbar theme override */
+.simplebar-scrollbar::before {
+  background: rgb(var(--accent)) !important;
+  opacity: 1 !important;
+  border-radius: 3px !important;
+  transition: background 0.2s ease !important;
+}
+
+.simplebar-scrollbar.simplebar-visible:before {
+  opacity: 1 !important;
+}
+
+.simplebar-scrollbar:hover::before {
+  background: rgb(var(--secondary)) !important;
+}
+
+.simplebar-track {
+  background: transparent !important;
+}
+
+.simplebar-track.simplebar-vertical {
+  width: 6px !important;
+  right: 2px !important;
+}
+
+.simplebar-track.simplebar-horizontal {
+  height: 6px !important;
+}
+
+/* Force SimpleBar to respect theme colors */
+.simplebar-content-wrapper::-webkit-scrollbar,
+.simplebar-hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* SimpleBar placeholder element */
+.simplebar-placeholder {
+  max-width: 100% !important;
+}
+
 /* Sidebar styles */
 .no-border-sidebar {
   border-right: none !important;
