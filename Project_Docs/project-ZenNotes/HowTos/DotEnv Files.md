@@ -131,18 +131,19 @@ DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 
 ## Environment Variable Usage
 
-### In Client Code
+### In Frontend Code
 ```typescript
 // Accessing environment variables in Next.js
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+const jwtExpiry = process.env.NEXT_PUBLIC_JWT_EXPIRY;
 ```
 
-### In Server Code
+### In Backend Code
 ```typescript
 // Accessing environment variables in NestJS
 const port = process.env.PORT || 3000;
-const apiKey = process.env.API_KEY;
+const jwtSecret = process.env.JWT_SECRET;
+const jwtExpiry = process.env.JWT_EXPIRY || '3600';
 ```
 
 ### In Prisma
@@ -162,19 +163,21 @@ datasource db {
    - Ensure database exists
    - Validate credentials
 
-2. **Client Environment Issues**
+2. **Frontend Environment Issues**
    - Verify `NEXT_PUBLIC_` prefix for client-side variables
-   - Check Clerk keys are properly set
-   - Ensure API URL is correct
+   - Ensure API URL points to correct backend
+   - Check JWT configuration if needed
 
-3. **Server Environment Issues**
-   - Verify port configuration
-   - Check API keys if used
+3. **Backend Environment Issues**
+   - Verify JWT_SECRET is set and secure
+   - Check port configuration
    - Ensure proper NODE_ENV setting
+   - Validate JWT_EXPIRY value
 
 ## Additional Resources
 
 - [Next.js Environment Variables](https://nextjs.org/docs/basic-features/environment-variables)
 - [NestJS Configuration](https://docs.nestjs.com/techniques/configuration)
 - [Prisma Environment Variables](https://www.prisma.io/docs/orm/prisma-schema/data-sources)
-- [Clerk Environment Setup](https://clerk.com/docs/quickstarts/get-started-with-nextjs)
+- [JWT Best Practices](https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/)
+- [NestJS JWT Authentication](https://docs.nestjs.com/security/authentication)

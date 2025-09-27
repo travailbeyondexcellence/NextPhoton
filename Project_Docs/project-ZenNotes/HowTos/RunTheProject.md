@@ -4,9 +4,9 @@
 
 Before you begin, ensure you have the following installed:
 - Node.js (Latest LTS version recommended)
+- Bun (Latest stable version - package manager)
 - PostgreSQL (Latest stable version)
 - Git (for version control)
-- pnpm (for package management)
 
 ## Environment Setup
 
@@ -18,13 +18,14 @@ Before you begin, ensure you have the following installed:
      ```
    - Replace `username`, `password`, and `your_database_name` with your PostgreSQL credentials
 
-2. **Client Environment Variables**
-   - Create a `.env` file in the `client` directory for Next.js specific variables
-   - Add any required client-side environment variables (e.g., Clerk authentication keys)
-   - Example:
+2. **Authentication Environment Variables**
+   - Create a `.env` file in the `frontend/web` directory for Next.js specific variables
+   - Add JWT authentication secret keys:
      ```env
-     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_key
-     CLERK_SECRET_KEY=your_key
+     JWT_SECRET=your_jwt_secret_key_here
+     JWT_EXPIRES_IN=7d
+     NEXTAUTH_SECRET=your_nextauth_secret_here
+     NEXTAUTH_URL=http://localhost:3001
      ```
 
 ## Installation Steps
@@ -32,15 +33,15 @@ Before you begin, ensure you have the following installed:
 1. **Install Dependencies**
    ```bash
    # In the root directory
-   npm install
+   bun install
    ```
 
 2. **Database Setup**
    ```bash
    # In the root directory
-   npx prisma generate --schema=shared/prisma/schema.prisma
+   bun run prisma:generate
 
-   npx prisma migrate dev --schema=shared/prisma/schema.prisma
+   bun run prisma:migrate
 
    ```
 
@@ -50,45 +51,49 @@ The project consists of two main components that need to run simultaneously:
 
 1. **Start the Server**
    ```bash
-   # Navigate to server directory
-   cd server
-   
-   # Start the NestJS server
-   npm run dev
+   # From the root directory
+   bun run server
    ```
-   The server will start on the default port (typically 3000)
+   The NestJS server will start on port 3000
 
 2. **Start the Client**
    ```bash
-   # Open a new terminal window
-   # Navigate to client directory
-   cd client
-   
-   # Start the Next.js development server
-   npm run dev
+   # From the root directory (new terminal window)
+   bun run web
    ```
-   The client will start on port 3001 (since 3000 is used by the server)
+   The Next.js client will start on port 3001
+
+3. **Start Both Simultaneously**
+   ```bash
+   # From the root directory
+   bun run start:all
+   ```
+   This will start both frontend and backend using Turbo
 
 ## Project Structure
 
 ```
 NextPhoton/
-├── client/             # Next.js frontend application
-├── server/             # NestJS backend application
-├── shared/             # Shared resources
-│   └── prisma/        # Database schema and migrations
+├── frontend/
+│   └── web/           # Next.js 15 web application
+├── backend/
+│   └── server_NestJS/ # NestJS API server with GraphQL
+├── shared/
+│   ├── prisma/        # Centralized Prisma schema
+│   └── db/            # Database utilities
 ├── .env               # Root environment variables
-└── package.json       # Root package configuration
+└── package.json       # Root workspace configuration
 ```
 
 ## Important Notes
 
-- The project uses a monorepo structure with pnpm workspaces
+- The project uses a monorepo structure with Bun workspaces
 - The database schema is located in `shared/prisma/schema.prisma`
-- Both client and server must be running simultaneously
-- The client uses Next.js with Clerk authentication
-- The server uses NestJS
-- Database operations are handled through Prisma ORM
+- Both frontend and backend must be running simultaneously
+- The frontend uses Next.js 15 with JWT authentication
+- The backend uses NestJS with JWT authentication and GraphQL
+- Database operations are handled through Prisma ORM with a centralized client
+- Authentication is handled via JWT tokens with role-based access control (ABAC)
 
 ## Troubleshooting
 
@@ -102,21 +107,31 @@ NextPhoton/
    - If port 3001 is in use, modify the client port in `client/package.json`
 
 3. **Prisma Issues**
-   - Run `npx prisma generate` if you encounter Prisma client errors
-   - Run `npx prisma db pull` to verify database connection
+   - Run `bun run prisma:generate` if you encounter Prisma client errors
+   - Run `bun run test:db` to verify database connection
    - Check Prisma logs for detailed error messages
+   - Use `bun run prisma:studio` to open Prisma Studio for database management
 
 ## Development Workflow
 
 1. Make changes to the database schema in `shared/prisma/schema.prisma`
-2. Run `npx prisma migrate dev` to apply changes
-3. Run `npx prisma generate` to update the Prisma client
-4. Restart the server if necessary
-5. The client will hot-reload automatically
+2. Run `bun run prisma:migrate` to create and apply new migrations
+3. Run `bun run prisma:generate` to update the Prisma client
+4. Restart the server if necessary (`bun run server`)
+5. The frontend will hot-reload automatically
+
+## Authentication Flow
+
+- JWT-based authentication with secure token storage
+- Role-based access control (ABAC) system
+- User roles: Learner, Guardian, Educator, EduCare Manager, Employee, Intern, Admin
+- Authentication endpoints provided by NestJS backend
+- Frontend authentication state managed via React context/hooks
 
 ## Additional Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)
 - [NestJS Documentation](https://docs.nestjs.com)
 - [Prisma Documentation](https://www.prisma.io/docs)
-- [Clerk Documentation](https://clerk.com/docs) 
+- [JWT Documentation](https://jwt.io/introduction)
+- [Bun Documentation](https://bun.sh/docs) 
