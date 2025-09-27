@@ -54,10 +54,10 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="relative flex flex-col xl:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 w-full cursor-pointer hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+    <div className="relative flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 w-full min-h-[250px] md:min-h-[220px] cursor-pointer hover:bg-white/15 hover:border-white/30 transition-all duration-300">
       {/* Price Tag */}
       <div
-        className={`absolute top-2 right-2 text-xs font-semibold px-3 py-1 rounded ${getPriceTagColor(educator.priceTier)}`}
+        className={`absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded z-10 ${getPriceTagColor(educator.priceTier)}`}
       >
         Price Range: {educator.priceTier}
       </div>
@@ -69,11 +69,11 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
           alt={educator.name}
           width={240}
           height={192}
-          className="w-full md:w-56 object-cover bg-white/5"
+          className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full object-cover bg-white/5"
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="w-full md:w-56 h-48 bg-primary/10 flex items-center justify-center border-r border-white/10">
+        <div className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full md:min-h-[200px] bg-primary/10 flex items-center justify-center md:border-r border-white/10">
           <div className="w-24 h-24 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center">
             <span className="text-3xl font-bold text-primary">
               {getInitials(educator.name)}
@@ -83,13 +83,13 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
       )}
 
       {/* Info Section */}
-      <div className="flex-1 p-3 space-y-2">
+      <div className="flex-1 p-4 md:p-5 space-y-2">
         <div className="text-xl font-semibold text-foreground">{educator.name}</div>
         <div className="text-sm text-muted-foreground">
           {educator.username || educator.emailFallback}
         </div>
-        <p className="text-sm italic text-foreground">{educator.intro}</p>
-        <div className="text-sm text-foreground">
+        <p className="text-sm italic text-foreground line-clamp-2">{educator.intro}</p>
+        <div className="text-sm text-foreground line-clamp-1">
           <span className="font-semibold text-muted-foreground">Qualification:</span>{" "}
           {educator.qualification}
         </div>
@@ -124,27 +124,27 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 pt-1">
+        <div className="flex flex-wrap gap-2 pt-2">
           <button
-            className="bg-primary/20 text-primary px-4 py-1.5 rounded-md border border-primary/30 hover:bg-primary/30 transition-all"
+            className="bg-primary/20 text-primary px-4 py-2 rounded-md border border-primary/30 hover:bg-primary/30 transition-all text-sm"
             onClick={() => router.push(`/admin/educators/${educator.id}`)}
           >
             View Profile
           </button>
-          <button className="bg-white/5 px-4 py-1.5 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground">
+          <button className="bg-white/5 px-4 py-2 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground text-sm">
             Message
           </button>
-          <button className="bg-white/5 px-4 py-1.5 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground">
+          <button className="bg-white/5 px-4 py-2 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground text-sm">
             Call
           </button>
         </div>
 
         {/* Footer */}
-        <div className="footer-container bg-white/5 flex items-center justify-between p-2 rounded-md text-sm font-semibold border border-white/10">
-          <span className="text-muted-foreground px-2">Demo Lecture(s)</span>
-          <div className="px-3 py-1 rounded bg-white/5 border border-white/10">
+        <div className="footer-container bg-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-md text-xs border border-white/10 gap-2 mt-2">
+          <span className="text-muted-foreground font-medium">Demo Lecture(s)</span>
+          <div className="px-2 py-1 rounded bg-white/5 border border-white/10">
             <span className="text-muted-foreground">Subjects:</span>{" "}
-            <span className="text-foreground">{educator.subjects.join(", ")}</span>
+            <span className="text-foreground font-medium">{educator.subjects.join(", ")}</span>
           </div>
         </div>
       </div>
