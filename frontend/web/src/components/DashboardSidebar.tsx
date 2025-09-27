@@ -128,14 +128,14 @@ export function DashboardSidebar() {
                             
                             <div className="p-1 hover:bg-white/20 rounded transition-all duration-200 ease-out hover:scale-110">
                               {openStates[groupIndex][itemIndex] ? (
-                                <Minus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:rotate-90" />
+                                <Minus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-x-125" />
                               ) : (
-                                <Plus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:rotate-90" />
+                                <Plus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:rotate-180" />
                               )}
                             </div>
                           </CollapsibleTrigger>
                           <CollapsibleContent className="mt-1">
-                            <div className="ml-6 space-y-1">
+                            <div className="ml-4 space-y-1">
                               {item.children.map((subItem, subIndex) => {
                                 const isSubActive = pathname === subItem.href
                                 return (

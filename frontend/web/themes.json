@@ -56,7 +56,7 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#ffffff",
+        "backgroundGradientFrom": "#007bff",
         "backgroundGradientVia": "#9acafe",
         "backgroundGradientTo": "#007bff",
         "cardOpacity": 0.1,
@@ -546,9 +546,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#f5e6d3",
-        "backgroundGradientVia": "#e8d5c4",
-        "backgroundGradientTo": "#f5e6d3",
+        "backgroundGradientFrom": "#a18f78",
+        "backgroundGradientVia": "#f5e6d3",
+        "backgroundGradientTo": "#e8d5c4",
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,

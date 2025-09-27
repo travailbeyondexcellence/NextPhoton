@@ -81,10 +81,10 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
           </h3>
           <button
             onClick={closeSecondarySidebar}
-            className="p-2 rounded-md hover:bg-white/10 transition-colors"
+            className="p-2 rounded-md hover:bg-white/10 transition-all duration-200 ease-out hover:scale-110 group"
             aria-label="Close secondary sidebar"
           >
-            <X size={20} className="text-muted-foreground" />
+            <X size={20} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-foreground group-hover:rotate-90" />
           </button>
         </div>
 
@@ -124,7 +124,7 @@ function renderSecondaryContent(content: string | null) {
       return (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3">Performance Analytics</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Performance Analytics</h4>
             <div className="space-y-1">
               <SecondaryMenuItem label="Overall Performance Dashboard" />
               <SecondaryMenuItem label="Individual Student Analytics" />
@@ -133,7 +133,7 @@ function renderSecondaryContent(content: string | null) {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3">Reports</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Reports</h4>
             <div className="space-y-1">
               <SecondaryMenuItem label="Generate Performance Report" />
               <SecondaryMenuItem label="Export Analytics Data" />
@@ -147,7 +147,7 @@ function renderSecondaryContent(content: string | null) {
       return (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3">Quick Actions</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Quick Actions</h4>
             <div className="space-y-1">
               <SecondaryMenuItem label="Compose New Message" />
               <SecondaryMenuItem label="Broadcast to All" />
@@ -155,7 +155,7 @@ function renderSecondaryContent(content: string | null) {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3">Message Management</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Message Management</h4>
             <div className="space-y-1">
               <SecondaryMenuItem label="Sent Messages" />
               <SecondaryMenuItem label="Scheduled Messages" />
@@ -164,7 +164,7 @@ function renderSecondaryContent(content: string | null) {
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3">Recipients</h4>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Recipients</h4>
             <div className="space-y-1">
               <SecondaryMenuItem label="Message to Educators" />
               <SecondaryMenuItem label="Message to Learners" />
@@ -191,8 +191,10 @@ function SecondaryMenuItem({ label, onClick }: { label: string; onClick?: () => 
       onClick={onClick}
       className={cn(
         "w-full text-left px-3 py-2 rounded-md text-sm",
-        "hover:bg-white/10 transition-colors",
-        "text-foreground/80 hover:text-foreground"
+        "transition-all duration-200 ease-out",
+        "hover:bg-white/10 hover:backdrop-blur-sm hover:scale-[1.02] hover:shadow-sm",
+        "text-foreground/80 hover:text-foreground",
+        "hover:translate-x-1"
       )}
     >
       {label}
