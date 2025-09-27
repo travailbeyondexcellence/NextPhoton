@@ -56,9 +56,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#007bff",
-        "backgroundGradientVia": "#9acafe",
-        "backgroundGradientTo": "#007bff",
+        "backgroundGradientFrom": "#66b3ff",
+        "backgroundGradientVia": "#c5e1ff",
+        "backgroundGradientTo": "#66b3ff",
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
         "blurIntensity": 12,
@@ -68,12 +68,12 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#0052FF",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#0056b3",
-        "sidebarGradientVia": "#6fa4d8",
-        "sidebarGradientTo": "#0056b3",
-        "dashboardHeaderGradientFrom": "#004d99",
-        "dashboardHeaderGradientVia": "#5c8ec2",
-        "dashboardHeaderGradientTo": "#004d99"
+        "sidebarGradientFrom": "#007bff",
+        "sidebarGradientVia": "#9acafe",
+        "sidebarGradientTo": "#007bff",
+        "dashboardHeaderGradientFrom": "#007bff",
+        "dashboardHeaderGradientVia": "#9acafe",
+        "dashboardHeaderGradientTo": "#007bff"
       },
       "progressGradient": {
         "from": "#0ea5e9",
