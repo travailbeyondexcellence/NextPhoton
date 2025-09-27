@@ -22,7 +22,7 @@ import {
   CollapsibleContent,
 } from "@/components/ui/collapsible";
 
-import { ChevronDown, ChevronRightSquare, ChevronRight } from "lucide-react";
+import { ChevronRight, Plus, Minus } from "lucide-react";
 
 import 'simplebar-react/dist/simplebar.min.css';
 import SimpleBar from 'simplebar-react';
