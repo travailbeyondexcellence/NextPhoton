@@ -32,7 +32,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
           sidebar fixed top-0 left-0 h-screen p-0 w-56 z-50 
           transition-transform duration-300 ease-in-out
           bg-white/5 backdrop-blur-xl border-r border-white/10
-          sidebar-scrollbar overflow-y-auto
+          overflow-y-auto
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
       >
@@ -48,7 +48,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         `}
       >
         <DashboardNavbar />
-        <main className="flex-1 p-6 overflow-auto glass-scrollbar">
+        <main className="flex-1 p-6 overflow-auto">
           {/* Glass panel wrapper for content */}
           <div className="relative">
             {children}
