@@ -21,7 +21,8 @@ import {
   Download,
   ExternalLink,
   Fingerprint,
-  Heart
+  Heart,
+  BookOpen
 } from "lucide-react";
 
 // Compliance frameworks

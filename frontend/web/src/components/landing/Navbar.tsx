@@ -20,24 +20,22 @@ const navigation = {
       { name: "Testimonials", href: "/product/testimonials" },
       { name: "Demo", href: "/product/demo" },
     ],
+    isTwoColumn: false,
   },
   company: {
-    name: "Company",
+    name: "Company & Resources",
     items: [
-      { name: "About", href: "/company/about" },
-      { name: "Careers", href: "/company/careers" },
-      { name: "Blog", href: "/company/blog" },
-      { name: "Press", href: "/company/press" },
+      { name: "About", href: "/company/about", category: "company" },
+      { name: "Contact", href: "/resources/contact", category: "resources" },
+      { name: "Careers", href: "/company/careers", category: "company" },
+      { name: "Blog", href: "/company/blog", category: "company" },
+      { name: "Press", href: "/company/press", category: "company" },
+      { name: "Documentation", href: "/resources/documentation", category: "resources" },
+      { name: "Help Center", href: "/resources/help-center", category: "resources" },
+      { name: "Community", href: "/resources/community", category: "resources" },
     ],
-  },
-  resources: {
-    name: "Resources",
-    items: [
-      { name: "Documentation", href: "/resources/documentation" },
-      { name: "Help Center", href: "/resources/help-center" },
-      { name: "Community", href: "/resources/community" },
-      { name: "Contact", href: "/resources/contact" },
-    ],
+    isTwoColumn: true,
+    columnTitles: { company: "Company", resources: "Resources" },
   },
   legal: {
     name: "Legal",
@@ -47,6 +45,7 @@ const navigation = {
       { name: "Security", href: "/legal/security" },
       { name: "Compliance", href: "/legal/compliance" },
     ],
+    isTwoColumn: false,
   },
 };
 
@@ -114,20 +113,70 @@ export function Navbar() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 mt-2 w-48 rounded-xl bg-background/80 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden"
+                      className={cn(
+                        "absolute top-full left-0 mt-2 rounded-xl bg-background/80 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden",
+                        section.isTwoColumn ? "w-96" : "w-48"
+                      )}
                     >
-                      {section.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={cn(
-                            "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
-                            pathname === item.href && "text-foreground bg-white/5"
-                          )}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
+                      {section.isTwoColumn && section.columnTitles ? (
+                        // Two-column layout for Company & Resources
+                        <div className="grid grid-cols-2 gap-0">
+                          {/* Company Column */}
+                          <div className="border-r border-white/10">
+                            <h4 className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase tracking-wider">
+                              {section.columnTitles.company}
+                            </h4>
+                            {section.items
+                              .filter((item: any) => item.category === "company")
+                              .map((item: any) => (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  className={cn(
+                                    "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
+                                    pathname === item.href && "text-foreground bg-white/5"
+                                  )}
+                                >
+                                  {item.name}
+                                </Link>
+                              ))}
+                          </div>
+                          {/* Resources Column */}
+                          <div>
+                            <h4 className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase tracking-wider">
+                              {section.columnTitles.resources}
+                            </h4>
+                            {section.items
+                              .filter((item: any) => item.category === "resources")
+                              .map((item: any) => (
+                                <Link
+                                  key={item.href}
+                                  href={item.href}
+                                  className={cn(
+                                    "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
+                                    pathname === item.href && "text-foreground bg-white/5"
+                                  )}
+                                >
+                                  {item.name}
+                                </Link>
+                              ))}
+                          </div>
+                        </div>
+                      ) : (
+                        // Single column layout for other dropdowns
+                        section.items.map((item: any) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                              "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
+                              pathname === item.href && "text-foreground bg-white/5"
+                            )}
+                          >
+                            {item.name}
+                          </Link>
+                        ))
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>

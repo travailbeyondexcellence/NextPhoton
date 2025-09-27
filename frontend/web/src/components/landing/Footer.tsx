@@ -62,18 +62,21 @@ export function Footer() {
 
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-8 mb-12">
-          {/* Brand section */}
+          {/* Brand section - Top Left */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <LogoComponent width={40} height={40} />
-              <span className="text-2xl font-bold bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent">
-                NextPhoton
-              </span>
+            {/* NextPhoton Brand - Prominent positioning */}
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-4">
+                <LogoComponent width={48} height={48} />
+                <span className="text-3xl font-bold bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent">
+                  NextPhoton
+                </span>
+              </div>
+              
+              <p className="text-white/70 text-lg">
+                Revolutionizing education management with cutting-edge technology and comprehensive monitoring solutions.
+              </p>
             </div>
-            
-            <p className="text-white/70 mb-6">
-              Revolutionizing education management with cutting-edge technology and comprehensive monitoring solutions.
-            </p>
 
             {/* Contact info */}
             <div className="space-y-2">
@@ -109,7 +112,7 @@ export function Footer() {
           </div>
 
           {/* Links sections */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:col-span-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:col-span-4 gap-8">
             {/* Product */}
             <div>
               <h3 className="font-semibold mb-4 text-white">Product</h3>
@@ -127,37 +130,40 @@ export function Footer() {
               </ul>
             </div>
 
-            {/* Company */}
+            {/* Company & Resources */}
             <div>
-              <h3 className="font-semibold mb-4 text-white">Company</h3>
+              <h3 className="font-semibold mb-4 text-white">Company & Resources</h3>
               <ul className="space-y-2">
-                {footerLinks.company.map((link, index) => (
-                  <li key={index}>
-                    <Link 
-                      href={link.href}
-                      className="text-sm text-white/60 hover:text-primary transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div>
-              <h3 className="font-semibold mb-4 text-white">Resources</h3>
-              <ul className="space-y-2">
-                {footerLinks.resources.map((link, index) => (
-                  <li key={index}>
-                    <Link 
-                      href={link.href}
-                      className="text-sm text-white/60 hover:text-primary transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <Link href="/company/about" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/resources/contact" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/careers" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Careers
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/docs" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Documentation
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/help" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Help Center
+                  </Link>
+                </li>
               </ul>
             </div>
 
@@ -165,16 +171,26 @@ export function Footer() {
             <div>
               <h3 className="font-semibold mb-4 text-white">Legal</h3>
               <ul className="space-y-2">
-                {footerLinks.legal.map((link, index) => (
-                  <li key={index}>
-                    <Link 
-                      href={link.href}
-                      className="text-sm text-white/60 hover:text-primary transition-colors"
-                    >
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
+                <li>
+                  <Link href="/legal/privacy" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/terms" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Terms
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/security" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Security
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/compliance" className="text-sm text-white/60 hover:text-primary transition-colors">
+                    Compliance
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
