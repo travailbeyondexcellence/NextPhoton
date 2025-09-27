@@ -1,29 +1,30 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen } from "lucide-react"
-
 export default function PremadePlansPage() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BookOpen className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Premade Academic Plans</h1>
-          <p className="text-muted-foreground">Browse and manage template academic plans</p>
-        </div>
+    <div className="min-h-full container mx-auto p-6">
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          📚 Premade Academic Plans
+        </h1>
+        <p className="text-muted-foreground">
+          Browse and manage template academic plans
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Templates</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {/* Content Grid */}
+      <div className="grid gap-6">
+        {/* Available Templates Section */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
+            Available Templates
+          </h2>
           <p className="text-muted-foreground">
             Premade academic plan templates will be displayed here.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

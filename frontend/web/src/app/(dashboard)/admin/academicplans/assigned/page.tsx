@@ -1,29 +1,30 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { BookOpen } from "lucide-react"
-
 export default function AssignedPlansPage() {
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center gap-4">
-        <BookOpen className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Assigned Academic Plans</h1>
-          <p className="text-muted-foreground">View and manage plans assigned to students</p>
-        </div>
+    <div className="min-h-full container mx-auto p-6">
+      {/* Header Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          📖 Assigned Academic Plans
+        </h1>
+        <p className="text-muted-foreground">
+          View and manage plans assigned to students
+        </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Assigned Plans</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {/* Content Grid */}
+      <div className="grid gap-6">
+        {/* Assigned Plans Section */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <h2 className="text-xl font-semibold text-foreground mb-4">
+            Assigned Plans
+          </h2>
           <p className="text-muted-foreground">
             Student academic plan assignments will be displayed here.
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

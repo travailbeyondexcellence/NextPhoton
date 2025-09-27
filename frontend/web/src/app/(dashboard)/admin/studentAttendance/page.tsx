@@ -1,75 +1,71 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar } from "lucide-react"
 
 export default function StudentAttendancePage() {
   return (
-    <div className="p-6 space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <Calendar className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Student Attendance</h1>
-          <p className="text-muted-foreground">Track and manage student attendance records</p>
+    <div className="min-h-full">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-4">
+          <Calendar className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Student Attendance</h1>
+            <p className="text-muted-foreground">Track and manage student attendance records</p>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Present Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">Students present</p>
-          </CardContent>
-        </Card>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Present Today Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">Present Today</div>
+            <div className="text-success">✅</div>
+          </div>
+          <div className="text-2xl font-bold">0</div>
+          <div className="text-xs text-muted-foreground mt-2">Students present</div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Absent Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">Students absent</p>
-          </CardContent>
-        </Card>
+        {/* Absent Today Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">Absent Today</div>
+            <div className="text-error">❌</div>
+          </div>
+          <div className="text-2xl font-bold">0</div>
+          <div className="text-xs text-muted-foreground mt-2">Students absent</div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>On Leave</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">Approved leaves</p>
-          </CardContent>
-        </Card>
+        {/* On Leave Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">On Leave</div>
+            <div className="text-warning">📝</div>
+          </div>
+          <div className="text-2xl font-bold">0</div>
+          <div className="text-xs text-muted-foreground mt-2">Approved leaves</div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Attendance Rate</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0%</p>
-            <p className="text-sm text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
+        {/* Attendance Rate Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">Attendance Rate</div>
+            <div className="text-primary">📊</div>
+          </div>
+          <div className="text-2xl font-bold">0%</div>
+          <div className="text-xs text-muted-foreground mt-2">This month</div>
+        </div>
       </div>
 
-      {/* Main Content */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Attendance Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Student attendance tracking functionality will be implemented here.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Attendance Management Section */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+        <h2 className="text-xl font-semibold mb-4">Attendance Management</h2>
+        <div className="text-muted-foreground">
+          Student attendance tracking functionality will be implemented here.
+        </div>
+      </div>
     </div>
   )
 }

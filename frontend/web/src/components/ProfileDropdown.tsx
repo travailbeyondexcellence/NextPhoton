@@ -81,19 +81,32 @@ export function ProfileDropdown() {
             <div className="p-2">
               <button
                 onClick={() => {
-                  // Navigate to profile page for account settings
+                  // Navigate to profile page
                   router.push('/profile');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
               >
                 <User className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">Profile</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  // Navigate to account settings in profile page
+                  router.push('/profile');
+                  setIsOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
+              >
+                <Settings className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">Account Settings</span>
               </button>
 
               <button
                 onClick={() => {
-                  // Handle notifications
+                  // Navigate to notifications page
+                  router.push('/admin/Notifications');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
@@ -107,20 +120,8 @@ export function ProfileDropdown() {
 
               <button
                 onClick={() => {
-                  // Navigate to settings page for preferences
-                  router.push('/settings');
-                  setIsOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
-              >
-                <Settings className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">Preferences</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  // Navigate to help center page
-                  router.push('/resources/help-center');
+                  // Navigate to help and support page
+                  router.push('/help-support');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"

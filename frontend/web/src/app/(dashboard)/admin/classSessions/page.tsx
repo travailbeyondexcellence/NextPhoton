@@ -1,65 +1,61 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Building2 } from "lucide-react"
 
 export default function ClassSessionsPage() {
   return (
-    <div className="p-6 space-y-6">
-      {/* Page Header */}
-      <div className="flex items-center gap-4">
-        <Building2 className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Class Sessions</h1>
-          <p className="text-muted-foreground">Manage and monitor class sessions</p>
+    <div className="min-h-full">
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-4">
+          <Building2 className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Class Sessions</h1>
+            <p className="text-muted-foreground">Manage and monitor class sessions</p>
+          </div>
         </div>
       </div>
 
-      {/* Content Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">Currently active</p>
-          </CardContent>
-        </Card>
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Active Sessions Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">Active Sessions</div>
+            <div className="text-primary">🟢</div>
+          </div>
+          <div className="text-2xl font-bold">0</div>
+          <div className="text-xs text-muted-foreground mt-2">Currently active</div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Today's Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">Scheduled for today</p>
-          </CardContent>
-        </Card>
+        {/* Today's Sessions Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">Today's Sessions</div>
+            <div className="text-secondary">📅</div>
+          </div>
+          <div className="text-2xl font-bold">0</div>
+          <div className="text-xs text-muted-foreground mt-2">Scheduled for today</div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Total Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-sm text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
+        {/* Total Sessions Card */}
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+          <div className="flex items-center justify-between mb-4">
+            <div className="text-muted-foreground">Total Sessions</div>
+            <div className="text-accent">📊</div>
+          </div>
+          <div className="text-2xl font-bold">0</div>
+          <div className="text-xs text-muted-foreground mt-2">This month</div>
+        </div>
       </div>
 
-      {/* Main Content Area */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Class Sessions Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            Class sessions functionality will be implemented here.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Class Sessions Management Section */}
+      <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+        <h2 className="text-xl font-semibold mb-4">Class Sessions Management</h2>
+        <div className="text-muted-foreground">
+          Class sessions functionality will be implemented here.
+        </div>
+      </div>
     </div>
   )
 }
