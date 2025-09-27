@@ -37,6 +37,7 @@ type Educator = typeof singleEducator;
 const EducatorsList_forAdmin = () => {
 
     const [educators, setEducators] = useState(educatorsArr);
+    const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
 
   return (
@@ -58,13 +59,16 @@ const EducatorsList_forAdmin = () => {
           {educators.map((edu) => (
             <tr key={edu.id} className="border-t border-white/10 hover:bg-white/5 transition-all">
               <td className="px-4 py-3">
-                {edu.profileImage ? (
+                {edu.profileImage && !imageErrors.has(edu.id) ? (
                   <Image
                     src={edu.profileImage}
                     alt={edu.name}
                     width={40}
                     height={40}
                     className="rounded-full object-cover border border-white/10"
+                    onError={() => {
+                      setImageErrors(prev => new Set(prev).add(edu.id));
+                    }}
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">

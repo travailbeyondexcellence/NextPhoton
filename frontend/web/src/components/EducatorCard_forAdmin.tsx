@@ -1,6 +1,7 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { getInitials } from "@/lib/utils";
+import { useState } from "react";
 
 import { educator as defaultEducator } from "@/app/(dashboard)/admin/educators/[educatorID]/dummyData";
 
@@ -50,6 +51,7 @@ const getPriceTagColor = (tier: string) => {
 
 const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educator }) => {
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
 
   return (
     <div className="relative flex flex-col xl:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 w-full cursor-pointer hover:bg-white/15 hover:border-white/30 transition-all duration-300">
@@ -61,13 +63,14 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
       </div>
 
       {/* Educator Image */}
-      {educator.profileImage ? (
+      {educator.profileImage && !imageError ? (
         <Image
           src={educator.profileImage}
           alt={educator.name}
           width={240}
           height={192}
           className="w-full md:w-56 object-cover bg-white/5"
+          onError={() => setImageError(true)}
         />
       ) : (
         <div className="w-full md:w-56 h-48 bg-primary/10 flex items-center justify-center border-r border-white/10">
