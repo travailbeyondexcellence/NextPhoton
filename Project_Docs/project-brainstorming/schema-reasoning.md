@@ -3,21 +3,22 @@
 ## Overview
 This document explains the reasoning behind the architectural decisions made in the proposed Prisma schema design for the NextPhoton EduCare Management System.
 
-## 1. Better-Auth Model Isolation
+## 1. JWT Authentication Model
 
 ### Decision
-Keep Better-auth models (User, Session, Account, Verification) completely separate from application-specific models.
+Implement JWT (JSON Web Token) based authentication using NestJS backend with Passport JWT strategy.
 
 ### Reasoning
-- **Future-Proofing**: If we decide to replace Better-auth with another authentication provider (e.g., Auth0, Clerk, custom solution), we only need to modify 4 models
-- **Interface Segregation Principle**: Authentication concerns are separated from business logic
-- **Maintainability**: Auth provider updates don't affect our business models
-- **Clean Architecture**: Clear boundary between external dependency and internal domain
+- **Stateless Authentication**: JWTs are self-contained, reducing database lookups for session validation
+- **Microservice Ready**: Tokens can be validated independently by any service with the secret key
+- **Mobile/Desktop Support**: Better support for native applications compared to session cookies
+- **Industry Standard**: JWT is widely adopted and well-supported across frameworks
 
 ### Implementation
-- User model only contains Better-auth required fields
-- All application-specific data goes into separate profile models
-- One-to-one relationships between User and each profile type
+- User model contains authentication fields (email, password hash)
+- JWT tokens issued on successful authentication containing user ID and roles
+- Token validation through NestJS guards and Passport JWT strategy
+- Refresh token mechanism for enhanced security
 
 ## 2. Multi-Role Support Architecture
 

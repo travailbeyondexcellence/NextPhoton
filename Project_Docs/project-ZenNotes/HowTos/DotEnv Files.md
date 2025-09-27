@@ -31,42 +31,49 @@ DATABASE_URL="postgresql://username:password@localhost:5432/your_database_name"
 - Essential for database operations
 - Used by Prisma migrations and client generation
 
-## Client `.env` File
+## Frontend `.env` File
 
-Located in the `client` directory, this file contains Next.js and client-specific environment variables.
+Located in the `frontend/web` directory, this file contains Next.js and frontend-specific environment variables.
 
 ### Required Variables
 ```env
-# Authentication (Clerk)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key
-CLERK_SECRET_KEY=your_secret_key
-
 # API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000  # Server URL
+NEXT_PUBLIC_API_URL=http://localhost:3000  # NestJS Backend URL
+
+# JWT Configuration (if storing any public keys)
+NEXT_PUBLIC_JWT_EXPIRY=3600  # Token expiry in seconds (optional)
 ```
 
 ### Purpose
-- Client-side environment variables
-- Authentication configuration
-- API endpoints
+- Frontend-specific environment variables
+- API endpoint configuration
 - Public variables (prefixed with `NEXT_PUBLIC_`)
+- Any frontend-specific feature flags
 
-## Server `.env` File (if needed)
+## Backend `.env` File
 
-Located in the `server` directory, this file would contain NestJS and server-specific environment variables.
+Located in the `backend/server_NestJS` directory, this file contains NestJS backend-specific environment variables.
 
-### Example Variables
+### Required Variables
 ```env
 # Server Configuration
 PORT=3000
 NODE_ENV=development
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRY=3600  # Token expiry in seconds
+
+# Database (if different from root)
+DATABASE_URL="postgresql://username:password@localhost:5432/your_database_name"
 
 # API Keys (if needed)
 API_KEY=your_api_key
 ```
 
 ### Purpose
-- Server-specific configuration
+- Backend-specific configuration
+- JWT secret key for token generation
 - API keys and secrets
 - Port configuration
 - Environment-specific settings
@@ -99,14 +106,27 @@ API_KEY=your_api_key
 DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 ```
 
-### Client `.env.example`
+### Frontend `.env.example`
 ```env
-# Authentication
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_publishable_key
-CLERK_SECRET_KEY=your_secret_key
-
-# API
+# API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:3000
+
+# Optional JWT Configuration
+NEXT_PUBLIC_JWT_EXPIRY=3600
+```
+
+### Backend `.env.example`
+```env
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# JWT Configuration
+JWT_SECRET=your_secret_key_here_min_32_chars
+JWT_EXPIRY=3600
+
+# Database (optional if using root .env)
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname"
 ```
 
 ## Environment Variable Usage

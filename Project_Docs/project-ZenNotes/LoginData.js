@@ -1,8 +1,7 @@
-
 {
 
 
-    // Clerk Dev Environment
+    // JWT Authentication Dev Environment
     // Test Admin Login Data
 
     // username: testAdmin1
@@ -14,38 +13,33 @@
 {
 
 
-    // Clerk Dev Environment
-    // Test Student Login Data
+    // JWT Authentication Dev Environment
+    // Test Learner Login Data
 
 
-    // username: testStudent1
-    // password: testStudent1@99
-    // email: teststudent1@nextphoton.com
-
-    // change name to learner in the place of student
+    // username: testLearner1
+    // password: testLearner1@99
+    // email: testlearner1@nextphoton.com
 }
 
 {
 
 
-    // Clerk Dev Environment
-    // Test Parent Login Data
+    // JWT Authentication Dev Environment
+    // Test Guardian Login Data
 
-    // username: testParent1
-    // password: testParent1@99
-    // email: testparent1@nextphoton.com
-
-
-    // Change name to Guardian in place of parent
+    // username: testGuardian1
+    // password: testGuardian1@99
+    // email: testguardian1@nextphoton.com
 }
 
 
 {
 
-    // Clerk Dev Environment
-    // Test Teacher Login Data
+    // JWT Authentication Dev Environment
+    // Test Educator Login Data
 
-    // username: testTeacher1
-    // password: testTeacher1@99
-    // email: testTeacher1@nextphoton.com
+    // username: testEducator1
+    // password: testEducator1@99
+    // email: testEducator1@nextphoton.com
 }
