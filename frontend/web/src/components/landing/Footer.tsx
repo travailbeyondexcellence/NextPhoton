@@ -67,8 +67,11 @@ export function Footer() {
             {/* NextPhoton Brand - Prominent positioning */}
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-4">
-                <LogoComponent width={48} height={48} />
-                <span className="text-3xl font-bold bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent">
+                {/* Logo with better visibility */}
+                <div className="w-12 h-12 flex items-center justify-center bg-white/10 rounded-lg p-2">
+                  <LogoComponent width={32} height={32} />
+                </div>
+                <span className="text-3xl font-bold text-white">
                   NextPhoton
                 </span>
               </div>

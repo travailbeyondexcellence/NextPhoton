@@ -56,14 +56,19 @@ const navigation = {
       { name: "Documentation", href: "/resources/documentation", icon: FileCheck, description: "Technical documentation", category: "resources" },
       { name: "Help Center", href: "/resources/help-center", icon: HelpCircle, description: "Find answers to your questions", category: "resources" },
       { name: "Community", href: "/resources/community", icon: UsersRound, description: "Connect with other users", category: "resources" },
-      // Legal items
-      { name: "Privacy", href: "/legal/privacy", icon: Shield, description: "Your privacy matters", category: "legal" },
-      { name: "Terms", href: "/legal/terms", icon: ScrollText, description: "Terms of service", category: "legal" },
-      { name: "Security", href: "/legal/security", icon: Lock, description: "How we protect your data", category: "legal" },
-      { name: "Compliance", href: "/legal/compliance", icon: FileCheck, description: "Regulatory compliance", category: "legal" },
     ],
     isTwoColumn: true,
-    columnTitles: { company: "Company", resources: "Resources", legal: "Legal" },
+    columnTitles: { company: "Company", resources: "Resources" },
+  },
+  legal: {
+    name: "Legal",
+    items: [
+      { name: "Privacy", href: "/legal/privacy", icon: Shield, description: "Your privacy matters" },
+      { name: "Terms", href: "/legal/terms", icon: ScrollText, description: "Terms of service" },
+      { name: "Security", href: "/legal/security", icon: Lock, description: "How we protect your data" },
+      { name: "Compliance", href: "/legal/compliance", icon: FileCheck, description: "Regulatory compliance" },
+    ],
+    isTwoColumn: false,
   },
 };
 
@@ -173,42 +178,13 @@ export function Navbar() {
                                   ))}
                               </div>
                               
-                              {/* Resources & Legal Column */}
+                              {/* Resources Column */}
                               <div>
                                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
                                   {section.columnTitles.resources}
                                 </h4>
                                 {section.items
                                   .filter((item: any) => item.category === "resources")
-                                  .map((item: any) => (
-                                    <Link
-                                      key={item.href}
-                                      href={item.href}
-                                      className={cn(
-                                        "flex items-start gap-3 p-3 rounded-lg relative overflow-hidden",
-                                        "bg-white/5 backdrop-blur-sm border mb-2",
-                                        pathname === item.href 
-                                          ? "border-white/30 bg-white/15" 
-                                          : "border-white/10 hover:border-white/20 hover:bg-white/10",
-                                        "transition-all duration-200"
-                                      )}
-                                    >
-                                      <item.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                                      <div className="flex-1">
-                                        <div className="font-medium text-sm">{item.name}</div>
-                                        <div className="text-xs text-muted-foreground">
-                                          {item.description}
-                                        </div>
-                                      </div>
-                                    </Link>
-                                  ))}
-                                
-                                {/* Legal Section */}
-                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-4 mb-2 px-1">
-                                  {section.columnTitles.legal}
-                                </h4>
-                                {section.items
-                                  .filter((item: any) => item.category === "legal")
                                   .map((item: any) => (
                                     <Link
                                       key={item.href}
