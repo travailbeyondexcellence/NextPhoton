@@ -81,7 +81,8 @@ export function ProfileDropdown() {
             <div className="p-2">
               <button
                 onClick={() => {
-                  // Handle account settings
+                  // Navigate to profile page for account settings
+                  router.push('/profile');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
@@ -106,7 +107,8 @@ export function ProfileDropdown() {
 
               <button
                 onClick={() => {
-                  // Handle preferences
+                  // Navigate to settings page for preferences
+                  router.push('/settings');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
@@ -117,7 +119,8 @@ export function ProfileDropdown() {
 
               <button
                 onClick={() => {
-                  // Handle help
+                  // Navigate to help center page
+                  router.push('/resources/help-center');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
