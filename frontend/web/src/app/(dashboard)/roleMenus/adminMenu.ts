@@ -18,6 +18,7 @@ import {
   PackageCheck,
   Wallet,
   CreditCard,
+  Palette,
 } from "lucide-react";
 
 export interface SidebarItem {
@@ -76,6 +77,7 @@ export const adminMenu: SidebarGroup[] = [
       { icon: MessageSquare, label: "Notifications", href: "/admin/Notifications", hasSecondaryDrawer: true, secondaryDrawerKey: "messaging" },
       { icon: Megaphone, label: "Announcements", href: "/admin/announcements" },
       { icon: Settings, label: "NextPhoton Settings", href: "/NextPhotonSettings" },
+      { icon: Palette, label: "Test Themes", href: "/test-themes" },
     ],
   },
   {

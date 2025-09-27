@@ -5,7 +5,9 @@ import React, { useState } from 'react';
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getInitials } from '@/lib/utils';
-import { learners } from '@/app/(dashboard)/admin/learners/learnersDummyData';
+import learnersData from '../../../mock-data/learners.json';
+
+const learners = learnersData.data;
 
 // Icons
 import { 
