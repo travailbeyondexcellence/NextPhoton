@@ -16,28 +16,28 @@ import {
 
 const footerLinks = {
   product: [
-    { name: "Features", href: "#features" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Testimonials", href: "#testimonials" },
-    { name: "Demo", href: "#demo" },
+    { name: "Features", href: "/product/features" },
+    { name: "Pricing", href: "/product/pricing" },
+    { name: "Testimonials", href: "/product/testimonials" },
+    { name: "Demo", href: "/product/demo" },
   ],
   company: [
-    { name: "About", href: "/about" },
-    { name: "Careers", href: "/careers" },
-    { name: "Blog", href: "/blog" },
-    { name: "Press", href: "/press" },
+    { name: "About", href: "/company/about" },
+    { name: "Careers", href: "/company/careers" },
+    { name: "Blog", href: "/company/blog" },
+    { name: "Press", href: "/company/press" },
   ],
   resources: [
-    { name: "Documentation", href: "/docs" },
-    { name: "Help Center", href: "/help" },
-    { name: "Community", href: "/community" },
-    { name: "Contact", href: "/contact" },
+    { name: "Documentation", href: "/resources/documentation" },
+    { name: "Help Center", href: "/resources/help-center" },
+    { name: "Community", href: "/resources/community" },
+    { name: "Contact", href: "/resources/contact" },
   ],
   legal: [
-    { name: "Privacy", href: "/privacy" },
-    { name: "Terms", href: "/terms" },
-    { name: "Security", href: "/security" },
-    { name: "Compliance", href: "/compliance" },
+    { name: "Privacy", href: "/legal/privacy" },
+    { name: "Terms", href: "/legal/terms" },
+    { name: "Security", href: "/legal/security" },
+    { name: "Compliance", href: "/legal/compliance" },
   ],
 };
 

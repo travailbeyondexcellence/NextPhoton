@@ -4,7 +4,28 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { 
+  Menu, 
+  X, 
+  ChevronDown,
+  Package,
+  Star,
+  CreditCard,
+  MessageSquare,
+  Rocket,
+  Building,
+  Users,
+  Mail,
+  Briefcase,
+  BookOpen,
+  FileText,
+  HelpCircle,
+  UsersRound,
+  Shield,
+  ScrollText,
+  Lock,
+  FileCheck
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeSelector } from "@/components/ThemeSelector";
 
@@ -15,37 +36,34 @@ const navigation = {
   product: {
     name: "Product",
     items: [
-      { name: "Features", href: "/product/features" },
-      { name: "Pricing", href: "/product/pricing" },
-      { name: "Testimonials", href: "/product/testimonials" },
-      { name: "Demo", href: "/product/demo" },
+      { name: "Features", href: "/product/features", icon: Package, description: "Explore our comprehensive features" },
+      { name: "Pricing", href: "/product/pricing", icon: CreditCard, description: "Simple, transparent pricing plans" },
+      { name: "Testimonials", href: "/product/testimonials", icon: Star, description: "What our users are saying" },
+      { name: "Demo", href: "/product/demo", icon: Rocket, description: "See NextPhoton in action" },
     ],
     isTwoColumn: false,
   },
-  company: {
-    name: "Company & Resources",
+  aboutUs: {
+    name: "About Us",
     items: [
-      { name: "About", href: "/company/about", category: "company" },
-      { name: "Contact", href: "/resources/contact", category: "resources" },
-      { name: "Careers", href: "/company/careers", category: "company" },
-      { name: "Blog", href: "/company/blog", category: "company" },
-      { name: "Press", href: "/company/press", category: "company" },
-      { name: "Documentation", href: "/resources/documentation", category: "resources" },
-      { name: "Help Center", href: "/resources/help-center", category: "resources" },
-      { name: "Community", href: "/resources/community", category: "resources" },
+      // Company items
+      { name: "About", href: "/company/about", icon: Building, description: "Learn about our mission", category: "company" },
+      { name: "Careers", href: "/company/careers", icon: Briefcase, description: "Join our growing team", category: "company" },
+      { name: "Blog", href: "/company/blog", icon: BookOpen, description: "Latest news and insights", category: "company" },
+      { name: "Press", href: "/company/press", icon: FileText, description: "Press releases and media", category: "company" },
+      // Resources items
+      { name: "Contact", href: "/resources/contact", icon: Mail, description: "Get in touch with us", category: "resources" },
+      { name: "Documentation", href: "/resources/documentation", icon: FileCheck, description: "Technical documentation", category: "resources" },
+      { name: "Help Center", href: "/resources/help-center", icon: HelpCircle, description: "Find answers to your questions", category: "resources" },
+      { name: "Community", href: "/resources/community", icon: UsersRound, description: "Connect with other users", category: "resources" },
+      // Legal items
+      { name: "Privacy", href: "/legal/privacy", icon: Shield, description: "Your privacy matters", category: "legal" },
+      { name: "Terms", href: "/legal/terms", icon: ScrollText, description: "Terms of service", category: "legal" },
+      { name: "Security", href: "/legal/security", icon: Lock, description: "How we protect your data", category: "legal" },
+      { name: "Compliance", href: "/legal/compliance", icon: FileCheck, description: "Regulatory compliance", category: "legal" },
     ],
     isTwoColumn: true,
-    columnTitles: { company: "Company", resources: "Resources" },
-  },
-  legal: {
-    name: "Legal",
-    items: [
-      { name: "Privacy", href: "/legal/privacy" },
-      { name: "Terms", href: "/legal/terms" },
-      { name: "Security", href: "/legal/security" },
-      { name: "Compliance", href: "/legal/compliance" },
-    ],
-    isTwoColumn: false,
+    columnTitles: { company: "Company", resources: "Resources", legal: "Legal" },
   },
 };
 
@@ -114,69 +132,139 @@ export function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       className={cn(
-                        "absolute top-full left-0 mt-2 rounded-xl bg-background/80 backdrop-blur-xl border border-white/10 shadow-xl overflow-hidden",
-                        section.isTwoColumn ? "w-96" : "w-48"
+                        "absolute top-full mt-2 z-50",
+                        section.isTwoColumn ? "left-1/2 -translate-x-1/2 w-[540px]" : "left-0 w-[320px]"
                       )}
                     >
-                      {section.isTwoColumn && section.columnTitles ? (
-                        // Two-column layout for Company & Resources
-                        <div className="grid grid-cols-2 gap-0">
-                          {/* Company Column */}
-                          <div className="border-r border-white/10">
-                            <h4 className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase tracking-wider">
-                              {section.columnTitles.company}
-                            </h4>
-                            {section.items
-                              .filter((item: any) => item.category === "company")
-                              .map((item: any) => (
-                                <Link
-                                  key={item.href}
-                                  href={item.href}
-                                  className={cn(
-                                    "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
-                                    pathname === item.href && "text-foreground bg-white/5"
-                                  )}
-                                >
-                                  {item.name}
-                                </Link>
-                              ))}
-                          </div>
-                          {/* Resources Column */}
+                      <div className="bg-white/10 backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
+                        {section.isTwoColumn && section.columnTitles ? (
+                          // Two-column layout for About Us
                           <div>
-                            <h4 className="px-4 py-2 text-xs font-semibold text-foreground/60 uppercase tracking-wider">
-                              {section.columnTitles.resources}
-                            </h4>
-                            {section.items
-                              .filter((item: any) => item.category === "resources")
-                              .map((item: any) => (
+                            <h3 className="text-lg font-semibold mb-4">{section.name}</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* Company Column */}
+                              <div>
+                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+                                  {section.columnTitles.company}
+                                </h4>
+                                {section.items
+                                  .filter((item: any) => item.category === "company")
+                                  .map((item: any) => (
+                                    <Link
+                                      key={item.href}
+                                      href={item.href}
+                                      className={cn(
+                                        "flex items-start gap-3 p-3 rounded-lg relative overflow-hidden",
+                                        "bg-white/5 backdrop-blur-sm border mb-2",
+                                        pathname === item.href 
+                                          ? "border-white/30 bg-white/15" 
+                                          : "border-white/10 hover:border-white/20 hover:bg-white/10",
+                                        "transition-all duration-200"
+                                      )}
+                                    >
+                                      <item.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                      <div className="flex-1">
+                                        <div className="font-medium text-sm">{item.name}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {item.description}
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  ))}
+                              </div>
+                              
+                              {/* Resources & Legal Column */}
+                              <div>
+                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
+                                  {section.columnTitles.resources}
+                                </h4>
+                                {section.items
+                                  .filter((item: any) => item.category === "resources")
+                                  .map((item: any) => (
+                                    <Link
+                                      key={item.href}
+                                      href={item.href}
+                                      className={cn(
+                                        "flex items-start gap-3 p-3 rounded-lg relative overflow-hidden",
+                                        "bg-white/5 backdrop-blur-sm border mb-2",
+                                        pathname === item.href 
+                                          ? "border-white/30 bg-white/15" 
+                                          : "border-white/10 hover:border-white/20 hover:bg-white/10",
+                                        "transition-all duration-200"
+                                      )}
+                                    >
+                                      <item.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                      <div className="flex-1">
+                                        <div className="font-medium text-sm">{item.name}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {item.description}
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  ))}
+                                
+                                {/* Legal Section */}
+                                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mt-4 mb-2 px-1">
+                                  {section.columnTitles.legal}
+                                </h4>
+                                {section.items
+                                  .filter((item: any) => item.category === "legal")
+                                  .map((item: any) => (
+                                    <Link
+                                      key={item.href}
+                                      href={item.href}
+                                      className={cn(
+                                        "flex items-start gap-3 p-3 rounded-lg relative overflow-hidden",
+                                        "bg-white/5 backdrop-blur-sm border mb-2",
+                                        pathname === item.href 
+                                          ? "border-white/30 bg-white/15" 
+                                          : "border-white/10 hover:border-white/20 hover:bg-white/10",
+                                        "transition-all duration-200"
+                                      )}
+                                    >
+                                      <item.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                      <div className="flex-1">
+                                        <div className="font-medium text-sm">{item.name}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {item.description}
+                                        </div>
+                                      </div>
+                                    </Link>
+                                  ))}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          // Single column layout for Product dropdown
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4">{section.name}</h3>
+                            <div className="space-y-2">
+                              {section.items.map((item: any) => (
                                 <Link
                                   key={item.href}
                                   href={item.href}
                                   className={cn(
-                                    "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
-                                    pathname === item.href && "text-foreground bg-white/5"
+                                    "flex items-start gap-3 p-3 rounded-lg relative overflow-hidden",
+                                    "bg-white/5 backdrop-blur-sm border",
+                                    pathname === item.href 
+                                      ? "border-white/30 bg-white/15" 
+                                      : "border-white/10 hover:border-white/20 hover:bg-white/10",
+                                    "transition-all duration-200"
                                   )}
                                 >
-                                  {item.name}
+                                  <item.icon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                                  <div className="flex-1">
+                                    <div className="font-medium text-sm">{item.name}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {item.description}
+                                    </div>
+                                  </div>
                                 </Link>
                               ))}
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        // Single column layout for other dropdowns
-                        section.items.map((item: any) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className={cn(
-                              "block px-4 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 transition-colors",
-                              pathname === item.href && "text-foreground bg-white/5"
-                            )}
-                          >
-                            {item.name}
-                          </Link>
-                        ))
-                      )}
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -231,16 +319,17 @@ export function Navbar() {
                       {section.name}
                     </h3>
                     <div className="space-y-1">
-                      {section.items.map((item) => (
+                      {section.items.map((item: any) => (
                         <Link
                           key={item.href}
                           href={item.href}
                           onClick={() => setIsMobileMenuOpen(false)}
                           className={cn(
-                            "block px-3 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 rounded-lg transition-colors",
+                            "flex items-center gap-2 px-3 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-white/5 rounded-lg transition-colors",
                             pathname === item.href && "text-foreground bg-white/5"
                           )}
                         >
+                          <item.icon className="w-4 h-4" />
                           {item.name}
                         </Link>
                       ))}
