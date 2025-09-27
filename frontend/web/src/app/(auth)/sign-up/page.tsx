@@ -9,24 +9,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { LogoComponent } from "@/components/LogoComponent";
-import { 
-  User, 
-  Mail, 
-  Lock, 
-  ArrowRight, 
-  Eye, 
-  EyeOff,
-  GraduationCap,
-  Users,
-  BookOpen,
-  Briefcase,
-  UserCog,
-  Shield
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ThemeSelector } from "@/components/ThemeSelector";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 // Form validation schema
@@ -40,61 +24,12 @@ const signUpSchema = z.object({
     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
   confirmPassword: z.string(),
-  role: z.enum(["learner", "guardian", "educator", "ecm", "employee", "intern"], {
-    required_error: "Please select a role",
-  }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
 type SignUpForm = z.infer<typeof signUpSchema>;
-
-// Role configurations with icons and descriptions
-const roles = [
-  { 
-    value: "learner", 
-    label: "Learner", 
-    icon: GraduationCap,
-    description: "Student seeking education",
-    color: "text-teal-500"
-  },
-  { 
-    value: "guardian", 
-    label: "Guardian", 
-    icon: Users,
-    description: "Parent or guardian",
-    color: "text-blue-500"
-  },
-  { 
-    value: "educator", 
-    label: "Educator", 
-    icon: BookOpen,
-    description: "Teacher or instructor",
-    color: "text-purple-500"
-  },
-  { 
-    value: "ecm", 
-    label: "EduCare Manager", 
-    icon: UserCog,
-    description: "Education care manager",
-    color: "text-orange-500"
-  },
-  { 
-    value: "employee", 
-    label: "Employee", 
-    icon: Briefcase,
-    description: "Staff member",
-    color: "text-green-500"
-  },
-  { 
-    value: "intern", 
-    label: "Intern", 
-    icon: Shield,
-    description: "Intern or trainee",
-    color: "text-pink-500"
-  },
-];
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -106,40 +41,30 @@ export default function SignUpPage() {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
   } = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
   });
-
-  const selectedRole = watch("role");
 
   const onSubmit = async (data: SignUpForm) => {
     setIsLoading(true);
     
     try {
       const { confirmPassword, ...registerData } = data;
-      const result = await authClient.signUp.email(registerData);
+      // Default to learner role for now - user can update role after login
+      const result = await authClient.signUp.email({
+        ...registerData,
+        role: 'learner'
+      });
       
       if (result.error) {
         toast.error(result.error.message || "Failed to create account");
         return;
       }
 
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully! Please sign in.");
       
-      // Redirect based on role
-      const roleRedirects: Record<string, string> = {
-        learner: "/dashboard/learner",
-        guardian: "/dashboard/guardian",
-        educator: "/dashboard/educator",
-        ecm: "/dashboard/ecm",
-        employee: "/dashboard/employee",
-        intern: "/dashboard/intern",
-        admin: "/dashboard/admin",
-      };
-      
-      router.push(roleRedirects[data.role] || "/dashboard");
+      // Redirect to sign in page after successful registration
+      router.push("/sign-in");
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     } finally {
@@ -148,244 +73,170 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Sign up form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full max-w-md space-y-8"
-        >
-          {/* Logo and heading */}
-          <div className="text-center">
-            <Link href="/" className="inline-flex items-center gap-2 justify-center mb-8 group">
-              <div className="transition-transform duration-300 group-hover:rotate-3">
-                <LogoComponent width={64} height={64} />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background/95 to-background relative">
+      {/* Background gradient effect - subtle */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-20 right-20 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-20 w-[500px] h-[500px] bg-accent/5 rounded-full blur-3xl" />
+      </div>
+
+      {/* Floating Theme Toggle */}
+      <div className="fixed top-6 right-6 z-50">
+        <ThemeSelector />
+      </div>
+
+      {/* Main Content */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-sm px-4"
+      >
+        {/* Glass morphism card */}
+        <div className="bg-white/10 backdrop-blur-2xl rounded-3xl p-8 border border-white/20 shadow-2xl">
+          {/* Logo and Header */}
+          <div className="text-center mb-8">
+            <motion.div 
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center mb-6"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 rounded-2xl blur-xl" />
+                <div className="relative w-20 h-20 flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl p-3 border border-white/20">
+                  <LogoComponent width={48} height={48} />
+                </div>
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent">
-                NextPhoton
-              </h1>
-            </Link>
-            <h2 className="text-2xl font-semibold text-foreground">Create your account</h2>
-            <p className="text-muted-foreground mt-2">
-              Join the education revolution
-            </p>
+            </motion.div>
+            <h2 className="text-2xl font-semibold text-foreground">Create Account</h2>
+            <p className="text-lg text-muted-foreground">to get started now!</p>
           </div>
 
-          {/* Sign up form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Name field */}
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-foreground">
-                Full Name
-              </Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  className="pl-10 bg-white/5 border-white/10 focus:border-primary"
-                  {...register("name")}
-                />
-              </div>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Name Field */}
+            <div>
+              <input
+                type="text"
+                placeholder="Full Name"
+                className="w-full px-4 py-4 border border-white/20 rounded-xl bg-white/5 backdrop-blur-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                {...register("name")}
+              />
               {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
               )}
             </div>
 
-            {/* Email field */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">
-                Email Address
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  className="pl-10 bg-white/5 border-white/10 focus:border-primary"
-                  {...register("email")}
-                />
-              </div>
+            {/* Email Field */}
+            <div>
+              <input
+                type="email"
+                placeholder="Email Address"
+                className="w-full px-4 py-4 border border-white/20 rounded-xl bg-white/5 backdrop-blur-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                {...register("email")}
+              />
               {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
               )}
             </div>
 
-            {/* Password field */}
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">
-                Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10 bg-white/5 border-white/10 focus:border-primary"
-                  {...register("password")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-
-            {/* Confirm Password field */}
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-foreground">
-                Confirm Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  className="pl-10 pr-10 bg-white/5 border-white/10 focus:border-primary"
-                  {...register("confirmPassword")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-
-            {/* Role selection */}
-            <div className="space-y-2">
-              <Label className="text-foreground">Select Your Role</Label>
-              <RadioGroup
-                onValueChange={(value) => setValue("role", value as any)}
-                className="grid grid-cols-2 gap-3"
+            {/* Password Field */}
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                className="w-full px-4 py-4 pr-12 border border-white/20 rounded-xl bg-white/5 backdrop-blur-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                {...register("password")}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                {roles.map((role) => {
-                  const Icon = role.icon;
-                  return (
-                    <div key={role.value}>
-                      <RadioGroupItem
-                        value={role.value}
-                        id={role.value}
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor={role.value}
-                        className={`
-                          flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer
-                          bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20
-                          peer-checked:bg-white/15 peer-checked:border-primary
-                          transition-all duration-200 hover:scale-[1.02]
-                        `}
-                      >
-                        <Icon className={`h-6 w-6 mb-2 ${role.color}`} />
-                        <span className="font-medium text-foreground">{role.label}</span>
-                        <span className="text-xs text-muted-foreground text-center mt-1">
-                          {role.description}
-                        </span>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </RadioGroup>
-              {errors.role && (
-                <p className="text-sm text-red-500">{errors.role.message}</p>
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
               )}
             </div>
 
-            {/* Submit button */}
-            <Button
+            {/* Confirm Password Field */}
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm Password"
+                className="w-full px-4 py-4 pr-12 border border-white/20 rounded-xl bg-white/5 backdrop-blur-sm text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                {...register("confirmPassword")}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            {/* Sign Up Button */}
+            <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 transition-all duration-200"
+              className="w-full py-4 bg-white text-background rounded-xl hover:bg-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Creating account...
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  Create Account
-                  <ArrowRight className="h-5 w-5" />
-                </div>
-              )}
-            </Button>
+              {isLoading ? "Creating Account..." : "Sign Up"}
+            </button>
+
+            {/* Or Sign Up With */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-transparent text-muted-foreground/60">Or Sign Up with</span>
+              </div>
+            </div>
+
+            {/* Social Sign Up Buttons */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className="py-3 px-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all flex items-center justify-center gap-2 group"
+                onClick={() => {/* TODO: Implement Google signup */}}
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="py-3 px-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all flex items-center justify-center gap-2 group"
+                onClick={() => {/* TODO: Implement Facebook signup */}}
+              >
+                <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </button>
+            </div>
           </form>
 
-          {/* Sign in link */}
-          <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link
-              href="/sign-in"
-              className="font-semibold text-primary hover:underline"
+          {/* Login Link */}
+          <div className="mt-6 text-center">
+            <span className="text-muted-foreground text-sm">Already have an account? </span>
+            <Link 
+              href="/sign-in" 
+              className="text-primary hover:text-primary/80 font-medium text-sm transition-colors"
             >
-              Sign in
+              Login Now
             </Link>
-          </p>
-        </motion.div>
-      </div>
-
-      {/* Right side - Feature showcase */}
-      <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-teal-500/20 via-blue-600/20 to-purple-600/20 backdrop-blur-xl p-12 items-center justify-center">
-        <div className="max-w-lg space-y-8">
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <h3 className="text-3xl font-bold text-white mb-4">
-              Join NextPhoton Today
-            </h3>
-            <p className="text-white/80 text-lg">
-              Experience the future of education management with our comprehensive platform designed for learners, educators, and guardians.
-            </p>
-          </motion.div>
-
-          {/* Features */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="space-y-6"
-          >
-            {[
-              { icon: BookOpen, title: "Comprehensive Learning", description: "Access a wide range of educational resources and tools" },
-              { icon: Users, title: "Community Driven", description: "Connect with educators, learners, and guardians" },
-              { icon: Shield, title: "Secure & Reliable", description: "Your data is protected with enterprise-grade security" },
-            ].map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div key={index} className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-white/10 backdrop-blur-sm">
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-white">{feature.title}</h4>
-                    <p className="text-white/70 text-sm">{feature.description}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </motion.div>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
