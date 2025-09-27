@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+/* PRIORITY: Remove scrollbar arrow buttons first */
+@layer base {
+  /* Remove all scrollbar buttons */
+  ::-webkit-scrollbar-button {
+    display: none !important;
+  }
+  
+  /* Target specific button states */
+  ::-webkit-scrollbar-button:horizontal:start:decrement,
+  ::-webkit-scrollbar-button:horizontal:end:increment,
+  ::-webkit-scrollbar-button:vertical:start:decrement,
+  ::-webkit-scrollbar-button:vertical:end:increment,
+  ::-webkit-scrollbar-button:horizontal:start:increment,
+  ::-webkit-scrollbar-button:horizontal:end:decrement,
+  ::-webkit-scrollbar-button:vertical:start:increment,
+  ::-webkit-scrollbar-button:vertical:end:decrement {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+}
+
 /* Theme CSS Variables */
 @layer base {
   :root {
@@ -256,6 +278,31 @@
   background: rgb(var(--secondary));
 }
 
+/* Force hide all scrollbar buttons globally */
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Windows Edge/Chrome specific scrollbar button removal */
+::-webkit-scrollbar:vertical {
+  width: 6px !important;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 6px !important;
+}
+
+/* Ensure no space is reserved for buttons */
+::-webkit-scrollbar-track-piece:start {
+  margin: 0 !important;
+}
+
+::-webkit-scrollbar-track-piece:end {
+  margin: 0 !important;
+}
+
 /* Alternative visible scrollbar using link colors */
 .theme-scrollbar {
   scrollbar-width: thin;
@@ -281,9 +328,25 @@
   background: rgb(var(--link-hover));
 }
 
-/* Hide scrollbar buttons */
+/* Hide scrollbar buttons - force removal */
 ::-webkit-scrollbar-button {
-  display: none;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Additional specificity to ensure buttons are hidden */
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment {
+  display: none !important;
+}
+
+/* Hide scrollbar arrows for all scrollbar states */
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none !important;
 }
 
 /* SimpleBar scrollbar theme override */
@@ -351,4 +414,59 @@
     background: rgb(var(--card) / 0.95);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
+}
+
+/* FINAL OVERRIDE: Absolutely remove all scrollbar buttons */
+html *::-webkit-scrollbar-button,
+body *::-webkit-scrollbar-button,
+div::-webkit-scrollbar-button,
+main::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Remove scrollbar buttons with maximum specificity */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+  display: none !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-button:single-button:vertical:increment {
+  display: none !important;
+  height: 0 !important;
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  display: none !important;
+  width: 0 !important;
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:increment {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Target Windows-specific scrollbar buttons */
+::-webkit-scrollbar-button:double-button:vertical:decrement {
+  display: none !important;
+}
+
+::-webkit-scrollbar-button:double-button:vertical:increment {
+  display: none !important;
+}
+
+/* Override any inline styles or user agent styles */
+*::-webkit-scrollbar-button:start {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+*::-webkit-scrollbar-button:end {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
 }
