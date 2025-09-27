@@ -19,8 +19,21 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
       onValueChange([newValue])
     }
 
+    const percentage = ((value[0] || 0) - min) / (max - min) * 100
+
     return (
       <div className={cn("relative w-full", className)}>
+        {/* Track background */}
+        <div className="absolute inset-y-0 w-full flex items-center pointer-events-none">
+          <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary transition-all duration-150"
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+        </div>
+        
+        {/* Input range */}
         <input
           ref={ref}
           type="range"
@@ -29,7 +42,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
           step={step}
           value={value[0] || 0}
           onChange={handleChange}
-          className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
+          className="relative w-full h-2 bg-transparent appearance-none cursor-pointer slider z-10"
           {...props}
         />
         <style jsx>{`
@@ -48,6 +61,8 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             border: 2px solid rgb(var(--background));
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease;
+            position: relative;
+            z-index: 2;
           }
           
           .slider::-webkit-slider-thumb:hover {
@@ -64,6 +79,9 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
             border: 2px solid rgb(var(--background));
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease;
+            position: relative;
+            z-index: 2;
+            border: none;
           }
           
           .slider::-moz-range-thumb:hover {
@@ -73,27 +91,15 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
           
           .slider::-webkit-slider-runnable-track {
             height: 8px;
-            background: rgba(var(--primary), 0.1);
-            border: 1px solid rgba(var(--primary), 0.2);
-            border-radius: 4px;
+            background: transparent;
             cursor: pointer;
           }
           
           .slider::-moz-range-track {
             height: 8px;
-            background: rgba(var(--primary), 0.1);
-            border: 1px solid rgba(var(--primary), 0.2);
-            border-radius: 4px;
+            background: transparent;
             cursor: pointer;
-          }
-          
-          .slider::-webkit-slider-runnable-track {
-            background: linear-gradient(to right, 
-              rgb(var(--primary)) 0%, 
-              rgb(var(--primary)) ${((value[0] || 0) - min) / (max - min) * 100}%, 
-              rgba(var(--primary), 0.1) ${((value[0] || 0) - min) / (max - min) * 100}%,
-              rgba(var(--primary), 0.1) 100%
-            );
+            border: none;
           }
         `}</style>
       </div>

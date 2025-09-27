@@ -143,14 +143,15 @@ export function DashboardSidebar() {
                                     key={subIndex}
                                     href={subItem.href || "#"}
                                     className={cn(
-                                      "flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
-                                      "bg-white/5 hover:bg-white/10",
+                                      "group flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-all duration-200 ease-out",
+                                      "bg-white/5 hover:bg-white/15 hover:backdrop-blur-sm",
                                       "text-muted-foreground hover:text-foreground",
-                                      isSubActive && "bg-white/10 text-foreground font-medium"
+                                      "hover:scale-[1.02] hover:shadow-sm",
+                                      isSubActive && "bg-white/15 text-foreground font-medium shadow-sm"
                                     )}
                                   >
-                                    <Icon size={16} />
-                                    <span>{subItem.label}</span>
+                                    <Icon size={16} className="transition-all duration-200 ease-out group-hover:scale-110 group-hover:text-primary" />
+                                    <span className="transition-all duration-200 ease-out group-hover:translate-x-0.5">{subItem.label}</span>
                                   </Link>
                                 )
                               })}
@@ -168,8 +169,10 @@ export function DashboardSidebar() {
                           asChild={!item.hasSecondaryDrawer}
                           data-active={isActive}
                           className={cn(
-                            "w-full justify-start",
-                            isActive && "bg-muted font-medium"
+                            "w-full justify-start transition-all duration-200 ease-out",
+                            "hover:bg-white/10 hover:backdrop-blur-sm hover:scale-[1.02] hover:shadow-sm",
+                            "group",
+                            isActive && "bg-white/15 font-medium shadow-sm"
                           )}
                           onClick={item.hasSecondaryDrawer ? (e) => {
                             e.preventDefault()
@@ -179,20 +182,24 @@ export function DashboardSidebar() {
                         >
                           {item.hasSecondaryDrawer ? (
                             <div className="flex items-center justify-between w-full">
-                              <div className="flex items-center">
-                                <span className="mr-2">
-                                  <Icon size={20} />
+                              <div className="flex items-center transition-all duration-200 ease-out group-hover:translate-x-1">
+                                <span className="mr-2 transition-all duration-200 ease-out group-hover:scale-110">
+                                  <Icon size={20} className="transition-colors duration-200 ease-out group-hover:text-primary" />
                                 </span>
-                                {item.label}
+                                <span className="transition-colors duration-200 ease-out group-hover:text-foreground">
+                                  {item.label}
+                                </span>
                               </div>
-                              <ChevronRight size={16} className="text-muted-foreground" />
+                              <ChevronRight size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:translate-x-1" />
                             </div>
                           ) : (
-                            <Link href={item.href}>
-                              <span className="mr-2">
-                                <Icon size={20} />
+                            <Link href={item.href} className="flex items-center transition-all duration-200 ease-out group-hover:translate-x-1">
+                              <span className="mr-2 transition-all duration-200 ease-out group-hover:scale-110">
+                                <Icon size={20} className="transition-colors duration-200 ease-out group-hover:text-primary" />
                               </span>
-                              {item.label}
+                              <span className="transition-colors duration-200 ease-out group-hover:text-foreground">
+                                {item.label}
+                              </span>
                             </Link>
                           )}
                         </SidebarMenuButton>
@@ -200,7 +207,7 @@ export function DashboardSidebar() {
                     )
                   })}
                 </SidebarMenu>
-                {groupIndex < adminMenu.length - 1 && <Separator className="my-0" />}
+                {groupIndex < adminMenu.length - 1 && <Separator className="my-0 opacity-20 hover:opacity-40 transition-opacity duration-200" />}
               </div>
             ))} 
         </SimpleBar>

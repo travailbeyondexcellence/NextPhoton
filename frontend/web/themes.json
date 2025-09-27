@@ -56,9 +56,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#e0f2fe",
-        "backgroundGradientVia": "#bae6fd",
-        "backgroundGradientTo": "#e0f2fe",
+        "backgroundGradientFrom": "#ffffff",
+        "backgroundGradientVia": "#9acafe",
+        "backgroundGradientTo": "#007bff",
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
         "blurIntensity": 12,
