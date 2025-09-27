@@ -4,7 +4,7 @@ import Image from "next/image";
 import { User, Atom, Dice5 } from 'lucide-react';
 import { useState } from 'react';
 import { getInitials } from '@/lib/utils';
-import educatorsData from '../../../mock-data/educators.json';
+import educatorsData from '../../mock-data/educators.json';
 
 const educators = educatorsData.data;
 

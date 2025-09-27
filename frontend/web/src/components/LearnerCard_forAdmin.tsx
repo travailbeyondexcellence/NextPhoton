@@ -15,7 +15,7 @@ import {
     Award,
     AlertCircle
 } from 'lucide-react';
-import learnersData from '../../../mock-data/learners.json';
+import learnersData from '../../mock-data/learners.json';
 
 type Learner = typeof learnersData.data[0];
 

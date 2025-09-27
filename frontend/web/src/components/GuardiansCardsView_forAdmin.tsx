@@ -3,7 +3,7 @@
 
 import React from 'react';
 import GuardianCard_forAdmin from './GuardianCard_forAdmin';
-import guardiansData from '../../../mock-data/guardians.json';
+import guardiansData from '../../mock-data/guardians.json';
 
 const guardians = guardiansData.data;
 

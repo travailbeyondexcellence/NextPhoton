@@ -18,7 +18,7 @@ import {
     GraduationCap,
     Briefcase
 } from 'lucide-react';
-import guardiansData from '../../../mock-data/guardians.json';
+import guardiansData from '../../mock-data/guardians.json';
 
 type Guardian = typeof guardiansData.data[0];
 

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { getInitials } from "@/lib/utils";
 import { useState } from "react";
 
-import educatorsData from '../../../mock-data/educators.json';
+import educatorsData from '../../mock-data/educators.json';
 
 type Educator = typeof educatorsData.data[0];
 

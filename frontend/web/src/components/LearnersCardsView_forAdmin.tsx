@@ -3,7 +3,7 @@
 
 import React from 'react';
 import LearnerCard_forAdmin from './LearnerCard_forAdmin';
-import learnersData from '../../../mock-data/learners.json';
+import learnersData from '../../mock-data/learners.json';
 
 const learners = learnersData.data;
 
