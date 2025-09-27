@@ -2,9 +2,31 @@
 
 import Image from "next/image";
 import { User, Atom, Dice5 } from 'lucide-react';
-import { educator, educatorReviews, adminNotes } from "../app/(dashboard)/admin/educators/[educatorID]/dummyData"; 
+import { useState } from 'react';
+import { getInitials } from '@/lib/utils';
+import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1';
 
-const EducatorProfile_forAdmin = () => {
+interface EducatorProfileProps {
+    educatorId: string;
+}
+
+const EducatorProfile_forAdmin = ({ educatorId }: EducatorProfileProps) => {
+    const [imageError, setImageError] = useState(false);
+    
+    // Find the educator by ID from the educators array
+    const educator = educators.find(edu => edu.id === educatorId);
+    
+    // If educator not found, show a fallback message
+    if (!educator) {
+        return (
+            <div className="min-h-screen p-4 md:p-6 flex items-center justify-center">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 border border-white/20 text-center">
+                    <h2 className="text-xl font-semibold text-foreground mb-2">Educator Not Found</h2>
+                    <p className="text-muted-foreground">The educator with ID "{educatorId}" could not be found.</p>
+                </div>
+            </div>
+        );
+    }
     return (
         <div className="min-h-screen p-4 md:p-6 space-y-4 md:space-y-6 mx-auto max-w-[1200px]">
               
@@ -18,13 +40,22 @@ const EducatorProfile_forAdmin = () => {
           {/* Profile Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 md:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 border border-white/20">
-              <Image
-                src={educator.profileImage}
-                alt={educator.name}
-                width={120}
-                height={120}
-                className="rounded-xl object-cover border-4 border-primary/50"
-              />
+              {educator.profileImage && !imageError ? (
+                <Image
+                  src={educator.profileImage}
+                  alt={educator.name}
+                  width={120}
+                  height={120}
+                  className="rounded-xl object-cover border-4 border-primary/50"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="w-[120px] h-[120px] rounded-xl bg-primary/20 border-4 border-primary/50 flex items-center justify-center">
+                  <span className="text-4xl font-bold text-primary">
+                    {getInitials(educator.name)}
+                  </span>
+                </div>
+              )}
               <div className="text-center sm:text-left">
                 <h2 className="text-lg md:text-xl font-semibold text-foreground">{educator.name}</h2>
                 <p className="text-sm text-primary">{educator.username}</p>
@@ -63,19 +94,12 @@ const EducatorProfile_forAdmin = () => {
 <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
   <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Subjects</h3>
   <div className="grid grid-cols-2 gap-4 md:gap-6 text-center p-2 md:p-4">
-    
-    {/* Physics */}
-    <div className="flex flex-col items-center justify-center space-y-2">
-    <Atom className="text-primary" size={24} />
-      <p className="text-xs md:text-sm font-semibold text-foreground">Physics</p>
-    </div>
-
-    {/* Mathematics */}
-    <div className="flex flex-col items-center justify-center space-y-2">
-    <Dice5 className="text-primary" size={24} />
-      <p className="text-xs md:text-sm font-semibold text-foreground">Mathematics</p>
-    </div>
-    
+    {educator.subjects.map((subject, index) => (
+      <div key={index} className="flex flex-col items-center justify-center space-y-2">
+        <Atom className="text-primary" size={24} />
+        <p className="text-xs md:text-sm font-semibold text-foreground">{subject}</p>
+      </div>
+    ))}
   </div>
 </div>
 
@@ -97,7 +121,7 @@ const EducatorProfile_forAdmin = () => {
           <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
             <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Student Reviews</h3>
             <div className="space-y-3 md:space-y-4">
-              {educatorReviews.map((review, index) => (
+              {educator.educatorReviews.map((review, index) => (
                 <div key={index} className="bg-white/5 p-3 md:p-4 rounded-md border border-white/10">
                   <div className="flex flex-col sm:flex-row sm:justify-between text-xs md:text-sm font-semibold gap-1">
                     <span className="text-foreground">{review.studentName}</span>
@@ -114,7 +138,7 @@ const EducatorProfile_forAdmin = () => {
           <div className="bg-white/10 backdrop-blur-sm p-4 md:p-6 rounded-xl border border-white/20">
             <h3 className="font-medium text-base md:text-lg mb-4 text-foreground">Admin Notes</h3>
             <ul className="space-y-3 text-xs md:text-sm">
-              {adminNotes.map((note, idx) => (
+              {educator.adminNotes.map((note, idx) => (
                 <li key={idx} className="border-l-4 border-primary pl-3 md:pl-4">
                   <p className="text-foreground font-semibold">{note.author}</p>
                   <p className="text-xs text-muted-foreground mb-1">{note.timestamp}</p>

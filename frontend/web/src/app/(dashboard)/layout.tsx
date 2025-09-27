@@ -29,7 +29,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
       {/* Sidebar with glass effect */}
       <aside
         className={`
-          sidebar fixed top-0 left-0 h-screen p-0 w-56 z-50 
+          sidebar fixed top-0 left-0 h-screen p-0 w-72 z-50 
           transition-transform duration-300 ease-in-out
           bg-white/5 backdrop-blur-xl border-r border-white/10
           overflow-y-auto
@@ -44,7 +44,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         className={`
           w-screen flex flex-col min-h-screen 
           transition-all duration-300
-          ${open ? "ml-56" : "ml-0"}
+          ${open ? "ml-72" : "ml-0"}
         `}
       >
         <DashboardNavbar />
