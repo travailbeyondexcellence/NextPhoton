@@ -476,16 +476,16 @@
         "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
-        "gradientFrom": "#FFD700",
-        "gradientVia": "#FFA500",
-        "gradientTo": "#FFED4E",
+        "gradientFrom": "#FFCC01",
+        "gradientVia": "#FFDB2D",
+        "gradientTo": "#FFEA59",
         "opacity": 0.8,
         "textColor": "#3e2723"
       },
       "dashboardHeader": {
-        "gradientFrom": "#FFD700",
-        "gradientVia": "#FFA500",
-        "gradientTo": "#FFED4E",
+        "gradientFrom": "#FFCC01",
+        "gradientVia": "#FFDB2D",
+        "gradientTo": "#FFEA59",
         "opacity": 0.5,
         "textColor": "#3e2723"
       },
