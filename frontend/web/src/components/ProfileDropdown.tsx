@@ -62,7 +62,15 @@ export function ProfileDropdown() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 z-50">
-          <div className="bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 shadow-2xl overflow-hidden">
+          <div 
+            className="rounded-xl border border-white/20 shadow-2xl overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, rgb(var(--gradient-from)) 0%, rgb(var(--gradient-via)) 50%, rgb(var(--gradient-to)) 100%)',
+              opacity: '0.95',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)'
+            }}
+          >
             {/* User Info Header */}
             <div className="p-4 border-b border-white/10">
               <div className="flex items-center gap-3">
@@ -93,8 +101,8 @@ export function ProfileDropdown() {
 
               <button
                 onClick={() => {
-                  // Navigate to account settings in profile page
-                  router.push('/profile');
+                  // Navigate to account settings page
+                  router.push('/settings');
                   setIsOpen(false);
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
@@ -147,7 +155,7 @@ export function ProfileDropdown() {
                   }
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-destructive/10 transition-colors text-left text-destructive"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-destructive/15 hover:scale-105 hover:shadow-lg active:scale-95 transition-all duration-200 ease-in-out text-left text-destructive transform"
               >
                 <LogOut className="w-4 h-4" />
                 <span className="text-sm">Log Out</span>

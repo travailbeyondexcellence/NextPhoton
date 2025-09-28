@@ -97,7 +97,7 @@ const AccountSettings = () => {
             <Settings size={28} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Account Settings</h1>
+            <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
             <p className="text-sm text-muted-foreground">Manage your account information and security settings</p>
           </div>
         </div>
