@@ -144,7 +144,7 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(5, 150, 105, 0.05)",
         "glassTextColor": "#e6ffe8",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.09
       },
       "themeSelector": {
         "backgroundOverlayGradientFrom": "#5FC05D",
@@ -518,9 +518,9 @@
         "backgroundOverlay": 0.0
       },
       "sidebar": {
-        "gradientFrom": "#FFCC01",
-        "gradientVia": "#FFDB2D",
-        "gradientTo": "#FFEA59",
+        "gradientFrom": "#FFD633",
+        "gradientVia": "#FFD372",
+        "gradientTo": "#FFCFB1",
         "opacity": 0.8,
         "textColor": "#3e2723"
       },
