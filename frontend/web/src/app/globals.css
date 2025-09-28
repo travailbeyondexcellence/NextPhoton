@@ -133,6 +133,19 @@
     pointer-events: none;
   }
   
+  /* Theme selector background overlay for darkening effect */
+  .theme-selector-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000000;
+    opacity: var(--theme-selector-background-overlay, 0);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
   ::selection {
     background-color: rgb(var(--selection) / 0.5);
     color: rgb(var(--foreground));

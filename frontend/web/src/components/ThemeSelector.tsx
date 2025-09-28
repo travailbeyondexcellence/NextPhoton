@@ -93,7 +93,7 @@ export function ThemeSelector() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-[9999]">
           <div 
-            className="rounded-xl p-5 border border-white/20 shadow-2xl"
+            className="rounded-xl p-5 border border-white/20 shadow-2xl relative overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, rgb(var(--gradient-from)) 0%, rgb(var(--gradient-via)) 50%, rgb(var(--gradient-to)) 100%)',
               opacity: '0.95',
@@ -101,8 +101,11 @@ export function ThemeSelector() {
               WebkitBackdropFilter: 'blur(12px)'
             }}
           >
-            <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
-            <div className="grid grid-cols-2 gap-3">
+            {/* Theme selector background overlay for theme-based darkening */}
+            <div className="theme-selector-overlay rounded-xl"></div>
+            <div className="relative z-10">
+              <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
+              <div className="grid grid-cols-2 gap-3">
               {/* Two column layout - themes alternate left/right based on order */}
               {getThemedIcons().map((theme, index) => (
                 <button
@@ -152,6 +155,7 @@ export function ThemeSelector() {
                   </div>
                 </button>
               ))}
+              </div>
             </div>
           </div>
         </div>

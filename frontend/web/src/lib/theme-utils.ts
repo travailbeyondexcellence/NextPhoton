@@ -184,6 +184,11 @@ export function applyTheme(themeKey: ThemeKey): void {
     if (theme.glass.mainSectionBackgroundOverlay !== undefined) {
       root.style.setProperty('--main-section-background-overlay', theme.glass.mainSectionBackgroundOverlay.toString());
     }
+    
+    // Apply theme selector background overlay
+    if (theme.glass.themeSelectorBackgroundOverlay !== undefined) {
+      root.style.setProperty('--theme-selector-background-overlay', theme.glass.themeSelectorBackgroundOverlay.toString());
+    }
   }
   
   // COMMENTED OUT: Theme-aware logo colors - always use original earth colors

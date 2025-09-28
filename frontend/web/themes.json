@@ -71,7 +71,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(30, 58, 95, 0.3)",
         "glassTextColor": "#ffffff",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#2D37FF",
@@ -126,7 +127,7 @@
         "backgroundGradientFrom": "#5FC05D",
         "backgroundGradientVia": "#30D197",
         "backgroundGradientTo": "#01E1D8",
-        "backgroundGradientOpacity": 0.90,
+        "backgroundGradientOpacity": 0.21,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -138,7 +139,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(5, 150, 105, 0.05)",
         "glassTextColor": "#e6ffe8",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#022119",
@@ -205,7 +207,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(16, 185, 129, 0.08)",
         "glassTextColor": "#a7f3d0",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#000000",
@@ -257,9 +260,9 @@
         "warningForeground": "#000000"
       },
       "glass": {
-        "backgroundGradientFrom": "#83419A",
-        "backgroundGradientVia": "#5E2DB0",
-        "backgroundGradientTo": "#3A19C6",
+        "backgroundGradientFrom": "#AF01FF",
+        "backgroundGradientVia": "#8234FF",
+        "backgroundGradientTo": "#5967FF",
         "backgroundGradientOpacity": 0.8,
         "cardOpacity": 0.15,
         "borderOpacity": 0.3,
@@ -272,7 +275,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(139, 92, 246, 0.1)",
         "glassTextColor": "#e2e8f0",
-        "mainSectionBackgroundOverlay": 0.36
+        "mainSectionBackgroundOverlay": 0.36,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#06030c",
@@ -339,7 +343,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(59, 130, 246, 0.08)",
         "glassTextColor": "#cbd5e1",
-        "mainSectionBackgroundOverlay": 0.36
+        "mainSectionBackgroundOverlay": 0.36,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#060810",
@@ -406,7 +411,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(20, 184, 166, 0.06)",
         "glassTextColor": "#ccfbf1",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#052b34",
@@ -473,7 +479,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 149, 0, 0.1)",
         "glassTextColor": "#ffe4b5",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#FFCC01",
@@ -562,7 +569,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 20, 147, 0.08)",
         "glassTextColor": "#fce7f3",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.36
       },
       "sidebar": {
         "gradientFrom": "#E8368B",
@@ -636,10 +644,10 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#be123c",
-        "backgroundGradientVia": "#dc2626",
-        "backgroundGradientTo": "#db2777",
-        "backgroundGradientOpacity": 0.48,
+        "backgroundGradientFrom": "#FF3D40",
+        "backgroundGradientVia": "#FF4579",
+        "backgroundGradientTo": "#FF4579",
+        "backgroundGradientOpacity": 0.69,
         "cardOpacity": 0.18,
         "borderOpacity": 0.35,
         "blurIntensity": 12,
@@ -651,7 +659,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 255, 255, 0.15)",
         "glassTextColor": "#5d1428",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#FF3D40",
@@ -740,7 +749,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 255, 255, 0.02)",
         "glassTextColor": "#d4d4d4",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#3B3B3B",
@@ -807,7 +817,8 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(62, 39, 35, 0.4)",
         "glassTextColor": "#ffffff",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#6b5147",
@@ -896,7 +907,8 @@
         "gradientOverlayToOpacity": 0.02,
         "glassTint": "rgba(0, 0, 0, 0.8)",
         "glassTextColor": "#ffffff",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0,
+        "themeSelectorBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#898989",
