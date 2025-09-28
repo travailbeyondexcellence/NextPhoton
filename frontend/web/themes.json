@@ -73,9 +73,9 @@
         "glassTextColor": "#ffffff"
       },
       "sidebar": {
-        "gradientFrom": "#004a99",
-        "gradientVia": "#5c7a97",
-        "gradientTo": "#004a99",
+        "gradientFrom": "#007bff",
+        "gradientVia": "#9acafe",
+        "gradientTo": "#007bff",
         "opacity": 1.0,
         "textColor": "#ffffff"
       },
@@ -469,9 +469,9 @@
         "glassTextColor": "#ffe4b5"
       },
       "sidebar": {
-        "gradientFrom": "#990000",
-        "gradientVia": "#994c00",
-        "gradientTo": "#994700",
+        "gradientFrom": "#FFD700",
+        "gradientVia": "#FFA500",
+        "gradientTo": "#FFED4E",
         "opacity": 0.8,
         "textColor": "#ffe4b5"
       },
@@ -740,9 +740,9 @@
         "textColor": "#ffffff"
       },
       "dashboardHeader": {
-        "gradientFrom": "#5c503f",
-        "gradientVia": "#a89a85",
-        "gradientTo": "#9a8878",
+        "gradientFrom": "#6b5147",
+        "gradientVia": "#8c6e63",
+        "gradientTo": "#a89085",
         "opacity": 0.7,
         "textColor": "#ffffff"
       },
