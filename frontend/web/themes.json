@@ -733,9 +733,9 @@
         "glassTextColor": "#ffffff"
       },
       "sidebar": {
-        "gradientFrom": "#6d5650",
+        "gradientFrom": "#6b5147",
         "gradientVia": "#8c6e63",
-        "gradientTo": "#a08875",
+        "gradientTo": "#a89085",
         "opacity": 0.75,
         "textColor": "#ffffff"
       },
