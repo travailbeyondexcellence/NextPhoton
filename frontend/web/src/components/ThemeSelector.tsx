@@ -17,6 +17,24 @@ export function ThemeSelector() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { currentTheme, changeTheme, themes, isLoading } = useTheme();
 
+  // Inject CSS to hide scrollbar for webkit browsers
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .theme-selector-no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .theme-selector-no-scrollbar {
+        -webkit-overflow-scrolling: touch;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   // Map themes with their icons
   const getThemedIcons = () => {
     const iconMap: Record<string, string> = {
@@ -91,7 +109,13 @@ export function ThemeSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto custom-scrollbar scrollbar-thin z-[9999]">
+        <div 
+          className="absolute right-0 mt-2 w-[420px] max-h-[70vh] overflow-y-auto theme-selector-no-scrollbar z-[9999]"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none'
+          }}
+        >
           <div 
             className="rounded-xl p-5 border border-white/20 shadow-2xl relative overflow-hidden"
             style={{

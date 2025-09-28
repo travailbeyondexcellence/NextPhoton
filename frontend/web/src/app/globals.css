@@ -146,6 +146,36 @@
     pointer-events: none;
   }
   
+  /* Hide scrollbar for theme selector while maintaining scroll functionality */
+  .theme-selector-scrollable {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  .theme-selector-scrollable::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
+  
+  /* More aggressive scrollbar hiding for theme selector */
+  .theme-selector-no-scrollbar {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar {
+    display: none !important; /* WebKit */
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar-track {
+    display: none !important;
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+  
   ::selection {
     background-color: rgb(var(--selection) / 0.5);
     color: rgb(var(--foreground));
