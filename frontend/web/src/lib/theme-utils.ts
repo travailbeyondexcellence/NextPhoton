@@ -179,6 +179,11 @@ export function applyTheme(themeKey: ThemeKey): void {
     if (theme.glass.glassTextColor) {
       root.style.setProperty('--glass-text-color', theme.glass.glassTextColor);
     }
+    
+    // Apply main section background overlay
+    if (theme.glass.mainSectionBackgroundOverlay !== undefined) {
+      root.style.setProperty('--main-section-background-overlay', theme.glass.mainSectionBackgroundOverlay.toString());
+    }
   }
   
   // Apply logo colors for theme-aware logo display (only for specific themes)

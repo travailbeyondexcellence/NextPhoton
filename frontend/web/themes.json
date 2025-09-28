@@ -56,9 +56,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#01CDFF",
-        "backgroundGradientVia": "#0970FF",
-        "backgroundGradientTo": "#010CFF",
+        "backgroundGradientFrom": "#0153FF",
+        "backgroundGradientVia": "#0191FF",
+        "backgroundGradientTo": "#01CFFF",
         "backgroundGradientOpacity": 0.75,
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
@@ -272,7 +272,7 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(139, 92, 246, 0.1)",
         "glassTextColor": "#e2e8f0",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.36
       },
       "sidebar": {
         "gradientFrom": "#06030c",
@@ -339,7 +339,7 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(59, 130, 246, 0.08)",
         "glassTextColor": "#cbd5e1",
-        "mainSectionBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.36
       },
       "sidebar": {
         "gradientFrom": "#060810",
@@ -458,9 +458,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#FFD700",
-        "backgroundGradientVia": "#FFA500",
-        "backgroundGradientTo": "#FFED4E",
+        "backgroundGradientFrom": "#FFC769",
+        "backgroundGradientVia": "#FFE195",
+        "backgroundGradientTo": "#FFFCC1",
         "backgroundGradientOpacity": 0.6,
         "cardOpacity": 0.024,
         "borderOpacity": 0.045,
@@ -654,16 +654,16 @@
         "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
-        "gradientFrom": "#be123c",
-        "gradientVia": "#dc2626",
-        "gradientTo": "#db2777",
-        "opacity": 0.42,
+        "gradientFrom": "#FF3D40",
+        "gradientVia": "#FF415C",
+        "gradientTo": "#FF4579",
+        "opacity": 0.90,
         "textColor": "#ffe8eb"
       },
       "dashboardHeader": {
-        "gradientFrom": "#be123c",
-        "gradientVia": "#dc2626",
-        "gradientTo": "#db2777",
+        "gradientFrom": "#FF3D40",
+        "gradientVia": "#FF45AC",
+        "gradientTo": "#FF4579",
         "opacity": 0.9,
         "textColor": "#ffe8eb"
       },
