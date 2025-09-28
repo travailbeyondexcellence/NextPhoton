@@ -49,33 +49,33 @@ export function LogoComponent({
       textColor: '#ffffff'
     };
     
-    // Get theme from themes.json
-    const theme = (themes as any).themes[currentTheme];
-    
-    // Only certain themes have custom logo colors
-    if (theme?.logo?.logoOnSidebarHeader) {
-      const customColors = theme.logo.logoOnSidebarHeader;
-      return {
-        gradientStart: customColors.gradientStart || defaultColors.gradientStart,
-        gradientMid1: customColors.gradientMid1 || defaultColors.gradientMid1,
-        gradientMid2: customColors.gradientMid2 || defaultColors.gradientMid2,
-        gradientMid3: customColors.gradientMid3 || defaultColors.gradientMid3,
-        gradientMid4: customColors.gradientMid4 || defaultColors.gradientMid4,
-        gradientMid5: customColors.gradientMid5 || defaultColors.gradientMid5,
-        gradientBlue: customColors.gradientBlue || defaultColors.gradientBlue,
-        gradientTeal1: customColors.gradientTeal1 || defaultColors.gradientTeal1,
-        gradientTeal2: customColors.gradientTeal2 || defaultColors.gradientTeal2,
-        gradientEnd: customColors.gradientEnd || defaultColors.gradientEnd,
-        ringColor1: customColors.ringColor1 || defaultColors.ringColor1,
-        ringColor2: customColors.ringColor2 || defaultColors.ringColor2,
-        ringColor3: customColors.ringColor3 || defaultColors.ringColor3,
-        ringColor4: customColors.ringColor4 || defaultColors.ringColor4,
-        detailColor: customColors.detailColor || defaultColors.detailColor,
-        detailColor2: customColors.detailColor2 || defaultColors.detailColor2,
-        detailColor3: customColors.detailColor3 || defaultColors.detailColor3,
-        textColor: customColors.textColor || defaultColors.textColor
-      };
-    }
+    // COMMENTED OUT: Theme-aware logo colors - always use default earth colors
+    // const theme = (themes as any).themes[currentTheme];
+    // 
+    // // Only certain themes have custom logo colors
+    // if (theme?.logo?.logoOnSidebarHeader) {
+    //   const customColors = theme.logo.logoOnSidebarHeader;
+    //   return {
+    //     gradientStart: customColors.gradientStart || defaultColors.gradientStart,
+    //     gradientMid1: customColors.gradientMid1 || defaultColors.gradientMid1,
+    //     gradientMid2: customColors.gradientMid2 || defaultColors.gradientMid2,
+    //     gradientMid3: customColors.gradientMid3 || defaultColors.gradientMid3,
+    //     gradientMid4: customColors.gradientMid4 || defaultColors.gradientMid4,
+    //     gradientMid5: customColors.gradientMid5 || defaultColors.gradientMid5,
+    //     gradientBlue: customColors.gradientBlue || defaultColors.gradientBlue,
+    //     gradientTeal1: customColors.gradientTeal1 || defaultColors.gradientTeal1,
+    //     gradientTeal2: customColors.gradientTeal2 || defaultColors.gradientTeal2,
+    //     gradientEnd: customColors.gradientEnd || defaultColors.gradientEnd,
+    //     ringColor1: customColors.ringColor1 || defaultColors.ringColor1,
+    //     ringColor2: customColors.ringColor2 || defaultColors.ringColor2,
+    //     ringColor3: customColors.ringColor3 || defaultColors.ringColor3,
+    //     ringColor4: customColors.ringColor4 || defaultColors.ringColor4,
+    //     detailColor: customColors.detailColor || defaultColors.detailColor,
+    //     detailColor2: customColors.detailColor2 || defaultColors.detailColor2,
+    //     detailColor3: customColors.detailColor3 || defaultColors.detailColor3,
+    //     textColor: customColors.textColor || defaultColors.textColor
+    //   };
+    // }
     
     return defaultColors;
   }, [currentTheme]);
