@@ -16,6 +16,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { authService, type User, type LoginCredentials, type RegisterData } from '@/lib/auth-service';
+import { useLoading } from '@/contexts/LoadingContext';
 
 interface AuthContextType {
   user: User | null;
@@ -40,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const { withLoading } = useLoading();
 
   /**
    * Initialize auth state on mount
@@ -100,72 +102,78 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    * Login function
    */
   const login = useCallback(async (credentials: LoginCredentials) => {
-    try {
-      const response = await authService.login(credentials);
-      setUser(response.user);
-      
-      // Redirect based on role
-      const primaryRole = response.user.roles[0];
-      const roleRedirectMap: Record<string, string> = {
-        admin: '/admin',
-        educator: '/educator',
-        learner: '/learner',
-        guardian: '/guardian',
-        ecm: '/ecm',
-        employee: '/employee',
-        intern: '/intern',
-      };
-      
-      const redirectPath = roleRedirectMap[primaryRole] || '/dashboard';
-      router.push(redirectPath);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
-  }, [router]);
+    return withLoading(async () => {
+      try {
+        const response = await authService.login(credentials);
+        setUser(response.user);
+
+        // Redirect based on role
+        const primaryRole = response.user.roles[0];
+        const roleRedirectMap: Record<string, string> = {
+          admin: '/admin',
+          educator: '/educator',
+          learner: '/learner',
+          guardian: '/guardian',
+          ecm: '/ecm',
+          employee: '/employee',
+          intern: '/intern',
+        };
+
+        const redirectPath = roleRedirectMap[primaryRole] || '/dashboard';
+        router.push(redirectPath);
+      } catch (error) {
+        console.error('Login failed:', error);
+        throw error;
+      }
+    }, 'auth-login', 'Signing in...');
+  }, [router, withLoading]);
 
   /**
    * Register function
    */
   const register = useCallback(async (data: RegisterData) => {
-    try {
-      const response = await authService.register(data);
-      setUser(response.user);
-      
-      // Redirect to role-specific dashboard after registration
-      const roleRedirectMap: Record<string, string> = {
-        admin: '/admin',
-        educator: '/educator',
-        learner: '/learner',
-        guardian: '/guardian',
-        ecm: '/ecm',
-        employee: '/employee',
-        intern: '/intern',
-      };
-      
-      const redirectPath = roleRedirectMap[data.role] || '/dashboard';
-      router.push(redirectPath);
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
-    }
-  }, [router]);
+    return withLoading(async () => {
+      try {
+        const response = await authService.register(data);
+        setUser(response.user);
+
+        // Redirect to role-specific dashboard after registration
+        const roleRedirectMap: Record<string, string> = {
+          admin: '/admin',
+          educator: '/educator',
+          learner: '/learner',
+          guardian: '/guardian',
+          ecm: '/ecm',
+          employee: '/employee',
+          intern: '/intern',
+        };
+
+        const redirectPath = roleRedirectMap[data.role] || '/dashboard';
+        router.push(redirectPath);
+      } catch (error) {
+        console.error('Registration failed:', error);
+        throw error;
+      }
+    }, 'auth-register', 'Creating your account...');
+  }, [router, withLoading]);
 
   /**
    * Logout function
    */
   const logout = useCallback(async () => {
-    try {
-      await authService.logout();
-      setUser(null);
-      router.push('/sign-in');
-    } catch (error) {
-      console.error('Logout failed:', error);
-      // Even if logout fails, clear local state
-      setUser(null);
-      router.push('/sign-in');
-    }
-  }, [router]);
+    return withLoading(async () => {
+      try {
+        await authService.logout();
+        setUser(null);
+        router.push('/sign-in');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // Even if logout fails, clear local state
+        setUser(null);
+        router.push('/sign-in');
+      }
+    }, 'auth-logout', 'Signing out...');
+  }, [router, withLoading]);
 
   /**
    * Refresh user profile
