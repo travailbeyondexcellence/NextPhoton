@@ -129,9 +129,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#00C9FF",
-        "backgroundGradientVia": "#92FE9D",
-        "backgroundGradientTo": "#92FE9D",
+        "backgroundGradientFrom": "#11998e",
+        "backgroundGradientVia": "#38ef7d",
+        "backgroundGradientTo": "#11998e",
         "backgroundGradientOpacity": 0.69,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
@@ -153,9 +153,9 @@
         "backgroundOverlay": 0.0
       },
       "sidebar": {
-        "gradientFrom": "#00bf8f",
+        "gradientFrom": "#001510",
         "gradientVia": "#001510",
-        "gradientTo": "#001510",
+        "gradientTo": "#00bf8f",
         "opacity": 0.9,
         "textColor": "#e6ffe8"
       },
