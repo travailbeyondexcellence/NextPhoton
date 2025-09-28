@@ -70,7 +70,8 @@
         "gradientOverlayTo": "#0052FF",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(30, 58, 95, 0.3)",
-        "glassTextColor": "#ffffff"
+        "glassTextColor": "#ffffff",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#2D37FF",
@@ -136,7 +137,8 @@
         "gradientOverlayTo": "#059669",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(5, 150, 105, 0.05)",
-        "glassTextColor": "#e6ffe8"
+        "glassTextColor": "#e6ffe8",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#022119",
@@ -202,7 +204,8 @@
         "gradientOverlayTo": "#10b981",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(16, 185, 129, 0.08)",
-        "glassTextColor": "#a7f3d0"
+        "glassTextColor": "#a7f3d0",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#000000",
@@ -268,7 +271,8 @@
         "gradientOverlayTo": "#6366f1",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(139, 92, 246, 0.1)",
-        "glassTextColor": "#e2e8f0"
+        "glassTextColor": "#e2e8f0",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#06030c",
@@ -334,7 +338,8 @@
         "gradientOverlayTo": "#3b82f6",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(59, 130, 246, 0.08)",
-        "glassTextColor": "#cbd5e1"
+        "glassTextColor": "#cbd5e1",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#060810",
@@ -400,7 +405,8 @@
         "gradientOverlayTo": "#14b8a6",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(20, 184, 166, 0.06)",
-        "glassTextColor": "#ccfbf1"
+        "glassTextColor": "#ccfbf1",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#052b34",
@@ -466,7 +472,8 @@
         "gradientOverlayTo": "#facc15",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 149, 0, 0.1)",
-        "glassTextColor": "#ffe4b5"
+        "glassTextColor": "#ffe4b5",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#FFD700",
@@ -554,7 +561,8 @@
         "gradientOverlayTo": "#FF1493",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 20, 147, 0.08)",
-        "glassTextColor": "#fce7f3"
+        "glassTextColor": "#fce7f3",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#E8368B",
@@ -642,7 +650,8 @@
         "gradientOverlayTo": "#F92A53",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 255, 255, 0.15)",
-        "glassTextColor": "#5d1428"
+        "glassTextColor": "#5d1428",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#be123c",
@@ -730,7 +739,8 @@
         "gradientOverlayTo": "#1a1a1a",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 255, 255, 0.02)",
-        "glassTextColor": "#d4d4d4"
+        "glassTextColor": "#d4d4d4",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#3B3B3B",
@@ -796,7 +806,8 @@
         "gradientOverlayTo": "#5d4037",
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(62, 39, 35, 0.4)",
-        "glassTextColor": "#ffffff"
+        "glassTextColor": "#ffffff",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#6b5147",
@@ -884,7 +895,8 @@
         "gradientOverlayTo": "#000000",
         "gradientOverlayToOpacity": 0.02,
         "glassTint": "rgba(0, 0, 0, 0.8)",
-        "glassTextColor": "#ffffff"
+        "glassTextColor": "#ffffff",
+        "mainSectionBackgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#898989",

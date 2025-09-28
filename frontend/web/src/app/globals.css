@@ -350,36 +350,45 @@
   display: none !important;
 }
 
-/* SimpleBar scrollbar theme override */
+/* SimpleBar scrollbar - INVISIBLE but functional */
+.simplebar-scrollbar {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+}
+
 .simplebar-scrollbar::before {
-  background: rgb(var(--accent)) !important;
-  opacity: 1 !important;
-  border-radius: 3px !important;
-  transition: background 0.2s ease !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  width: 0 !important;
 }
 
 .simplebar-scrollbar.simplebar-visible:before {
-  opacity: 1 !important;
+  opacity: 0 !important;
 }
 
 .simplebar-scrollbar:hover::before {
-  background: rgb(var(--secondary)) !important;
+  background: transparent !important;
+  opacity: 0 !important;
 }
 
 .simplebar-track {
   background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
 }
 
 .simplebar-track.simplebar-vertical {
-  width: 6px !important;
-  right: 2px !important;
+  width: 0 !important;
+  right: 0 !important;
 }
 
 .simplebar-track.simplebar-horizontal {
-  height: 6px !important;
+  height: 0 !important;
 }
 
-/* Force SimpleBar to respect theme colors */
+/* Force SimpleBar to respect invisible scrollbar */
 .simplebar-content-wrapper::-webkit-scrollbar,
 .simplebar-hide-scrollbar::-webkit-scrollbar {
   display: none !important;
@@ -388,6 +397,16 @@
 /* SimpleBar placeholder element */
 .simplebar-placeholder {
   max-width: 100% !important;
+}
+
+/* Ensure scrolling still works but scrollbar is invisible */
+.simplebar-content-wrapper {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.simplebar-content-wrapper::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
 }
 
 /* Sidebar styles */
