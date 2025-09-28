@@ -26,18 +26,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const { open } = useSidebar();
 
   return (
-    <div className="flex w-screen h-screen overflow-hidden relative">
-      {/* Background gradient layer */}
-      <div
-        className="fixed inset-0 z-0"
-        style={{
-          background: `linear-gradient(to bottom right,
-            rgb(var(--gradient-from)),
-            rgb(var(--gradient-via)),
-            rgb(var(--gradient-to)))`
-        }}
-      />
-
+    <div className="flex w-screen h-screen overflow-hidden">
       {/* Sidebar with glass effect */}
       <aside
         className={`
@@ -61,7 +50,7 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
       <div
         className={`
           w-screen flex flex-col min-h-screen
-          transition-all duration-300 bg-transparent
+          transition-all duration-300
           ${open ? "ml-72" : "ml-0"}
         `}
       >
