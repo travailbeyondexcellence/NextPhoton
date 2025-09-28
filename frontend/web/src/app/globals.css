@@ -134,8 +134,67 @@
       rgb(var(--gradient-from)),
       rgb(var(--gradient-via)),
       rgb(var(--gradient-to)));
-    opacity: 1;
-    z-index: -2;
+    opacity: 0.75;
+    z-index: -1;
+  }
+  
+  /* Main section background overlay for darkening effect */
+  .main-section-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000000;
+    opacity: var(--main-section-background-overlay, 0);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  /* Theme selector background overlay with gradient */
+  .theme-selector-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgb(var(--theme-selector-overlay-gradient-from, 0 0 0)) 0%, 
+      rgb(var(--theme-selector-overlay-gradient-via, 0 0 0)) 50%, 
+      rgb(var(--theme-selector-overlay-gradient-to, 0 0 0)) 100%);
+    opacity: var(--theme-selector-background-overlay, 0);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  /* Hide scrollbar for theme selector while maintaining scroll functionality */
+  .theme-selector-scrollable {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  .theme-selector-scrollable::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
+  
+  /* More aggressive scrollbar hiding for theme selector */
+  .theme-selector-no-scrollbar {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar {
+    display: none !important; /* WebKit */
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar-track {
+    display: none !important;
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar-thumb {
+    display: none !important;
   }
   
   ::selection {
@@ -368,36 +427,45 @@
   display: none !important;
 }
 
-/* SimpleBar scrollbar theme override */
+/* SimpleBar scrollbar - INVISIBLE but functional */
+.simplebar-scrollbar {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+}
+
 .simplebar-scrollbar::before {
-  background: rgb(var(--accent)) !important;
-  opacity: 1 !important;
-  border-radius: 3px !important;
-  transition: background 0.2s ease !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  width: 0 !important;
 }
 
 .simplebar-scrollbar.simplebar-visible:before {
-  opacity: 1 !important;
+  opacity: 0 !important;
 }
 
 .simplebar-scrollbar:hover::before {
-  background: rgb(var(--secondary)) !important;
+  background: transparent !important;
+  opacity: 0 !important;
 }
 
 .simplebar-track {
   background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
 }
 
 .simplebar-track.simplebar-vertical {
-  width: 6px !important;
-  right: 2px !important;
+  width: 0 !important;
+  right: 0 !important;
 }
 
 .simplebar-track.simplebar-horizontal {
-  height: 6px !important;
+  height: 0 !important;
 }
 
-/* Force SimpleBar to respect theme colors */
+/* Force SimpleBar to respect invisible scrollbar */
 .simplebar-content-wrapper::-webkit-scrollbar,
 .simplebar-hide-scrollbar::-webkit-scrollbar {
   display: none !important;
@@ -406,6 +474,16 @@
 /* SimpleBar placeholder element */
 .simplebar-placeholder {
   max-width: 100% !important;
+}
+
+/* Ensure scrolling still works but scrollbar is invisible */
+.simplebar-content-wrapper {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.simplebar-content-wrapper::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
 }
 
 /* Sidebar styles */

@@ -48,7 +48,10 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
         style={{
-          background: `linear-gradient(135deg, rgb(var(--sidebar-gradient-from)) 0%, rgb(var(--sidebar-gradient-via)) 50%, rgb(var(--sidebar-gradient-to)) 100%)`
+          background: `linear-gradient(135deg, 
+            rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
+            rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
+            rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%)`
         }}
       >
         <DashboardSidebar />
@@ -63,9 +66,11 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         `}
       >
         <DashboardNavbar />
-        <main className="flex-1 p-6 overflow-auto relative z-10 bg-transparent">
+        <main className="flex-1 p-6 overflow-auto relative z-10">
+          {/* Main section background overlay for theme-based darkening */}
+          <div className="main-section-overlay"></div>
           {/* Glass panel wrapper for content */}
-          <div className="relative bg-transparent">
+          <div className="relative z-10">
             {children}
           </div>
         </main>
