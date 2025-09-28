@@ -185,9 +185,20 @@ export function applyTheme(themeKey: ThemeKey): void {
       root.style.setProperty('--main-section-background-overlay', theme.glass.mainSectionBackgroundOverlay.toString());
     }
     
-    // Apply theme selector background overlay
-    if (theme.glass.themeSelectorBackgroundOverlay !== undefined) {
-      root.style.setProperty('--theme-selector-background-overlay', theme.glass.themeSelectorBackgroundOverlay.toString());
+    // Apply theme selector properties
+    if (theme.themeSelector) {
+      if (theme.themeSelector.backgroundOverlayGradientFrom) {
+        root.style.setProperty('--theme-selector-overlay-gradient-from', hexToRgb(theme.themeSelector.backgroundOverlayGradientFrom));
+      }
+      if (theme.themeSelector.backgroundOverlayGradientVia) {
+        root.style.setProperty('--theme-selector-overlay-gradient-via', hexToRgb(theme.themeSelector.backgroundOverlayGradientVia));
+      }
+      if (theme.themeSelector.backgroundOverlayGradientTo) {
+        root.style.setProperty('--theme-selector-overlay-gradient-to', hexToRgb(theme.themeSelector.backgroundOverlayGradientTo));
+      }
+      if (theme.themeSelector.backgroundOverlay !== undefined) {
+        root.style.setProperty('--theme-selector-background-overlay', theme.themeSelector.backgroundOverlay.toString());
+      }
     }
   }
   

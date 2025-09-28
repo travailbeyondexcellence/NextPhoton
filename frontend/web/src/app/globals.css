@@ -133,14 +133,17 @@
     pointer-events: none;
   }
   
-  /* Theme selector background overlay for darkening effect */
+  /* Theme selector background overlay with gradient */
   .theme-selector-overlay {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000000;
+    background: linear-gradient(135deg, 
+      rgb(var(--theme-selector-overlay-gradient-from, 0 0 0)) 0%, 
+      rgb(var(--theme-selector-overlay-gradient-via, 0 0 0)) 50%, 
+      rgb(var(--theme-selector-overlay-gradient-to, 0 0 0)) 100%);
     opacity: var(--theme-selector-background-overlay, 0);
     z-index: 1;
     pointer-events: none;

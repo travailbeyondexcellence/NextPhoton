@@ -71,8 +71,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(30, 58, 95, 0.3)",
         "glassTextColor": "#ffffff",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#0153FF",
+        "backgroundOverlayGradientVia": "#0191FF",
+        "backgroundOverlayGradientTo": "#01CFFF",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#2D37FF",
@@ -139,8 +144,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(5, 150, 105, 0.05)",
         "glassTextColor": "#e6ffe8",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#5FC05D",
+        "backgroundOverlayGradientVia": "#30D197",
+        "backgroundOverlayGradientTo": "#01E1D8",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#022119",
@@ -207,8 +217,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(16, 185, 129, 0.08)",
         "glassTextColor": "#a7f3d0",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#000000",
+        "backgroundOverlayGradientVia": "#064e3b",
+        "backgroundOverlayGradientTo": "#052e16",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#000000",
@@ -275,8 +290,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(139, 92, 246, 0.1)",
         "glassTextColor": "#e2e8f0",
-        "mainSectionBackgroundOverlay": 0.36,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.36
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#AF01FF",
+        "backgroundOverlayGradientVia": "#8234FF",
+        "backgroundOverlayGradientTo": "#5967FF",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#06030c",
@@ -343,8 +363,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(59, 130, 246, 0.08)",
         "glassTextColor": "#cbd5e1",
-        "mainSectionBackgroundOverlay": 0.36,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.36
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#01CDFF",
+        "backgroundOverlayGradientVia": "#0970FF",
+        "backgroundOverlayGradientTo": "#010CFF",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#060810",
@@ -411,8 +436,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(20, 184, 166, 0.06)",
         "glassTextColor": "#ccfbf1",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#0e7490",
+        "backgroundOverlayGradientVia": "#0d9488",
+        "backgroundOverlayGradientTo": "#1e3a8a",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#052b34",
@@ -479,8 +509,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 149, 0, 0.1)",
         "glassTextColor": "#ffe4b5",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#FFC769",
+        "backgroundOverlayGradientVia": "#FFE195",
+        "backgroundOverlayGradientTo": "#FFFCC1",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#FFCC01",
@@ -569,8 +604,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 20, 147, 0.08)",
         "glassTextColor": "#fce7f3",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.36
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#FF8AC9",
+        "backgroundOverlayGradientVia": "#FFADFD",
+        "backgroundOverlayGradientTo": "#FF8ACB",
+        "backgroundOverlay": 0.36
       },
       "sidebar": {
         "gradientFrom": "#E8368B",
@@ -659,8 +699,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 255, 255, 0.15)",
         "glassTextColor": "#5d1428",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#FF3D40",
+        "backgroundOverlayGradientVia": "#FF4579",
+        "backgroundOverlayGradientTo": "#FF4579",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#FF3D40",
@@ -749,8 +794,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(255, 255, 255, 0.02)",
         "glassTextColor": "#d4d4d4",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#6E6F73",
+        "backgroundOverlayGradientVia": "#3A3A3D",
+        "backgroundOverlayGradientTo": "#060606",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#3B3B3B",
@@ -817,8 +867,13 @@
         "gradientOverlayToOpacity": 0.05,
         "glassTint": "rgba(62, 39, 35, 0.4)",
         "glassTextColor": "#ffffff",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#a18f78",
+        "backgroundOverlayGradientVia": "#f5e6d3",
+        "backgroundOverlayGradientTo": "#e8d5c4",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#6b5147",
@@ -907,8 +962,13 @@
         "gradientOverlayToOpacity": 0.02,
         "glassTint": "rgba(0, 0, 0, 0.8)",
         "glassTextColor": "#ffffff",
-        "mainSectionBackgroundOverlay": 0.0,
-        "themeSelectorBackgroundOverlay": 0.0
+        "mainSectionBackgroundOverlay": 0.0
+      },
+      "themeSelector": {
+        "backgroundOverlayGradientFrom": "#FFFFFF",
+        "backgroundOverlayGradientVia": "#B5B5B5",
+        "backgroundOverlayGradientTo": "#6B6B6B",
+        "backgroundOverlay": 0.0
       },
       "sidebar": {
         "gradientFrom": "#898989",
