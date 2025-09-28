@@ -65,6 +65,71 @@ export default function ThemeScript() {
                       'xl': '24px'
                     };
                     root.style.setProperty('--glass-blur', blurMap[theme.glass.blurIntensity] || '12px');
+                    
+                    // Apply background gradient colors from themes.json
+                    if (theme.glass.backgroundGradientFrom) {
+                      const hexValue = theme.glass.backgroundGradientFrom.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--gradient-from', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.glass.backgroundGradientVia) {
+                      const hexValue = theme.glass.backgroundGradientVia.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--gradient-via', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.glass.backgroundGradientTo) {
+                      const hexValue = theme.glass.backgroundGradientTo.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--gradient-to', r + ' ' + g + ' ' + b);
+                    }
+                  }
+                  
+                  // Apply sidebar colors and gradients
+                  if (theme.sidebar) {
+                    if (theme.sidebar.gradientFrom) {
+                      const hexValue = theme.sidebar.gradientFrom.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--sidebar-gradient-from', r + ' ' + g + ' ' + b);
+                      root.style.setProperty('--sidebar-background', r + ' ' + g + ' ' + b);
+                      root.style.setProperty('--sidebar-accent', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.sidebar.gradientVia) {
+                      const hexValue = theme.sidebar.gradientVia.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--sidebar-gradient-via', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.sidebar.gradientTo) {
+                      const hexValue = theme.sidebar.gradientTo.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--sidebar-gradient-to', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.sidebar.opacity !== undefined) {
+                      root.style.setProperty('--sidebar-gradient-opacity', theme.sidebar.opacity.toString());
+                    }
+                    if (theme.sidebar.textColor) {
+                      root.style.setProperty('--sidebar-text-color', theme.sidebar.textColor);
+                      
+                      // Also set Tailwind sidebar CSS variables for consistency
+                      const textHexValue = theme.sidebar.textColor.replace('#', '');
+                      const textR = parseInt(textHexValue.substring(0, 2), 16);
+                      const textG = parseInt(textHexValue.substring(2, 4), 16);
+                      const textB = parseInt(textHexValue.substring(4, 6), 16);
+                      root.style.setProperty('--sidebar-foreground', textR + ' ' + textG + ' ' + textB);
+                      root.style.setProperty('--sidebar-primary', textR + ' ' + textG + ' ' + textB);
+                      root.style.setProperty('--sidebar-accent-foreground', textR + ' ' + textG + ' ' + textB);
+                    }
                   }
                 }
               })

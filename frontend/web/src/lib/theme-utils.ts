@@ -132,6 +132,19 @@ export function applyTheme(themeKey: ThemeKey): void {
       }
       if (theme.sidebar.textColor) {
         root.style.setProperty('--sidebar-text-color', theme.sidebar.textColor);
+        
+        // Also set Tailwind sidebar CSS variables for consistency
+        root.style.setProperty('--sidebar-foreground', hexToRgb(theme.sidebar.textColor));
+        root.style.setProperty('--sidebar-primary', hexToRgb(theme.sidebar.textColor));
+        root.style.setProperty('--sidebar-accent-foreground', hexToRgb(theme.sidebar.textColor));
+      }
+      
+      // Set sidebar background from gradient colors for Tailwind variables
+      if (theme.sidebar.gradientFrom) {
+        root.style.setProperty('--sidebar-background', hexToRgb(theme.sidebar.gradientFrom));
+        root.style.setProperty('--sidebar-accent', hexToRgb(theme.sidebar.gradientFrom));
+        root.style.setProperty('--sidebar-border', hexToRgb(theme.sidebar.gradientFrom));
+        root.style.setProperty('--sidebar-ring', hexToRgb(theme.sidebar.gradientFrom));
       }
     }
     

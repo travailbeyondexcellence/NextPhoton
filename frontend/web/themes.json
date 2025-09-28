@@ -73,16 +73,16 @@
         "glassTextColor": "#ffffff"
       },
       "sidebar": {
-        "gradientFrom": "#007bff",
+        "gradientFrom": "#004a99",
         "gradientVia": "#9acafe",
-        "gradientTo": "#007bff",
+        "gradientTo": "#004a99",
         "opacity": 1.0,
         "textColor": "#ffffff"
       },
       "dashboardHeader": {
-        "gradientFrom": "#007bff",
+        "gradientFrom": "#004a99",
         "gradientVia": "#9acafe",
-        "gradientTo": "#007bff",
+        "gradientTo": "#004a99",
         "opacity": 1.0,
         "textColor": "#ffffff"
       },
@@ -473,7 +473,7 @@
         "gradientVia": "#FFA500",
         "gradientTo": "#FFED4E",
         "opacity": 0.8,
-        "textColor": "#ffe4b5"
+        "textColor": "#3e2723"
       },
       "dashboardHeader": {
         "gradientFrom": "#990000",
