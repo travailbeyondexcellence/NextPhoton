@@ -131,6 +131,37 @@ export default function ThemeScript() {
                       root.style.setProperty('--sidebar-accent-foreground', textR + ' ' + textG + ' ' + textB);
                     }
                   }
+                  
+                  // Apply dashboard header colors and gradients
+                  if (theme.dashboardHeader) {
+                    if (theme.dashboardHeader.gradientFrom) {
+                      const hexValue = theme.dashboardHeader.gradientFrom.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--dashboard-header-gradient-from', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.dashboardHeader.gradientVia) {
+                      const hexValue = theme.dashboardHeader.gradientVia.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--dashboard-header-gradient-via', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.dashboardHeader.gradientTo) {
+                      const hexValue = theme.dashboardHeader.gradientTo.replace('#', '');
+                      const r = parseInt(hexValue.substring(0, 2), 16);
+                      const g = parseInt(hexValue.substring(2, 4), 16);
+                      const b = parseInt(hexValue.substring(4, 6), 16);
+                      root.style.setProperty('--dashboard-header-gradient-to', r + ' ' + g + ' ' + b);
+                    }
+                    if (theme.dashboardHeader.opacity !== undefined) {
+                      root.style.setProperty('--dashboard-header-gradient-opacity', theme.dashboardHeader.opacity.toString());
+                    }
+                    if (theme.dashboardHeader.textColor) {
+                      root.style.setProperty('--dashboard-header-text-color', theme.dashboardHeader.textColor);
+                    }
+                  }
                 }
               })
               .catch(() => {
