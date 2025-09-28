@@ -6,6 +6,8 @@ interface LogoComponentProps {
   width?: number;
   height?: number;
   className?: string;
+  showText?: boolean;
+  textClassName?: string;
 }
 
 /**
@@ -15,7 +17,9 @@ interface LogoComponentProps {
 export function LogoComponent({ 
   width = 48, 
   height = 48, 
-  className = "" 
+  className = "",
+  showText = false,
+  textClassName = ""
 }: LogoComponentProps) {
   const [useFallback, setUseFallback] = useState(false);
 
@@ -27,34 +31,28 @@ export function LogoComponent({
   // SVG logo implementation
   return (
     <div 
-      className={`flex items-center justify-center ${className}`}
-      style={{ width, height }}
+      className={`flex items-center gap-3 ${className}`}
     >
-      <svg 
-        viewBox="0 0 889.54 859.21" 
-        xmlns="http://www.w3.org/2000/svg" 
-        width={width}
-        height={height}
-        className="object-contain"
-        onError={() => {
-          console.warn("Logo SVG failed to render, using text fallback");
-          setUseFallback(true);
-        }}
-      >
+      <div style={{ width, height }}>
+        <svg 
+          viewBox="0 0 889.54 859.21" 
+          xmlns="http://www.w3.org/2000/svg" 
+          width={width}
+          height={height}
+          className="object-contain"
+          onError={() => {
+            console.warn("Logo SVG failed to render, using text fallback");
+            setUseFallback(true);
+          }}
+        >
         <defs>
           <linearGradient gradientUnits="userSpaceOnUse" y2="72.95" x2="445.93" y1="759.32" x1="445.93" id="logo-gradient">
-            <stop stopColor="#140d39" offset="0"/>
-            <stop stopColor="#15103c" offset=".1"/>
-            <stop stopColor="#191b46" offset=".19"/>
-            <stop stopColor="#1e2c56" offset=".28"/>
-            <stop stopColor="#26456d" offset=".36"/>
-            <stop stopColor="#31658a" offset=".43"/>
-            <stop stopColor="#3d8cae" offset=".51"/>
-            <stop stopColor="#4cbad8" offset=".58"/>
-            <stop stopColor="#51c8e5" offset=".6"/>
-            <stop stopColor="#136935" offset="1"/>
+            <stop stopColor="var(--logo-svg-primary-color, #140d39)" offset="0"/>
+            <stop stopColor="var(--logo-svg-secondary-color, #15103c)" offset=".3"/>
+            <stop stopColor="var(--logo-svg-accent-color, #3d8cae)" offset=".7"/>
+            <stop stopColor="var(--logo-svg-primary-color, #136935)" offset="1"/>
           </linearGradient>
-          <style>{`.cls-4{fill:#3d68b1}.cls-8{fill:#1f1f1f}.cls-10{fill:#414141}.cls-17{fill:#070707}`}</style>
+          <style>{`.cls-4{fill:var(--logo-svg-secondary-color, #3d68b1)}.cls-8{fill:var(--logo-svg-primary-color, #1f1f1f)}.cls-10{fill:var(--logo-svg-accent-color, #414141)}.cls-17{fill:var(--logo-svg-primary-color, #070707)}`}</style>
         </defs>
         <ellipse ry="343.18" rx="342.81" cy="416.14" cx="445.93" style={{ fill: "url(#logo-gradient)" }}/>
         <path transform="translate(-83.43 -133.68)" d="M528.54 992.87a444.73 444.73 0 0 1-438-365.15 431.6 431.6 0 0 1-7.09-76.61c0-3.39.41-6.45 3.62-8.34 4.85-2.84 9.94 1.06 10 7.94a416 416 0 0 0 3.09 49.16c12.44 100 54.38 185.67 126.17 256.11 74.2 72.8 163.64 113.88 267.39 122.33C706.15 995.6 898.89 855.16 948.27 647.6a412.5 412.5 0 0 0 11.47-95.39c0-1.13 0-2.26.06-3.4.11-4.47 1.61-8 6.75-7.94s6.45 3.6 6.45 8.13a439.5 439.5 0 0 1-15.23 115.34c-45.4 167.87-183.42 293.17-355.36 322.54a412.6 412.6 0 0 1-73.87 5.99" style={{ fill: "#273b88" }}/>
@@ -86,7 +84,18 @@ export function LogoComponent({
         <path transform="translate(-83.43 -133.68)" d="M528.8 268.65c-2.78-.12-5.57-.18-8.15-1.43-4.54-2.19-4.74-3.76-1-7.63 6.33-.52 11.75 3.65 18 3.52-.25 6.56-1.44 7.3-8.85 5.54" style={{ fill: "#151515" }}/>
         <path transform="translate(-83.43 -133.68)" d="M609.22 602.86c.16-2.64.33-5.76 3.69-6s3.2 3.14 3.64 5.38c.61 3.13-1.42 4.54-4.13 4.82-3.02.33-3.04-2.06-3.2-4.2" style={{ fill: "#080808" }}/>
         <path transform="translate(-83.43 -133.68)" d="M300.13 412c0 4 .14 7.88-3.57 10.28a2.57 2.57 0 0 1-3.57-.54c-2.66-3.53-1.33-7.15.25-10.58 1.12-2.46 2.07-6.42 5.14-5.82s.32 4.72 1.75 6.66" style={{ fill: "#161616" }}/>
-      </svg>
+        </svg>
+      </div>
+      
+      {/* NextPhoton Text */}
+      {showText && (
+        <span 
+          className={`font-semibold text-lg tracking-wide ${textClassName}`}
+          style={{ color: 'var(--logo-text-color, #ffffff)' }}
+        >
+          NextPhoton
+        </span>
+      )}
     </div>
   );
 }

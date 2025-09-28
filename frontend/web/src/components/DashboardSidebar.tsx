@@ -80,11 +80,13 @@ export function DashboardSidebar() {
         <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-white/5 backdrop-blur-sm border-b border-white/10">
           <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer group transition-all duration-300 ease-out hover:scale-105" onClick={() => router.push("/")}>
             <div className="transition-all duration-300 ease-out group-hover:rotate-3 group-hover:drop-shadow-lg">
-              <LogoComponent width={48} height={48} />
+              <LogoComponent 
+                width={48} 
+                height={48} 
+                showText={true}
+                textClassName="text-lg font-bold hover:cursor-pointer transition-all duration-300 ease-out group-hover:drop-shadow-sm"
+              />
             </div>
-            <h2 className="text-lg font-bold hover:cursor-pointer text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-500 transition-all duration-300 ease-out group-hover:from-teal-400 group-hover:to-blue-400 group-hover:drop-shadow-sm">
-              NextPhoton
-            </h2>
           </span>
         </div>
       </div>

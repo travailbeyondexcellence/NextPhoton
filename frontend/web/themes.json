@@ -86,6 +86,14 @@
         "opacity": 1.0,
         "textColor": "#ffffff"
       },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#ffffff",
+          "svgSecondaryColor": "#87ceeb",
+          "svgAccentColor": "#004a99",
+          "textColor": "#ffffff"
+        }
+      },
       "progressGradient": {
         "from": "#0ea5e9",
         "to": "#0052FF"
@@ -151,6 +159,14 @@
         "gradientTo": "#065449",
         "opacity": 0.85,
         "textColor": "#e6ffe8"
+      },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#e6ffe8",
+          "svgSecondaryColor": "#34d399",
+          "svgAccentColor": "#059669",
+          "textColor": "#e6ffe8"
+        }
       },
       "progressGradient": {
         "from": "#10b981",
@@ -218,6 +234,14 @@
         "opacity": 0.9,
         "textColor": "#a7f3d0"
       },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#a7f3d0",
+          "svgSecondaryColor": "#6ee7b7",
+          "svgAccentColor": "#10b981",
+          "textColor": "#a7f3d0"
+        }
+      },
       "progressGradient": {
         "from": "#34d399",
         "to": "#10b981"
@@ -283,6 +307,14 @@
         "gradientTo": "#181345",
         "opacity": 0.95,
         "textColor": "#e2e8f0"
+      },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#e2e8f0",
+          "svgSecondaryColor": "#8b5cf6",
+          "svgAccentColor": "#6366f1",
+          "textColor": "#e2e8f0"
+        }
       },
       "progressGradient": {
         "from": "#8b5cf6",
@@ -350,6 +382,14 @@
         "opacity": 0.9,
         "textColor": "#cbd5e1"
       },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#cbd5e1",
+          "svgSecondaryColor": "#60a5fa",
+          "svgAccentColor": "#3b82f6",
+          "textColor": "#cbd5e1"
+        }
+      },
       "progressGradient": {
         "from": "#60a5fa",
         "to": "#3b82f6"
@@ -415,6 +455,14 @@
         "gradientTo": "#0f1a42",
         "opacity": 0.8,
         "textColor": "#ccfbf1"
+      },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#ccfbf1",
+          "svgSecondaryColor": "#5eead4",
+          "svgAccentColor": "#14b8a6",
+          "textColor": "#ccfbf1"
+        }
       },
       "progressGradient": {
         "from": "#06b6d4",
@@ -482,6 +530,14 @@
         "opacity": 0.5,
         "textColor": "#3e2723"
       },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#3e2723",
+          "svgSecondaryColor": "#ff9500",
+          "svgAccentColor": "#ffa500",
+          "textColor": "#3e2723"
+        }
+      },
       "progressGradient": {
         "from": "#fde047",
         "to": "#facc15"
@@ -547,6 +603,14 @@
         "gradientTo": "#FF1496",
         "opacity": 0.85,
         "textColor": "#fce7f3"
+      },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#fce7f3",
+          "svgSecondaryColor": "#FF5BFC",
+          "svgAccentColor": "#FF1493",
+          "textColor": "#fce7f3"
+        }
       },
       "progressGradient": {
         "from": "#FF5BFC",
@@ -614,6 +678,14 @@
         "opacity": 0.9,
         "textColor": "#ffe8eb"
       },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#ffe8eb",
+          "svgSecondaryColor": "#FE244F",
+          "svgAccentColor": "#F92A53",
+          "textColor": "#ffe8eb"
+        }
+      },
       "progressGradient": {
         "from": "#FE244F",
         "to": "#F92A53"
@@ -679,6 +751,14 @@
         "gradientTo": "#1f1f1f",
         "opacity": 0.6,
         "textColor": "#d4d4d4"
+      },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#d4d4d4",
+          "svgSecondaryColor": "#f5f5f5",
+          "svgAccentColor": "#525252",
+          "textColor": "#d4d4d4"
+        }
       },
       "progressGradient": {
         "from": "#525252",
@@ -746,6 +826,14 @@
         "opacity": 0.7,
         "textColor": "#ffffff"
       },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#ffffff",
+          "svgSecondaryColor": "#b8a88a",
+          "svgAccentColor": "#8d6e63",
+          "textColor": "#ffffff"
+        }
+      },
       "progressGradient": {
         "from": "#a1887f",
         "to": "#795548"
@@ -811,6 +899,14 @@
         "gradientTo": "#d5d5d5",
         "opacity": 0.4,
         "textColor": "#ffffff"
+      },
+      "logo": {
+        "logoOnSidebarHeader": {
+          "svgPrimaryColor": "#000000",
+          "svgSecondaryColor": "#666666",
+          "svgAccentColor": "#333333",
+          "textColor": "#000000"
+        }
       },
       "progressGradient": {
         "from": "#666666",

@@ -162,6 +162,24 @@ export default function ThemeScript() {
                       root.style.setProperty('--dashboard-header-text-color', theme.dashboardHeader.textColor);
                     }
                   }
+                  
+                  // Apply logo colors for theme-aware logo display
+                  if (theme.logo && theme.logo.logoOnSidebarHeader) {
+                    const logoColors = theme.logo.logoOnSidebarHeader;
+                    
+                    if (logoColors.svgPrimaryColor) {
+                      root.style.setProperty('--logo-svg-primary-color', logoColors.svgPrimaryColor);
+                    }
+                    if (logoColors.svgSecondaryColor) {
+                      root.style.setProperty('--logo-svg-secondary-color', logoColors.svgSecondaryColor);
+                    }
+                    if (logoColors.svgAccentColor) {
+                      root.style.setProperty('--logo-svg-accent-color', logoColors.svgAccentColor);
+                    }
+                    if (logoColors.textColor) {
+                      root.style.setProperty('--logo-text-color', logoColors.textColor);
+                    }
+                  }
                 }
               })
               .catch(() => {
