@@ -116,37 +116,47 @@ export function applyTheme(themeKey: ThemeKey): void {
         theme.glass.gradientOverlayToOpacity?.toString() || '0.05');
     }
     
-    // Apply sidebar gradient colors
-    if (theme.glass.sidebarGradientFrom) {
-      root.style.setProperty('--sidebar-gradient-from', hexToRgb(theme.glass.sidebarGradientFrom));
-    }
-    if (theme.glass.sidebarGradientVia) {
-      root.style.setProperty('--sidebar-gradient-via', hexToRgb(theme.glass.sidebarGradientVia));
-    }
-    if (theme.glass.sidebarGradientTo) {
-      root.style.setProperty('--sidebar-gradient-to', hexToRgb(theme.glass.sidebarGradientTo));
-    }
-    
-    // Apply dashboard header gradient colors
-    if (theme.glass.dashboardHeaderGradientFrom) {
-      root.style.setProperty('--dashboard-header-gradient-from', hexToRgb(theme.glass.dashboardHeaderGradientFrom));
-    }
-    if (theme.glass.dashboardHeaderGradientVia) {
-      root.style.setProperty('--dashboard-header-gradient-via', hexToRgb(theme.glass.dashboardHeaderGradientVia));
-    }
-    if (theme.glass.dashboardHeaderGradientTo) {
-      root.style.setProperty('--dashboard-header-gradient-to', hexToRgb(theme.glass.dashboardHeaderGradientTo));
+    // Apply sidebar colors and gradients
+    if (theme.sidebar) {
+      if (theme.sidebar.gradientFrom) {
+        root.style.setProperty('--sidebar-gradient-from', hexToRgb(theme.sidebar.gradientFrom));
+      }
+      if (theme.sidebar.gradientVia) {
+        root.style.setProperty('--sidebar-gradient-via', hexToRgb(theme.sidebar.gradientVia));
+      }
+      if (theme.sidebar.gradientTo) {
+        root.style.setProperty('--sidebar-gradient-to', hexToRgb(theme.sidebar.gradientTo));
+      }
+      if (theme.sidebar.opacity !== undefined) {
+        root.style.setProperty('--sidebar-gradient-opacity', theme.sidebar.opacity.toString());
+      }
+      if (theme.sidebar.textColor) {
+        root.style.setProperty('--sidebar-text-color', theme.sidebar.textColor);
+      }
     }
     
-    // Apply gradient opacity values
+    // Apply dashboard header colors and gradients
+    if (theme.dashboardHeader) {
+      if (theme.dashboardHeader.gradientFrom) {
+        root.style.setProperty('--dashboard-header-gradient-from', hexToRgb(theme.dashboardHeader.gradientFrom));
+      }
+      if (theme.dashboardHeader.gradientVia) {
+        root.style.setProperty('--dashboard-header-gradient-via', hexToRgb(theme.dashboardHeader.gradientVia));
+      }
+      if (theme.dashboardHeader.gradientTo) {
+        root.style.setProperty('--dashboard-header-gradient-to', hexToRgb(theme.dashboardHeader.gradientTo));
+      }
+      if (theme.dashboardHeader.opacity !== undefined) {
+        root.style.setProperty('--dashboard-header-gradient-opacity', theme.dashboardHeader.opacity.toString());
+      }
+      if (theme.dashboardHeader.textColor) {
+        root.style.setProperty('--dashboard-header-text-color', theme.dashboardHeader.textColor);
+      }
+    }
+    
+    // Apply background gradient opacity
     if (theme.glass.backgroundGradientOpacity !== undefined) {
       root.style.setProperty('--background-gradient-opacity', theme.glass.backgroundGradientOpacity.toString());
-    }
-    if (theme.glass.sidebarGradientOpacity !== undefined) {
-      root.style.setProperty('--sidebar-gradient-opacity', theme.glass.sidebarGradientOpacity.toString());
-    }
-    if (theme.glass.dashboardHeaderGradientOpacity !== undefined) {
-      root.style.setProperty('--dashboard-header-gradient-opacity', theme.glass.dashboardHeaderGradientOpacity.toString());
     }
     
     // Apply glass tint and text color for adaptive glass morphism

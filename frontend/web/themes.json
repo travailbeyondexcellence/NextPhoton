@@ -69,16 +69,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#0052FF",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#004a99",
-        "sidebarGradientVia": "#5c7a97",
-        "sidebarGradientTo": "#004a99",
-        "sidebarGradientOpacity": 1.0,
-        "dashboardHeaderGradientFrom": "#007bff",
-        "dashboardHeaderGradientVia": "#9acafe",
-        "dashboardHeaderGradientTo": "#007bff",
-        "dashboardHeaderGradientOpacity": 1.0,
         "glassTint": "rgba(30, 58, 95, 0.3)",
         "glassTextColor": "#ffffff"
+      },
+      "sidebar": {
+        "gradientFrom": "#004a99",
+        "gradientVia": "#5c7a97",
+        "gradientTo": "#004a99",
+        "opacity": 1.0,
+        "textColor": "#ffffff"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#007bff",
+        "gradientVia": "#9acafe",
+        "gradientTo": "#007bff",
+        "opacity": 1.0,
+        "textColor": "#ffffff"
       },
       "progressGradient": {
         "from": "#0ea5e9",
@@ -129,16 +135,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#059669",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#022119",
-        "sidebarGradientVia": "#013426",
-        "sidebarGradientTo": "#054038",
-        "dashboardHeaderGradientFrom": "#022419",
-        "dashboardHeaderGradientVia": "#02402f",
-        "dashboardHeaderGradientTo": "#065449",
-        "sidebarGradientOpacity": 0.9,
-        "dashboardHeaderGradientOpacity": 0.85,
         "glassTint": "rgba(5, 150, 105, 0.05)",
         "glassTextColor": "#e6ffe8"
+      },
+      "sidebar": {
+        "gradientFrom": "#022119",
+        "gradientVia": "#013426",
+        "gradientTo": "#054038",
+        "opacity": 0.9,
+        "textColor": "#e6ffe8"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#022419",
+        "gradientVia": "#02402f",
+        "gradientTo": "#065449",
+        "opacity": 0.85,
+        "textColor": "#e6ffe8"
       },
       "progressGradient": {
         "from": "#10b981",
@@ -189,16 +201,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#10b981",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#000000",
-        "sidebarGradientVia": "#022119",
-        "sidebarGradientTo": "#011308",
-        "dashboardHeaderGradientFrom": "#000000",
-        "dashboardHeaderGradientVia": "#022419",
-        "dashboardHeaderGradientTo": "#01170a",
-        "sidebarGradientOpacity": 0.95,
-        "dashboardHeaderGradientOpacity": 0.9,
         "glassTint": "rgba(16, 185, 129, 0.08)",
         "glassTextColor": "#a7f3d0"
+      },
+      "sidebar": {
+        "gradientFrom": "#000000",
+        "gradientVia": "#022119",
+        "gradientTo": "#011308",
+        "opacity": 0.95,
+        "textColor": "#a7f3d0"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#000000",
+        "gradientVia": "#022419",
+        "gradientTo": "#01170a",
+        "opacity": 0.9,
+        "textColor": "#a7f3d0"
       },
       "progressGradient": {
         "from": "#34d399",
@@ -249,16 +267,22 @@
         "gradientOverlayFromOpacity": 0.15,
         "gradientOverlayTo": "#6366f1",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#06030c",
-        "sidebarGradientVia": "#100626",
-        "sidebarGradientTo": "#131034",
-        "dashboardHeaderGradientFrom": "#060309",
-        "dashboardHeaderGradientVia": "#14062d",
-        "dashboardHeaderGradientTo": "#181345",
-        "sidebarGradientOpacity": 1.0,
-        "dashboardHeaderGradientOpacity": 0.95,
         "glassTint": "rgba(139, 92, 246, 0.1)",
         "glassTextColor": "#e2e8f0"
+      },
+      "sidebar": {
+        "gradientFrom": "#06030c",
+        "gradientVia": "#100626",
+        "gradientTo": "#131034",
+        "opacity": 1.0,
+        "textColor": "#e2e8f0"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#060309",
+        "gradientVia": "#14062d",
+        "gradientTo": "#181345",
+        "opacity": 0.95,
+        "textColor": "#e2e8f0"
       },
       "progressGradient": {
         "from": "#8b5cf6",
@@ -309,16 +333,22 @@
         "gradientOverlayFromOpacity": 0.15,
         "gradientOverlayTo": "#3b82f6",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#060810",
-        "sidebarGradientVia": "#0c1636",
-        "sidebarGradientTo": "#052b34",
-        "dashboardHeaderGradientFrom": "#050711",
-        "dashboardHeaderGradientVia": "#0f1a42",
-        "dashboardHeaderGradientTo": "#06343f",
-        "sidebarGradientOpacity": 0.9,
-        "dashboardHeaderGradientOpacity": 0.9,
         "glassTint": "rgba(59, 130, 246, 0.08)",
         "glassTextColor": "#cbd5e1"
+      },
+      "sidebar": {
+        "gradientFrom": "#060810",
+        "gradientVia": "#0c1636",
+        "gradientTo": "#052b34",
+        "opacity": 0.9,
+        "textColor": "#cbd5e1"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#050711",
+        "gradientVia": "#0f1a42",
+        "gradientTo": "#06343f",
+        "opacity": 0.9,
+        "textColor": "#cbd5e1"
       },
       "progressGradient": {
         "from": "#60a5fa",
@@ -369,16 +399,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#14b8a6",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#052b34",
-        "sidebarGradientVia": "#054038",
-        "sidebarGradientTo": "#0c1636",
-        "dashboardHeaderGradientFrom": "#06343f",
-        "dashboardHeaderGradientVia": "#065449",
-        "dashboardHeaderGradientTo": "#0f1a42",
-        "sidebarGradientOpacity": 0.85,
-        "dashboardHeaderGradientOpacity": 0.8,
         "glassTint": "rgba(20, 184, 166, 0.06)",
         "glassTextColor": "#ccfbf1"
+      },
+      "sidebar": {
+        "gradientFrom": "#052b34",
+        "gradientVia": "#054038",
+        "gradientTo": "#0c1636",
+        "opacity": 0.85,
+        "textColor": "#ccfbf1"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#06343f",
+        "gradientVia": "#065449",
+        "gradientTo": "#0f1a42",
+        "opacity": 0.8,
+        "textColor": "#ccfbf1"
       },
       "progressGradient": {
         "from": "#06b6d4",
@@ -429,16 +465,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#facc15",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#990000",
-        "sidebarGradientVia": "#994c00",
-        "sidebarGradientTo": "#994700",
-        "dashboardHeaderGradientFrom": "#990000",
-        "dashboardHeaderGradientVia": "#994400",
-        "dashboardHeaderGradientTo": "#998800",
-        "sidebarGradientOpacity": 0.8,
-        "dashboardHeaderGradientOpacity": 0.5,
         "glassTint": "rgba(255, 149, 0, 0.1)",
         "glassTextColor": "#ffe4b5"
+      },
+      "sidebar": {
+        "gradientFrom": "#990000",
+        "gradientVia": "#994c00",
+        "gradientTo": "#994700",
+        "opacity": 0.8,
+        "textColor": "#ffe4b5"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#990000",
+        "gradientVia": "#994400",
+        "gradientTo": "#998800",
+        "opacity": 0.5,
+        "textColor": "#ffe4b5"
       },
       "progressGradient": {
         "from": "#fde047",
@@ -489,16 +531,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#FF1493",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#990c58",
-        "sidebarGradientVia": "#993797",
-        "sidebarGradientTo": "#990c5a",
-        "dashboardHeaderGradientFrom": "#FF1493",
-        "dashboardHeaderGradientVia": "#FF5BFC",
-        "dashboardHeaderGradientTo": "#FF1496",
-        "sidebarGradientOpacity": 0.9,
-        "dashboardHeaderGradientOpacity": 0.85,
         "glassTint": "rgba(255, 20, 147, 0.08)",
         "glassTextColor": "#fce7f3"
+      },
+      "sidebar": {
+        "gradientFrom": "#990c58",
+        "gradientVia": "#993797",
+        "gradientTo": "#990c5a",
+        "opacity": 0.9,
+        "textColor": "#fce7f3"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#FF1493",
+        "gradientVia": "#FF5BFC",
+        "gradientTo": "#FF1496",
+        "opacity": 0.85,
+        "textColor": "#fce7f3"
       },
       "progressGradient": {
         "from": "#FF5BFC",
@@ -549,16 +597,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#F92A53",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#4a0612",
-        "sidebarGradientVia": "#610f0f",
-        "sidebarGradientTo": "#610f34",
-        "dashboardHeaderGradientFrom": "#5c0716",
-        "dashboardHeaderGradientVia": "#7a1212",
-        "dashboardHeaderGradientTo": "#7a1240",
-        "sidebarGradientOpacity": 0.95,
-        "dashboardHeaderGradientOpacity": 0.9,
         "glassTint": "rgba(249, 42, 83, 0.08)",
         "glassTextColor": "#ffe8eb"
+      },
+      "sidebar": {
+        "gradientFrom": "#4a0612",
+        "gradientVia": "#610f0f",
+        "gradientTo": "#610f34",
+        "opacity": 0.95,
+        "textColor": "#ffe8eb"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#5c0716",
+        "gradientVia": "#7a1212",
+        "gradientTo": "#7a1240",
+        "opacity": 0.9,
+        "textColor": "#ffe8eb"
       },
       "progressGradient": {
         "from": "#FE244F",
@@ -609,16 +663,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#1a1a1a",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#080808",
-        "sidebarGradientVia": "#101010",
-        "sidebarGradientTo": "#1a1a1a",
-        "dashboardHeaderGradientFrom": "#0a0a0a",
-        "dashboardHeaderGradientVia": "#141414",
-        "dashboardHeaderGradientTo": "#1f1f1f",
-        "sidebarGradientOpacity": 0.7,
-        "dashboardHeaderGradientOpacity": 0.6,
         "glassTint": "rgba(255, 255, 255, 0.02)",
         "glassTextColor": "#d4d4d4"
+      },
+      "sidebar": {
+        "gradientFrom": "#080808",
+        "gradientVia": "#101010",
+        "gradientTo": "#1a1a1a",
+        "opacity": 0.7,
+        "textColor": "#d4d4d4"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#0a0a0a",
+        "gradientVia": "#141414",
+        "gradientTo": "#1f1f1f",
+        "opacity": 0.6,
+        "textColor": "#d4d4d4"
       },
       "progressGradient": {
         "from": "#525252",
@@ -669,16 +729,22 @@
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#5d4037",
         "gradientOverlayToOpacity": 0.05,
-        "sidebarGradientFrom": "#4a4032",
-        "sidebarGradientVia": "#746657",
-        "sidebarGradientTo": "#6d6056",
-        "dashboardHeaderGradientFrom": "#5c503f",
-        "dashboardHeaderGradientVia": "#a89a85",
-        "dashboardHeaderGradientTo": "#9a8878",
-        "sidebarGradientOpacity": 0.75,
-        "dashboardHeaderGradientOpacity": 0.7,
         "glassTint": "rgba(62, 39, 35, 0.4)",
         "glassTextColor": "#ffffff"
+      },
+      "sidebar": {
+        "gradientFrom": "#6d5650",
+        "gradientVia": "#8c6e63",
+        "gradientTo": "#a08875",
+        "opacity": 0.75,
+        "textColor": "#ffffff"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#5c503f",
+        "gradientVia": "#a89a85",
+        "gradientTo": "#9a8878",
+        "opacity": 0.7,
+        "textColor": "#ffffff"
       },
       "progressGradient": {
         "from": "#a1887f",
@@ -729,16 +795,22 @@
         "gradientOverlayFromOpacity": 0.05,
         "gradientOverlayTo": "#000000",
         "gradientOverlayToOpacity": 0.02,
-        "sidebarGradientFrom": "#898989",
-        "sidebarGradientVia": "#909090",
-        "sidebarGradientTo": "#868686",
-        "dashboardHeaderGradientFrom": "#d0d0d0",
-        "dashboardHeaderGradientVia": "#e0e0e0",
-        "dashboardHeaderGradientTo": "#d5d5d5",
-        "sidebarGradientOpacity": 0.5,
-        "dashboardHeaderGradientOpacity": 0.4,
         "glassTint": "rgba(0, 0, 0, 0.8)",
         "glassTextColor": "#ffffff"
+      },
+      "sidebar": {
+        "gradientFrom": "#898989",
+        "gradientVia": "#909090",
+        "gradientTo": "#868686",
+        "opacity": 0.5,
+        "textColor": "#ffffff"
+      },
+      "dashboardHeader": {
+        "gradientFrom": "#d0d0d0",
+        "gradientVia": "#e0e0e0",
+        "gradientTo": "#d5d5d5",
+        "opacity": 0.4,
+        "textColor": "#ffffff"
       },
       "progressGradient": {
         "from": "#666666",

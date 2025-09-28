@@ -77,12 +77,13 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
           background: `linear-gradient(135deg, 
             rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
             rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
-            rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%)`
+            rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%)`,
+          color: 'var(--sidebar-text-color, inherit)'
         }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
-          <h3 className="text-lg font-semibold text-foreground">
+          <h3 className="text-lg font-semibold">
             {getDrawerTitle(secondarySidebarContent)}
           </h3>
           <button
@@ -90,7 +91,7 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
             className="p-2 rounded-md hover:bg-white/10 transition-all duration-200 ease-out hover:scale-110 group"
             aria-label="Close secondary sidebar"
           >
-            <X size={20} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-foreground group-hover:rotate-90" />
+            <X size={20} className="opacity-75 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:rotate-90" />
           </button>
         </div>
 

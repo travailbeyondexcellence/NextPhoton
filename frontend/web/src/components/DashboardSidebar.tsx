@@ -74,7 +74,7 @@ export function DashboardSidebar() {
   return (
 
 
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
       {/* Fixed Header */}
       <div className="flex-shrink-0">
         <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-white/5 backdrop-blur-sm border-b border-white/10">

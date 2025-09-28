@@ -16,11 +16,11 @@ export function DashboardNavbar() {
           rgb(var(--dashboard-header-gradient-to) / var(--dashboard-header-gradient-opacity, 1)) 100%)`
       }}
     >
-      <div className="h-full px-4 flex items-center justify-between">
+      <div className="h-full px-4 flex items-center justify-between" style={{ color: 'var(--dashboard-header-text-color, inherit)' }}>
         {/* Left: Sidebar trigger + title */}
         <div className="flex items-center gap-4">
-          <SidebarTrigger className="text-foreground hover:bg-white/5 rounded-md p-2 transition-colors" />
-          <h2 className="text-lg font-semibold text-foreground">Dashboard</h2>
+          <SidebarTrigger className="hover:bg-white/5 rounded-md p-2 transition-colors" />
+          <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
 
         {/* Right: Theme selector + Profile dropdown */}
