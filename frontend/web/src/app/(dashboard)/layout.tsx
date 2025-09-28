@@ -69,11 +69,11 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
         <DashboardNavbar />
         <main className="flex-1 overflow-auto relative z-10">
           {/* Content with extended background */}
-          <div className="min-h-full p-6">
+          <div className="relative min-h-full">
             {/* Main section background overlay for theme-based darkening */}
             <div className="main-section-overlay"></div>
             {/* Glass panel wrapper for content */}
-            <div className="relative z-10">
+            <div className="relative z-10 p-6">
               {children}
             </div>
           </div>
