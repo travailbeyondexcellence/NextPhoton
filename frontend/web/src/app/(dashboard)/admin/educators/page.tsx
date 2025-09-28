@@ -17,11 +17,11 @@ const Educators = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="p-6">
+    <div className="min-h-screen bg-transparent">
+      <div className="p-6 bg-transparent">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <div className="bg-white/10 backdrop-blur-sm p-2 rounded-full text-primary border border-white/20">
+            <div className="bg-white/5 backdrop-blur-sm p-2 rounded-full text-primary border border-white/20">
               <User size={24} />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Educators</h1>
@@ -29,7 +29,7 @@ const Educators = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={toggleView}
-              className="p-2 bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/20 border border-white/20 transition-all"
+              className="p-2 bg-white/5 backdrop-blur-sm rounded-lg hover:bg-white/10 border border-white/20 transition-all"
               title={view === "list" ? "Switch to Card View" : "Switch to List View"}
             >
               {view === "list" ? <LayoutGrid size={20} /> : <List size={20} />}
@@ -45,11 +45,11 @@ const Educators = () => {
         </div>
 
         {/* View Toggle */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+        <div>
           {view === "list" ? (
             <EducatorsList_forAdmin initialView="table" />
           ) : (
-            <div className="p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <EducatorsCardsView_forAdmin />
             </div>
           )}

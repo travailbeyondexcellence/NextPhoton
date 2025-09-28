@@ -1,0 +1,631 @@
+{
+  "metadata": {
+    "lastUpdated": "2024-03-22T10:00:00Z",
+    "version": "1.0",
+    "count": 25,
+    "description": "Communication records including messages, announcements, and notifications"
+  },
+  "data": [
+    {
+      "id": "comm001",
+      "type": "announcement",
+      "category": "academic",
+      "priority": "high",
+      "subject": "Mock Test Schedule for March 2024",
+      "message": "Dear Students, The JEE Main Mock Test is scheduled for Sunday, March 24, 2024, from 9 AM to 12 PM. Please ensure you join the test link 15 minutes before the start time. Study material for revision has been uploaded to your dashboard.",
+      "sender": {
+        "id": "admin001",
+        "name": "Academic Coordinator",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "batch",
+        "batchIds": ["batch_jee_2026_01"],
+        "totalRecipients": 45
+      },
+      "sentAt": "2024-03-20T10:00:00Z",
+      "readBy": 42,
+      "attachments": [
+        { "name": "Mock Test Guidelines.pdf", "url": "/attachments/mock-test-guidelines.pdf" }
+      ],
+      "status": "sent",
+      "createdAt": "2024-03-20T09:45:00Z",
+      "updatedAt": "2024-03-20T10:00:00Z"
+    },
+    {
+      "id": "comm002",
+      "type": "message",
+      "category": "personal",
+      "priority": "normal",
+      "subject": "Excellent Performance in Physics Test",
+      "message": "Hi Aarav, Congratulations on scoring 78/100 in the recent Physics test! Your problem-solving approach was excellent. Keep up the good work! For the topics you found challenging, I've scheduled a doubt session this Friday at 4 PM.",
+      "sender": {
+        "id": "e001",
+        "name": "Dr. Meera Sharma",
+        "role": "educator"
+      },
+      "recipients": {
+        "type": "individual",
+        "learnerIds": ["l001"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-18T14:00:00Z",
+      "readAt": "2024-03-18T16:30:00Z",
+      "readBy": 1,
+      "replyTo": null,
+      "status": "read",
+      "createdAt": "2024-03-18T14:00:00Z",
+      "updatedAt": "2024-03-18T16:30:00Z"
+    },
+    {
+      "id": "comm003",
+      "type": "notification",
+      "category": "attendance",
+      "priority": "high",
+      "subject": "Low Attendance Alert",
+      "message": "Your ward Rohan Verma has missed 3 consecutive classes this week. Current attendance: 65%. Please ensure regular attendance to maintain academic progress.",
+      "sender": {
+        "id": "system",
+        "name": "NextPhoton System",
+        "role": "system"
+      },
+      "recipients": {
+        "type": "guardian",
+        "guardianIds": ["g003"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-21T18:00:00Z",
+      "readAt": "2024-03-21T20:15:00Z",
+      "readBy": 1,
+      "actionRequired": true,
+      "actionTaken": false,
+      "status": "read",
+      "createdAt": "2024-03-21T18:00:00Z",
+      "updatedAt": "2024-03-21T20:15:00Z"
+    },
+    {
+      "id": "comm004",
+      "type": "message",
+      "category": "doubt",
+      "priority": "normal",
+      "subject": "Doubt in Organic Chemistry - SN1 Reactions",
+      "message": "Sir, I'm having trouble understanding the mechanism of SN1 reactions, especially the carbocation stability part. Can you please explain this in the next class or suggest some resources?",
+      "sender": {
+        "id": "l002",
+        "name": "Ishita Reddy",
+        "role": "learner"
+      },
+      "recipients": {
+        "type": "educator",
+        "educatorIds": ["e002"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-19T21:00:00Z",
+      "readAt": "2024-03-19T22:00:00Z",
+      "readBy": 1,
+      "replyTo": null,
+      "hasReply": true,
+      "status": "replied",
+      "createdAt": "2024-03-19T21:00:00Z",
+      "updatedAt": "2024-03-20T09:00:00Z"
+    },
+    {
+      "id": "comm005",
+      "type": "message",
+      "category": "doubt",
+      "priority": "normal",
+      "subject": "Re: Doubt in Organic Chemistry - SN1 Reactions",
+      "message": "Hi Ishita, Great question! I'll cover carbocation stability in detail in tomorrow's class. Meanwhile, I've uploaded a video explanation and practice problems to your dashboard. Check the 'Organic Chemistry Resources' folder.",
+      "sender": {
+        "id": "e002",
+        "name": "Prof. Anand Iyer",
+        "role": "educator"
+      },
+      "recipients": {
+        "type": "individual",
+        "learnerIds": ["l002"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-20T09:00:00Z",
+      "readAt": "2024-03-20T10:30:00Z",
+      "readBy": 1,
+      "replyTo": "comm004",
+      "status": "read",
+      "createdAt": "2024-03-20T09:00:00Z",
+      "updatedAt": "2024-03-20T10:30:00Z"
+    },
+    {
+      "id": "comm006",
+      "type": "announcement",
+      "category": "administrative",
+      "priority": "medium",
+      "subject": "Fee Payment Reminder - Second Installment",
+      "message": "This is a reminder that the second installment of fees (₹37,500) for the JEE 2026 batch is due by March 31, 2024. Please make the payment through the parent portal to avoid late fees.",
+      "sender": {
+        "id": "admin002",
+        "name": "Finance Department",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "guardians",
+        "batchIds": ["batch_jee_2026_01"],
+        "totalRecipients": 90
+      },
+      "sentAt": "2024-03-22T09:00:00Z",
+      "readBy": 72,
+      "status": "sent",
+      "createdAt": "2024-03-22T08:45:00Z",
+      "updatedAt": "2024-03-22T09:00:00Z"
+    },
+    {
+      "id": "comm007",
+      "type": "feedback",
+      "category": "performance",
+      "priority": "normal",
+      "subject": "Monthly Progress Report - March 2024",
+      "message": "Dear Parent, Please find attached the monthly progress report for Aarav Patel. Overall performance: Good. Attendance: 92%. Average Test Score: 78%. Areas of improvement: Time management in tests. Strengths: Problem-solving skills in Physics and Mathematics.",
+      "sender": {
+        "id": "ecm001",
+        "name": "Ms. Priya Singh",
+        "role": "educare_manager"
+      },
+      "recipients": {
+        "type": "guardian",
+        "guardianIds": ["g001", "g002"],
+        "totalRecipients": 2
+      },
+      "sentAt": "2024-03-22T11:00:00Z",
+      "readBy": 2,
+      "attachments": [
+        { "name": "Progress_Report_March_2024.pdf", "url": "/reports/aarav-march-2024.pdf" }
+      ],
+      "status": "read",
+      "createdAt": "2024-03-22T10:30:00Z",
+      "updatedAt": "2024-03-22T12:00:00Z"
+    },
+    {
+      "id": "comm008",
+      "type": "notification",
+      "category": "assignment",
+      "priority": "normal",
+      "subject": "New Assignment Posted - Integration Practice",
+      "message": "A new assignment 'Integration Practice Problems' has been posted for Mathematics. Due date: March 31, 2024. Total marks: 120. Please check your assignments section for details.",
+      "sender": {
+        "id": "e004",
+        "name": "Mr. Ramesh Kulkarni",
+        "role": "educator"
+      },
+      "recipients": {
+        "type": "batch",
+        "batchIds": ["batch_jee_2026_01"],
+        "totalRecipients": 45
+      },
+      "sentAt": "2024-03-28T10:00:00Z",
+      "readBy": 43,
+      "linkedContent": {
+        "type": "assignment",
+        "id": "asn004"
+      },
+      "status": "sent",
+      "createdAt": "2024-03-28T10:00:00Z",
+      "updatedAt": "2024-03-28T10:00:00Z"
+    },
+    {
+      "id": "comm009",
+      "type": "message",
+      "category": "appreciation",
+      "priority": "normal",
+      "subject": "Outstanding Essay!",
+      "message": "Dear Ananya, Your essay on 'The Impact of Technology on Education' was exceptional! Your arguments were well-structured and the examples were very relevant. I'm nominating it for the school magazine. Keep writing!",
+      "sender": {
+        "id": "e006",
+        "name": "Ms. Kavita Menon",
+        "role": "educator"
+      },
+      "recipients": {
+        "type": "individual",
+        "learnerIds": ["l004"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-24T15:00:00Z",
+      "readAt": "2024-03-24T17:00:00Z",
+      "readBy": 1,
+      "status": "read",
+      "createdAt": "2024-03-24T15:00:00Z",
+      "updatedAt": "2024-03-24T17:00:00Z"
+    },
+    {
+      "id": "comm010",
+      "type": "announcement",
+      "category": "event",
+      "priority": "medium",
+      "subject": "Parent-Teacher Meeting - April 5, 2024",
+      "message": "Dear Parents, The quarterly Parent-Teacher Meeting is scheduled for April 5, 2024, from 10 AM to 1 PM. Please book your slot through the parent portal. This is an opportunity to discuss your child's progress and address any concerns.",
+      "sender": {
+        "id": "admin001",
+        "name": "Academic Coordinator",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "all_guardians",
+        "totalRecipients": 250
+      },
+      "sentAt": "2024-03-20T14:00:00Z",
+      "readBy": 198,
+      "actionRequired": true,
+      "actionLink": "/parent-portal/ptm-booking",
+      "status": "sent",
+      "createdAt": "2024-03-20T13:30:00Z",
+      "updatedAt": "2024-03-20T14:00:00Z"
+    },
+    {
+      "id": "comm011",
+      "type": "query",
+      "category": "technical",
+      "priority": "high",
+      "subject": "Unable to Access Recorded Lectures",
+      "message": "I'm unable to access the recorded lectures for yesterday's Physics class. The video player shows an error. Please help resolve this issue as I need to review the content for the upcoming test.",
+      "sender": {
+        "id": "l009",
+        "name": "Rahul Kumar",
+        "role": "learner"
+      },
+      "recipients": {
+        "type": "support",
+        "supportTeamIds": ["support001"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-19T11:00:00Z",
+      "resolvedAt": "2024-03-19T14:00:00Z",
+      "status": "resolved",
+      "ticketNumber": "TKT-2024-0319",
+      "createdAt": "2024-03-19T11:00:00Z",
+      "updatedAt": "2024-03-19T14:00:00Z"
+    },
+    {
+      "id": "comm012",
+      "type": "notification",
+      "category": "schedule",
+      "priority": "high",
+      "subject": "Class Rescheduled - Chemistry March 25",
+      "message": "The Chemistry class scheduled for March 25, 2024, at 2 PM has been rescheduled to March 26, 2024, at 3 PM due to educator unavailability. The class link remains the same.",
+      "sender": {
+        "id": "admin001",
+        "name": "Academic Coordinator",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "batch",
+        "batchIds": ["batch_neet_2025_01"],
+        "totalRecipients": 42
+      },
+      "sentAt": "2024-03-24T18:00:00Z",
+      "readBy": 40,
+      "status": "sent",
+      "createdAt": "2024-03-24T17:45:00Z",
+      "updatedAt": "2024-03-24T18:00:00Z"
+    },
+    {
+      "id": "comm013",
+      "type": "message",
+      "category": "counseling",
+      "priority": "medium",
+      "subject": "Career Counseling Session Request",
+      "message": "Dear Ms. Singh, I would like to schedule a career counseling session to discuss my options after 12th. I'm confused between pursuing pure sciences and engineering. Please let me know your available slots.",
+      "sender": {
+        "id": "l005",
+        "name": "Arjun Malhotra",
+        "role": "learner"
+      },
+      "recipients": {
+        "type": "counselor",
+        "counselorIds": ["counselor001"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-21T16:00:00Z",
+      "readAt": "2024-03-21T17:30:00Z",
+      "readBy": 1,
+      "appointmentScheduled": true,
+      "appointmentDate": "2024-03-28T15:00:00Z",
+      "status": "scheduled",
+      "createdAt": "2024-03-21T16:00:00Z",
+      "updatedAt": "2024-03-21T18:00:00Z"
+    },
+    {
+      "id": "comm014",
+      "type": "feedback",
+      "category": "educator",
+      "priority": "normal",
+      "subject": "Feedback on Teaching Methods",
+      "message": "Dr. Sharma's teaching methods are excellent. She makes complex Physics concepts easy to understand with real-life examples. The only suggestion is to provide more practice problems for home study.",
+      "sender": {
+        "id": "g001",
+        "name": "Rajesh Patel",
+        "role": "guardian"
+      },
+      "recipients": {
+        "type": "admin",
+        "adminIds": ["admin001"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-20T19:00:00Z",
+      "readAt": "2024-03-21T09:00:00Z",
+      "readBy": 1,
+      "feedbackRating": 4.5,
+      "status": "acknowledged",
+      "createdAt": "2024-03-20T19:00:00Z",
+      "updatedAt": "2024-03-21T10:00:00Z"
+    },
+    {
+      "id": "comm015",
+      "type": "announcement",
+      "category": "achievement",
+      "priority": "normal",
+      "subject": "Congratulations to Our Top Performers!",
+      "message": "We are proud to announce that the following students have secured top ranks in the March Mock Test: 1. Aarav Patel (Rank 12/145), 2. Ishita Reddy (Rank 245/2850), 3. Ananya Singh (Rank 3/30). Keep up the excellent work!",
+      "sender": {
+        "id": "admin001",
+        "name": "Academic Coordinator",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "all",
+        "totalRecipients": 500
+      },
+      "sentAt": "2024-03-18T12:00:00Z",
+      "readBy": 423,
+      "likes": 87,
+      "status": "sent",
+      "createdAt": "2024-03-18T11:30:00Z",
+      "updatedAt": "2024-03-18T12:00:00Z"
+    },
+    {
+      "id": "comm016",
+      "type": "message",
+      "category": "request",
+      "priority": "normal",
+      "subject": "Request for Extra Classes",
+      "message": "Sir, I'm finding Coordinate Geometry challenging. Can we have extra doubt clearing sessions for this topic before the next test? A few of my batchmates also have similar difficulties.",
+      "sender": {
+        "id": "l001",
+        "name": "Aarav Patel",
+        "role": "learner"
+      },
+      "recipients": {
+        "type": "educator",
+        "educatorIds": ["e004"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-22T20:00:00Z",
+      "readAt": "2024-03-22T21:00:00Z",
+      "readBy": 1,
+      "approved": true,
+      "status": "approved",
+      "createdAt": "2024-03-22T20:00:00Z",
+      "updatedAt": "2024-03-23T09:00:00Z"
+    },
+    {
+      "id": "comm017",
+      "type": "notification",
+      "category": "submission",
+      "priority": "high",
+      "subject": "Assignment Submission Confirmation",
+      "message": "Your assignment 'Essay Writing - Technology Impact' has been successfully submitted. Submission ID: SUB-2024-0324-001. You will receive your grades within 3 working days.",
+      "sender": {
+        "id": "system",
+        "name": "NextPhoton System",
+        "role": "system"
+      },
+      "recipients": {
+        "type": "individual",
+        "learnerIds": ["l004"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-24T14:30:00Z",
+      "readAt": "2024-03-24T14:31:00Z",
+      "readBy": 1,
+      "status": "read",
+      "createdAt": "2024-03-24T14:30:00Z",
+      "updatedAt": "2024-03-24T14:31:00Z"
+    },
+    {
+      "id": "comm018",
+      "type": "alert",
+      "category": "emergency",
+      "priority": "urgent",
+      "subject": "Technical Issue - Platform Maintenance",
+      "message": "URGENT: The NextPhoton platform will undergo emergency maintenance on March 25, 2024, from 2 AM to 4 AM IST. All services will be temporarily unavailable. Please plan accordingly.",
+      "sender": {
+        "id": "admin003",
+        "name": "Technical Team",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "all",
+        "totalRecipients": 500
+      },
+      "sentAt": "2024-03-24T20:00:00Z",
+      "readBy": 467,
+      "status": "sent",
+      "createdAt": "2024-03-24T19:45:00Z",
+      "updatedAt": "2024-03-24T20:00:00Z"
+    },
+    {
+      "id": "comm019",
+      "type": "message",
+      "category": "compliment",
+      "priority": "normal",
+      "subject": "Thank You for the Extra Support",
+      "message": "Dear Prof. Iyer, Thank you for the extra chemistry doubt session yesterday. Your explanation of reaction mechanisms really helped me understand the concepts better. I scored 85% in today's quiz!",
+      "sender": {
+        "id": "l002",
+        "name": "Ishita Reddy",
+        "role": "learner"
+      },
+      "recipients": {
+        "type": "educator",
+        "educatorIds": ["e002"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-21T17:00:00Z",
+      "readAt": "2024-03-21T18:00:00Z",
+      "readBy": 1,
+      "status": "read",
+      "createdAt": "2024-03-21T17:00:00Z",
+      "updatedAt": "2024-03-21T18:00:00Z"
+    },
+    {
+      "id": "comm020",
+      "type": "notification",
+      "category": "result",
+      "priority": "high",
+      "subject": "Test Results Published - Biology Weekly Test",
+      "message": "The results for Biology Weekly Test (Genetics) have been published. You scored 41/50 (82%). Rank: 8/42. Please check the detailed analysis in your dashboard for topic-wise performance.",
+      "sender": {
+        "id": "e003",
+        "name": "Dr. Priya Nair",
+        "role": "educator"
+      },
+      "recipients": {
+        "type": "individual",
+        "learnerIds": ["l002"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-10T12:00:00Z",
+      "readAt": "2024-03-10T13:00:00Z",
+      "readBy": 1,
+      "linkedContent": {
+        "type": "test_result",
+        "id": "tr011"
+      },
+      "status": "read",
+      "createdAt": "2024-03-10T12:00:00Z",
+      "updatedAt": "2024-03-10T13:00:00Z"
+    },
+    {
+      "id": "comm021",
+      "type": "broadcast",
+      "category": "motivation",
+      "priority": "low",
+      "subject": "Weekly Motivation - Success Story",
+      "message": "This week's inspiration: Our alumni Prateek Kumar (Batch 2022) has secured AIR 156 in JEE Advanced 2023 and is now studying at IIT Delhi. His message: 'Consistency and regular practice at NextPhoton helped me achieve my dreams.' Keep working hard!",
+      "sender": {
+        "id": "admin001",
+        "name": "Academic Coordinator",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "all_learners",
+        "totalRecipients": 350
+      },
+      "sentAt": "2024-03-18T08:00:00Z",
+      "readBy": 298,
+      "likes": 145,
+      "status": "sent",
+      "createdAt": "2024-03-18T07:30:00Z",
+      "updatedAt": "2024-03-18T08:00:00Z"
+    },
+    {
+      "id": "comm022",
+      "type": "reminder",
+      "category": "deadline",
+      "priority": "high",
+      "subject": "Assignment Due Tomorrow - Linear Equations Worksheet",
+      "message": "Reminder: Your assignment 'Linear Equations Worksheet' is due tomorrow (March 22, 2024) by 11:59 PM. Please submit through the student portal. Late submissions will incur a 10% penalty.",
+      "sender": {
+        "id": "system",
+        "name": "NextPhoton System",
+        "role": "system"
+      },
+      "recipients": {
+        "type": "batch",
+        "batchIds": ["batch_7th_cbse_01"],
+        "totalRecipients": 30
+      },
+      "sentAt": "2024-03-21T18:00:00Z",
+      "readBy": 28,
+      "linkedContent": {
+        "type": "assignment",
+        "id": "asn006"
+      },
+      "status": "sent",
+      "createdAt": "2024-03-21T18:00:00Z",
+      "updatedAt": "2024-03-21T18:00:00Z"
+    },
+    {
+      "id": "comm023",
+      "type": "message",
+      "category": "leave",
+      "priority": "normal",
+      "subject": "Leave Application - Family Emergency",
+      "message": "Respected Sir/Madam, I need to take leave from March 26-28, 2024, due to a family emergency. I will catch up on missed classes through recordings and complete all pending assignments. Please grant me leave for these dates.",
+      "sender": {
+        "id": "l003",
+        "name": "Rohan Verma",
+        "role": "learner"
+      },
+      "recipients": {
+        "type": "admin",
+        "adminIds": ["admin001"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-24T10:00:00Z",
+      "readAt": "2024-03-24T11:00:00Z",
+      "readBy": 1,
+      "approved": true,
+      "approvedBy": "admin001",
+      "status": "approved",
+      "createdAt": "2024-03-24T10:00:00Z",
+      "updatedAt": "2024-03-24T11:30:00Z"
+    },
+    {
+      "id": "comm024",
+      "type": "notification",
+      "category": "certificate",
+      "priority": "normal",
+      "subject": "Certificate of Completion Available",
+      "message": "Congratulations! Your certificate for completing the 'Python Programming Basics' module is now available for download. You scored 94% in the final assessment. Certificate ID: CERT-2024-CS-0313",
+      "sender": {
+        "id": "system",
+        "name": "NextPhoton System",
+        "role": "system"
+      },
+      "recipients": {
+        "type": "individual",
+        "learnerIds": ["l003"],
+        "totalRecipients": 1
+      },
+      "sentAt": "2024-03-13T14:00:00Z",
+      "readAt": "2024-03-13T15:00:00Z",
+      "readBy": 1,
+      "certificateUrl": "/certificates/CERT-2024-CS-0313.pdf",
+      "status": "read",
+      "createdAt": "2024-03-13T14:00:00Z",
+      "updatedAt": "2024-03-13T15:00:00Z"
+    },
+    {
+      "id": "comm025",
+      "type": "survey",
+      "category": "feedback",
+      "priority": "low",
+      "subject": "Monthly Feedback Survey - March 2024",
+      "message": "Dear Student, Please take 5 minutes to complete our monthly feedback survey. Your input helps us improve our teaching methods and platform features. The survey is anonymous and closes on March 31, 2024.",
+      "sender": {
+        "id": "admin004",
+        "name": "Quality Team",
+        "role": "admin"
+      },
+      "recipients": {
+        "type": "all_learners",
+        "totalRecipients": 350
+      },
+      "sentAt": "2024-03-25T10:00:00Z",
+      "readBy": 245,
+      "surveyLink": "/surveys/march-2024-feedback",
+      "responsesReceived": 178,
+      "status": "active",
+      "createdAt": "2024-03-25T09:30:00Z",
+      "updatedAt": "2024-03-25T10:00:00Z"
+    }
+  ]
+}

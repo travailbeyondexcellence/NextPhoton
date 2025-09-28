@@ -10,33 +10,29 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthProviderWithLoading';
 import { ThemeSelector } from '@/components/ThemeSelector';
 import { LogoComponent } from '@/components/LogoComponent';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { toast } from 'sonner';
+import { AsyncButton } from '@/components/LoadingButton';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setError('');
-    setIsLoading(true);
 
     try {
       await login({ email, password });
       // Redirect handled by AuthContext
     } catch (err: any) {
       setError(err.message || 'Failed to sign in. Please check your credentials.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -79,7 +75,7 @@ export default function SignInPage() {
             <h2 className="text-2xl font-semibold text-foreground">Welcome, Glad to see you!</h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             {error && (
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
@@ -149,13 +145,15 @@ export default function SignInPage() {
 
 
             {/* Login Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            <AsyncButton
+              variant="primary"
+              size="lg"
+              className="w-full py-3.5 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              onClick={handleLogin}
+              loadingMessage="Signing in..."
             >
-              {isLoading ? 'Logging in...' : 'Login'}
-            </button>
+              Login
+            </AsyncButton>
 
             {/* Or Login With */}
             <div className="relative">
@@ -197,7 +195,7 @@ export default function SignInPage() {
                 <span className="text-foreground">Google</span>
               </button>
             </div>
-          </form>
+          </div>
 
           {/* Separator */}
           <div className="relative my-6">

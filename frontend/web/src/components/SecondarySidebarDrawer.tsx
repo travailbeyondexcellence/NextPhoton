@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
 import SimpleBar from 'simplebar-react'
 import 'simplebar-react/dist/simplebar.min.css'
@@ -12,6 +13,7 @@ interface SecondarySidebarDrawerProps {
 }
 
 export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProps) {
+  const router = useRouter()
   const {
     isSecondarySidebarOpen,
     secondarySidebarContent,
@@ -98,7 +100,7 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
         {/* Content */}
         <SimpleBar className="h-[calc(100vh-4rem)] w-full px-2" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
           <div className="py-4">
-            {renderSecondaryContent(secondarySidebarContent)}
+            {renderSecondaryContent(secondarySidebarContent, router, closeSecondarySidebar)}
           </div>
         </SimpleBar>
       </aside>
@@ -122,7 +124,7 @@ function getDrawerTitle(content: string | null): string {
 }
 
 // Helper function to render content based on content type
-function renderSecondaryContent(content: string | null) {
+function renderSecondaryContent(content: string | null, router: any, closeSecondarySidebar: () => void) {
   if (!content) return null
 
   // This is where you'll add specific content for each menu type
@@ -131,21 +133,69 @@ function renderSecondaryContent(content: string | null) {
       return (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Performance Analytics</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Performance Analytics</h4>
             <div className="space-y-1">
-              <SecondaryMenuItem label="Overall Performance Dashboard" />
-              <SecondaryMenuItem label="Individual Student Analytics" />
-              <SecondaryMenuItem label="Class-wise Performance" />
-              <SecondaryMenuItem label="Subject-wise Analytics" />
+              <SecondaryMenuItem
+                label="Overall Performance Dashboard"
+                onClick={() => {
+                  router.push('/admin/performance')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Individual Student Analytics"
+                onClick={() => {
+                  router.push('/admin/performance/individual-analytics')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Class-wise Performance"
+                onClick={() => {
+                  router.push('/admin/performance/class-performance')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Subject-wise Analytics"
+                onClick={() => {
+                  router.push('/admin/performance/subject-analytics')
+                  closeSecondarySidebar()
+                }}
+              />
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Reports</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Reports</h4>
             <div className="space-y-1">
-              <SecondaryMenuItem label="Generate Performance Report" />
-              <SecondaryMenuItem label="Export Analytics Data" />
-              <SecondaryMenuItem label="Custom Report Builder" />
-              <SecondaryMenuItem label="Scheduled Reports" />
+              <SecondaryMenuItem
+                label="Generate Performance Report"
+                onClick={() => {
+                  router.push('/admin/performance/generate-report')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Export Analytics Data"
+                onClick={() => {
+                  router.push('/admin/performance/export-data')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Custom Report Builder"
+                onClick={() => {
+                  router.push('/admin/performance/custom-report-builder')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Scheduled Reports"
+                onClick={() => {
+                  router.push('/admin/performance/scheduled-reports')
+                  closeSecondarySidebar()
+                }}
+              />
             </div>
           </div>
         </div>
@@ -154,29 +204,95 @@ function renderSecondaryContent(content: string | null) {
       return (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Quick Actions</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Quick Actions</h4>
             <div className="space-y-1">
-              <SecondaryMenuItem label="Compose New Message" />
-              <SecondaryMenuItem label="Broadcast to All" />
-              <SecondaryMenuItem label="Message Templates" />
+              <SecondaryMenuItem
+                label="Compose New Message"
+                onClick={() => {
+                  router.push('/admin/Notifications/compose-message')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Broadcast to All"
+                onClick={() => {
+                  router.push('/admin/Notifications/broadcast')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Message Templates"
+                onClick={() => {
+                  router.push('/admin/Notifications/templates')
+                  closeSecondarySidebar()
+                }}
+              />
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Message Management</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Message Management</h4>
             <div className="space-y-1">
-              <SecondaryMenuItem label="Sent Messages" />
-              <SecondaryMenuItem label="Scheduled Messages" />
-              <SecondaryMenuItem label="Message History" />
-              <SecondaryMenuItem label="Notification Settings" />
+              <SecondaryMenuItem
+                label="Sent Messages"
+                onClick={() => {
+                  router.push('/admin/Notifications/sent-messages')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Scheduled Messages"
+                onClick={() => {
+                  router.push('/admin/Notifications/scheduled-messages')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Message History"
+                onClick={() => {
+                  router.push('/admin/Notifications/message-history')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Notification Settings"
+                onClick={() => {
+                  router.push('/admin/Notifications/settings')
+                  closeSecondarySidebar()
+                }}
+              />
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2 px-3 hover:text-foreground transition-colors duration-200 ease-out cursor-default">Recipients</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Recipients</h4>
             <div className="space-y-1">
-              <SecondaryMenuItem label="Message to Educators" />
-              <SecondaryMenuItem label="Message to Learners" />
-              <SecondaryMenuItem label="Message to Guardians" />
-              <SecondaryMenuItem label="Create Groups" />
+              <SecondaryMenuItem
+                label="Message to Educators"
+                onClick={() => {
+                  router.push('/admin/Notifications/message-educators')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Message to Learners"
+                onClick={() => {
+                  router.push('/admin/Notifications/message-learners')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Message to Guardians"
+                onClick={() => {
+                  router.push('/admin/Notifications/message-guardians')
+                  closeSecondarySidebar()
+                }}
+              />
+              <SecondaryMenuItem
+                label="Create Groups"
+                onClick={() => {
+                  router.push('/admin/Notifications/create-groups')
+                  closeSecondarySidebar()
+                }}
+              />
             </div>
           </div>
         </div>
@@ -197,11 +313,12 @@ function SecondaryMenuItem({ label, onClick }: { label: string; onClick?: () => 
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left px-3 py-2 rounded-md text-sm",
+        "w-full text-left px-4 py-2 rounded-md text-xs font-normal",
         "transition-all duration-200 ease-out",
-        "hover:bg-white/10 hover:backdrop-blur-sm hover:scale-[1.02] hover:shadow-sm",
-        "text-foreground/80 hover:text-foreground",
-        "hover:translate-x-1"
+        "hover:bg-white/5 hover:backdrop-blur-sm hover:scale-[1.01] hover:shadow-sm",
+        "text-muted-foreground hover:text-foreground/90",
+        "hover:translate-x-1 border-l-2 border-transparent hover:border-primary/30",
+        "ml-2"
       )}
     >
       {label}

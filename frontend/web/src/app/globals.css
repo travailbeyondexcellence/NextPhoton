@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+/* Override Next.js default loader styles */
+@layer base {
+  /* Hide default Next.js development loader */
+  #__next-dev-overlay-logo {
+    display: none !important;
+  }
+
+  /* Ensure our custom loaders have proper z-index */
+  .minimalistic-loader-overlay {
+    z-index: 9999 !important;
+  }
+
+  /* Smooth transitions for page content */
+  .page-transition {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+}
+
 /* PRIORITY: Remove scrollbar arrow buttons first */
 @layer base {
   /* Remove all scrollbar buttons */
@@ -98,10 +116,10 @@
   }
   
   body {
-    /* background-color: rgb(var(--background)); */
     color: rgb(var(--foreground));
     min-height: 100vh;
     position: relative;
+    background: transparent;
   }
   
   /* Theme-aware gradient background */
@@ -112,7 +130,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom right, 
+    background: linear-gradient(to bottom right,
       rgb(var(--gradient-from)),
       rgb(var(--gradient-via)),
       rgb(var(--gradient-to)));

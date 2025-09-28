@@ -54,7 +54,7 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="relative flex flex-col md:flex-row bg-white/10 backdrop-blur-sm rounded-xl overflow-hidden border border-white/20 w-full min-h-[250px] md:min-h-[220px] cursor-pointer hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+    <div className="relative flex flex-col md:flex-row bg-white/[0.02] backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 w-full min-h-[250px] md:min-h-[220px] cursor-pointer hover:bg-white/[0.04] hover:border-white/20 transition-all duration-300">
       {/* Price Tag */}
       <div
         className={`absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded z-10 ${getPriceTagColor(educator.priceTier)}`}
@@ -69,12 +69,12 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
           alt={educator.name}
           width={240}
           height={192}
-          className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full object-cover bg-white/5"
+          className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full object-cover bg-white/[0.01]"
           onError={() => setImageError(true)}
         />
       ) : (
-        <div className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full md:min-h-[200px] bg-primary/10 flex items-center justify-center md:border-r border-white/10">
-          <div className="w-24 h-24 rounded-full bg-primary/20 border-2 border-primary/30 flex items-center justify-center">
+        <div className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full md:min-h-[200px] bg-primary/[0.05] flex items-center justify-center md:border-r border-white/5">
+          <div className="w-24 h-24 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
             <span className="text-3xl font-bold text-primary">
               {getInitials(educator.name)}
             </span>
@@ -126,23 +126,23 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
         {/* Buttons */}
         <div className="flex flex-wrap gap-2 pt-2">
           <button
-            className="bg-primary/20 text-primary px-4 py-2 rounded-md border border-primary/30 hover:bg-primary/30 transition-all text-sm"
+            className="bg-primary/10 text-primary px-4 py-2 rounded-md border border-primary/20 hover:bg-primary/20 transition-all text-sm"
             onClick={() => router.push(`/admin/educators/${educator.id}`)}
           >
             View Profile
           </button>
-          <button className="bg-white/5 px-4 py-2 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground text-sm">
+          <button className="bg-white/[0.02] px-4 py-2 rounded-md border border-white/5 hover:bg-white/[0.05] transition-all text-foreground text-sm">
             Message
           </button>
-          <button className="bg-white/5 px-4 py-2 rounded-md border border-white/10 hover:bg-white/10 transition-all text-foreground text-sm">
+          <button className="bg-white/[0.02] px-4 py-2 rounded-md border border-white/5 hover:bg-white/[0.05] transition-all text-foreground text-sm">
             Call
           </button>
         </div>
 
         {/* Footer */}
-        <div className="footer-container bg-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-md text-xs border border-white/10 gap-2 mt-2">
+        <div className="footer-container bg-white/[0.01] flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-md text-xs border border-white/5 gap-2 mt-2">
           <span className="text-muted-foreground font-medium">Demo Lecture(s)</span>
-          <div className="px-2 py-1 rounded bg-white/5 border border-white/10">
+          <div className="px-2 py-1 rounded bg-white/[0.02] border border-white/5">
             <span className="text-muted-foreground">Subjects:</span>{" "}
             <span className="text-foreground font-medium">{educator.subjects.join(", ")}</span>
           </div>
