@@ -1,0 +1,572 @@
+{
+  "metadata": {
+    "lastUpdated": "2024-03-22T10:00:00Z",
+    "version": "1.0",
+    "count": 12,
+    "description": "Academic plans and curriculum for different batches and individual learners"
+  },
+  "data": [
+    {
+      "id": "ap001",
+      "planName": "JEE Advanced 2026 - Complete Preparation",
+      "planType": "batch",
+      "targetExam": "JEE Advanced",
+      "targetYear": 2026,
+      "batchId": "batch_jee_2026_01",
+      "duration": "24 months",
+      "startDate": "2024-06-01",
+      "endDate": "2026-05-31",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Physics",
+          "educatorId": "e001",
+          "educatorName": "Dr. Meera Sharma",
+          "totalChapters": 28,
+          "completedChapters": 8,
+          "weeklyHours": 6,
+          "modules": [
+            { "name": "Mechanics", "status": "in-progress", "completion": 70 },
+            { "name": "Electrostatics", "status": "scheduled", "completion": 0 },
+            { "name": "Thermodynamics", "status": "scheduled", "completion": 0 },
+            { "name": "Modern Physics", "status": "scheduled", "completion": 0 }
+          ]
+        },
+        {
+          "name": "Chemistry",
+          "educatorId": "e002",
+          "educatorName": "Prof. Anand Iyer",
+          "totalChapters": 30,
+          "completedChapters": 10,
+          "weeklyHours": 6,
+          "modules": [
+            { "name": "Physical Chemistry", "status": "in-progress", "completion": 60 },
+            { "name": "Organic Chemistry", "status": "in-progress", "completion": 40 },
+            { "name": "Inorganic Chemistry", "status": "scheduled", "completion": 0 }
+          ]
+        },
+        {
+          "name": "Mathematics",
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "totalChapters": 32,
+          "completedChapters": 12,
+          "weeklyHours": 6,
+          "modules": [
+            { "name": "Calculus", "status": "in-progress", "completion": 50 },
+            { "name": "Algebra", "status": "completed", "completion": 100 },
+            { "name": "Coordinate Geometry", "status": "scheduled", "completion": 0 },
+            { "name": "Trigonometry", "status": "completed", "completion": 100 }
+          ]
+        }
+      ],
+      "assessments": [
+        { "type": "Weekly Test", "frequency": "Every Sunday", "duration": "90 minutes" },
+        { "type": "Monthly Mock", "frequency": "Last Sunday", "duration": "180 minutes" },
+        { "type": "Chapter Test", "frequency": "After each chapter", "duration": "60 minutes" }
+      ],
+      "milestones": [
+        { "date": "2024-09-30", "milestone": "Complete 11th syllabus", "status": "upcoming" },
+        { "date": "2025-03-31", "milestone": "Complete 12th syllabus", "status": "upcoming" },
+        { "date": "2025-09-30", "milestone": "Start revision", "status": "upcoming" },
+        { "date": "2026-01-15", "milestone": "JEE Main attempt", "status": "upcoming" }
+      ],
+      "createdAt": "2024-06-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap002",
+      "planName": "NEET 2025 - Medical Entrance Preparation",
+      "planType": "batch",
+      "targetExam": "NEET",
+      "targetYear": 2025,
+      "batchId": "batch_neet_2025_01",
+      "duration": "18 months",
+      "startDate": "2024-01-01",
+      "endDate": "2025-06-30",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Physics",
+          "educatorId": "e009",
+          "educatorName": "Dr. Vikram Reddy",
+          "totalChapters": 25,
+          "completedChapters": 10,
+          "weeklyHours": 4,
+          "modules": [
+            { "name": "Mechanics", "status": "completed", "completion": 100 },
+            { "name": "Waves and Oscillations", "status": "in-progress", "completion": 40 },
+            { "name": "Optics", "status": "scheduled", "completion": 0 }
+          ]
+        },
+        {
+          "name": "Chemistry",
+          "educatorId": "e002",
+          "educatorName": "Prof. Anand Iyer",
+          "totalChapters": 28,
+          "completedChapters": 12,
+          "weeklyHours": 4,
+          "modules": [
+            { "name": "Organic Chemistry", "status": "in-progress", "completion": 60 },
+            { "name": "Inorganic Chemistry", "status": "in-progress", "completion": 30 },
+            { "name": "Physical Chemistry", "status": "scheduled", "completion": 0 }
+          ]
+        },
+        {
+          "name": "Biology",
+          "educatorId": "e003",
+          "educatorName": "Dr. Priya Nair",
+          "totalChapters": 38,
+          "completedChapters": 15,
+          "weeklyHours": 8,
+          "modules": [
+            { "name": "Botany", "status": "in-progress", "completion": 45 },
+            { "name": "Zoology", "status": "in-progress", "completion": 35 },
+            { "name": "Human Physiology", "status": "in-progress", "completion": 50 }
+          ]
+        }
+      ],
+      "assessments": [
+        { "type": "Weekly MCQ Test", "frequency": "Every Saturday", "duration": "120 minutes" },
+        { "type": "NEET Mock", "frequency": "Bi-weekly", "duration": "200 minutes" },
+        { "type": "Topic Test", "frequency": "After each topic", "duration": "45 minutes" }
+      ],
+      "milestones": [
+        { "date": "2024-12-31", "milestone": "Complete NCERT syllabus", "status": "upcoming" },
+        { "date": "2025-03-31", "milestone": "Start final revision", "status": "upcoming" },
+        { "date": "2025-05-07", "milestone": "NEET Exam", "status": "upcoming" }
+      ],
+      "createdAt": "2024-01-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap003",
+      "planName": "10th CBSE Board Excellence Program",
+      "planType": "batch",
+      "targetExam": "10th CBSE Board",
+      "targetYear": 2025,
+      "batchId": "batch_10th_cbse_01",
+      "duration": "10 months",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Mathematics",
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "totalChapters": 15,
+          "completedChapters": 3,
+          "weeklyHours": 4,
+          "modules": [
+            { "name": "Real Numbers", "status": "completed", "completion": 100 },
+            { "name": "Polynomials", "status": "completed", "completion": 100 },
+            { "name": "Linear Equations", "status": "in-progress", "completion": 60 }
+          ]
+        },
+        {
+          "name": "Science",
+          "educatorId": "e003",
+          "educatorName": "Dr. Priya Nair",
+          "totalChapters": 16,
+          "completedChapters": 4,
+          "weeklyHours": 4,
+          "modules": [
+            { "name": "Chemical Reactions", "status": "completed", "completion": 100 },
+            { "name": "Life Processes", "status": "in-progress", "completion": 70 },
+            { "name": "Light", "status": "scheduled", "completion": 0 }
+          ]
+        },
+        {
+          "name": "English",
+          "educatorId": "e006",
+          "educatorName": "Ms. Kavita Menon",
+          "totalChapters": 20,
+          "completedChapters": 5,
+          "weeklyHours": 3,
+          "modules": [
+            { "name": "Literature", "status": "in-progress", "completion": 40 },
+            { "name": "Grammar", "status": "in-progress", "completion": 50 },
+            { "name": "Writing Skills", "status": "scheduled", "completion": 0 }
+          ]
+        }
+      ],
+      "assessments": [
+        { "type": "Unit Test", "frequency": "Monthly", "duration": "90 minutes" },
+        { "type": "Pre-board", "frequency": "Twice", "duration": "180 minutes" },
+        { "type": "Practice Papers", "frequency": "Weekly", "duration": "60 minutes" }
+      ],
+      "milestones": [
+        { "date": "2024-09-30", "milestone": "Complete first term syllabus", "status": "upcoming" },
+        { "date": "2024-12-15", "milestone": "First pre-board", "status": "upcoming" },
+        { "date": "2025-02-01", "milestone": "Second pre-board", "status": "upcoming" }
+      ],
+      "createdAt": "2024-04-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap004",
+      "planName": "Personalized JEE Plan - Aarav Patel",
+      "planType": "individual",
+      "learnerId": "l001",
+      "learnerName": "Aarav Patel",
+      "targetExam": "JEE Advanced",
+      "targetYear": 2026,
+      "basePlanId": "ap001",
+      "duration": "24 months",
+      "startDate": "2024-06-15",
+      "endDate": "2026-05-31",
+      "status": "active",
+      "strengths": ["Physics Problem Solving", "Calculus", "Organic Chemistry"],
+      "weaknesses": ["Inorganic Chemistry", "Coordinate Geometry", "Time Management"],
+      "customizations": [
+        {
+          "area": "Additional Support",
+          "description": "Extra 2 hours weekly for Inorganic Chemistry",
+          "educatorId": "e002"
+        },
+        {
+          "area": "Practice Sessions",
+          "description": "Mock test analysis sessions every week",
+          "frequency": "Weekly"
+        }
+      ],
+      "personalGoals": [
+        { "goal": "Score 95+ percentile in JEE Main", "targetDate": "2026-01-31", "status": "in-progress" },
+        { "goal": "Complete HC Verma Physics", "targetDate": "2025-06-30", "status": "in-progress" },
+        { "goal": "Solve 500+ JEE Advanced problems", "targetDate": "2025-12-31", "status": "in-progress" }
+      ],
+      "performanceMetrics": {
+        "currentPercentile": 78,
+        "targetPercentile": 95,
+        "averageTestScore": 72,
+        "improvementRate": "8% per month",
+        "studyHoursPerWeek": 25,
+        "recommendedHours": 30
+      },
+      "specialNotes": "Strong analytical skills, needs focus on speed and accuracy",
+      "createdAt": "2024-06-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap005",
+      "planName": "NEET Focused Plan - Ishita Reddy",
+      "planType": "individual",
+      "learnerId": "l002",
+      "learnerName": "Ishita Reddy",
+      "targetExam": "NEET",
+      "targetYear": 2025,
+      "basePlanId": "ap002",
+      "duration": "15 months",
+      "startDate": "2024-02-01",
+      "endDate": "2025-05-07",
+      "status": "active",
+      "strengths": ["Biology NCERT", "Organic Chemistry", "Diagram-based Questions"],
+      "weaknesses": ["Physics Numericals", "Time Management in Biology"],
+      "customizations": [
+        {
+          "area": "Physics Support",
+          "description": "One-on-one physics problem solving sessions",
+          "frequency": "Twice weekly",
+          "educatorId": "e009"
+        },
+        {
+          "area": "Biology Speed",
+          "description": "Timed practice for biology sections",
+          "frequency": "Daily"
+        }
+      ],
+      "personalGoals": [
+        { "goal": "Score 650+ in NEET", "targetDate": "2025-05-07", "status": "in-progress" },
+        { "goal": "Complete NCERT Biology 3 times", "targetDate": "2025-03-31", "status": "in-progress" },
+        { "goal": "Solve 10,000 MCQs", "targetDate": "2025-04-30", "status": "in-progress" }
+      ],
+      "performanceMetrics": {
+        "currentScore": 520,
+        "targetScore": 650,
+        "biologyAccuracy": "85%",
+        "physicsAccuracy": "65%",
+        "chemistryAccuracy": "78%",
+        "overallRank": "Top 15%"
+      },
+      "specialNotes": "Excellent retention, needs confidence building in physics",
+      "createdAt": "2024-02-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap006",
+      "planName": "8th Grade Foundation Program",
+      "planType": "batch",
+      "targetExam": "8th CBSE Annual",
+      "targetYear": 2025,
+      "batchId": "batch_8th_cbse_01",
+      "duration": "10 months",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Mathematics",
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "totalChapters": 14,
+          "completedChapters": 2,
+          "weeklyHours": 3
+        },
+        {
+          "name": "Science",
+          "educatorId": "e003",
+          "educatorName": "Dr. Priya Nair",
+          "totalChapters": 18,
+          "completedChapters": 3,
+          "weeklyHours": 3
+        },
+        {
+          "name": "English",
+          "educatorId": "e006",
+          "educatorName": "Ms. Kavita Menon",
+          "totalChapters": 16,
+          "completedChapters": 2,
+          "weeklyHours": 2
+        }
+      ],
+      "assessments": [
+        { "type": "Monthly Test", "frequency": "Monthly", "duration": "60 minutes" },
+        { "type": "Term Exam", "frequency": "Twice yearly", "duration": "120 minutes" }
+      ],
+      "createdAt": "2024-04-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap007",
+      "planName": "12th Humanities Board Preparation",
+      "planType": "batch",
+      "targetExam": "12th CBSE Board",
+      "targetYear": 2025,
+      "batchId": "batch_12th_humanities_01",
+      "duration": "10 months",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "History",
+          "educatorId": "e005",
+          "educatorName": "Prof. Sanjay Gupta",
+          "totalChapters": 15,
+          "completedChapters": 4,
+          "weeklyHours": 4
+        },
+        {
+          "name": "Political Science",
+          "educatorId": "e005",
+          "educatorName": "Prof. Sanjay Gupta",
+          "totalChapters": 12,
+          "completedChapters": 3,
+          "weeklyHours": 3
+        },
+        {
+          "name": "English",
+          "educatorId": "e006",
+          "educatorName": "Ms. Kavita Menon",
+          "totalChapters": 18,
+          "completedChapters": 5,
+          "weeklyHours": 3
+        }
+      ],
+      "assessments": [
+        { "type": "Essay Writing", "frequency": "Bi-weekly", "duration": "90 minutes" },
+        { "type": "Pre-board", "frequency": "Twice", "duration": "180 minutes" }
+      ],
+      "createdAt": "2024-04-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap008",
+      "planName": "Computer Science Specialization - 11th Grade",
+      "planType": "batch",
+      "targetExam": "11th Annual Exam",
+      "targetYear": 2025,
+      "batchId": "batch_11th_cs_01",
+      "duration": "10 months",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Computer Science",
+          "educatorId": "e007",
+          "educatorName": "Mr. Arun Kumar",
+          "totalChapters": 12,
+          "completedChapters": 3,
+          "weeklyHours": 4,
+          "modules": [
+            { "name": "Python Basics", "status": "completed", "completion": 100 },
+            { "name": "Data Structures", "status": "in-progress", "completion": 40 },
+            { "name": "Database Management", "status": "scheduled", "completion": 0 }
+          ]
+        },
+        {
+          "name": "Mathematics",
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "totalChapters": 16,
+          "completedChapters": 4,
+          "weeklyHours": 4
+        },
+        {
+          "name": "Physics",
+          "educatorId": "e001",
+          "educatorName": "Dr. Meera Sharma",
+          "totalChapters": 15,
+          "completedChapters": 3,
+          "weeklyHours": 3
+        }
+      ],
+      "practicalWork": [
+        { "type": "Programming Lab", "frequency": "Weekly", "duration": "120 minutes" },
+        { "type": "Project Work", "frequency": "Quarterly", "duration": "Ongoing" }
+      ],
+      "createdAt": "2024-04-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap009",
+      "planName": "9th Grade CBSE Foundation",
+      "planType": "batch",
+      "targetExam": "9th Annual Exam",
+      "targetYear": 2025,
+      "batchId": "batch_9th_cbse_01",
+      "duration": "10 months",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Mathematics",
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "totalChapters": 15,
+          "completedChapters": 3,
+          "weeklyHours": 3
+        },
+        {
+          "name": "Science",
+          "educatorId": "e003",
+          "educatorName": "Dr. Priya Nair",
+          "totalChapters": 15,
+          "completedChapters": 3,
+          "weeklyHours": 3
+        },
+        {
+          "name": "Geography",
+          "educatorId": "e008",
+          "educatorName": "Ms. Neha Singh",
+          "totalChapters": 8,
+          "completedChapters": 2,
+          "weeklyHours": 2
+        }
+      ],
+      "assessments": [
+        { "type": "Unit Test", "frequency": "After each unit", "duration": "60 minutes" },
+        { "type": "Term Exam", "frequency": "Twice yearly", "duration": "150 minutes" }
+      ],
+      "createdAt": "2024-04-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap010",
+      "planName": "7th Grade Regular Program",
+      "planType": "batch",
+      "targetExam": "7th Annual Exam",
+      "targetYear": 2025,
+      "batchId": "batch_7th_cbse_01",
+      "duration": "10 months",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "subjects": [
+        {
+          "name": "Mathematics",
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "totalChapters": 13,
+          "completedChapters": 2,
+          "weeklyHours": 3
+        },
+        {
+          "name": "Science",
+          "educatorId": "e003",
+          "educatorName": "Dr. Priya Nair",
+          "totalChapters": 14,
+          "completedChapters": 2,
+          "weeklyHours": 3
+        },
+        {
+          "name": "English",
+          "educatorId": "e006",
+          "educatorName": "Ms. Kavita Menon",
+          "totalChapters": 12,
+          "completedChapters": 2,
+          "weeklyHours": 2
+        }
+      ],
+      "assessments": [
+        { "type": "Class Test", "frequency": "Bi-weekly", "duration": "45 minutes" },
+        { "type": "Term Exam", "frequency": "Twice yearly", "duration": "120 minutes" }
+      ],
+      "createdAt": "2024-04-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap011",
+      "planName": "Olympiad Preparation - Mathematics",
+      "planType": "special",
+      "targetExam": "IMO",
+      "targetYear": 2025,
+      "duration": "12 months",
+      "startDate": "2024-03-01",
+      "endDate": "2025-02-28",
+      "status": "active",
+      "educatorId": "e004",
+      "educatorName": "Mr. Ramesh Kulkarni",
+      "enrolledLearners": ["l001", "l003", "l008"],
+      "topics": [
+        { "name": "Number Theory", "status": "in-progress", "completion": 40 },
+        { "name": "Combinatorics", "status": "scheduled", "completion": 0 },
+        { "name": "Geometry", "status": "scheduled", "completion": 0 },
+        { "name": "Algebra", "status": "in-progress", "completion": 60 }
+      ],
+      "sessionFrequency": "Twice weekly",
+      "sessionDuration": "90 minutes",
+      "practiceProblems": "50 per week",
+      "mockTests": "Monthly",
+      "createdAt": "2024-03-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "ap012",
+      "planName": "Summer Crash Course - Board Revision",
+      "planType": "intensive",
+      "targetExam": "10th/12th Boards",
+      "targetYear": 2025,
+      "duration": "2 months",
+      "startDate": "2024-05-01",
+      "endDate": "2024-06-30",
+      "status": "upcoming",
+      "subjects": ["Mathematics", "Science", "English"],
+      "features": [
+        "Daily 4-hour sessions",
+        "Weekend mock tests",
+        "Previous year paper solving",
+        "Doubt clearing sessions",
+        "Study material provided"
+      ],
+      "batchSize": 25,
+      "enrollmentStatus": "open",
+      "fee": "₹15,000",
+      "createdAt": "2024-03-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/auth-client";
+import { useAuth } from "@/contexts/AuthProviderWithLoading";
 import { LogoComponent } from "@/components/LogoComponent";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { Eye, EyeOff, User } from "lucide-react";
@@ -33,7 +33,7 @@ type SignUpForm = z.infer<typeof signUpSchema>;
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { register: registerUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -46,29 +46,18 @@ export default function SignUpPage() {
   });
 
   const onSubmit = async (data: SignUpForm) => {
-    setIsLoading(true);
-    
     try {
       const { confirmPassword, ...registerData } = data;
       // Default to learner role for now - user can update role after login
-      const result = await authClient.signUp.email({
+      await registerUser({
         ...registerData,
         role: 'learner'
       });
-      
-      if (result.error) {
-        toast.error(result.error.message || "Failed to create account");
-        return;
-      }
 
-      toast.success("Account created successfully! Please sign in.");
-      
-      // Redirect to sign in page after successful registration
-      router.push("/sign-in");
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
+      toast.success("Account created successfully!");
+      // Redirect handled by AuthContext
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -210,10 +199,9 @@ export default function SignUpPage() {
             {/* Sign Up Button */}
             <button
               type="submit"
-              disabled={isLoading}
               className="w-full py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium text-base shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              {isLoading ? "Creating Account..." : "Sign Up"}
+              Sign Up
             </button>
 
             {/* Or Sign Up With */}

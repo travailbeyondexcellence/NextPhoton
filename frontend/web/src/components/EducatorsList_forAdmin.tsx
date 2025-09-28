@@ -39,24 +39,24 @@ const EducatorsList_forAdmin = () => {
 
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-lg overflow-x-auto border border-white/20">
-      <table className="min-w-full text-sm text-left">
-        <thead className="bg-white/5 border-b border-white/10">
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm text-left border-collapse">
+        <thead className="border-b border-white/20">
           <tr>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Photo</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Name</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Subjects</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Exams</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Experience</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Students</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Hours</th>
-            <th className="px-4 py-3 text-muted-foreground font-medium">Actions</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Photo</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Name</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Subjects</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Exams</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Experience</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Students</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Hours</th>
+            <th className="text-left p-4 font-medium text-muted-foreground">Actions</th>
           </tr>
         </thead>
         <tbody>
           {educators.map((edu) => (
-            <tr key={edu.id} className="border-t border-white/10 hover:bg-white/5 transition-all">
-              <td className="px-4 py-3">
+            <tr key={edu.id} className="border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
+              <td className="p-4">
                 {edu.profileImage && !imageErrors.has(edu.id) ? (
                   <Image
                     src={edu.profileImage}
@@ -76,7 +76,7 @@ const EducatorsList_forAdmin = () => {
                   </div>
                 )}
               </td>
-              <td className="px-4 py-3">
+              <td className="p-4">
                 <div className="font-semibold text-foreground">{edu.name}</div>
                 <div className="text-muted-foreground text-xs">{edu.username}</div>
               </td>
