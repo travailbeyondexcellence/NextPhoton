@@ -379,9 +379,9 @@
         "textColor": "#cbd5e1"
       },
       "dashboardHeader": {
-        "gradientFrom": "#050711",
-        "gradientVia": "#0f1a42",
-        "gradientTo": "#06343f",
+        "gradientFrom": "#010227",
+        "gradientVia": "#010227",
+        "gradientTo": "#090192",
         "opacity": 0.9,
         "textColor": "#cbd5e1"
       },
