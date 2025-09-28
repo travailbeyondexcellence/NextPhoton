@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useTheme } from "@/hooks/useTheme";
+import themes from '@/../../themes.json';
 
 interface LogoComponentProps {
   width?: number;
@@ -22,6 +24,61 @@ export function LogoComponent({
   textClassName = ""
 }: LogoComponentProps) {
   const [useFallback, setUseFallback] = useState(false);
+  const { currentTheme } = useTheme();
+  
+  // Get logo colors directly from themes.json
+  const logoColors = useMemo(() => {
+    const defaultColors = {
+      gradientStart: '#140d39',
+      gradientMid1: '#15103c',
+      gradientMid2: '#191b46',
+      gradientMid3: '#1e2c56',
+      gradientMid4: '#26456d',
+      gradientMid5: '#31658a',
+      gradientBlue: '#3d8cae',
+      gradientTeal1: '#4cbad8',
+      gradientTeal2: '#51c8e5',
+      gradientEnd: '#136935',
+      ringColor1: '#3d68b1',
+      ringColor2: '#273b88',
+      ringColor3: '#32c0c6',
+      ringColor4: '#3e68af',
+      detailColor: '#1f1f1f',
+      detailColor2: '#414141',
+      detailColor3: '#070707',
+      textColor: '#ffffff'
+    };
+    
+    // Get theme from themes.json
+    const theme = (themes as any).themes[currentTheme];
+    
+    // Only certain themes have custom logo colors
+    if (theme?.logo?.logoOnSidebarHeader) {
+      const customColors = theme.logo.logoOnSidebarHeader;
+      return {
+        gradientStart: customColors.gradientStart || defaultColors.gradientStart,
+        gradientMid1: customColors.gradientMid1 || defaultColors.gradientMid1,
+        gradientMid2: customColors.gradientMid2 || defaultColors.gradientMid2,
+        gradientMid3: customColors.gradientMid3 || defaultColors.gradientMid3,
+        gradientMid4: customColors.gradientMid4 || defaultColors.gradientMid4,
+        gradientMid5: customColors.gradientMid5 || defaultColors.gradientMid5,
+        gradientBlue: customColors.gradientBlue || defaultColors.gradientBlue,
+        gradientTeal1: customColors.gradientTeal1 || defaultColors.gradientTeal1,
+        gradientTeal2: customColors.gradientTeal2 || defaultColors.gradientTeal2,
+        gradientEnd: customColors.gradientEnd || defaultColors.gradientEnd,
+        ringColor1: customColors.ringColor1 || defaultColors.ringColor1,
+        ringColor2: customColors.ringColor2 || defaultColors.ringColor2,
+        ringColor3: customColors.ringColor3 || defaultColors.ringColor3,
+        ringColor4: customColors.ringColor4 || defaultColors.ringColor4,
+        detailColor: customColors.detailColor || defaultColors.detailColor,
+        detailColor2: customColors.detailColor2 || defaultColors.detailColor2,
+        detailColor3: customColors.detailColor3 || defaultColors.detailColor3,
+        textColor: customColors.textColor || defaultColors.textColor
+      };
+    }
+    
+    return defaultColors;
+  }, [currentTheme]);
 
   // If SVG fails to render, show text fallback
   if (useFallback) {
@@ -35,6 +92,7 @@ export function LogoComponent({
     >
       <div style={{ width, height }}>
         <svg 
+          key={currentTheme}
           viewBox="0 0 889.54 859.21" 
           xmlns="http://www.w3.org/2000/svg" 
           width={width}
@@ -46,25 +104,25 @@ export function LogoComponent({
           }}
         >
         <defs>
-          <linearGradient gradientUnits="userSpaceOnUse" y2="72.95" x2="445.93" y1="759.32" x1="445.93" id="logo-gradient">
-            <stop stopColor="var(--logo-gradient-start, #140d39)" offset="0"/>
-            <stop stopColor="var(--logo-gradient-mid1, #15103c)" offset=".1"/>
-            <stop stopColor="var(--logo-gradient-mid2, #191b46)" offset=".19"/>
-            <stop stopColor="var(--logo-gradient-mid3, #1e2c56)" offset=".28"/>
-            <stop stopColor="var(--logo-gradient-mid4, #26456d)" offset=".36"/>
-            <stop stopColor="var(--logo-gradient-mid5, #31658a)" offset=".43"/>
-            <stop stopColor="var(--logo-gradient-blue, #3d8cae)" offset=".51"/>
-            <stop stopColor="var(--logo-gradient-teal1, #4cbad8)" offset=".58"/>
-            <stop stopColor="var(--logo-gradient-teal2, #51c8e5)" offset=".6"/>
-            <stop stopColor="var(--logo-gradient-end, #136935)" offset="1"/>
+          <linearGradient gradientUnits="userSpaceOnUse" y2="72.95" x2="445.93" y1="759.32" x1="445.93" id={`logo-gradient-${currentTheme}`}>
+            <stop stopColor={logoColors.gradientStart} offset="0"/>
+            <stop stopColor={logoColors.gradientMid1} offset=".1"/>
+            <stop stopColor={logoColors.gradientMid2} offset=".19"/>
+            <stop stopColor={logoColors.gradientMid3} offset=".28"/>
+            <stop stopColor={logoColors.gradientMid4} offset=".36"/>
+            <stop stopColor={logoColors.gradientMid5} offset=".43"/>
+            <stop stopColor={logoColors.gradientBlue} offset=".51"/>
+            <stop stopColor={logoColors.gradientTeal1} offset=".58"/>
+            <stop stopColor={logoColors.gradientTeal2} offset=".6"/>
+            <stop stopColor={logoColors.gradientEnd} offset="1"/>
           </linearGradient>
-          <style>{`.cls-4{fill:var(--logo-ring-color-1, #3d68b1)}.cls-8{fill:var(--logo-detail-color, #1f1f1f)}.cls-10{fill:var(--logo-detail-color-2, #414141)}.cls-17{fill:var(--logo-detail-color-3, #070707)}`}</style>
+          <style>{`.cls-4{fill:${logoColors.ringColor1}}.cls-8{fill:${logoColors.detailColor}}.cls-10{fill:${logoColors.detailColor2}}.cls-17{fill:${logoColors.detailColor3}}`}</style>
         </defs>
-        <ellipse ry="343.18" rx="342.81" cy="416.14" cx="445.93" style={{ fill: "url(#logo-gradient)" }}/>
-        <path transform="translate(-83.43 -133.68)" d="M528.54 992.87a444.73 444.73 0 0 1-438-365.15 431.6 431.6 0 0 1-7.09-76.61c0-3.39.41-6.45 3.62-8.34 4.85-2.84 9.94 1.06 10 7.94a416 416 0 0 0 3.09 49.16c12.44 100 54.38 185.67 126.17 256.11 74.2 72.8 163.64 113.88 267.39 122.33C706.15 995.6 898.89 855.16 948.27 647.6a412.5 412.5 0 0 0 11.47-95.39c0-1.13 0-2.26.06-3.4.11-4.47 1.61-8 6.75-7.94s6.45 3.6 6.45 8.13a439.5 439.5 0 0 1-15.23 115.34c-45.4 167.87-183.42 293.17-355.36 322.54a412.6 412.6 0 0 1-73.87 5.99" style={{ fill: "var(--logo-ring-color-2, #273b88)" }}/>
-        <path d="M763.65 164.49c-3.71.13-5.72-2.36-7.8-4.89A395.9 395.9 0 0 0 487.93 16.98c-66.33-6.4-130 3.57-191.87 28.39-56.57 22.7-103.94 57.75-144.49 102.65a34 34 0 0 1-2.77 2.84c-2.83 2.47-5.81 2.6-8.68.14s-3.35-5.61-1-8.55c3.5-4.45 7.2-8.76 11.09-12.86 67-70.62 148.92-112.44 245.1-125.66 79.27-10.9 155.71.9 227.93 35.25 55.83 26.59 104.18 63.67 143.33 112.06a32 32 0 0 1 2.4 3.16 6.43 6.43 0 0 1-5.32 10.09M37.28 411.17c-.15-45.76 8.27-93.47 25.33-139.66.46-1.24.92-2.48 1.4-3.71 1.56-4 4.45-5.7 8.53-4.37s5.19 4.59 4 8.64c-.32 1.08-.7 2.15-1.09 3.21-18.46 50.49-27 102.65-24.16 156.28a402.5 402.5 0 0 0 32.75 139.93c21 48.22 50 91 87.69 127.59q82.08 79.68 194 104.56a45 45 0 0 1 8.18 2.18c2.93 1.29 4.91 3.78 4.13 7.25a6.4 6.4 0 0 1-6.94 5.42 35 35 0 0 1-6.16-.85c-56-11.89-106.9-35.33-153.95-67.86C137.1 698.72 87.84 629.52 58.57 545.43c-11.5-33.11-18-67.43-20.33-102.49-.67-9.44-.84-18.86-.96-31.77m825.04 1.31c-1.73 104.47-35 195.26-102.22 273.2a376.2 376.2 0 0 1-71.67 64.79c-52.39 36-109.5 60.66-172.55 70.77-4.57.73-8 0-9.15-5-1-4.25 1.62-7.2 7.14-8.15 66.06-11.31 126-37 178.7-78.33 82-64.32 131.6-148.23 149.51-250.9 3.73-21.38 6.68-42.85 6.47-64.61a407.8 407.8 0 0 0-19.72-123.09c-.76-2.33-1.54-4.66-2.17-7-1-3.87.26-6.9 4.07-8.16 4-1.33 7 .34 8.51 4.35.34.89.61 1.79.91 2.69 12.41 37.49 20.23 75.83 21.34 115.41.15 5.29.62 10.56.83 14.03" style={{ fill: "var(--logo-ring-color-3, #32c0c6)" }}/>
+        <ellipse ry="343.18" rx="342.81" cy="416.14" cx="445.93" style={{ fill: `url(#logo-gradient-${currentTheme})` }}/>
+        <path transform="translate(-83.43 -133.68)" d="M528.54 992.87a444.73 444.73 0 0 1-438-365.15 431.6 431.6 0 0 1-7.09-76.61c0-3.39.41-6.45 3.62-8.34 4.85-2.84 9.94 1.06 10 7.94a416 416 0 0 0 3.09 49.16c12.44 100 54.38 185.67 126.17 256.11 74.2 72.8 163.64 113.88 267.39 122.33C706.15 995.6 898.89 855.16 948.27 647.6a412.5 412.5 0 0 0 11.47-95.39c0-1.13 0-2.26.06-3.4.11-4.47 1.61-8 6.75-7.94s6.45 3.6 6.45 8.13a439.5 439.5 0 0 1-15.23 115.34c-45.4 167.87-183.42 293.17-355.36 322.54a412.6 412.6 0 0 1-73.87 5.99" style={{ fill: logoColors.ringColor2 }}/>
+        <path d="M763.65 164.49c-3.71.13-5.72-2.36-7.8-4.89A395.9 395.9 0 0 0 487.93 16.98c-66.33-6.4-130 3.57-191.87 28.39-56.57 22.7-103.94 57.75-144.49 102.65a34 34 0 0 1-2.77 2.84c-2.83 2.47-5.81 2.6-8.68.14s-3.35-5.61-1-8.55c3.5-4.45 7.2-8.76 11.09-12.86 67-70.62 148.92-112.44 245.1-125.66 79.27-10.9 155.71.9 227.93 35.25 55.83 26.59 104.18 63.67 143.33 112.06a32 32 0 0 1 2.4 3.16 6.43 6.43 0 0 1-5.32 10.09M37.28 411.17c-.15-45.76 8.27-93.47 25.33-139.66.46-1.24.92-2.48 1.4-3.71 1.56-4 4.45-5.7 8.53-4.37s5.19 4.59 4 8.64c-.32 1.08-.7 2.15-1.09 3.21-18.46 50.49-27 102.65-24.16 156.28a402.5 402.5 0 0 0 32.75 139.93c21 48.22 50 91 87.69 127.59q82.08 79.68 194 104.56a45 45 0 0 1 8.18 2.18c2.93 1.29 4.91 3.78 4.13 7.25a6.4 6.4 0 0 1-6.94 5.42 35 35 0 0 1-6.16-.85c-56-11.89-106.9-35.33-153.95-67.86C137.1 698.72 87.84 629.52 58.57 545.43c-11.5-33.11-18-67.43-20.33-102.49-.67-9.44-.84-18.86-.96-31.77m825.04 1.31c-1.73 104.47-35 195.26-102.22 273.2a376.2 376.2 0 0 1-71.67 64.79c-52.39 36-109.5 60.66-172.55 70.77-4.57.73-8 0-9.15-5-1-4.25 1.62-7.2 7.14-8.15 66.06-11.31 126-37 178.7-78.33 82-64.32 131.6-148.23 149.51-250.9 3.73-21.38 6.68-42.85 6.47-64.61a407.8 407.8 0 0 0-19.72-123.09c-.76-2.33-1.54-4.66-2.17-7-1-3.87.26-6.9 4.07-8.16 4-1.33 7 .34 8.51 4.35.34.89.61 1.79.91 2.69 12.41 37.49 20.23 75.83 21.34 115.41.15 5.29.62 10.56.83 14.03" style={{ fill: logoColors.ringColor3 }}/>
         <path d="M430.68 792.77c-47.95.1-106.42-14.86-161.46-43.67-7.21-3.76-9.13-7.14-6.68-11.42 2.32-4.06 5.85-4.07 12.88-.52 112 56.54 224.15 56 336.56 1.34a58 58 0 0 1 7.15-3.38 6.11 6.11 0 0 1 7.74 3 6.29 6.29 0 0 1-1.69 8.61 39 39 0 0 1-6.37 3.66c-54.58 27.99-112.47 42.3-188.13 42.38" className="cls-4"/>
-        <path transform="translate(-83.43 -133.68)" d="M150.4 531.93c9.17-130.34 67.59-232 176.79-304.24 2.76-1.82 5.52-3.39 9-1.91a6.57 6.57 0 0 1 2.33 10.76 30 30 0 0 1-5.48 4Q194.34 331.4 167.6 495a344 344 0 0 0-3.6 38.92c-.34 7.37-2.26 10.3-6.94 10.11s-6.83-3.4-6.7-10.4c.05-.57.04-1.13.04-1.7" style={{ fill: "var(--logo-ring-color-4, #3e68af)" }}/>
+        <path transform="translate(-83.43 -133.68)" d="M150.4 531.93c9.17-130.34 67.59-232 176.79-304.24 2.76-1.82 5.52-3.39 9-1.91a6.57 6.57 0 0 1 2.33 10.76 30 30 0 0 1-5.48 4Q194.34 331.4 167.6 495a344 344 0 0 0-3.6 38.92c-.34 7.37-2.26 10.3-6.94 10.11s-6.83-3.4-6.7-10.4c.05-.57.04-1.13.04-1.7" style={{ fill: logoColors.ringColor4 }}/>
         <path d="M822.57 393.24c0 3.2-.1 6.41 0 9.61.17 4.37-1.18 7.51-6.07 7.8-5.22.31-7-3-7.15-7.49a293 293 0 0 0-2.37-30.47c-15.3-113.19-70.1-201.74-165.34-265.06-2-1.36-4.21-2.57-6.11-4.1-2.89-2.33-3.48-5.34-1.58-8.58s5-3.95 8.34-2.63a33.5 33.5 0 0 1 5.86 3.41q146.57 96.68 171.42 270.45 1 6.74 1.58 13.5c.42 4.51.63 9 .92 13.56Z" className="cls-4"/>
         <path transform="translate(-83.43 -133.68)" d="m189.83 598.64.15-3.54a48.4 48.4 0 0 1 2.1 16.08 28.8 28.8 0 0 1-2.25-12.54" style={{ fill: "#a4a4a4" }}/>
         <path transform="translate(-83.43 -133.68)" d="M667 541.83c-3.95-4.16-1.65-10.24-4.53-14.73-.22-2 .08-4.8-3.09-1.79a18 18 0 0 1-2.65 1.76c1.1-2.18 2.26-4.33 3.29-6.55.45-1 .36-2.5 1.85-2.39 1.28.1 1.66 1.45 2 2.53a43.8 43.8 0 0 1 2 12.23 31.3 31.3 0 0 0 1.13 8.94" style={{ fill: "#2d2d2d" }}/>
@@ -96,8 +154,9 @@ export function LogoComponent({
       {/* NextPhoton Text */}
       {showText && (
         <span 
+          key={`text-${currentTheme}`}
           className={`font-semibold text-lg tracking-wide ${textClassName}`}
-          style={{ color: 'var(--logo-text-color, #ffffff)' }}
+          style={{ color: logoColors.textColor }}
         >
           NextPhoton
         </span>

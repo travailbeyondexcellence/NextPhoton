@@ -56,9 +56,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#66b3ff",
-        "backgroundGradientVia": "#c5e1ff",
-        "backgroundGradientTo": "#66b3ff",
+        "backgroundGradientFrom": "#01CDFF",
+        "backgroundGradientVia": "#0970FF",
+        "backgroundGradientTo": "#010CFF",
         "backgroundGradientOpacity": 0.75,
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
@@ -73,16 +73,16 @@
         "glassTextColor": "#ffffff"
       },
       "sidebar": {
-        "gradientFrom": "#004a99",
-        "gradientVia": "#9acafe",
-        "gradientTo": "#004a99",
+        "gradientFrom": "#2D37FF",
+        "gradientVia": "#1783FF",
+        "gradientTo": "#01CFFF",
         "opacity": 1.0,
         "textColor": "#ffffff"
       },
       "dashboardHeader": {
-        "gradientFrom": "#004a99",
-        "gradientVia": "#9acafe",
-        "gradientTo": "#004a99",
+        "gradientFrom": "#2D37FF",
+        "gradientVia": "#1783FF",
+        "gradientTo": "#01CFFF",
         "opacity": 1.0,
         "textColor": "#ffffff"
       },
@@ -99,7 +99,7 @@
       "order": 1,
       "colors": {
         "background": "#0a1f0f",
-        "foreground": "#eafff2",
+        "foreground": "#0a4f4a",
         "card": "#162a1a",
         "cardForeground": "#e6ffe8",
         "primary": "#059669",
@@ -122,10 +122,10 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#064e3b",
-        "backgroundGradientVia": "#047857",
-        "backgroundGradientTo": "#0d9488",
-        "backgroundGradientOpacity": 0.65,
+        "backgroundGradientFrom": "#5FC05D",
+        "backgroundGradientVia": "#30D197",
+        "backgroundGradientTo": "#01E1D8",
+        "backgroundGradientOpacity": 0.90,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -191,7 +191,7 @@
         "backgroundGradientFrom": "#000000",
         "backgroundGradientVia": "#064e3b",
         "backgroundGradientTo": "#052e16",
-        "backgroundGradientOpacity": 0.7,
+        "backgroundGradientOpacity": 0.90,
         "cardOpacity": 0.12,
         "borderOpacity": 0.25,
         "blurIntensity": 16,
@@ -254,9 +254,9 @@
         "warningForeground": "#000000"
       },
       "glass": {
-        "backgroundGradientFrom": "#0f0a1f",
-        "backgroundGradientVia": "#2e1065",
-        "backgroundGradientTo": "#312e81",
+        "backgroundGradientFrom": "#83419A",
+        "backgroundGradientVia": "#5E2DB0",
+        "backgroundGradientTo": "#3A19C6",
         "backgroundGradientOpacity": 0.8,
         "cardOpacity": 0.15,
         "borderOpacity": 0.3,
@@ -320,10 +320,10 @@
         "warningForeground": "#422006"
       },
       "glass": {
-        "backgroundGradientFrom": "#0f172a",
-        "backgroundGradientVia": "#1e3a8a",
-        "backgroundGradientTo": "#0e7490",
-        "backgroundGradientOpacity": 0.75,
+        "backgroundGradientFrom": "#01CDFF",
+        "backgroundGradientVia": "#0970FF",
+        "backgroundGradientTo": "#010CFF",
+        "backgroundGradientOpacity": 0.84,
         "cardOpacity": 0.12,
         "borderOpacity": 0.25,
         "blurIntensity": 16,
@@ -517,7 +517,7 @@
       "order": 9,
       "colors": {
         "background": "#1f0813",
-        "foreground": "#fdf2f8",
+        "foreground": "#4a1a2e",
         "card": "#2d0f1b",
         "cardForeground": "#fce7f3",
         "primary": "#FF1493",
@@ -557,16 +557,16 @@
         "glassTextColor": "#fce7f3"
       },
       "sidebar": {
-        "gradientFrom": "#990c58",
-        "gradientVia": "#993797",
-        "gradientTo": "#990c5a",
-        "opacity": 0.9,
+        "gradientFrom": "#E8368B",
+        "gradientVia": "#F16ABB",
+        "gradientTo": "#FF9DEB",
+        "opacity": 0.85,
         "textColor": "#fce7f3"
       },
       "dashboardHeader": {
-        "gradientFrom": "#FF1493",
-        "gradientVia": "#FF5BFC",
-        "gradientTo": "#FF1496",
+        "gradientFrom": "#E8368B",
+        "gradientVia": "#F16ABB",
+        "gradientTo": "#FF9DEB",
         "opacity": 0.85,
         "textColor": "#fce7f3"
       },
@@ -605,9 +605,9 @@
       "order": 11,
       "colors": {
         "background": "#1f0a0d",
-        "foreground": "#fff5f6",
+        "foreground": "#4a0e23",
         "card": "#3a1419",
-        "cardForeground": "#ffe8eb",
+        "cardForeground": "#5d1428",
         "primary": "#F92A53",
         "primaryForeground": "#ffffff",
         "secondary": "#DE254A",
@@ -615,8 +615,8 @@
         "accent": "#FE244F",
         "accentForeground": "#ffffff",
         "muted": "#3a1419",
-        "mutedForeground": "#ffc0cb",
-        "border": "#F23057",
+        "mutedForeground": "#8b2f47",
+        "border": "#ffffff",
         "selection": "#fb7185",
         "link": "#DE254A",
         "linkHover": "#A61C37",
@@ -631,24 +631,24 @@
         "backgroundGradientFrom": "#be123c",
         "backgroundGradientVia": "#dc2626",
         "backgroundGradientTo": "#db2777",
-        "backgroundGradientOpacity": 0.7,
-        "cardOpacity": 0.08,
-        "borderOpacity": 0.15,
-        "blurIntensity": 8,
-        "hoverOpacity": 0.12,
-        "activeOpacity": 0.16,
+        "backgroundGradientOpacity": 0.48,
+        "cardOpacity": 0.18,
+        "borderOpacity": 0.35,
+        "blurIntensity": 12,
+        "hoverOpacity": 0.22,
+        "activeOpacity": 0.26,
         "gradientOverlayFrom": "#FE244F",
         "gradientOverlayFromOpacity": 0.1,
         "gradientOverlayTo": "#F92A53",
         "gradientOverlayToOpacity": 0.05,
-        "glassTint": "rgba(249, 42, 83, 0.08)",
-        "glassTextColor": "#ffe8eb"
+        "glassTint": "rgba(255, 255, 255, 0.15)",
+        "glassTextColor": "#5d1428"
       },
       "sidebar": {
         "gradientFrom": "#be123c",
         "gradientVia": "#dc2626",
         "gradientTo": "#db2777",
-        "opacity": 0.95,
+        "opacity": 0.42,
         "textColor": "#ffe8eb"
       },
       "dashboardHeader": {
@@ -716,10 +716,10 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#171717",
-        "backgroundGradientVia": "#262626",
-        "backgroundGradientTo": "#404040",
-        "backgroundGradientOpacity": 0.5,
+        "backgroundGradientFrom": "#6E6F73",
+        "backgroundGradientVia": "#3A3A3D",
+        "backgroundGradientTo": "#060606",
+        "backgroundGradientOpacity": 0.78,
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
         "blurIntensity": 16,
@@ -733,9 +733,9 @@
         "glassTextColor": "#d4d4d4"
       },
       "sidebar": {
-        "gradientFrom": "#080808",
-        "gradientVia": "#101010",
-        "gradientTo": "#1a1a1a",
+        "gradientFrom": "#3B3B3B",
+        "gradientVia": "#1E1E1E",
+        "gradientTo": "#010101",
         "opacity": 0.7,
         "textColor": "#d4d4d4"
       },
@@ -870,9 +870,9 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#f9fafb",
-        "backgroundGradientVia": "#ffffff",
-        "backgroundGradientTo": "#f3f4f6",
+        "backgroundGradientFrom": "#FFFFFF",
+        "backgroundGradientVia": "#B5B5B5",
+        "backgroundGradientTo": "#6B6B6B",
         "backgroundGradientOpacity": 0.3,
         "cardOpacity": 0.05,
         "borderOpacity": 0.8,
@@ -891,14 +891,14 @@
         "gradientVia": "#909090",
         "gradientTo": "#868686",
         "opacity": 0.5,
-        "textColor": "#ffffff"
+        "textColor": "#000000"
       },
       "dashboardHeader": {
         "gradientFrom": "#d0d0d0",
         "gradientVia": "#e0e0e0",
         "gradientTo": "#d5d5d5",
         "opacity": 0.4,
-        "textColor": "#ffffff"
+        "textColor": "#000000"
       },
       "progressGradient": {
         "from": "#666666",
