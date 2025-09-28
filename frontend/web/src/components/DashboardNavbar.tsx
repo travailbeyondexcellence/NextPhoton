@@ -10,7 +10,10 @@ export function DashboardNavbar() {
     <div 
       className="h-16 w-full border-b border-white/10 backdrop-blur-xl relative z-40"
       style={{
-        background: `linear-gradient(135deg, rgb(var(--dashboard-header-gradient-from)) 0%, rgb(var(--dashboard-header-gradient-via)) 50%, rgb(var(--dashboard-header-gradient-to)) 100%)`
+        background: `linear-gradient(135deg, 
+          rgba(var(--dashboard-header-gradient-from), var(--dashboard-header-gradient-opacity, 1)) 0%, 
+          rgba(var(--dashboard-header-gradient-via), var(--dashboard-header-gradient-opacity, 1)) 50%, 
+          rgba(var(--dashboard-header-gradient-to), var(--dashboard-header-gradient-opacity, 1)) 100%)`
       }}
     >
       <div className="h-full px-4 flex items-center justify-between">

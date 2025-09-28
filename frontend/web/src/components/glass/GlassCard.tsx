@@ -39,7 +39,7 @@ export function GlassCard({
   };
 
   const baseClasses = cn(
-    'rounded-lg border border-border/20',
+    'relative rounded-lg border border-border/20',
     'shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]',
     'transition-all duration-300',
     blurClasses[blur],
@@ -53,10 +53,17 @@ export function GlassCard({
 
   return (
     <div className={baseClasses} {...props}>
+      {/* Glass tint overlay */}
+      <div 
+        className="absolute inset-0 rounded-lg pointer-events-none"
+        style={{ backgroundColor: 'var(--glass-tint, transparent)' }}
+      />
       {gradient && (
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
       )}
-      {children}
+      <div className="relative z-10" style={{ color: 'var(--glass-text-color, inherit)' }}>
+        {children}
+      </div>
     </div>
   );
 }

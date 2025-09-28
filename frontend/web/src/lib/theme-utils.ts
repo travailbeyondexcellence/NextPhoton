@@ -137,6 +137,25 @@ export function applyTheme(themeKey: ThemeKey): void {
     if (theme.glass.dashboardHeaderGradientTo) {
       root.style.setProperty('--dashboard-header-gradient-to', hexToRgb(theme.glass.dashboardHeaderGradientTo));
     }
+    
+    // Apply gradient opacity values
+    if (theme.glass.backgroundGradientOpacity !== undefined) {
+      root.style.setProperty('--background-gradient-opacity', theme.glass.backgroundGradientOpacity.toString());
+    }
+    if (theme.glass.sidebarGradientOpacity !== undefined) {
+      root.style.setProperty('--sidebar-gradient-opacity', theme.glass.sidebarGradientOpacity.toString());
+    }
+    if (theme.glass.dashboardHeaderGradientOpacity !== undefined) {
+      root.style.setProperty('--dashboard-header-gradient-opacity', theme.glass.dashboardHeaderGradientOpacity.toString());
+    }
+    
+    // Apply glass tint and text color for adaptive glass morphism
+    if (theme.glass.glassTint) {
+      root.style.setProperty('--glass-tint', theme.glass.glassTint);
+    }
+    if (theme.glass.glassTextColor) {
+      root.style.setProperty('--glass-text-color', theme.glass.glassTextColor);
+    }
   }
   
   // Save to localStorage

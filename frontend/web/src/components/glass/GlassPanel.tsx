@@ -43,7 +43,7 @@ export function GlassPanel({
   };
 
   const baseClasses = cn(
-    'rounded-xl p-6',
+    'relative rounded-xl p-6',
     'transition-all duration-300',
     blurClasses[blur],
     gradientClasses[gradient],
@@ -53,7 +53,12 @@ export function GlassPanel({
 
   return (
     <div className={baseClasses} {...props}>
-      <div className="relative z-10">
+      {/* Glass tint overlay */}
+      <div 
+        className="absolute inset-0 rounded-xl pointer-events-none"
+        style={{ backgroundColor: 'var(--glass-tint, transparent)' }}
+      />
+      <div className="relative z-10" style={{ color: 'var(--glass-text-color, inherit)' }}>
         {children}
       </div>
       {/* Decorative glass overlay */}

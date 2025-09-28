@@ -50,11 +50,16 @@ export function GlassModal({
         sizeClasses[size],
         className
       )}>
+        {/* Glass tint overlay */}
+        <div 
+          className="absolute inset-0 rounded-xl pointer-events-none"
+          style={{ backgroundColor: 'var(--glass-tint, transparent)' }}
+        />
         {/* Glass overlay effect */}
         <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-white/5 to-transparent pointer-events-none" />
         
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10" style={{ color: 'var(--glass-text-color, inherit)' }}>
           {children}
         </div>
       </div>

@@ -59,6 +59,7 @@
         "backgroundGradientFrom": "#66b3ff",
         "backgroundGradientVia": "#c5e1ff",
         "backgroundGradientTo": "#66b3ff",
+        "backgroundGradientOpacity": 0.75,
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
         "blurIntensity": 12,
@@ -71,9 +72,13 @@
         "sidebarGradientFrom": "#007bff",
         "sidebarGradientVia": "#9acafe",
         "sidebarGradientTo": "#007bff",
+        "sidebarGradientOpacity": 1.0,
         "dashboardHeaderGradientFrom": "#007bff",
         "dashboardHeaderGradientVia": "#9acafe",
-        "dashboardHeaderGradientTo": "#007bff"
+        "dashboardHeaderGradientTo": "#007bff",
+        "dashboardHeaderGradientOpacity": 1.0,
+        "glassTint": "rgba(30, 58, 95, 0.3)",
+        "glassTextColor": "#ffffff"
       },
       "progressGradient": {
         "from": "#0ea5e9",
@@ -114,6 +119,7 @@
         "backgroundGradientFrom": "#064e3b",
         "backgroundGradientVia": "#047857",
         "backgroundGradientTo": "#0d9488",
+        "backgroundGradientOpacity": 0.65,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -128,7 +134,11 @@
         "sidebarGradientTo": "#086a5d",
         "dashboardHeaderGradientFrom": "#022419",
         "dashboardHeaderGradientVia": "#02402f",
-        "dashboardHeaderGradientTo": "#065449"
+        "dashboardHeaderGradientTo": "#065449",
+        "sidebarGradientOpacity": 0.9,
+        "dashboardHeaderGradientOpacity": 0.85,
+        "glassTint": "rgba(5, 150, 105, 0.05)",
+        "glassTextColor": "#e6ffe8"
       },
       "progressGradient": {
         "from": "#10b981",
@@ -169,6 +179,7 @@
         "backgroundGradientFrom": "#000000",
         "backgroundGradientVia": "#064e3b",
         "backgroundGradientTo": "#052e16",
+        "backgroundGradientOpacity": 0.7,
         "cardOpacity": 0.12,
         "borderOpacity": 0.25,
         "blurIntensity": 16,
@@ -183,7 +194,11 @@
         "sidebarGradientTo": "#021f0e",
         "dashboardHeaderGradientFrom": "#000000",
         "dashboardHeaderGradientVia": "#022419",
-        "dashboardHeaderGradientTo": "#01170a"
+        "dashboardHeaderGradientTo": "#01170a",
+        "sidebarGradientOpacity": 0.95,
+        "dashboardHeaderGradientOpacity": 0.9,
+        "glassTint": "rgba(16, 185, 129, 0.08)",
+        "glassTextColor": "#a7f3d0"
       },
       "progressGradient": {
         "from": "#34d399",
@@ -224,6 +239,7 @@
         "backgroundGradientFrom": "#0f0a1f",
         "backgroundGradientVia": "#2e1065",
         "backgroundGradientTo": "#312e81",
+        "backgroundGradientOpacity": 0.8,
         "cardOpacity": 0.15,
         "borderOpacity": 0.3,
         "blurIntensity": 20,
@@ -238,7 +254,11 @@
         "sidebarGradientTo": "#1f1a57",
         "dashboardHeaderGradientFrom": "#060309",
         "dashboardHeaderGradientVia": "#14062d",
-        "dashboardHeaderGradientTo": "#181345"
+        "dashboardHeaderGradientTo": "#181345",
+        "sidebarGradientOpacity": 1.0,
+        "dashboardHeaderGradientOpacity": 0.95,
+        "glassTint": "rgba(139, 92, 246, 0.1)",
+        "glassTextColor": "#e2e8f0"
       },
       "progressGradient": {
         "from": "#8b5cf6",
@@ -279,6 +299,7 @@
         "backgroundGradientFrom": "#0f172a",
         "backgroundGradientVia": "#1e3a8a",
         "backgroundGradientTo": "#0e7490",
+        "backgroundGradientOpacity": 0.75,
         "cardOpacity": 0.12,
         "borderOpacity": 0.25,
         "blurIntensity": 16,
@@ -293,7 +314,11 @@
         "sidebarGradientTo": "#094757",
         "dashboardHeaderGradientFrom": "#050711",
         "dashboardHeaderGradientVia": "#0f1a42",
-        "dashboardHeaderGradientTo": "#06343f"
+        "dashboardHeaderGradientTo": "#06343f",
+        "sidebarGradientOpacity": 0.9,
+        "dashboardHeaderGradientOpacity": 0.9,
+        "glassTint": "rgba(59, 130, 246, 0.08)",
+        "glassTextColor": "#cbd5e1"
       },
       "progressGradient": {
         "from": "#60a5fa",
@@ -334,6 +359,7 @@
         "backgroundGradientFrom": "#0e7490",
         "backgroundGradientVia": "#0d9488",
         "backgroundGradientTo": "#1e3a8a",
+        "backgroundGradientOpacity": 0.7,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -348,7 +374,11 @@
         "sidebarGradientTo": "#14255a",
         "dashboardHeaderGradientFrom": "#06343f",
         "dashboardHeaderGradientVia": "#065449",
-        "dashboardHeaderGradientTo": "#0f1a42"
+        "dashboardHeaderGradientTo": "#0f1a42",
+        "sidebarGradientOpacity": 0.85,
+        "dashboardHeaderGradientOpacity": 0.8,
+        "glassTint": "rgba(20, 184, 166, 0.06)",
+        "glassTextColor": "#ccfbf1"
       },
       "progressGradient": {
         "from": "#06b6d4",
@@ -389,6 +419,7 @@
         "backgroundGradientFrom": "#FF0000",
         "backgroundGradientVia": "#FF7F00",
         "backgroundGradientTo": "#FF0900",
+        "backgroundGradientOpacity": 0.6,
         "cardOpacity": 0.024,
         "borderOpacity": 0.045,
         "blurIntensity": 8,
@@ -403,7 +434,11 @@
         "sidebarGradientTo": "#FF7700",
         "dashboardHeaderGradientFrom": "#990000",
         "dashboardHeaderGradientVia": "#994400",
-        "dashboardHeaderGradientTo": "#998800"
+        "dashboardHeaderGradientTo": "#998800",
+        "sidebarGradientOpacity": 0.8,
+        "dashboardHeaderGradientOpacity": 0.5,
+        "glassTint": "rgba(255, 149, 0, 0.1)",
+        "glassTextColor": "#ffe4b5"
       },
       "progressGradient": {
         "from": "#fde047",
@@ -444,6 +479,7 @@
         "backgroundGradientFrom": "#FF8AC9",
         "backgroundGradientVia": "#FFADFD",
         "backgroundGradientTo": "#FF8ACB",
+        "backgroundGradientOpacity": 0.65,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -458,7 +494,11 @@
         "sidebarGradientTo": "#FF1496",
         "dashboardHeaderGradientFrom": "#FF1493",
         "dashboardHeaderGradientVia": "#FF5BFC",
-        "dashboardHeaderGradientTo": "#FF1496"
+        "dashboardHeaderGradientTo": "#FF1496",
+        "sidebarGradientOpacity": 0.9,
+        "dashboardHeaderGradientOpacity": 0.85,
+        "glassTint": "rgba(255, 20, 147, 0.08)",
+        "glassTextColor": "#fce7f3"
       },
       "progressGradient": {
         "from": "#FF5BFC",
@@ -499,6 +539,7 @@
         "backgroundGradientFrom": "#be123c",
         "backgroundGradientVia": "#dc2626",
         "backgroundGradientTo": "#db2777",
+        "backgroundGradientOpacity": 0.7,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -513,7 +554,11 @@
         "sidebarGradientTo": "#a11956",
         "dashboardHeaderGradientFrom": "#5c0716",
         "dashboardHeaderGradientVia": "#7a1212",
-        "dashboardHeaderGradientTo": "#7a1240"
+        "dashboardHeaderGradientTo": "#7a1240",
+        "sidebarGradientOpacity": 0.95,
+        "dashboardHeaderGradientOpacity": 0.9,
+        "glassTint": "rgba(249, 42, 83, 0.08)",
+        "glassTextColor": "#ffe8eb"
       },
       "progressGradient": {
         "from": "#FE244F",
@@ -554,6 +599,7 @@
         "backgroundGradientFrom": "#171717",
         "backgroundGradientVia": "#262626",
         "backgroundGradientTo": "#404040",
+        "backgroundGradientOpacity": 0.5,
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
         "blurIntensity": 16,
@@ -568,7 +614,11 @@
         "sidebarGradientTo": "#2a2a2a",
         "dashboardHeaderGradientFrom": "#0a0a0a",
         "dashboardHeaderGradientVia": "#141414",
-        "dashboardHeaderGradientTo": "#1f1f1f"
+        "dashboardHeaderGradientTo": "#1f1f1f",
+        "sidebarGradientOpacity": 0.7,
+        "dashboardHeaderGradientOpacity": 0.6,
+        "glassTint": "rgba(255, 255, 255, 0.02)",
+        "glassTextColor": "#d4d4d4"
       },
       "progressGradient": {
         "from": "#525252",
@@ -609,6 +659,7 @@
         "backgroundGradientFrom": "#a18f78",
         "backgroundGradientVia": "#f5e6d3",
         "backgroundGradientTo": "#e8d5c4",
+        "backgroundGradientOpacity": 0.55,
         "cardOpacity": 0.08,
         "borderOpacity": 0.15,
         "blurIntensity": 8,
@@ -623,7 +674,11 @@
         "sidebarGradientTo": "#b5a090",
         "dashboardHeaderGradientFrom": "#5c503f",
         "dashboardHeaderGradientVia": "#a89a85",
-        "dashboardHeaderGradientTo": "#9a8878"
+        "dashboardHeaderGradientTo": "#9a8878",
+        "sidebarGradientOpacity": 0.75,
+        "dashboardHeaderGradientOpacity": 0.7,
+        "glassTint": "rgba(62, 39, 35, 0.4)",
+        "glassTextColor": "#ffffff"
       },
       "progressGradient": {
         "from": "#a1887f",
@@ -664,6 +719,7 @@
         "backgroundGradientFrom": "#f9fafb",
         "backgroundGradientVia": "#ffffff",
         "backgroundGradientTo": "#f3f4f6",
+        "backgroundGradientOpacity": 0.3,
         "cardOpacity": 0.05,
         "borderOpacity": 0.8,
         "blurIntensity": 0,
@@ -678,7 +734,11 @@
         "sidebarGradientTo": "#e0e0e0",
         "dashboardHeaderGradientFrom": "#d0d0d0",
         "dashboardHeaderGradientVia": "#e0e0e0",
-        "dashboardHeaderGradientTo": "#d5d5d5"
+        "dashboardHeaderGradientTo": "#d5d5d5",
+        "sidebarGradientOpacity": 0.5,
+        "dashboardHeaderGradientOpacity": 0.4,
+        "glassTint": "rgba(0, 0, 0, 0.8)",
+        "glassTextColor": "#ffffff"
       },
       "progressGradient": {
         "from": "#666666",

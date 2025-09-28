@@ -116,7 +116,7 @@
       rgb(var(--gradient-from)),
       rgb(var(--gradient-via)),
       rgb(var(--gradient-to)));
-    opacity: 0.75;
+    opacity: var(--background-gradient-opacity, 0.75);
     z-index: -1;
   }
   
