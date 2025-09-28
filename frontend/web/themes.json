@@ -519,8 +519,8 @@
       },
       "sidebar": {
         "gradientFrom": "#FFD633",
-        "gradientVia": "#FFD372",
-        "gradientTo": "#FFCFB1",
+        "gradientVia": "#FFBA49",
+        "gradientTo": "#FF9D5F",
         "opacity": 0.8,
         "textColor": "#3e2723"
       },
