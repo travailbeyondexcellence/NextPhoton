@@ -971,11 +971,11 @@
         "backgroundOverlay": 0.0
       },
       "sidebar": {
-        "gradientFrom": "#898989",
-        "gradientVia": "#909090",
-        "gradientTo": "#868686",
-        "opacity": 0.5,
-        "textColor": "#000000"
+        "gradientFrom": "#2C5364",
+        "gradientVia": "#203A43",
+        "gradientTo": "#0F2027",
+        "opacity": 0.69,
+        "textColor": "#ffffff"
       },
       "dashboardHeader": {
         "gradientFrom": "#d0d0d0",
