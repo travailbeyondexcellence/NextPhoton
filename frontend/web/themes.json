@@ -372,9 +372,9 @@
         "backgroundOverlay": 0.0
       },
       "sidebar": {
-        "gradientFrom": "#060810",
-        "gradientVia": "#0c1636",
-        "gradientTo": "#052b34",
+        "gradientFrom": "#090192",
+        "gradientVia": "#010227",
+        "gradientTo": "#010227",
         "opacity": 0.9,
         "textColor": "#cbd5e1"
       },
@@ -687,7 +687,7 @@
         "backgroundGradientFrom": "#FF3D40",
         "backgroundGradientVia": "#FF4579",
         "backgroundGradientTo": "#FF4579",
-        "backgroundGradientOpacity": 0.69,
+        "backgroundGradientOpacity": 0.45,
         "cardOpacity": 0.18,
         "borderOpacity": 0.35,
         "blurIntensity": 12,
