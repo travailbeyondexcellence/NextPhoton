@@ -26,7 +26,19 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const { open } = useSidebar();
 
   return (
-    <div className="flex w-screen h-screen overflow-hidden">
+    <div className="flex w-screen h-screen overflow-hidden relative">
+      {/* Background gradient that extends to full content */}
+      <div 
+        className="fixed inset-0 z-0"
+        style={{
+          background: `linear-gradient(to bottom right,
+            rgb(var(--gradient-from)),
+            rgb(var(--gradient-via)),
+            rgb(var(--gradient-to)))`,
+          opacity: `var(--background-gradient-opacity, 0.75)`
+        }}
+      />
+      
       {/* Sidebar with glass effect */}
       <aside
         className={`
@@ -49,18 +61,21 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
       {/* Main content area */}
       <div
         className={`
-          w-screen flex flex-col min-h-screen
+          relative w-screen flex flex-col min-h-screen
           transition-all duration-300
           ${open ? "ml-72" : "ml-0"}
         `}
       >
         <DashboardNavbar />
-        <main className="flex-1 p-6 overflow-auto relative z-10">
-          {/* Main section background overlay for theme-based darkening */}
-          <div className="main-section-overlay"></div>
-          {/* Glass panel wrapper for content */}
-          <div className="relative z-10">
-            {children}
+        <main className="flex-1 overflow-auto relative z-10">
+          {/* Content with extended background */}
+          <div className="min-h-full p-6">
+            {/* Main section background overlay for theme-based darkening */}
+            <div className="main-section-overlay"></div>
+            {/* Glass panel wrapper for content */}
+            <div className="relative z-10">
+              {children}
+            </div>
           </div>
         </main>
       </div>

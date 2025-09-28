@@ -56,10 +56,10 @@
         "warningForeground": "#ffffff"
       },
       "glass": {
-        "backgroundGradientFrom": "#0153FF",
-        "backgroundGradientVia": "#0191FF",
-        "backgroundGradientTo": "#01CFFF",
-        "backgroundGradientOpacity": 0.75,
+        "backgroundGradientFrom": "#5B7FFF",
+        "backgroundGradientVia": "#3B9FE6",
+        "backgroundGradientTo": "#0EA5E9",
+        "backgroundGradientOpacity": 0.6,
         "cardOpacity": 0.1,
         "borderOpacity": 0.2,
         "blurIntensity": 12,
@@ -90,7 +90,7 @@
         "gradientFrom": "#2D37FF",
         "gradientVia": "#1783FF",
         "gradientTo": "#01CFFF",
-        "opacity": 1.0,
+        "opacity": 0.75,
         "textColor": "#ffffff"
       },
       "progressGradient": {
@@ -716,8 +716,8 @@
       },
       "dashboardHeader": {
         "gradientFrom": "#FF3D40",
-        "gradientVia": "#FF45AC",
-        "gradientTo": "#FF4579",
+        "gradientVia": "#FF336B",
+        "gradientTo": "#FF336B",
         "opacity": 0.9,
         "textColor": "#ffe8eb"
       },

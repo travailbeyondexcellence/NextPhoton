@@ -237,6 +237,35 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.15);
   }
   
+  /* Ensure glass effects work in all scroll contexts */
+  .glass,
+  .glass-card,
+  [class*="backdrop-blur"] {
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Theme-aware glass utilities to replace hard-coded values */
+  .theme-bg-glass {
+    background: rgb(var(--card) / var(--glass-opacity)) !important;
+  }
+  
+  .theme-bg-glass-hover:hover {
+    background: rgb(var(--card) / var(--glass-hover-opacity)) !important;
+  }
+  
+  .theme-backdrop-blur {
+    backdrop-filter: blur(calc(var(--glass-blur) * 1px)) !important;
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px)) !important;
+  }
+  
+  .theme-border-glass {
+    border-color: rgb(var(--border) / var(--glass-border-opacity)) !important;
+  }
+  
   /* Glass panel for larger areas */
   .glass-panel {
     background: linear-gradient(
