@@ -74,7 +74,10 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
           className
         )}
         style={{
-          background: `linear-gradient(135deg, rgb(var(--sidebar-gradient-from)) 0%, rgb(var(--sidebar-gradient-via)) 50%, rgb(var(--sidebar-gradient-to)) 100%)`
+          background: `linear-gradient(135deg, 
+            rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
+            rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
+            rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%)`
         }}
       >
         {/* Header */}
