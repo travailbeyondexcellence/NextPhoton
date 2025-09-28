@@ -163,19 +163,68 @@ export default function ThemeScript() {
                     }
                   }
                   
-                  // Apply logo colors for theme-aware logo display
+                  // Apply logo colors for theme-aware logo display (only for specific themes)
                   if (theme.logo && theme.logo.logoOnSidebarHeader) {
                     const logoColors = theme.logo.logoOnSidebarHeader;
                     
-                    if (logoColors.svgPrimaryColor) {
-                      root.style.setProperty('--logo-svg-primary-color', logoColors.svgPrimaryColor);
+                    // Apply gradient colors for earth
+                    if (logoColors.gradientStart) {
+                      root.style.setProperty('--logo-gradient-start', logoColors.gradientStart);
                     }
-                    if (logoColors.svgSecondaryColor) {
-                      root.style.setProperty('--logo-svg-secondary-color', logoColors.svgSecondaryColor);
+                    if (logoColors.gradientMid1) {
+                      root.style.setProperty('--logo-gradient-mid1', logoColors.gradientMid1);
                     }
-                    if (logoColors.svgAccentColor) {
-                      root.style.setProperty('--logo-svg-accent-color', logoColors.svgAccentColor);
+                    if (logoColors.gradientMid2) {
+                      root.style.setProperty('--logo-gradient-mid2', logoColors.gradientMid2);
                     }
+                    if (logoColors.gradientMid3) {
+                      root.style.setProperty('--logo-gradient-mid3', logoColors.gradientMid3);
+                    }
+                    if (logoColors.gradientMid4) {
+                      root.style.setProperty('--logo-gradient-mid4', logoColors.gradientMid4);
+                    }
+                    if (logoColors.gradientMid5) {
+                      root.style.setProperty('--logo-gradient-mid5', logoColors.gradientMid5);
+                    }
+                    if (logoColors.gradientBlue) {
+                      root.style.setProperty('--logo-gradient-blue', logoColors.gradientBlue);
+                    }
+                    if (logoColors.gradientTeal1) {
+                      root.style.setProperty('--logo-gradient-teal1', logoColors.gradientTeal1);
+                    }
+                    if (logoColors.gradientTeal2) {
+                      root.style.setProperty('--logo-gradient-teal2', logoColors.gradientTeal2);
+                    }
+                    if (logoColors.gradientEnd) {
+                      root.style.setProperty('--logo-gradient-end', logoColors.gradientEnd);
+                    }
+                    
+                    // Apply ring colors
+                    if (logoColors.ringColor1) {
+                      root.style.setProperty('--logo-ring-color-1', logoColors.ringColor1);
+                    }
+                    if (logoColors.ringColor2) {
+                      root.style.setProperty('--logo-ring-color-2', logoColors.ringColor2);
+                    }
+                    if (logoColors.ringColor3) {
+                      root.style.setProperty('--logo-ring-color-3', logoColors.ringColor3);
+                    }
+                    if (logoColors.ringColor4) {
+                      root.style.setProperty('--logo-ring-color-4', logoColors.ringColor4);
+                    }
+                    
+                    // Apply detail colors
+                    if (logoColors.detailColor) {
+                      root.style.setProperty('--logo-detail-color', logoColors.detailColor);
+                    }
+                    if (logoColors.detailColor2) {
+                      root.style.setProperty('--logo-detail-color-2', logoColors.detailColor2);
+                    }
+                    if (logoColors.detailColor3) {
+                      root.style.setProperty('--logo-detail-color-3', logoColors.detailColor3);
+                    }
+                    
+                    // Apply text color
                     if (logoColors.textColor) {
                       root.style.setProperty('--logo-text-color', logoColors.textColor);
                     }
