@@ -16,7 +16,13 @@
       "Bash(touch:*)",
       "Bash(grep:*)",
       "Bash(rg:*)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(test:*)",
+      "Bash(curl:*)",
+      "Bash(netstat:*)",
+      "Bash(ss:*)",
+      "Bash(lsof:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

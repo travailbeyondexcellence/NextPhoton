@@ -4,12 +4,15 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-  User, 
-  Mail, 
-  AtSign, 
+import { useMutation } from '@apollo/client';
+import { CREATE_LEARNER, GET_LEARNERS } from '@/lib/apollo';
+import { useRouter } from 'next/navigation';
+import {
+  User,
+  Mail,
+  AtSign,
   Phone,
-  School, 
+  School,
   GraduationCap,
   Target,
   Calendar,
@@ -19,7 +22,8 @@ import {
   Image as ImageIcon,
   FileText,
   MapPin,
-  Hash
+  Hash,
+  Loader2
 } from 'lucide-react';
 
 const learnerSchema = z.object({
@@ -27,8 +31,21 @@ const learnerSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   username: z.string().min(2, 'Username is required'),
   email: z.string().email('Invalid email'),
-  phone: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number').optional().or(z.literal('')),
-  profileImage: z.string().url('Invalid URL').optional().or(z.literal('')),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number too long').optional().or(z.literal('')),
+  profileImage: z.string().url('Invalid URL').refine((url) => {
+    if (!url) return true; // Empty is ok
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname;
+      // Reject example domains and invalid hostnames
+      if (hostname.startsWith('example.') || hostname === 'example.jpeg' || hostname === 'example.jpg' || hostname === 'example.png') {
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }, 'Please enter a real image URL (example URLs not allowed)').optional().or(z.literal('')),
   
   // Academic Information
   academicLevel: z.string().min(1, 'Academic level is required'),
@@ -43,7 +60,7 @@ const learnerSchema = z.object({
   // Guardian Information (simplified for creation)
   guardianName: z.string().min(2, 'Guardian name is required'),
   guardianRelation: z.string().min(1, 'Guardian relation is required'),
-  guardianPhone: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number'),
+  guardianPhone: z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number too long'),
   guardianEmail: z.string().email('Invalid guardian email'),
   
   // Additional Info
@@ -87,16 +104,86 @@ const remarkTagOptions = [
 ];
 
 export default function CreateLearnerForm() {
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<LearnerFormData>({
     resolver: zodResolver(learnerSchema),
     defaultValues,
   });
 
-  const onSubmit = (data: LearnerFormData) => {
-    // Handle form submission
-    console.log('Form data:', data);
-    alert('Learner created successfully!');
-    reset();
+  // Apollo mutation for creating learner
+  const [createLearner, { loading: creating }] = useMutation(CREATE_LEARNER, {
+    // Update the cache after creating learner
+    update(cache, { data }) {
+      // Only update cache if we have valid data
+      if (!data?.createLearner) return;
+
+      try {
+        const existingData: any = cache.readQuery({ query: GET_LEARNERS });
+        if (existingData?.learners) {
+          cache.writeQuery({
+            query: GET_LEARNERS,
+            data: {
+              learners: [...existingData.learners, data.createLearner],
+            },
+          });
+        }
+      } catch (error) {
+        // Query might not be in cache yet, which is fine
+        console.log('Cache update skipped - query not in cache yet');
+      }
+    },
+    onCompleted: () => {
+      alert('Learner created successfully!');
+      reset();
+      // Navigate back to learners list
+      router.push('/admin/learners');
+    },
+    onError: (error) => {
+      console.error('Error creating learner:', error);
+      alert('Failed to create learner. Please try again.');
+    },
+  });
+
+  const onSubmit = async (data: LearnerFormData) => {
+    try {
+      // Transform form data to match GraphQL input
+      // Address field should contain all custom data as JSON
+      const addressData = {
+        school: data.school,
+        board: data.board,
+        academicLevel: data.academicLevel,
+        targetExams: data.targetExams,
+        targetExamYear: data.targetExamYear,
+        guardianInfo: {
+          name: data.guardianName,
+          relation: data.guardianRelation,
+          phone: data.guardianPhone,
+          email: data.guardianEmail,
+        },
+        remarkTags: data.remarkTags || [],
+        enrollmentDate: data.enrollmentDate || new Date().toISOString().split('T')[0],
+        username: data.username,
+      };
+
+      await createLearner({
+        variables: {
+          input: {
+            firstName: data.name.split(' ')[0] || data.name,
+            lastName: data.name.split(' ').slice(1).join(' ') || '',
+            email: data.email,
+            phoneNumber: data.phone || undefined,
+            dateOfBirth: undefined, // Can add this to form if needed
+            grade: data.grade,
+            guardianIds: [], // Will be linked when guardian is created
+            batchIds: data.batchId ? [data.batchId] : [],
+            profilePicture: data.profileImage || undefined,
+            address: addressData,
+          },
+        },
+      });
+    } catch (err) {
+      console.error('Submit error:', err);
+    }
   };
 
   // Handle multi-select for exams
@@ -458,13 +545,16 @@ export default function CreateLearnerForm() {
         >
           Reset
         </button>
-        <button 
-          type="submit" 
-          className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg 
+        <button
+          type="submit"
+          disabled={creating}
+          className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg
                    hover:bg-primary/30 hover:border-primary/40 transition-all duration-200
-                   focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium"
+                   focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium
+                   disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Create Learner
+          {creating && <Loader2 className="w-4 h-4 animate-spin" />}
+          {creating ? 'Creating...' : 'Create Learner'}
         </button>
       </div>
     </form>

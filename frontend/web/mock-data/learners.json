@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "lastUpdated": "2024-03-22T10:00:00Z",
+    "lastUpdated": "2025-09-30T09:52:22.535Z",
     "version": "1.0",
-    "count": 9,
+    "count": 10,
     "description": "Learner profiles with academic information, guardian relationships, and progress tracking"
   },
   "data": [
@@ -16,19 +16,42 @@
       "grade": "11th Standard",
       "school": "DPS International School",
       "board": "CBSE",
-      "targetExams": ["JEE Main", "JEE Advanced"],
+      "targetExams": [
+        "JEE Main",
+        "JEE Advanced"
+      ],
       "targetExamYear": 2026,
       "batchId": "batch_jee_2026_01",
       "assignedEducators": [
-        { "educatorId": "e001", "educatorName": "Dr. Meera Sharma", "subject": "Physics" },
-        { "educatorId": "e002", "educatorName": "Prof. Anand Iyer", "subject": "Chemistry" },
-        { "educatorId": "e004", "educatorName": "Mr. Ramesh Kulkarni", "subject": "Mathematics" }
+        {
+          "educatorId": "e001",
+          "educatorName": "Dr. Meera Sharma",
+          "subject": "Physics"
+        },
+        {
+          "educatorId": "e002",
+          "educatorName": "Prof. Anand Iyer",
+          "subject": "Chemistry"
+        },
+        {
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "subject": "Mathematics"
+        }
       ],
       "enrollmentDate": "2023-06-15",
       "profileImage": "/learners/aarav.png",
       "guardians": [
-        { "guardianId": "g001", "guardianName": "Rajesh Patel", "relation": "Father" },
-        { "guardianId": "g002", "guardianName": "Sneha Patel", "relation": "Mother" }
+        {
+          "guardianId": "g001",
+          "guardianName": "Rajesh Patel",
+          "relation": "Father"
+        },
+        {
+          "guardianId": "g002",
+          "guardianName": "Sneha Patel",
+          "relation": "Mother"
+        }
       ],
       "attendance": {
         "overall": 92,
@@ -71,7 +94,11 @@
           "type": "behavioral"
         }
       ],
-      "remarkTags": ["High Potential", "Physics Star", "Needs Chemistry Support"],
+      "remarkTags": [
+        "High Potential",
+        "Physics Star",
+        "Needs Chemistry Support"
+      ],
       "status": "active",
       "lastActive": "2024-03-22",
       "createdAt": "2023-06-15T00:00:00Z",
@@ -87,19 +114,41 @@
       "grade": "12th Standard",
       "school": "St. Mary's Convent School",
       "board": "ICSE",
-      "targetExams": ["NEET"],
+      "targetExams": [
+        "NEET"
+      ],
       "targetExamYear": 2025,
       "batchId": "batch_neet_2025_02",
       "assignedEducators": [
-        { "educatorId": "e003", "educatorName": "Ms. Nisha Rao", "subject": "Biology" },
-        { "educatorId": "e001", "educatorName": "Dr. Meera Sharma", "subject": "Physics" },
-        { "educatorId": "e002", "educatorName": "Prof. Anand Iyer", "subject": "Chemistry" }
+        {
+          "educatorId": "e003",
+          "educatorName": "Ms. Nisha Rao",
+          "subject": "Biology"
+        },
+        {
+          "educatorId": "e001",
+          "educatorName": "Dr. Meera Sharma",
+          "subject": "Physics"
+        },
+        {
+          "educatorId": "e002",
+          "educatorName": "Prof. Anand Iyer",
+          "subject": "Chemistry"
+        }
       ],
       "enrollmentDate": "2023-07-01",
       "profileImage": null,
       "guardians": [
-        { "guardianId": "g003", "guardianName": "Anil Reddy", "relation": "Father" },
-        { "guardianId": "g004", "guardianName": "Priya Reddy", "relation": "Mother" }
+        {
+          "guardianId": "g003",
+          "guardianName": "Anil Reddy",
+          "relation": "Father"
+        },
+        {
+          "guardianId": "g004",
+          "guardianName": "Priya Reddy",
+          "relation": "Mother"
+        }
       ],
       "attendance": {
         "overall": 95,
@@ -128,7 +177,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Consistent Performer", "Biology Excellence", "NEET Focused"],
+      "remarkTags": [
+        "Consistent Performer",
+        "Biology Excellence",
+        "NEET Focused"
+      ],
       "status": "active",
       "lastActive": "2024-03-22",
       "createdAt": "2023-07-01T00:00:00Z",
@@ -144,18 +197,37 @@
       "grade": "10th Standard",
       "school": "Delhi Public School",
       "board": "CBSE",
-      "targetExams": ["10th Boards", "NTSE"],
+      "targetExams": [
+        "10th Boards",
+        "NTSE"
+      ],
       "targetExamYear": 2024,
       "batchId": "batch_10th_cbse_03",
       "assignedEducators": [
-        { "educatorId": "e004", "educatorName": "Mr. Ramesh Kulkarni", "subject": "Mathematics" },
-        { "educatorId": "e005", "educatorName": "Ms. Tanya Kapoor", "subject": "English" },
-        { "educatorId": "e006", "educatorName": "Mr. Vivek Deshmukh", "subject": "Physics" }
+        {
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "subject": "Mathematics"
+        },
+        {
+          "educatorId": "e005",
+          "educatorName": "Ms. Tanya Kapoor",
+          "subject": "English"
+        },
+        {
+          "educatorId": "e006",
+          "educatorName": "Mr. Vivek Deshmukh",
+          "subject": "Physics"
+        }
       ],
       "enrollmentDate": "2023-08-01",
       "profileImage": "/learners/rohan.png",
       "guardians": [
-        { "guardianId": "g005", "guardianName": "Vikram Verma", "relation": "Father" }
+        {
+          "guardianId": "g005",
+          "guardianName": "Vikram Verma",
+          "relation": "Father"
+        }
       ],
       "attendance": {
         "overall": 88,
@@ -175,7 +247,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Board Exam Prep", "Improving", "NTSE Candidate"],
+      "remarkTags": [
+        "Board Exam Prep",
+        "Improving",
+        "NTSE Candidate"
+      ],
       "status": "active",
       "lastActive": "2024-03-21",
       "createdAt": "2023-08-01T00:00:00Z",
@@ -191,18 +267,37 @@
       "grade": "12th Standard",
       "school": "Vidya Valley School",
       "board": "State Board",
-      "targetExams": ["JEE Main", "MHT-CET"],
+      "targetExams": [
+        "JEE Main",
+        "MHT-CET"
+      ],
       "targetExamYear": 2025,
       "batchId": "batch_jee_2025_01",
       "assignedEducators": [
-        { "educatorId": "e001", "educatorName": "Dr. Meera Sharma", "subject": "Physics" },
-        { "educatorId": "e004", "educatorName": "Mr. Ramesh Kulkarni", "subject": "Mathematics" }
+        {
+          "educatorId": "e001",
+          "educatorName": "Dr. Meera Sharma",
+          "subject": "Physics"
+        },
+        {
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "subject": "Mathematics"
+        }
       ],
       "enrollmentDate": "2023-05-20",
       "profileImage": "",
       "guardians": [
-        { "guardianId": "g006", "guardianName": "Suresh Desai", "relation": "Father" },
-        { "guardianId": "g007", "guardianName": "Kavita Desai", "relation": "Mother" }
+        {
+          "guardianId": "g006",
+          "guardianName": "Suresh Desai",
+          "relation": "Father"
+        },
+        {
+          "guardianId": "g007",
+          "guardianName": "Kavita Desai",
+          "relation": "Mother"
+        }
       ],
       "attendance": {
         "overall": 96,
@@ -231,7 +326,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Top Performer", "JEE Advanced Ready", "100% Attendance"],
+      "remarkTags": [
+        "Top Performer",
+        "JEE Advanced Ready",
+        "100% Attendance"
+      ],
       "status": "active",
       "lastActive": "2024-03-22",
       "createdAt": "2023-05-20T00:00:00Z",
@@ -247,18 +346,37 @@
       "grade": "11th Standard",
       "school": "Sophia College",
       "board": "ICSE",
-      "targetExams": ["NEET", "Biology Olympiad"],
+      "targetExams": [
+        "NEET",
+        "Biology Olympiad"
+      ],
       "targetExamYear": 2026,
       "batchId": "batch_neet_2026_01",
       "assignedEducators": [
-        { "educatorId": "e003", "educatorName": "Ms. Nisha Rao", "subject": "Biology" },
-        { "educatorId": "e007", "educatorName": "Dr. Farah Qureshi", "subject": "Biology (Advanced)" }
+        {
+          "educatorId": "e003",
+          "educatorName": "Ms. Nisha Rao",
+          "subject": "Biology"
+        },
+        {
+          "educatorId": "e007",
+          "educatorName": "Dr. Farah Qureshi",
+          "subject": "Biology (Advanced)"
+        }
       ],
       "enrollmentDate": "2023-06-10",
       "profileImage": "/learners/sana.png",
       "guardians": [
-        { "guardianId": "g008", "guardianName": "Imran Sheikh", "relation": "Father" },
-        { "guardianId": "g009", "guardianName": "Fatima Sheikh", "relation": "Mother" }
+        {
+          "guardianId": "g008",
+          "guardianName": "Imran Sheikh",
+          "relation": "Father"
+        },
+        {
+          "guardianId": "g009",
+          "guardianName": "Fatima Sheikh",
+          "relation": "Mother"
+        }
       ],
       "attendance": {
         "overall": 90,
@@ -287,7 +405,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Olympiad Aspirant", "Research Oriented", "Biology Excellence"],
+      "remarkTags": [
+        "Olympiad Aspirant",
+        "Research Oriented",
+        "Biology Excellence"
+      ],
       "status": "active",
       "lastActive": "2024-03-22",
       "createdAt": "2023-06-10T00:00:00Z",
@@ -303,17 +425,32 @@
       "grade": "12th Standard",
       "school": "Kendriya Vidyalaya",
       "board": "CBSE",
-      "targetExams": ["12th Boards", "JEE Main"],
+      "targetExams": [
+        "12th Boards",
+        "JEE Main"
+      ],
       "targetExamYear": 2024,
       "batchId": "batch_12th_cbse_02",
       "assignedEducators": [
-        { "educatorId": "e009", "educatorName": "Ms. Shruti Desai", "subject": "Computer Science" },
-        { "educatorId": "e004", "educatorName": "Mr. Ramesh Kulkarni", "subject": "Mathematics" }
+        {
+          "educatorId": "e009",
+          "educatorName": "Ms. Shruti Desai",
+          "subject": "Computer Science"
+        },
+        {
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "subject": "Mathematics"
+        }
       ],
       "enrollmentDate": "2023-07-15",
       "profileImage": null,
       "guardians": [
-        { "guardianId": "g010", "guardianName": "Krishnan Nair", "relation": "Father" }
+        {
+          "guardianId": "g010",
+          "guardianName": "Krishnan Nair",
+          "relation": "Father"
+        }
       ],
       "attendance": {
         "overall": 75,
@@ -348,7 +485,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Attendance Issue", "Strong in Coding", "Needs Monitoring"],
+      "remarkTags": [
+        "Attendance Issue",
+        "Strong in Coding",
+        "Needs Monitoring"
+      ],
       "status": "active",
       "lastActive": "2024-03-20",
       "createdAt": "2023-07-15T00:00:00Z",
@@ -364,18 +505,37 @@
       "grade": "11th Standard",
       "school": "Mount Carmel School",
       "board": "State Board",
-      "targetExams": ["State Boards", "CLAT"],
+      "targetExams": [
+        "State Boards",
+        "CLAT"
+      ],
       "targetExamYear": 2025,
       "batchId": "batch_11th_state_01",
       "assignedEducators": [
-        { "educatorId": "e008", "educatorName": "Mr. Arvind Menon", "subject": "Political Science" },
-        { "educatorId": "e005", "educatorName": "Ms. Tanya Kapoor", "subject": "English" }
+        {
+          "educatorId": "e008",
+          "educatorName": "Mr. Arvind Menon",
+          "subject": "Political Science"
+        },
+        {
+          "educatorId": "e005",
+          "educatorName": "Ms. Tanya Kapoor",
+          "subject": "English"
+        }
       ],
       "enrollmentDate": "2023-08-20",
       "profileImage": "/learners/priya.png",
       "guardians": [
-        { "guardianId": "g011", "guardianName": "Deepak Mehta", "relation": "Father" },
-        { "guardianId": "g012", "guardianName": "Sunita Mehta", "relation": "Mother" }
+        {
+          "guardianId": "g011",
+          "guardianName": "Deepak Mehta",
+          "relation": "Father"
+        },
+        {
+          "guardianId": "g012",
+          "guardianName": "Sunita Mehta",
+          "relation": "Mother"
+        }
       ],
       "attendance": {
         "overall": 94,
@@ -404,7 +564,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Humanities Star", "CLAT Aspirant", "Consistent"],
+      "remarkTags": [
+        "Humanities Star",
+        "CLAT Aspirant",
+        "Consistent"
+      ],
       "status": "active",
       "lastActive": "2024-03-22",
       "createdAt": "2023-08-20T00:00:00Z",
@@ -420,17 +584,31 @@
       "grade": "10th Standard",
       "school": "Ryan International School",
       "board": "CBSE",
-      "targetExams": ["10th Boards"],
+      "targetExams": [
+        "10th Boards"
+      ],
       "targetExamYear": 2024,
       "batchId": "batch_10th_cbse_01",
       "assignedEducators": [
-        { "educatorId": "e005", "educatorName": "Ms. Tanya Kapoor", "subject": "English" },
-        { "educatorId": "e004", "educatorName": "Mr. Ramesh Kulkarni", "subject": "Mathematics" }
+        {
+          "educatorId": "e005",
+          "educatorName": "Ms. Tanya Kapoor",
+          "subject": "English"
+        },
+        {
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "subject": "Mathematics"
+        }
       ],
       "enrollmentDate": "2023-09-01",
       "profileImage": "",
       "guardians": [
-        { "guardianId": "g003", "guardianName": "Anil Reddy", "relation": "Uncle" }
+        {
+          "guardianId": "g003",
+          "guardianName": "Anil Reddy",
+          "relation": "Uncle"
+        }
       ],
       "attendance": {
         "overall": 82,
@@ -459,7 +637,11 @@
           "type": "academic"
         }
       ],
-      "remarkTags": ["Board Prep", "English Improvement", "Math Support Needed"],
+      "remarkTags": [
+        "Board Prep",
+        "English Improvement",
+        "Math Support Needed"
+      ],
       "status": "active",
       "lastActive": "2024-03-21",
       "createdAt": "2023-09-01T00:00:00Z",
@@ -475,19 +657,43 @@
       "grade": "12th Standard",
       "school": "St. Xavier's College",
       "board": "State Board",
-      "targetExams": ["JEE Main", "NEET", "State CET"],
+      "targetExams": [
+        "JEE Main",
+        "NEET",
+        "State CET"
+      ],
       "targetExamYear": 2025,
       "batchId": "batch_pcmb_2025_01",
       "assignedEducators": [
-        { "educatorId": "e001", "educatorName": "Dr. Meera Sharma", "subject": "Physics" },
-        { "educatorId": "e002", "educatorName": "Prof. Anand Iyer", "subject": "Chemistry" },
-        { "educatorId": "e003", "educatorName": "Ms. Nisha Rao", "subject": "Biology" },
-        { "educatorId": "e004", "educatorName": "Mr. Ramesh Kulkarni", "subject": "Mathematics" }
+        {
+          "educatorId": "e001",
+          "educatorName": "Dr. Meera Sharma",
+          "subject": "Physics"
+        },
+        {
+          "educatorId": "e002",
+          "educatorName": "Prof. Anand Iyer",
+          "subject": "Chemistry"
+        },
+        {
+          "educatorId": "e003",
+          "educatorName": "Ms. Nisha Rao",
+          "subject": "Biology"
+        },
+        {
+          "educatorId": "e004",
+          "educatorName": "Mr. Ramesh Kulkarni",
+          "subject": "Mathematics"
+        }
       ],
       "enrollmentDate": "2023-06-01",
       "profileImage": "/learners/rehan.png",
       "guardians": [
-        { "guardianId": "g013", "guardianName": "Salman Khan", "relation": "Father" }
+        {
+          "guardianId": "g013",
+          "guardianName": "Salman Khan",
+          "relation": "Father"
+        }
       ],
       "attendance": {
         "overall": 78,
@@ -516,11 +722,54 @@
           "type": "general"
         }
       ],
-      "remarkTags": ["PCMB Student", "Dual Track", "Decision Pending"],
+      "remarkTags": [
+        "PCMB Student",
+        "Dual Track",
+        "Decision Pending"
+      ],
       "status": "on-break",
       "lastActive": "2024-03-15",
       "createdAt": "2023-06-01T00:00:00Z",
       "updatedAt": "2024-03-15T10:00:00Z"
+    },
+    {
+      "firstName": "Marshal",
+      "lastName": "Inoue",
+      "email": "marshal@bolero.in",
+      "phoneNumber": "9861428670",
+      "dateOfBirth": null,
+      "grade": "9th Standard",
+      "guardianIds": [],
+      "batchIds": [
+        "fdfg"
+      ],
+      "profilePicture": "https://example.jpeg",
+      "address": {
+        "school": "dfgdd",
+        "board": "CBSE",
+        "academicLevel": "Senior School",
+        "targetExams": [
+          "Olympiads",
+          "NEET",
+          "NTSE",
+          "CLAT"
+        ],
+        "targetExamYear": 2026,
+        "guardianInfo": {
+          "name": "erifjdm skdfgjk",
+          "relation": "Father",
+          "phone": "9815497822",
+          "email": "dfdsfhnfd@gmail.com"
+        },
+        "remarkTags": [],
+        "enrollmentDate": "2025-09-30",
+        "username": "@marshalwa"
+      },
+      "enrollmentDate": "2025-09-30",
+      "isActive": true,
+      "id": "ac0bbd21-3621-4ba8-9f53-1e445579db1f",
+      "createdAt": "2025-09-30T09:52:22.535Z",
+      "updatedAt": "2025-09-30T09:52:22.535Z"
     }
   ]
 }

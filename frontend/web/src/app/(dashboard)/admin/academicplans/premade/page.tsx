@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { BookOpen, Clock, Users, Tag, Search, Filter, Plus, Edit, Copy, Trash2, Eye } from "lucide-react"
+import { BookOpen, Clock, Users, Tag, Search, Filter, Plus, Edit, Copy, Trash2, Eye, X } from "lucide-react"
 import { premadePlans } from "@/app/(features)/AcademicPlans/academicPlansDummyData"
 
 export default function PremadePlansPage() {
@@ -9,6 +9,7 @@ export default function PremadePlansPage() {
   const [subjectFilter, setSubjectFilter] = useState("all")
   const [difficultyFilter, setDifficultyFilter] = useState("all")
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
   // Get unique subjects and calculate stats
   const { subjects, stats } = useMemo(() => {
@@ -133,7 +134,10 @@ export default function PremadePlansPage() {
             <option value="Advanced">Advanced</option>
           </select>
 
-          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+          <button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             Create New Plan
           </button>
@@ -268,6 +272,216 @@ export default function PremadePlansPage() {
           ))
         )}
       </div>
+
+      {/* Create New Plan Dialog */}
+      {isCreateDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-background border border-white/20 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Dialog Header */}
+            <div className="sticky top-0 bg-background border-b border-white/20 p-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Create New Academic Plan</h2>
+                <p className="text-sm text-muted-foreground mt-1">Design a new premade academic plan template</p>
+              </div>
+              <button
+                onClick={() => setIsCreateDialogOpen(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Dialog Content */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                // TODO: Implement plan creation logic with GraphQL mutation
+                console.log('Creating new academic plan...')
+                setIsCreateDialogOpen(false)
+              }}
+              className="p-6 space-y-6"
+            >
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Basic Information</h3>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Plan Title *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., Introduction to Calculus"
+                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Description *</label>
+                  <textarea
+                    required
+                    rows={3}
+                    placeholder="Brief description of the academic plan..."
+                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Subject *</label>
+                    <select
+                      required
+                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground"
+                    >
+                      <option value="">Select subject</option>
+                      {subjects.map(subject => (
+                        <option key={subject} value={subject}>{subject}</option>
+                      ))}
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Grade Level *</label>
+                    <select
+                      required
+                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground"
+                    >
+                      <option value="">Select grade level</option>
+                      <option value="Grade 6">Grade 6</option>
+                      <option value="Grade 7">Grade 7</option>
+                      <option value="Grade 8">Grade 8</option>
+                      <option value="Grade 9">Grade 9</option>
+                      <option value="Grade 10">Grade 10</option>
+                      <option value="Grade 11">Grade 11</option>
+                      <option value="Grade 12">Grade 12</option>
+                      <option value="College/University">College/University</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Difficulty *</label>
+                    <select
+                      required
+                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground"
+                    >
+                      <option value="">Select</option>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Duration *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g., 6 weeks"
+                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Est. Hours *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      placeholder="36"
+                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Learning Objectives */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Learning Objectives</h3>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Objectives (one per line) *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    placeholder="Enter learning objectives, one per line..."
+                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground resize-none"
+                  />
+                </div>
+              </div>
+
+              {/* Topics Covered */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Topics Covered</h3>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Topics (comma-separated) *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., Variables, Equations, Linear Functions, Graphing"
+                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                  />
+                </div>
+              </div>
+
+              {/* Resources */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Resources</h3>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Resources (comma-separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Textbook, Online Videos, Practice Worksheets"
+                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                  />
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Tags & Visibility</h3>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., STEM, Problem-Solving, Critical Thinking"
+                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="isPublic"
+                    defaultChecked
+                    className="w-4 h-4 rounded border-white/10 bg-black/20 text-primary focus:ring-primary"
+                  />
+                  <label htmlFor="isPublic" className="text-sm">
+                    Make this plan public (visible to all educators)
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-white/20">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateDialogOpen(false)}
+                  className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/15 text-foreground rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium"
+                >
+                  Create Plan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

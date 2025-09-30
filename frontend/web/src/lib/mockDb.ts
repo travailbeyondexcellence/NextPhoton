@@ -1,10 +1,10 @@
 /**
  * MockDatabase - Utility class for CRUD operations with JSON files
- * 
+ *
  * This class provides a consistent interface for managing mock data during
  * the rapid prototyping phase. It handles file operations, data validation,
  * and maintains the schema structure defined in the implementation guidelines.
- * 
+ *
  * Features:
  * - CRUD operations for all entities
  * - Automatic ID generation
@@ -12,15 +12,18 @@
  * - Metadata tracking (count, lastUpdated)
  * - Type-safe operations with TypeScript
  * - Error handling and validation
- * 
+ *
  * Usage:
  * const db = new MockDatabase();
  * const educators = await db.read('educators');
  * const newEducator = await db.create('educators', educatorData);
  * await db.update('educators', id, updatedData);
  * await db.delete('educators', id);
+ *
+ * IMPORTANT: This module can only be imported in server-side code!
  */
 
+import 'server-only';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';

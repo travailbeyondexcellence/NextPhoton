@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { AuthProviderInner as AuthProvider } from "@/contexts/AuthProviderWithLoading";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import { GlobalLoader } from "@/components/GlobalLoader";
+import { ApolloProvider } from "@/lib/apollo";
 import ThemeScript from "./theme-script";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -34,8 +35,10 @@ export default async function RootLayout({
       <body className={`${inter.className} min-h-screen font-sans text-foreground transition-colors duration-200`}>
         <LoadingProvider>
           <AuthProvider>
-            {children}
-            <GlobalLoader />
+            <ApolloProvider>
+              {children}
+              <GlobalLoader />
+            </ApolloProvider>
           </AuthProvider>
         </LoadingProvider>
         <ToastContainer position="bottom-right" theme="dark" />

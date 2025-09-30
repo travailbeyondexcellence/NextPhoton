@@ -5,14 +5,12 @@ import React, { useState } from 'react';
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getInitials } from '@/lib/utils';
-import learnersData from '../../mock-data/learners.json';
-
-const learners = learnersData.data;
+import { useQuery, useMutation, GET_LEARNERS, DELETE_LEARNER } from '@/lib/apollo';
 
 // Icons
-import { 
-    ChevronUp, 
-    ChevronDown, 
+import {
+    ChevronUp,
+    ChevronDown,
     MoreVertical,
     TrendingUp,
     TrendingDown,
@@ -23,11 +21,29 @@ import {
     School,
     GraduationCap,
     Target,
-    Users
+    Users,
+    Loader2
 } from 'lucide-react';
 
 // Define view type
 type ViewType = 'table' | 'list';
+
+// Helper function to check if URL is valid for Next.js Image component
+const isValidImageUrl = (url: string | null | undefined): boolean => {
+    if (!url) return false;
+    try {
+        const urlObj = new URL(url);
+        // Check if hostname is valid (not just a file extension)
+        const hostname = urlObj.hostname;
+        // Reject URLs where hostname is just a file extension or invalid
+        if (!hostname || hostname.includes('.') === false || hostname.startsWith('example')) {
+            return false;
+        }
+        return true;
+    } catch {
+        return false;
+    }
+};
 
 const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewType }) => {
     const [view, setView] = useState<ViewType>(initialView);
@@ -39,6 +55,45 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
     const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
     const router = useRouter();
+
+    // Fetch learners using Apollo
+    const { data, loading, error, refetch } = useQuery(GET_LEARNERS, {
+        fetchPolicy: 'cache-and-network',
+    });
+
+    // Delete learner mutation
+    const [deleteLearner] = useMutation(DELETE_LEARNER, {
+        update(cache, { data: { deleteLearner } }, { variables }) {
+            if (deleteLearner && variables) {
+                cache.modify({
+                    fields: {
+                        learners(existingLearners = [], { readField }) {
+                            return existingLearners.filter(
+                                (learnerRef: any) => variables.id !== readField('id', learnerRef)
+                            );
+                        },
+                    },
+                });
+            }
+        },
+        onCompleted: () => {
+            alert('Learner deleted successfully!');
+        },
+        onError: (error) => {
+            console.error('Error deleting learner:', error);
+            alert('Failed to delete learner. Please try again.');
+        },
+    });
+
+    const handleDelete = async (id: string, name: string) => {
+        if (confirm(`Are you sure you want to delete ${name}?`)) {
+            await deleteLearner({
+                variables: { id },
+            });
+        }
+    };
+
+    const learners = data?.learners || [];
 
     // Sort learners based on current sort configuration
     const sortedLearners = React.useMemo(() => {
@@ -130,6 +185,31 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
         }
     };
 
+    // Loading state
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2 text-muted-foreground">Loading learners...</span>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                <p className="text-red-400">Error loading learners: {error.message}</p>
+                <button
+                    onClick={() => refetch()}
+                    className="mt-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors"
+                >
+                    Retry
+                </button>
+            </div>
+        );
+    }
+
     if (view === 'table') {
         return (
             <div className="w-full overflow-x-auto">
@@ -195,9 +275,9 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                 >
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
-                                            {learner.profileImage && !imageErrors.has(learner.id) ? (
+                                            {isValidImageUrl(learner.profileImage) && !imageErrors.has(learner.id) ? (
                                                 <Image
-                                                    src={learner.profileImage}
+                                                    src={learner.profileImage!}
                                                     alt={learner.name}
                                                     width={40}
                                                     height={40}
@@ -345,9 +425,9 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                     onClick={() => router.push(`/admin/learners/${learner.id}`)}
                 >
                     <div className="flex items-start gap-4">
-                        {learner.profileImage && !imageErrors.has(learner.id) ? (
+                        {isValidImageUrl(learner.profileImage) && !imageErrors.has(learner.id) ? (
                             <Image
-                                src={learner.profileImage}
+                                src={learner.profileImage!}
                                 alt={learner.name}
                                 width={60}
                                 height={60}

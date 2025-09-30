@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "lastUpdated": "2024-03-22T10:00:00Z",
+    "lastUpdated": "2025-09-30T07:47:21.947Z",
     "version": "1.0",
-    "count": 9,
+    "count": 10,
     "description": "Educator profiles with qualifications, subjects, reviews, and admin notes"
   },
   "data": [
@@ -13,9 +13,21 @@
       "emailFallback": "meerasharma@nextphoton.com",
       "intro": "Passionate Physics & Maths educator who simplifies the toughest topics. 20 years of experience in JEE and NEET coaching.",
       "qualification": "Ph.D. in Theoretical Physics, IIT Bombay",
-      "subjects": ["Physics", "Mathematics"],
-      "levels": ["Senior School", "Junior College", "JEE Advanced"],
-      "exams": ["10th Boards", "JEE Main", "NEET", "Olympiads"],
+      "subjects": [
+        "Physics",
+        "Mathematics"
+      ],
+      "levels": [
+        "Senior School",
+        "Junior College",
+        "JEE Advanced"
+      ],
+      "exams": [
+        "10th Boards",
+        "JEE Main",
+        "NEET",
+        "Olympiads"
+      ],
       "priceTier": "intermediate-2",
       "yearsWithNextPhoton": 5,
       "studentsTaught": 1800,
@@ -59,9 +71,17 @@
       "emailFallback": "anandiyer@nextphoton.com",
       "intro": "Chemistry expert with a flair for conceptual clarity. Known for simplifying Organic Chemistry reactions.",
       "qualification": "M.Sc. Organic Chemistry, IISc Bangalore",
-      "subjects": ["Chemistry"],
-      "levels": ["Junior College", "JEE Advanced"],
-      "exams": ["JEE Main", "Olympiads"],
+      "subjects": [
+        "Chemistry"
+      ],
+      "levels": [
+        "Junior College",
+        "JEE Advanced"
+      ],
+      "exams": [
+        "JEE Main",
+        "Olympiads"
+      ],
       "priceTier": "premium-1",
       "yearsWithNextPhoton": 3,
       "studentsTaught": 1200,
@@ -93,9 +113,17 @@
       "emailFallback": "nisharao@nextphoton.com",
       "intro": "Interactive Biology teacher focused on NEET preparation. Believes in visual learning.",
       "qualification": "M.Sc. Microbiology, Delhi University",
-      "subjects": ["Biology"],
-      "levels": ["Senior School", "NEET"],
-      "exams": ["12th Boards", "NEET"],
+      "subjects": [
+        "Biology"
+      ],
+      "levels": [
+        "Senior School",
+        "NEET"
+      ],
+      "exams": [
+        "12th Boards",
+        "NEET"
+      ],
       "priceTier": "intermediate-1",
       "yearsWithNextPhoton": 4,
       "studentsTaught": 1000,
@@ -127,9 +155,17 @@
       "emailFallback": "rameshkulkarni@nextphoton.com",
       "intro": "Veteran Mathematics professor with strong roots in problem-solving strategies.",
       "qualification": "M.Sc. Mathematics, Pune University",
-      "subjects": ["Mathematics"],
-      "levels": ["JEE Main", "Senior School"],
-      "exams": ["10th Boards", "JEE Main"],
+      "subjects": [
+        "Mathematics"
+      ],
+      "levels": [
+        "JEE Main",
+        "Senior School"
+      ],
+      "exams": [
+        "10th Boards",
+        "JEE Main"
+      ],
       "priceTier": "beginner-3",
       "yearsWithNextPhoton": 6,
       "studentsTaught": 2200,
@@ -161,9 +197,18 @@
       "emailFallback": "tanyakapoor@nextphoton.com",
       "intro": "Language coach focused on grammar and comprehension. Known for practical, engaging sessions.",
       "qualification": "M.A. English, JNU",
-      "subjects": ["English"],
-      "levels": ["10th", "11th", "12th"],
-      "exams": ["Boards", "Olympiads"],
+      "subjects": [
+        "English"
+      ],
+      "levels": [
+        "10th",
+        "11th",
+        "12th"
+      ],
+      "exams": [
+        "Boards",
+        "Olympiads"
+      ],
       "priceTier": "beginner-2",
       "yearsWithNextPhoton": 2,
       "studentsTaught": 800,
@@ -195,9 +240,17 @@
       "emailFallback": "vivekdeshmukh@nextphoton.com",
       "intro": "Physics mentor with a visual-first approach. Specializes in motion, electricity, and optics.",
       "qualification": "M.Sc. Physics, BITS Pilani",
-      "subjects": ["Physics"],
-      "levels": ["Senior School", "JEE Main"],
-      "exams": ["Boards", "JEE Main"],
+      "subjects": [
+        "Physics"
+      ],
+      "levels": [
+        "Senior School",
+        "JEE Main"
+      ],
+      "exams": [
+        "Boards",
+        "JEE Main"
+      ],
       "priceTier": "intermediate-3",
       "yearsWithNextPhoton": 3,
       "studentsTaught": 1500,
@@ -229,9 +282,17 @@
       "emailFallback": "farahqureshi@nextphoton.com",
       "intro": "Award-winning Biology Olympiad coach. Popular for her crash courses and test series.",
       "qualification": "Ph.D. in Genetics, AIIMS",
-      "subjects": ["Biology"],
-      "levels": ["NEET", "Olympiads"],
-      "exams": ["NEET", "Olympiads"],
+      "subjects": [
+        "Biology"
+      ],
+      "levels": [
+        "NEET",
+        "Olympiads"
+      ],
+      "exams": [
+        "NEET",
+        "Olympiads"
+      ],
       "priceTier": "premium-2",
       "yearsWithNextPhoton": 4,
       "studentsTaught": 1300,
@@ -263,9 +324,17 @@
       "emailFallback": "arvindmenon@nextphoton.com",
       "intro": "Humanities mentor focusing on Political Science and Geography. Encourages analytical thinking.",
       "qualification": "M.A. Political Science, TISS Mumbai",
-      "subjects": ["Political Science", "Geography"],
-      "levels": ["Senior School"],
-      "exams": ["Boards", "Olympiads"],
+      "subjects": [
+        "Political Science",
+        "Geography"
+      ],
+      "levels": [
+        "Senior School"
+      ],
+      "exams": [
+        "Boards",
+        "Olympiads"
+      ],
       "priceTier": "beginner-1",
       "yearsWithNextPhoton": 1,
       "studentsTaught": 600,
@@ -297,9 +366,17 @@
       "emailFallback": "shrutidesai@nextphoton.com",
       "intro": "Computer Science coach for ICSE and CBSE. Focuses on logic building and Python.",
       "qualification": "M.Tech Computer Science, VIT",
-      "subjects": ["Computer Science"],
-      "levels": ["Senior School", "Junior College"],
-      "exams": ["Boards", "Olympiads"],
+      "subjects": [
+        "Computer Science"
+      ],
+      "levels": [
+        "Senior School",
+        "Junior College"
+      ],
+      "exams": [
+        "Boards",
+        "Olympiads"
+      ],
       "priceTier": "intermediate-1",
       "yearsWithNextPhoton": 3,
       "studentsTaught": 950,
@@ -323,6 +400,37 @@
       ],
       "createdAt": "2022-04-01T00:00:00Z",
       "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "firstName": "Sabyasachi",
+      "lastName": "Sahani",
+      "email": "sibuspd@gmail.com",
+      "subject": "Physics, Mathematics, Computer Science, English",
+      "qualifications": [
+        "B.Tech"
+      ],
+      "experience": 1,
+      "bio": "sdfkdsfdskfjdkfj",
+      "availability": {
+        "username": "@sibuspd",
+        "levels": [
+          "JEE Advanced",
+          "Senior School",
+          "Olympiads"
+        ],
+        "exams": [
+          "JEE Main",
+          "JEE Advanced"
+        ],
+        "priceTier": "beginner-1",
+        "studentsTaught": 10,
+        "hoursTaught": 234,
+        "profileImage": "https://pbs.twimg.com/profile_images/1218624125339459585/OqbCDxdh_400x400.jpg"
+      },
+      "isActive": true,
+      "id": "5c2405cb-8381-4932-96c5-e67f0f645049",
+      "createdAt": "2025-09-30T07:47:21.947Z",
+      "updatedAt": "2025-09-30T07:47:21.947Z"
     }
   ]
 }

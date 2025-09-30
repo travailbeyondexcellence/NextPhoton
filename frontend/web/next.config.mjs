@@ -23,7 +23,28 @@ const nextConfig = {
         protocol: 'https',
         hostname: "www.gravatar.com",
       },
+      {
+        protocol: 'https',
+        hostname: "pbs.twimg.com",
+      },
+      {
+        protocol: 'https',
+        hostname: "*.twimg.com",
+      },
     ],
+  },
+  webpack: (config, { isServer }) => {
+    // Exclude server-only modules from client bundle
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // Mark these modules as external for client-side builds
+        'fs': false,
+        'path': false,
+        'uuid': false,
+      };
+    }
+    return config;
   },
 };
 

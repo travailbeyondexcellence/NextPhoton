@@ -4,18 +4,22 @@ import React from 'react';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-  User, 
-  Mail, 
-  AtSign, 
-  GraduationCap, 
-  BookOpen, 
+import { useMutation } from '@apollo/client';
+import { CREATE_EDUCATOR, GET_EDUCATORS } from '@/lib/apollo';
+import { useRouter } from 'next/navigation';
+import {
+  User,
+  Mail,
+  AtSign,
+  GraduationCap,
+  BookOpen,
   DollarSign,
   Calendar,
   Users,
   Clock,
   Image as ImageIcon,
-  FileText
+  FileText,
+  Loader2
 } from 'lucide-react';
 
 const educatorSchema = z.object({
@@ -68,16 +72,77 @@ const priceTiers = [
 ];
 
 export default function CreateEducatorForm() {
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<EducatorFormData>({
     resolver: zodResolver(educatorSchema),
     defaultValues,
   });
 
-  const onSubmit = (data: EducatorFormData) => {
-    // Handle form submission
-    console.log('Form data:', data);
-    alert('Educator created successfully!');
-    reset();
+  // Apollo mutation for creating educator
+  const [createEducator, { loading: creating }] = useMutation(CREATE_EDUCATOR, {
+    // Update the cache after creating educator
+    update(cache, { data }) {
+      // Only update cache if we have valid data
+      if (!data?.createEducator) return;
+
+      try {
+        const existingData: any = cache.readQuery({ query: GET_EDUCATORS });
+        if (existingData?.educators) {
+          cache.writeQuery({
+            query: GET_EDUCATORS,
+            data: {
+              educators: [...existingData.educators, data.createEducator],
+            },
+          });
+        }
+      } catch (error) {
+        // Query might not be in cache yet, which is fine
+        console.log('Cache update skipped - query not in cache yet');
+      }
+    },
+    onCompleted: () => {
+      alert('Educator created successfully!');
+      reset();
+      // Navigate back to educators list
+      router.push('/admin/educators');
+    },
+    onError: (error) => {
+      console.error('Error creating educator:', error);
+      alert('Failed to create educator. Please try again.');
+    },
+  });
+
+  const onSubmit = async (data: EducatorFormData) => {
+    try {
+      // Generate a unique ID for the educator
+      const educatorId = `edu-${Date.now()}`;
+
+      // Transform form data to match GraphQL input
+      await createEducator({
+        variables: {
+          input: {
+            firstName: data.name.split(' ')[0] || data.name,
+            lastName: data.name.split(' ').slice(1).join(' ') || '',
+            email: data.emailFallback,
+            subject: data.subjects.join(', '),
+            qualifications: [data.qualification],
+            experience: data.yearsWithNextPhoton,
+            bio: data.intro,
+            availability: {
+              username: data.username,
+              levels: data.levels,
+              exams: data.exams,
+              priceTier: data.priceTier,
+              studentsTaught: data.studentsTaught,
+              hoursTaught: data.hoursTaught,
+              profileImage: data.profileImage || undefined,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      console.error('Submit error:', err);
+    }
   };
 
   // For multi-selects
@@ -363,13 +428,16 @@ export default function CreateEducatorForm() {
         >
           Reset
         </button>
-        <button 
-          type="submit" 
-          className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg 
+        <button
+          type="submit"
+          disabled={creating}
+          className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg
                    hover:bg-primary/30 hover:border-primary/40 transition-all duration-200
-                   focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium"
+                   focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium
+                   disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Create Educator
+          {creating && <Loader2 className="w-4 h-4 animate-spin" />}
+          {creating ? 'Creating...' : 'Create Educator'}
         </button>
       </div>
     </form>
