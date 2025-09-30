@@ -114,14 +114,14 @@ export default function TravailPractisePage() {
   }
 
   return (
-    <div className="min-h-full p-6 space-y-6">
+    <div className="min-h-full space-y-6">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center gap-4">
           <Edit3 className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-3xl font-bold text-foreground">Practice Assignments</h1>
-            <p className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Manage and monitor practice exercises</p>
+            <p className="text-muted-foreground">Manage and monitor practice exercises</p>
           </div>
         </div>
       </div>
@@ -130,38 +130,38 @@ export default function TravailPractisePage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Active Practices</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Active Practices</h3>
             <Clock className="h-5 w-5 text-blue-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.active}</p>
-          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Currently assigned</p>
+          <p className="text-xs text-muted-foreground mt-2">Currently assigned</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Completed</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Completed</h3>
             <CheckCircle className="h-5 w-5 text-green-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.thisWeekCompleted}</p>
-          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>This week</p>
+          <p className="text-xs text-muted-foreground mt-2">This week</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Average Score</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Average Score</h3>
             <TrendingUp className="h-5 w-5 text-purple-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageScore}%</p>
-          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Overall performance</p>
+          <p className="text-xs text-muted-foreground mt-2">Overall performance</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Overdue</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Overdue</h3>
             <AlertTriangle className="h-5 w-5 text-red-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.overdue}</p>
-          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Need attention</p>
+          <p className="text-xs text-muted-foreground mt-2">Need attention</p>
         </div>
       </div>
 
@@ -170,14 +170,13 @@ export default function TravailPractisePage() {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search assignments by title, subject, topic..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder:opacity-70"
-                style={{ "--tw-placeholder-color": 'var(--sidebar-text-color, inherit)' } as React.CSSProperties}
+                className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
               />
             </div>
           </div>
@@ -217,9 +216,9 @@ export default function TravailPractisePage() {
       <div className="space-y-4">
         {sortedAssignments.length === 0 ? (
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
-            <BookOpen className="h-12 w-12 opacity-70 mx-auto mb-4" style={{ color: 'var(--sidebar-text-color, inherit)' }} />
+            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No practice assignments found</h3>
-            <p className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>No assignments match your current filters.</p>
+            <p className="text-muted-foreground">No assignments match your current filters.</p>
           </div>
         ) : (
           sortedAssignments.map((assignment) => (
@@ -239,21 +238,21 @@ export default function TravailPractisePage() {
                       {getStatusBadge(assignment.status)}
                       {getDifficultyBadge(assignment.difficulty)}
                     </div>
-                    <p className="text-sm opacity-70 mb-3" style={{ color: 'var(--sidebar-text-color, inherit)' }}>{assignment.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{assignment.description}</p>
 
-                    <div className="flex flex-wrap gap-4 text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
+                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <BookOpen className="h-4 w-4" />
                         <span className="text-primary">{assignment.subject}</span>
-                        <span>- {assignment.topic}</span>
+                        <span className="text-muted-foreground">- {assignment.topic}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <span>👨‍🏫</span>
-                        <span>{assignment.educatorName}</span>
+                        <span className="text-muted-foreground">{assignment.educatorName}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{assignment.estimatedTime} min</span>
+                        <span className="text-muted-foreground">{assignment.estimatedTime} min</span>
                       </div>
                     </div>
                   </div>
@@ -262,20 +261,20 @@ export default function TravailPractisePage() {
                 {/* Dates and Progress */}
                 <div className="flex flex-wrap gap-4 text-sm mb-4">
                   <div>
-                    <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Due: </span>
+                    <span className="text-muted-foreground">Due: </span>
                     <span className={assignment.status === "Overdue" ? "text-red-400 font-semibold" : "text-foreground"}>
                       {formatDate(assignment.dueDate)}
                     </span>
                   </div>
                   {assignment.submittedAt && (
                     <div>
-                      <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Submitted: </span>
+                      <span className="text-muted-foreground">Submitted: </span>
                       <span className="text-green-400">{formatDate(assignment.submittedAt)}</span>
                     </div>
                   )}
                   {assignment.gradedAt && (
                     <div>
-                      <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Graded: </span>
+                      <span className="text-muted-foreground">Graded: </span>
                       <span className="text-purple-400">{formatDate(assignment.gradedAt)}</span>
                     </div>
                   )}
@@ -285,16 +284,16 @@ export default function TravailPractisePage() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="text-sm">
-                      <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Questions: </span>
-                      <span className="font-medium">{assignment.questions.length}</span>
+                      <span className="text-muted-foreground">Questions: </span>
+                      <span className="font-medium text-foreground">{assignment.questions.length}</span>
                     </div>
                     <div className="text-sm">
-                      <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Total Marks: </span>
-                      <span className="font-medium">{assignment.totalMarks}</span>
+                      <span className="text-muted-foreground">Total Marks: </span>
+                      <span className="font-medium text-foreground">{assignment.totalMarks}</span>
                     </div>
                     <div className="text-sm">
-                      <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Attempts: </span>
-                      <span className="font-medium">{assignment.attempts}/{assignment.maxAttempts}</span>
+                      <span className="text-muted-foreground">Attempts: </span>
+                      <span className="font-medium text-foreground">{assignment.attempts}/{assignment.maxAttempts}</span>
                     </div>
                   </div>
                   {assignment.obtainedMarks !== undefined && (
@@ -302,7 +301,7 @@ export default function TravailPractisePage() {
                       <div className="text-lg font-bold text-primary">
                         {assignment.obtainedMarks}/{assignment.totalMarks}
                       </div>
-                      <div className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
+                      <div className="text-sm text-muted-foreground">
                         {Math.round((assignment.obtainedMarks / assignment.totalMarks) * 100)}%
                       </div>
                     </div>
@@ -324,8 +323,8 @@ export default function TravailPractisePage() {
                 {/* Feedback */}
                 {assignment.feedback && (
                   <div className="bg-black/20 rounded p-3 mb-4">
-                    <div className="text-sm opacity-70 mb-1" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Feedback:</div>
-                    <div className="text-sm">{assignment.feedback}</div>
+                    <div className="text-sm text-muted-foreground mb-1">Feedback:</div>
+                    <div className="text-sm text-foreground">{assignment.feedback}</div>
                   </div>
                 )}
 
@@ -340,20 +339,20 @@ export default function TravailPractisePage() {
                           <div key={question.id} className="bg-black/20 rounded p-3">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex-1">
-                                <div className="text-sm font-medium mb-1">Q{idx + 1}. {question.question}</div>
-                                <div className="text-xs opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
+                                <div className="text-sm font-medium text-foreground mb-1">Q{idx + 1}. {question.question}</div>
+                                <div className="text-xs text-muted-foreground">
                                   Type: {question.type} | Marks: {question.marks}
                                 </div>
                               </div>
                               {question.obtainedMarks !== undefined && (
-                                <div className="text-xs font-semibold">
+                                <div className="text-xs font-semibold text-foreground">
                                   {question.obtainedMarks}/{question.marks}
                                 </div>
                               )}
                             </div>
                             {question.studentAnswer && (
                               <div className="text-xs">
-                                <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Answer: </span>
+                                <span className="text-muted-foreground">Answer: </span>
                                 <span className={question.studentAnswer === question.correctAnswer ? "text-green-400" : "text-red-400"}>
                                   {question.studentAnswer}
                                 </span>
@@ -362,7 +361,7 @@ export default function TravailPractisePage() {
                           </div>
                         ))}
                         {assignment.questions.length > 3 && (
-                          <div className="text-xs opacity-70 text-center" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
+                          <div className="text-xs text-muted-foreground text-center">
                             +{assignment.questions.length - 3} more questions
                           </div>
                         )}
