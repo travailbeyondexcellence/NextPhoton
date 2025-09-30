@@ -26,16 +26,34 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   const { open } = useSidebar();
 
   return (
-    <div className="flex w-screen h-screen overflow-hidden">
+    <div className="flex w-screen h-screen overflow-hidden relative">
+      {/* Background gradient that extends to full content */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          background: `linear-gradient(to bottom right,
+            rgb(var(--gradient-from)),
+            rgb(var(--gradient-via)),
+            rgb(var(--gradient-to)))`,
+          opacity: `var(--background-gradient-opacity, 0.75)`
+        }}
+      />
+
       {/* Sidebar with glass effect */}
       <aside
         className={`
-          sidebar fixed top-0 left-0 h-screen p-0 w-72 z-50 
+          sidebar fixed top-0 left-0 h-screen p-0 w-72 z-50
           transition-transform duration-300 ease-in-out
-          bg-white/5 backdrop-blur-xl border-r border-white/10
+          backdrop-blur-xl border-r border-white/10
           overflow-y-auto
           ${open ? "translate-x-0" : "-translate-x-full"}
         `}
+        style={{
+          background: `linear-gradient(135deg,
+            rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%,
+            rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%,
+            rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%)`
+        }}
       >
         <DashboardSidebar />
       </aside>
@@ -43,16 +61,21 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
       {/* Main content area */}
       <div
         className={`
-          w-screen flex flex-col min-h-screen 
+          relative w-screen flex flex-col min-h-screen
           transition-all duration-300
           ${open ? "ml-72" : "ml-0"}
         `}
       >
         <DashboardNavbar />
-        <main className="flex-1 p-6 overflow-auto">
-          {/* Glass panel wrapper for content */}
-          <div className="relative">
-            {children}
+        <main className="flex-1 overflow-auto relative z-10">
+          {/* Content with extended background */}
+          <div className="relative min-h-full">
+            {/* Main section background overlay for theme-based darkening */}
+            <div className="main-section-overlay"></div>
+            {/* Glass panel wrapper for content */}
+            <div className="relative z-10 p-6">
+              {children}
+            </div>
           </div>
         </main>
       </div>

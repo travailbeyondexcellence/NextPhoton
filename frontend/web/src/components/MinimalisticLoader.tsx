@@ -19,7 +19,7 @@ import { motion } from 'framer-motion';
 
 export interface MinimalisticLoaderProps {
   // Loader variant
-  variant?: 'spinner' | 'dots' | 'pulse' | 'bars' | 'orbit';
+  variant?: 'spinner' | 'dots' | 'pulse' | 'bars' | 'orbit' | 'shimmer';
 
   // Size of the loader
   size?: 'sm' | 'md' | 'lg';
@@ -176,6 +176,83 @@ export const MinimalisticLoader: React.FC<MinimalisticLoaderProps> = ({
                 backgroundColor: color ? `${color}60` : undefined,
               }}
             />
+          </div>
+        );
+
+      case 'shimmer':
+        const shimmerSize = size === 'lg' ? 'w-24 h-24' : size === 'md' ? 'w-16 h-16' : 'w-12 h-12';
+        return (
+          <div className="relative">
+            {/* Outer ring with shimmer effect */}
+            <motion.div
+              className={`${shimmerSize} rounded-full bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20`}
+              animate={{
+                rotate: 360,
+              }}
+              transition={{
+                duration: duration * 2,
+                repeat: Infinity,
+                ease: 'linear',
+              }}
+            >
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-shimmer" />
+            </motion.div>
+
+            {/* Inner circle with pulse */}
+            <motion.div
+              className="absolute inset-3 rounded-full bg-primary/30 backdrop-blur-sm"
+              animate={{
+                scale: [1, 1.05, 1],
+                opacity: [0.6, 1, 0.6],
+              }}
+              transition={{
+                duration: duration * 1.5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+
+            {/* Center icon or logo */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div
+                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl"
+                animate={{
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: duration,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                style={{ backgroundColor: color }}
+              >
+                N
+              </motion.div>
+            </div>
+
+            {/* Orbiting particles */}
+            {[0, 1, 2].map((index) => (
+              <motion.div
+                key={index}
+                className="absolute w-1.5 h-1.5 bg-primary rounded-full shadow-lg shadow-primary/50"
+                animate={{
+                  rotate: 360,
+                }}
+                transition={{
+                  duration: duration * (2 + index * 0.5),
+                  repeat: Infinity,
+                  ease: 'linear',
+                }}
+                style={{
+                  backgroundColor: color,
+                  left: '50%',
+                  top: '50%',
+                  transformOrigin: `${24 + index * 8}px 0`,
+                  marginLeft: '-3px',
+                  marginTop: '-3px',
+                }}
+              />
+            ))}
           </div>
         );
 

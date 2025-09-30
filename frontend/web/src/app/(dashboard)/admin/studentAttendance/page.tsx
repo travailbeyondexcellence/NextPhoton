@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Calendar, Users, CheckCircle, XCircle, AlertCircle, Clock, TrendingUp, TrendingDown, Search, Filter, ChevronDown } from "lucide-react"
 import attendanceRecords, { getAttendanceSummary, AttendanceRecord } from "@/app/(features)/Attendance/attendanceDummyData"
 
@@ -11,9 +11,23 @@ export default function StudentAttendancePage() {
   const [batchFilter, setBatchFilter] = useState("all")
   const [viewMode, setViewMode] = useState<"daily" | "learner" | "session">("daily")
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
 
   // Get attendance summary
   const summary = getAttendanceSummary()
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (selectedRecordId && !target.closest('.relative')) {
+        setSelectedRecordId(null);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [selectedRecordId]);
 
   // Get unique values for filters
   const uniqueDates = useMemo(() => {
@@ -123,6 +137,74 @@ export default function StudentAttendancePage() {
     const rate = total > 0 ? Math.round((present / total) * 100) : 0;
 
     return { total, present, absent: total - present, rate };
+  };
+
+  // Handler for Mark Attendance button
+  const handleMarkAttendance = () => {
+    // TODO: Implement mark attendance modal/form
+    console.log("Mark Attendance clicked");
+    alert("Mark Attendance feature - Coming soon!\n\nThis will open a form to mark attendance for students.");
+  };
+
+  // Handler for Export Report button
+  const handleExportReport = () => {
+    // TODO: Implement export functionality (CSV, PDF, Excel)
+    console.log("Export Report clicked");
+    console.log("Filtered records:", filteredRecords);
+
+    // Simple CSV export as placeholder
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + "Date,Student,Session,Educator,Status,Check In,Check Out,Participation\n"
+      + filteredRecords.map(r =>
+          `${r.sessionDate},${r.learnerName},${r.sessionName},${r.educatorName},${r.status},${r.checkInTime || 'N/A'},${r.checkOutTime || 'N/A'},${r.participationScore || 'N/A'}%`
+        ).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `attendance_report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    alert("Attendance report exported successfully!");
+  };
+
+  // Handler for action menu (three dots)
+  const handleActionClick = (recordId: string, action?: string) => {
+    console.log("Action clicked for record:", recordId, "Action:", action);
+
+    if (action) {
+      // Close menu first
+      setSelectedRecordId(null);
+
+      // Handle specific action
+      switch (action) {
+        case "edit":
+          // TODO: Implement edit attendance modal
+          alert(`Edit attendance for record ${recordId}\n\nThis will open an edit form to modify attendance details.`);
+          break;
+        case "view":
+          // TODO: Implement view details modal
+          const record = attendanceRecords.find(r => r.id === recordId);
+          if (record) {
+            alert(`View Details:\n\nStudent: ${record.learnerName}\nSession: ${record.sessionName}\nDate: ${record.sessionDate}\nStatus: ${record.status}\nCheck In: ${record.checkInTime || 'N/A'}\nCheck Out: ${record.checkOutTime || 'N/A'}\nParticipation: ${record.participationScore || 'N/A'}%`);
+          }
+          break;
+        case "delete":
+          // TODO: Implement delete functionality
+          if (confirm("Are you sure you want to delete this attendance record?")) {
+            console.log(`Deleting record ${recordId}`);
+            alert(`Record ${recordId} would be deleted.\n\nThis functionality needs to be connected to the backend.`);
+          }
+          break;
+        default:
+          break;
+      }
+    } else {
+      // Toggle menu visibility
+      setSelectedRecordId(selectedRecordId === recordId ? null : recordId);
+    }
   };
 
   return (
@@ -285,10 +367,16 @@ export default function StudentAttendancePage() {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold">Attendance Management</h2>
             <div className="flex gap-2">
-              <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors text-sm">
+              <button
+                onClick={handleMarkAttendance}
+                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors text-sm cursor-pointer"
+              >
                 Mark Attendance
               </button>
-              <button className="px-4 py-2 bg-white/10 hover:bg-white/20 text-foreground rounded-lg transition-colors text-sm">
+              <button
+                onClick={handleExportReport}
+                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-foreground rounded-lg transition-colors text-sm cursor-pointer"
+              >
                 Export Report
               </button>
             </div>
@@ -391,11 +479,40 @@ export default function StudentAttendancePage() {
                     )}
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-center">
-                    <button className="text-primary hover:text-primary/80 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
-                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={() => handleActionClick(record.id)}
+                        className="text-primary hover:text-primary/80 transition-colors cursor-pointer p-1 rounded hover:bg-white/10"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                        </svg>
+                      </button>
+
+                      {/* Dropdown menu */}
+                      {selectedRecordId === record.id && (
+                        <div className="absolute right-0 top-8 z-50 min-w-[160px] bg-background border border-white/20 rounded-lg shadow-lg overflow-hidden">
+                          <button
+                            onClick={() => handleActionClick(record.id, "view")}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                          >
+                            View Details
+                          </button>
+                          <button
+                            onClick={() => handleActionClick(record.id, "edit")}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                          >
+                            Edit Attendance
+                          </button>
+                          <button
+                            onClick={() => handleActionClick(record.id, "delete")}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors text-red-400"
+                          >
+                            Delete Record
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

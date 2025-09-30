@@ -114,7 +114,7 @@ export default function TravailPractisePage() {
   }
 
   return (
-    <div className="min-h-full p-6 space-y-6">
+    <div className="min-h-full space-y-6">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center gap-4">
@@ -130,38 +130,38 @@ export default function TravailPractisePage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Active Practices</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Active Practices</h3>
             <Clock className="h-5 w-5 text-blue-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.active}</p>
-          <p className="text-sm text-muted-foreground">Currently assigned</p>
+          <p className="text-xs text-muted-foreground mt-2">Currently assigned</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Completed</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Completed</h3>
             <CheckCircle className="h-5 w-5 text-green-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.thisWeekCompleted}</p>
-          <p className="text-sm text-muted-foreground">This week</p>
+          <p className="text-xs text-muted-foreground mt-2">This week</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Average Score</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Average Score</h3>
             <TrendingUp className="h-5 w-5 text-purple-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageScore}%</p>
-          <p className="text-sm text-muted-foreground">Overall performance</p>
+          <p className="text-xs text-muted-foreground mt-2">Overall performance</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Overdue</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Overdue</h3>
             <AlertTriangle className="h-5 w-5 text-red-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.overdue}</p>
-          <p className="text-sm text-muted-foreground">Need attention</p>
+          <p className="text-xs text-muted-foreground mt-2">Need attention</p>
         </div>
       </div>
 
@@ -244,15 +244,15 @@ export default function TravailPractisePage() {
                       <div className="flex items-center gap-1">
                         <BookOpen className="h-4 w-4" />
                         <span className="text-primary">{assignment.subject}</span>
-                        <span>- {assignment.topic}</span>
+                        <span className="text-muted-foreground">- {assignment.topic}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <span>👨‍🏫</span>
-                        <span>{assignment.educatorName}</span>
+                        <span className="text-muted-foreground">{assignment.educatorName}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{assignment.estimatedTime} min</span>
+                        <span className="text-muted-foreground">{assignment.estimatedTime} min</span>
                       </div>
                     </div>
                   </div>
@@ -285,15 +285,15 @@ export default function TravailPractisePage() {
                   <div className="flex items-center gap-4">
                     <div className="text-sm">
                       <span className="text-muted-foreground">Questions: </span>
-                      <span className="font-medium">{assignment.questions.length}</span>
+                      <span className="font-medium text-foreground">{assignment.questions.length}</span>
                     </div>
                     <div className="text-sm">
                       <span className="text-muted-foreground">Total Marks: </span>
-                      <span className="font-medium">{assignment.totalMarks}</span>
+                      <span className="font-medium text-foreground">{assignment.totalMarks}</span>
                     </div>
                     <div className="text-sm">
                       <span className="text-muted-foreground">Attempts: </span>
-                      <span className="font-medium">{assignment.attempts}/{assignment.maxAttempts}</span>
+                      <span className="font-medium text-foreground">{assignment.attempts}/{assignment.maxAttempts}</span>
                     </div>
                   </div>
                   {assignment.obtainedMarks !== undefined && (
@@ -324,7 +324,7 @@ export default function TravailPractisePage() {
                 {assignment.feedback && (
                   <div className="bg-black/20 rounded p-3 mb-4">
                     <div className="text-sm text-muted-foreground mb-1">Feedback:</div>
-                    <div className="text-sm">{assignment.feedback}</div>
+                    <div className="text-sm text-foreground">{assignment.feedback}</div>
                   </div>
                 )}
 
@@ -339,13 +339,13 @@ export default function TravailPractisePage() {
                           <div key={question.id} className="bg-black/20 rounded p-3">
                             <div className="flex items-start justify-between mb-2">
                               <div className="flex-1">
-                                <div className="text-sm font-medium mb-1">Q{idx + 1}. {question.question}</div>
+                                <div className="text-sm font-medium text-foreground mb-1">Q{idx + 1}. {question.question}</div>
                                 <div className="text-xs text-muted-foreground">
                                   Type: {question.type} | Marks: {question.marks}
                                 </div>
                               </div>
                               {question.obtainedMarks !== undefined && (
-                                <div className="text-xs font-semibold">
+                                <div className="text-xs font-semibold text-foreground">
                                   {question.obtainedMarks}/{question.marks}
                                 </div>
                               )}

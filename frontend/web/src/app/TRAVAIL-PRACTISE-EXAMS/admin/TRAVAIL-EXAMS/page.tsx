@@ -133,7 +133,7 @@ export default function TravailExamsPage() {
   }
 
   return (
-    <div className="min-h-full p-6 space-y-6">
+    <div className="min-h-full space-y-6">
       {/* Header Section */}
       <div className="mb-8">
         <div className="flex items-center gap-4">
@@ -149,38 +149,38 @@ export default function TravailExamsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Upcoming Exams</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Upcoming Exams</h3>
             <Calendar className="h-5 w-5 text-blue-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.upcoming}</p>
-          <p className="text-sm text-muted-foreground">Scheduled</p>
+          <p className="text-xs text-muted-foreground mt-2">Scheduled</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">In Progress</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">In Progress</h3>
             <Clock className="h-5 w-5 text-yellow-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.inProgress}</p>
-          <p className="text-sm text-muted-foreground">Currently active</p>
+          <p className="text-xs text-muted-foreground mt-2">Currently active</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Completed</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Completed</h3>
             <CheckCircle className="h-5 w-5 text-green-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.thisMonthCompleted}</p>
-          <p className="text-sm text-muted-foreground">This month</p>
+          <p className="text-xs text-muted-foreground mt-2">This month</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Average Score</h3>
+            <h3 className="text-lg font-semibold text-muted-foreground">Average Score</h3>
             <TrendingUp className="h-5 w-5 text-purple-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageScore}%</p>
-          <p className="text-sm text-muted-foreground">Overall average</p>
+          <p className="text-xs text-muted-foreground mt-2">Overall average</p>
         </div>
       </div>
 
@@ -265,15 +265,15 @@ export default function TravailExamsPage() {
                       </div>
                       <div className="flex items-center gap-1">
                         <span>👨‍🏫</span>
-                        <span>{exam.educatorName}</span>
+                        <span className="text-muted-foreground">{exam.educatorName}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>{formatDuration(exam.duration)}</span>
+                        <span className="text-muted-foreground">{formatDuration(exam.duration)}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        <span>{exam.enrolledStudents.length} students</span>
+                        <span className="text-muted-foreground">{exam.enrolledStudents.length} students</span>
                       </div>
                     </div>
                   </div>
@@ -283,15 +283,15 @@ export default function TravailExamsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
                     <span className="text-muted-foreground text-sm">Scheduled: </span>
-                    <div className="font-medium">{formatDateTime(exam.scheduledDate)}</div>
+                    <div className="font-medium text-foreground">{formatDateTime(exam.scheduledDate)}</div>
                   </div>
                   <div>
                     <span className="text-muted-foreground text-sm">Total Marks: </span>
-                    <div className="font-medium">{exam.totalMarks}</div>
+                    <div className="font-medium text-foreground">{exam.totalMarks}</div>
                   </div>
                   <div>
                     <span className="text-muted-foreground text-sm">Passing Marks: </span>
-                    <div className="font-medium">{exam.passingMarks}</div>
+                    <div className="font-medium text-foreground">{exam.passingMarks}</div>
                   </div>
                   <div className="flex items-center gap-1">
                     {exam.isOnline ? (
@@ -309,11 +309,11 @@ export default function TravailExamsPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">Completed: </span>
-                        <span className="font-medium">{exam.examResults.filter(r => r.status === "Completed").length}</span>
+                        <span className="font-medium text-foreground">{exam.examResults.filter(r => r.status === "Completed").length}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Average: </span>
-                        <span className="font-medium">
+                        <span className="font-medium text-foreground">
                           {Math.round(exam.examResults.reduce((sum, r) => sum + r.percentage, 0) / exam.examResults.length)}%
                         </span>
                       </div>
@@ -325,7 +325,7 @@ export default function TravailExamsPage() {
                       </div>
                       <div>
                         <span className="text-muted-foreground">Pass Rate: </span>
-                        <span className="font-medium">
+                        <span className="font-medium text-foreground">
                           {Math.round((exam.examResults.filter(r => r.obtainedMarks >= exam.passingMarks).length / exam.examResults.length) * 100)}%
                         </span>
                       </div>
@@ -369,7 +369,7 @@ export default function TravailExamsPage() {
                           {exam.examResults.slice(0, 5).map((result) => (
                             <div key={result.studentId} className="flex items-center justify-between bg-black/20 rounded p-3">
                               <div className="flex items-center gap-3">
-                                <span className="font-medium">{result.studentName}</span>
+                                <span className="font-medium text-foreground">{result.studentName}</span>
                                 <span className={`px-2 py-1 rounded text-xs ${
                                   result.status === "Completed" ? "bg-green-500/20 text-green-300" :
                                   result.status === "In Progress" ? "bg-yellow-500/20 text-yellow-300" :
@@ -382,7 +382,7 @@ export default function TravailExamsPage() {
                                 )}
                               </div>
                               <div className="text-right">
-                                <div className="font-bold">
+                                <div className="font-bold text-foreground">
                                   {result.obtainedMarks}/{exam.totalMarks}
                                 </div>
                                 <div className={`text-sm ${

@@ -16,6 +16,20 @@
   .page-transition {
     transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
   }
+
+  /* Shimmer animation keyframes */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
+  }
 }
 
 /* PRIORITY: Remove scrollbar arrow buttons first */

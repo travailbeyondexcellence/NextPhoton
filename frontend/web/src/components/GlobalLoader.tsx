@@ -21,7 +21,7 @@ import { MinimalisticLoader } from '@/components/MinimalisticLoader';
 
 interface GlobalLoaderProps {
   // Optional: Override default loader style
-  variant?: 'spinner' | 'dots' | 'pulse' | 'bars' | 'orbit';
+  variant?: 'spinner' | 'dots' | 'pulse' | 'bars' | 'orbit' | 'shimmer';
 
   // Optional: Show progress bar for extended operations
   showProgress?: boolean;
@@ -37,7 +37,7 @@ interface GlobalLoaderProps {
  * Uses framer-motion for smooth animations and transitions.
  */
 export const GlobalLoader: React.FC<GlobalLoaderProps> = ({
-  variant = 'orbit',
+  variant = 'shimmer',
   showProgress = false,
   minDisplayDuration = 150,
 }) => {

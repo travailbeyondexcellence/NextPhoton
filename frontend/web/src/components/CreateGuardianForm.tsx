@@ -4,9 +4,12 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { 
-  User, 
-  Mail, 
+import { useMutation } from '@apollo/client';
+import { CREATE_GUARDIAN, GET_GUARDIANS } from '@/lib/apollo';
+import { useRouter } from 'next/navigation';
+import {
+  User,
+  Mail,
   Phone,
   Briefcase,
   MapPin,
@@ -19,7 +22,8 @@ import {
   DollarSign,
   MessageSquare,
   GraduationCap,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 
 const guardianSchema = z.object({
@@ -27,10 +31,23 @@ const guardianSchema = z.object({
   name: z.string().min(2, 'Name is required'),
   relation: z.string().min(1, 'Relation is required'),
   email: z.string().email('Invalid email'),
-  phone: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number'),
-  alternatePhone: z.string().regex(/^\+?[1-9]\d{9,14}$/, 'Invalid phone number').optional().or(z.literal('')),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number too long'),
+  alternatePhone: z.string().min(10, 'Phone number must be at least 10 digits').max(15, 'Phone number too long').optional().or(z.literal('')),
   occupation: z.string().min(2, 'Occupation is required'),
-  profileImage: z.string().url('Invalid URL').optional().or(z.literal('')),
+  profileImage: z.string().url('Invalid URL').refine((url) => {
+    if (!url) return true; // Empty is ok
+    try {
+      const urlObj = new URL(url);
+      const hostname = urlObj.hostname;
+      // Reject example domains and invalid hostnames
+      if (hostname.startsWith('example.') || hostname === 'example.jpeg' || hostname === 'example.jpg' || hostname === 'example.png') {
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }, 'Please enter a real image URL (example URLs not allowed)').optional().or(z.literal('')),
   
   // Address Information
   street: z.string().min(5, 'Street address is required'),
@@ -110,16 +127,98 @@ const states = [
 ];
 
 export default function CreateGuardianForm() {
+  const router = useRouter();
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<GuardianFormData>({
     resolver: zodResolver(guardianSchema),
     defaultValues,
   });
 
-  const onSubmit = (data: GuardianFormData) => {
-    // Handle form submission
-    console.log('Form data:', data);
-    alert('Guardian created successfully!');
-    reset();
+  // Apollo mutation for creating guardian
+  const [createGuardian, { loading: creating }] = useMutation(CREATE_GUARDIAN, {
+    // Update the cache after creating guardian
+    update(cache, { data }) {
+      // Only update cache if we have valid data
+      if (!data?.createGuardian) return;
+
+      try {
+        const existingData: any = cache.readQuery({ query: GET_GUARDIANS });
+        if (existingData?.guardians) {
+          cache.writeQuery({
+            query: GET_GUARDIANS,
+            data: {
+              guardians: [...existingData.guardians, data.createGuardian],
+            },
+          });
+        }
+      } catch (error) {
+        // Query might not be in cache yet, which is fine
+        console.log('Cache update skipped - query not in cache yet');
+      }
+    },
+    onCompleted: () => {
+      alert('Guardian created successfully!');
+      reset();
+      // Navigate back to guardians list
+      router.push('/admin/guardians');
+    },
+    onError: (error) => {
+      console.error('Error creating guardian:', error);
+      alert('Failed to create guardian. Please try again.');
+    },
+  });
+
+  const onSubmit = async (data: GuardianFormData) => {
+    try {
+      // Transform form data to match GraphQL input
+      // Address field should contain all extended data as JSON
+      const addressData = {
+        street: data.street,
+        city: data.city,
+        state: data.state,
+        pincode: data.pincode,
+        alternatePhone: data.alternatePhone,
+        preferredContactTime: data.preferredContactTime,
+        assignedLearners: [
+          {
+            learnerName: data.learnerName,
+            grade: data.learnerGrade,
+            school: data.learnerSchool,
+            relation: data.relation,
+          }
+        ],
+        paymentInfo: {
+          method: data.paymentMethod,
+          billingCycle: data.billingCycle,
+          paymentStatus: 'pending',
+        },
+        communicationPreferences: {
+          academicUpdates: data.academicUpdates,
+          attendanceAlerts: data.attendanceAlerts,
+          performanceReports: data.performanceReports,
+          paymentReminders: data.paymentReminders,
+          generalNotifications: data.generalNotifications,
+        },
+      };
+
+      await createGuardian({
+        variables: {
+          input: {
+            firstName: data.name.split(' ')[0] || data.name,
+            lastName: data.name.split(' ').slice(1).join(' ') || '',
+            email: data.email,
+            phoneNumber: data.phone,
+            relationship: data.relation,
+            occupation: data.occupation,
+            address: addressData,
+            emergencyContact: true, // This guardian is an emergency contact by default
+            learnerIds: [], // Will be linked when learner is created/associated
+            preferredContactMethod: data.preferredContactMethod,
+          },
+        },
+      });
+    } catch (err) {
+      console.error('Submit error:', err);
+    }
   };
 
   return (
@@ -494,13 +593,16 @@ export default function CreateGuardianForm() {
         >
           Reset
         </button>
-        <button 
-          type="submit" 
-          className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg 
+        <button
+          type="submit"
+          disabled={creating}
+          className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg
                    hover:bg-primary/30 hover:border-primary/40 transition-all duration-200
-                   focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium"
+                   focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium
+                   disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Create Guardian
+          {creating && <Loader2 className="w-4 h-4 animate-spin" />}
+          {creating ? 'Creating...' : 'Create Guardian'}
         </button>
       </div>
     </form>
