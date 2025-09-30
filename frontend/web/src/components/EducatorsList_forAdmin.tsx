@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Pencil, Trash2, Loader2 } from 'lucide-react';
 import { getInitials } from '@/lib/utils';
 import { useQuery, useMutation, GET_EDUCATORS, DELETE_EDUCATOR } from '@/lib/apollo';
@@ -44,12 +45,35 @@ interface Educator {
 //   },
 // ];
 
+/**
+ * Helper function to validate image URLs before passing to Next.js Image component
+ * Checks for valid URL structure and rejects example/placeholder domains
+ */
+const isValidImageUrl = (url: string | null | undefined): boolean => {
+  if (!url) return false;
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname;
+    // Reject URLs with invalid hostnames or example domains
+    if (!hostname || hostname.includes('.') === false || hostname.startsWith('example')) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const EducatorsList_forAdmin = () => {
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const router = useRouter();
 
-  // Fetch educators using Apollo
+  // Fetch educators using Apollo with aggressive fetch policy
   const { data, loading, error, refetch } = useQuery(GET_EDUCATORS, {
-    fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'network-only', // Always fetch fresh data on mount to avoid stale cache
+    nextFetchPolicy: 'cache-first', // Then use cache for subsequent queries
+    notifyOnNetworkStatusChange: true,
+    errorPolicy: 'all',
   });
 
   // Delete educator mutation
@@ -85,12 +109,23 @@ const EducatorsList_forAdmin = () => {
     }
   };
 
-  // Loading state
-  if (loading) {
+  // Loading state - show skeleton while loading first time
+  if (loading && !data) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Loading educators...</span>
+      <div className="space-y-4">
+        {/* Skeleton loader */}
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 animate-pulse">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-white/10" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-white/10 rounded w-1/4" />
+                <div className="h-3 bg-white/10 rounded w-1/3" />
+              </div>
+              <div className="w-32 h-8 bg-white/10 rounded" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -141,7 +176,7 @@ const EducatorsList_forAdmin = () => {
             return (
               <tr key={edu.id} className="border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer">
                 <td className="p-4">
-                  {profileImage && !imageErrors.has(edu.id) ? (
+                  {isValidImageUrl(profileImage) && !imageErrors.has(edu.id) ? (
                     <Image
                       src={profileImage}
                       alt={fullName}
@@ -174,7 +209,7 @@ const EducatorsList_forAdmin = () => {
                     className="text-primary hover:text-primary/80 transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
-                      alert('Edit functionality coming soon!');
+                      router.push(`/admin/educators/${edu.id}/edit`);
                     }}
                   >
                     <Pencil size={16} />

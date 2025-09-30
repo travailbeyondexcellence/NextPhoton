@@ -22,7 +22,8 @@
       "Bash(netstat:*)",
       "Bash(ss:*)",
       "Bash(lsof:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []

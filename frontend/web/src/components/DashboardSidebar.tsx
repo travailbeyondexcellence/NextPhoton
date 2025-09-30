@@ -100,7 +100,7 @@ export function DashboardSidebar() {
                 key={group.title}
                 className={`py-2 overflow-hidden ${groupIndex === 0 ? "mt-2" : ""}`}
               >
-                <h3 className="mb-2 px-2 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors duration-200 ease-out cursor-default">
+                <h3 className="mb-2 px-2 text-sm font-semibold opacity-70 hover:opacity-100 transition-all duration-200 ease-out cursor-default" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
                   {group.title}
                 </h3>
                 <SidebarMenu className="space-y-1">
@@ -122,17 +122,17 @@ export function DashboardSidebar() {
                               )
                             )
                           }>
-                          <CollapsibleTrigger className="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-white/10 hover:backdrop-blur-sm rounded-md transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-sm">
+                          <CollapsibleTrigger className="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-white/10 hover:backdrop-blur-sm rounded-md transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-sm" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
                             <span className="flex items-center gap-2 transition-all duration-200 ease-out group-hover:translate-x-1">
-                              <item.icon size={20} className="transition-all duration-200 ease-out group-hover:scale-110 group-hover:text-primary" /> 
-                              <span className="transition-colors duration-200 ease-out group-hover:text-foreground">{item.label}</span>
+                              <item.icon size={20} className="transition-all duration-200 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100" />
+                              <span className="transition-all duration-200 ease-out opacity-95 group-hover:opacity-100">{item.label}</span>
                             </span>
-                            
+
                             <div className="p-1 hover:bg-white/20 rounded transition-all duration-200 ease-out hover:scale-110">
                               {openStates[groupIndex][itemIndex] ? (
-                                <Minus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:scale-x-125" />
+                                <Minus size={16} className="opacity-70 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:scale-x-125" />
                               ) : (
-                                <Plus size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:rotate-180" />
+                                <Plus size={16} className="opacity-70 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:rotate-180" />
                               )}
                             </div>
                           </CollapsibleTrigger>
@@ -147,12 +147,13 @@ export function DashboardSidebar() {
                                     className={cn(
                                       "group flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-all duration-200 ease-out",
                                       "bg-white/5 hover:bg-white/15 hover:backdrop-blur-sm",
-                                      "text-muted-foreground hover:text-foreground",
+                                      "opacity-85 hover:opacity-100",
                                       "hover:scale-[1.02] hover:shadow-sm",
-                                      isSubActive && "bg-white/15 text-foreground font-medium shadow-sm"
+                                      isSubActive && "bg-white/15 opacity-100 font-medium shadow-sm"
                                     )}
+                                    style={{ color: 'var(--sidebar-text-color, inherit)' }}
                                   >
-                                    <Icon size={16} className="transition-all duration-200 ease-out group-hover:scale-110 group-hover:text-primary" />
+                                    <Icon size={16} className="transition-all duration-200 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100" />
                                     <span className="transition-all duration-200 ease-out group-hover:translate-x-0.5">{subItem.label}</span>
                                   </Link>
                                 )
@@ -176,6 +177,7 @@ export function DashboardSidebar() {
                             "group",
                             isActive && "bg-white/15 font-medium shadow-sm"
                           )}
+                          style={{ color: 'var(--sidebar-text-color, inherit)' }}
                           onClick={item.hasSecondaryDrawer ? (e) => {
                             e.preventDefault()
                             openSecondarySidebar(item.secondaryDrawerKey || '')
@@ -186,20 +188,20 @@ export function DashboardSidebar() {
                             <div className="flex items-center justify-between w-full">
                               <div className="flex items-center transition-all duration-200 ease-out group-hover:translate-x-1">
                                 <span className="mr-2 transition-all duration-200 ease-out group-hover:scale-110">
-                                  <Icon size={20} className="transition-colors duration-200 ease-out group-hover:text-primary" />
+                                  <Icon size={20} className="transition-all duration-200 ease-out opacity-90 group-hover:opacity-100" />
                                 </span>
-                                <span className="transition-colors duration-200 ease-out group-hover:text-foreground">
+                                <span className="transition-all duration-200 ease-out opacity-95 group-hover:opacity-100">
                                   {item.label}
                                 </span>
                               </div>
-                              <ChevronRight size={16} className="text-muted-foreground transition-all duration-200 ease-out group-hover:text-primary group-hover:translate-x-1" />
+                              <ChevronRight size={16} className="opacity-70 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:translate-x-1" />
                             </div>
                           ) : (
                             <Link href={item.href} className="flex items-center transition-all duration-200 ease-out group-hover:translate-x-1">
                               <span className="mr-2 transition-all duration-200 ease-out group-hover:scale-110">
-                                <Icon size={20} className="transition-colors duration-200 ease-out group-hover:text-primary" />
+                                <Icon size={20} className="transition-all duration-200 ease-out opacity-90 group-hover:opacity-100" />
                               </span>
-                              <span className="transition-colors duration-200 ease-out group-hover:text-foreground">
+                              <span className="transition-all duration-200 ease-out opacity-95 group-hover:opacity-100">
                                 {item.label}
                               </span>
                             </Link>

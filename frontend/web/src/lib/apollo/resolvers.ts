@@ -84,166 +84,269 @@ function parseLiteral(ast: any): any {
   }
 }
 
+// Cache for date strings to avoid repeated Date object creation
+const _currentDate = new Date().toISOString();
+const _currentYear = new Date().getFullYear();
+
 // Helper function to transform old educator data structure to new schema
 function transformEducator(edu: any) {
   if (!edu) return null;
 
-  // Handle both old format (name) and new format (firstName/lastName)
-  let firstName = edu.firstName;
-  let lastName = edu.lastName;
+  try {
+    // Handle both old format (name) and new format (firstName/lastName)
+    let firstName = edu.firstName;
+    let lastName = edu.lastName;
 
-  if (!firstName && edu.name) {
-    // Split name into firstName and lastName
-    const nameParts = edu.name.split(' ');
-    firstName = nameParts[0] || edu.name;
-    lastName = nameParts.slice(1).join(' ') || '';
+    if (!firstName && edu.name) {
+      // Split name into firstName and lastName
+      const nameParts = edu.name.split(' ');
+      firstName = nameParts[0] || edu.name;
+      lastName = nameParts.slice(1).join(' ') || '';
+    }
+
+    return {
+      ...edu,
+      firstName: firstName || 'Unknown',
+      lastName: lastName || '',
+      email: edu.email || edu.emailFallback || `${edu.id}@nextphoton.com`,
+      subject: edu.subject || (edu.subjects && edu.subjects[0]) || 'General',
+      qualifications: edu.qualifications || (edu.qualification ? [edu.qualification] : []),
+      experience: edu.experience || edu.yearsWithNextPhoton || 0,
+      bio: edu.bio || edu.intro || '',
+      availability: edu.availability || {
+        username: edu.username,
+        levels: edu.levels,
+        exams: edu.exams,
+        priceTier: edu.priceTier,
+        studentsTaught: edu.studentsTaught,
+        hoursTaught: edu.hoursTaught,
+        profileImage: edu.profileImage,
+      },
+      isActive: edu.isActive !== undefined ? edu.isActive : true,
+      createdAt: edu.createdAt || _currentDate,
+      updatedAt: edu.updatedAt || _currentDate,
+    };
+  } catch (error) {
+    console.error('Error transforming educator:', edu?.id, error);
+    return {
+      id: edu?.id || 'unknown',
+      firstName: 'Error',
+      lastName: 'Loading',
+      email: `${edu?.id || 'unknown'}@nextphoton.com`,
+      subject: 'N/A',
+      qualifications: [],
+      experience: 0,
+      bio: '',
+      availability: null,
+      isActive: true,
+      createdAt: _currentDate,
+      updatedAt: _currentDate,
+    };
   }
-
-  return {
-    ...edu,
-    firstName: firstName || 'Unknown',
-    lastName: lastName || '',
-    email: edu.email || edu.emailFallback || `${edu.id}@nextphoton.com`,
-    subject: edu.subject || (edu.subjects && edu.subjects[0]) || 'General',
-    qualifications: edu.qualifications || (edu.qualification ? [edu.qualification] : []),
-    experience: edu.experience || edu.yearsWithNextPhoton || 0,
-    bio: edu.bio || edu.intro || '',
-    availability: edu.availability || {
-      username: edu.username,
-      levels: edu.levels,
-      exams: edu.exams,
-      priceTier: edu.priceTier,
-      studentsTaught: edu.studentsTaught,
-      hoursTaught: edu.hoursTaught,
-      profileImage: edu.profileImage,
-    },
-    isActive: edu.isActive !== undefined ? edu.isActive : true,
-    createdAt: edu.createdAt || new Date().toISOString(),
-    updatedAt: edu.updatedAt || new Date().toISOString(),
-  };
 }
 
 // Helper function to transform old learner data structure to new schema
 function transformLearner(learner: any) {
   if (!learner) return null;
 
-  // Handle both old format (name) and new format (firstName/lastName)
-  let firstName = learner.firstName;
-  let lastName = learner.lastName;
+  try {
+    // Handle both old format (name) and new format (firstName/lastName)
+    let firstName = learner.firstName;
+    let lastName = learner.lastName;
 
-  if (!firstName && learner.name) {
-    // Split name into firstName and lastName
-    const nameParts = learner.name.split(' ');
-    firstName = nameParts[0] || learner.name;
-    lastName = nameParts.slice(1).join(' ') || '';
+    if (!firstName && learner.name) {
+      // Split name into firstName and lastName
+      const nameParts = learner.name.split(' ');
+      firstName = nameParts[0] || learner.name;
+      lastName = nameParts.slice(1).join(' ') || '';
+    }
+
+    const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || learner.name || 'Unknown';
+
+    // Extract guardianIds efficiently
+    const guardianIds = learner.guardianIds ||
+      (Array.isArray(learner.guardians) ? learner.guardians.map((g: any) => g.guardianId).filter(Boolean) : []);
+
+    // Extract batchIds efficiently
+    const batchIds = learner.batchIds || (learner.batchId ? [learner.batchId] : []);
+
+    return {
+      ...learner,
+      // New GraphQL schema fields
+      firstName: firstName || 'Unknown',
+      lastName: lastName || '',
+      email: learner.email || `${learner.id}@student.nextphoton.com`,
+      phoneNumber: learner.phoneNumber || learner.phone || '',
+      dateOfBirth: learner.dateOfBirth || null,
+      grade: learner.grade || 'Not specified',
+      enrollmentDate: learner.enrollmentDate || _currentDate,
+      guardianIds,
+      batchIds,
+      profilePicture: learner.profilePicture || learner.profileImage || null,
+      address: learner.address || {
+        school: learner.school,
+        board: learner.board,
+        academicLevel: learner.academicLevel,
+        targetExams: learner.targetExams,
+        targetExamYear: learner.targetExamYear,
+      },
+      status: learner.status || 'active',
+      isActive: learner.isActive !== undefined ? learner.isActive : true,
+      createdAt: learner.createdAt || _currentDate,
+      updatedAt: learner.updatedAt || _currentDate,
+      // Backward compatibility fields (for UI components expecting old structure)
+      name: fullName,
+      username: learner.username || `@${firstName?.toLowerCase() || 'user'}`,
+      phone: learner.phoneNumber || learner.phone || '',
+      profileImage: learner.profilePicture || learner.profileImage || null,
+      school: learner.address?.school || learner.school || 'Not specified',
+      board: learner.address?.board || learner.board || 'Not specified',
+      academicLevel: learner.address?.academicLevel || learner.academicLevel || 'Not specified',
+      targetExams: learner.address?.targetExams || learner.targetExams || [],
+      targetExamYear: learner.address?.targetExamYear || learner.targetExamYear || _currentYear,
+      guardians: learner.guardians || [],
+      assignedEducators: learner.assignedEducators || [],
+      attendance: learner.attendance || { overall: 0, lastMonth: 0 },
+      performance: learner.performance || { averageScore: 0, lastTestScore: 0, trend: 'stable' },
+      remarkTags: learner.remarkTags || [],
+    };
+  } catch (error) {
+    console.error('Error transforming learner:', learner?.id, error);
+    // Return a minimal valid learner object on error
+    return {
+      id: learner?.id || 'unknown',
+      firstName: 'Error',
+      lastName: 'Loading',
+      name: 'Error Loading',
+      email: `${learner?.id || 'unknown'}@student.nextphoton.com`,
+      grade: 'N/A',
+      enrollmentDate: _currentDate,
+      guardianIds: [],
+      batchIds: [],
+      isActive: true,
+      createdAt: _currentDate,
+      updatedAt: _currentDate,
+      username: '@error',
+      phone: '',
+      profileImage: null,
+      school: 'N/A',
+      board: 'N/A',
+      academicLevel: 'N/A',
+      targetExams: [],
+      targetExamYear: _currentYear,
+      guardians: [],
+      assignedEducators: [],
+      attendance: { overall: 0, lastMonth: 0 },
+      performance: { averageScore: 0, lastTestScore: 0, trend: 'stable' },
+      remarkTags: [],
+    };
   }
-
-  const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || learner.name || 'Unknown';
-
-  return {
-    ...learner,
-    // New GraphQL schema fields
-    firstName: firstName || 'Unknown',
-    lastName: lastName || '',
-    email: learner.email || `${learner.id}@student.nextphoton.com`,
-    phoneNumber: learner.phoneNumber || learner.phone || '',
-    dateOfBirth: learner.dateOfBirth || null,
-    grade: learner.grade || 'Not specified',
-    enrollmentDate: learner.enrollmentDate || new Date().toISOString(),
-    guardianIds: learner.guardianIds || (learner.guardians ? learner.guardians.map((g: any) => g.guardianId) : []),
-    batchIds: learner.batchIds || (learner.batchId ? [learner.batchId] : []),
-    profilePicture: learner.profilePicture || learner.profileImage || null,
-    address: learner.address || {
-      school: learner.school,
-      board: learner.board,
-      academicLevel: learner.academicLevel,
-      targetExams: learner.targetExams,
-      targetExamYear: learner.targetExamYear,
-    },
-    status: learner.status || 'active',
-    isActive: learner.isActive !== undefined ? learner.isActive : true,
-    createdAt: learner.createdAt || new Date().toISOString(),
-    updatedAt: learner.updatedAt || new Date().toISOString(),
-    // Backward compatibility fields (for UI components expecting old structure)
-    name: fullName,
-    username: learner.username || `@${firstName?.toLowerCase() || 'user'}`,
-    phone: learner.phoneNumber || learner.phone || '',
-    profileImage: learner.profilePicture || learner.profileImage || null,
-    school: learner.address?.school || learner.school || 'Not specified',
-    board: learner.address?.board || learner.board || 'Not specified',
-    academicLevel: learner.address?.academicLevel || learner.academicLevel || 'Not specified',
-    targetExams: learner.address?.targetExams || learner.targetExams || [],
-    targetExamYear: learner.address?.targetExamYear || learner.targetExamYear || new Date().getFullYear(),
-    guardians: learner.guardians || [],
-    assignedEducators: learner.assignedEducators || [],
-    attendance: learner.attendance || { overall: 0, lastMonth: 0 },
-    performance: learner.performance || { averageScore: 0, lastTestScore: 0, trend: 'stable' },
-    remarkTags: learner.remarkTags || [],
-  };
 }
+
+// Cache for default objects to avoid repeated object creation
+const _defaultPaymentInfo = {
+  method: 'online',
+  billingCycle: 'monthly',
+  paymentStatus: 'pending',
+  lastPaymentDate: _currentDate,
+  nextDueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+};
+
+const _defaultCommPrefs = {
+  academicUpdates: true,
+  attendanceAlerts: true,
+  performanceReports: true,
+  paymentReminders: true,
+  generalNotifications: true,
+};
 
 // Helper function to transform old guardian data structure to new schema
 function transformGuardian(guardian: any) {
   if (!guardian) return null;
 
-  // Handle both old format (name) and new format (firstName/lastName)
-  let firstName = guardian.firstName;
-  let lastName = guardian.lastName;
+  try {
+    // Handle both old format (name) and new format (firstName/lastName)
+    let firstName = guardian.firstName;
+    let lastName = guardian.lastName;
 
-  if (!firstName && guardian.name) {
-    // Split name into firstName and lastName
-    const nameParts = guardian.name.split(' ');
-    firstName = nameParts[0] || guardian.name;
-    lastName = nameParts.slice(1).join(' ') || '';
+    if (!firstName && guardian.name) {
+      // Split name into firstName and lastName
+      const nameParts = guardian.name.split(' ');
+      firstName = nameParts[0] || guardian.name;
+      lastName = nameParts.slice(1).join(' ') || '';
+    }
+
+    // Extract nested data from address field if present (with null safety)
+    const addressData = (typeof guardian.address === 'object' && guardian.address) || {};
+
+    // Use cached defaults or extract from data
+    const paymentInfoData = guardian.paymentInfo || addressData.paymentInfo || _defaultPaymentInfo;
+    const commPrefsData = guardian.communicationPreferences || addressData.communicationPreferences || _defaultCommPrefs;
+    const assignedLearnersData = Array.isArray(guardian.assignedLearners)
+      ? guardian.assignedLearners
+      : (Array.isArray(addressData.assignedLearners) ? addressData.assignedLearners : []);
+
+    // Extract learnerIds efficiently
+    const learnerIds = guardian.learnerIds ||
+      (assignedLearnersData.length > 0 ? assignedLearnersData.map((l: any) => l.learnerId || l.id).filter(Boolean) : []);
+
+    return {
+      ...guardian,
+      firstName: firstName || 'Unknown',
+      lastName: lastName || '',
+      email: guardian.email || `${guardian.id}@guardian.nextphoton.com`,
+      phoneNumber: guardian.phoneNumber || guardian.phone || '',
+      relationship: guardian.relationship || guardian.relation || 'Guardian',
+      occupation: guardian.occupation || 'Not specified',
+      address: guardian.address || null,
+      emergencyContact: guardian.emergencyContact !== undefined ? guardian.emergencyContact : true,
+      learnerIds,
+      preferredContactMethod: guardian.preferredContactMethod || addressData.preferredContactMethod || 'phone',
+      isActive: guardian.isActive !== undefined ? guardian.isActive : true,
+      createdAt: guardian.createdAt || _currentDate,
+      updatedAt: guardian.updatedAt || _currentDate,
+      // Backward compatibility fields (for UI components expecting old structure)
+      name: `${firstName} ${lastName}`.trim() || 'Unknown',
+      relation: guardian.relationship || guardian.relation || 'Guardian',
+      phone: guardian.phoneNumber || guardian.phone || '',
+      assignedLearners: assignedLearnersData,
+      paymentInfo: paymentInfoData,
+      communicationPreferences: commPrefsData,
+      lastInteraction: guardian.lastInteraction || _currentDate,
+      profileImage: guardian.profileImage || null,
+      preferredContactTime: guardian.preferredContactTime || addressData.preferredContactTime || 'Any time',
+      notes: Array.isArray(guardian.notes) ? guardian.notes : [],
+    };
+  } catch (error) {
+    console.error('Error transforming guardian:', guardian?.id, error);
+    // Return a minimal valid guardian object on error
+    return {
+      id: guardian?.id || 'unknown',
+      firstName: 'Error',
+      lastName: 'Loading',
+      name: 'Error Loading',
+      email: `${guardian?.id || 'unknown'}@guardian.nextphoton.com`,
+      phoneNumber: '',
+      relationship: 'Guardian',
+      occupation: 'N/A',
+      address: null,
+      emergencyContact: true,
+      learnerIds: [],
+      preferredContactMethod: 'phone',
+      isActive: true,
+      createdAt: _currentDate,
+      updatedAt: _currentDate,
+      relation: 'Guardian',
+      phone: '',
+      assignedLearners: [],
+      paymentInfo: _defaultPaymentInfo,
+      communicationPreferences: _defaultCommPrefs,
+      lastInteraction: _currentDate,
+      profileImage: null,
+      preferredContactTime: 'Any time',
+      notes: [],
+    };
   }
-
-  // Extract nested data from address field if present
-  const addressData = typeof guardian.address === 'object' ? guardian.address : {};
-  const paymentInfoData = guardian.paymentInfo || (addressData && addressData.paymentInfo) || {
-    method: 'online',
-    billingCycle: 'monthly',
-    paymentStatus: 'pending',
-    lastPaymentDate: new Date().toISOString(),
-    nextDueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-  };
-  const commPrefsData = guardian.communicationPreferences || (addressData && addressData.communicationPreferences) || {
-    academicUpdates: true,
-    attendanceAlerts: true,
-    performanceReports: true,
-    paymentReminders: true,
-    generalNotifications: true,
-  };
-  const assignedLearnersData = Array.isArray(guardian.assignedLearners)
-    ? guardian.assignedLearners
-    : (addressData && Array.isArray(addressData.assignedLearners) ? addressData.assignedLearners : []);
-
-  return {
-    ...guardian,
-    firstName: firstName || 'Unknown',
-    lastName: lastName || '',
-    email: guardian.email || `${guardian.id}@guardian.nextphoton.com`,
-    phoneNumber: guardian.phoneNumber || guardian.phone || '',
-    relationship: guardian.relationship || guardian.relation || 'Guardian',
-    occupation: guardian.occupation || 'Not specified',
-    address: guardian.address || null,
-    emergencyContact: guardian.emergencyContact !== undefined ? guardian.emergencyContact : true,
-    learnerIds: guardian.learnerIds || (assignedLearnersData.length > 0 ? assignedLearnersData.map((l: any) => l.learnerId || l.id) : []),
-    preferredContactMethod: guardian.preferredContactMethod || (addressData && addressData.preferredContactMethod) || 'phone',
-    isActive: guardian.isActive !== undefined ? guardian.isActive : true,
-    createdAt: guardian.createdAt || new Date().toISOString(),
-    updatedAt: guardian.updatedAt || new Date().toISOString(),
-    // Backward compatibility fields (for UI components expecting old structure)
-    name: `${firstName} ${lastName}`.trim() || 'Unknown',
-    relation: guardian.relationship || guardian.relation || 'Guardian',
-    phone: guardian.phoneNumber || guardian.phone || '',
-    assignedLearners: assignedLearnersData,
-    paymentInfo: paymentInfoData,
-    communicationPreferences: commPrefsData,
-    lastInteraction: guardian.lastInteraction || new Date().toISOString(),
-    profileImage: guardian.profileImage || null,
-    preferredContactTime: guardian.preferredContactTime || (addressData && addressData.preferredContactTime) || 'Any time',
-    notes: Array.isArray(guardian.notes) ? guardian.notes : [],
-  };
 }
 
 // Resolver functions that interact with mockDb
@@ -255,65 +358,119 @@ export const resolvers = {
   Query: {
     // Educator queries
     educators: async () => {
-      const educators = await mockDb.read('educators');
-      // Transform old data structure to match GraphQL schema
-      return educators.map((edu: any) => transformEducator(edu));
+      try {
+        const educators = await mockDb.read('educators');
+        // Transform old data structure to match GraphQL schema
+        return educators.map((edu: any) => transformEducator(edu)).filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching educators:', error);
+        return [];
+      }
     },
     educator: async (_: any, { id }: { id: string }) => {
-      const educator = await mockDb.readById('educators', id);
-      if (!educator) return null;
-      // Transform old data structure to match GraphQL schema
-      return transformEducator(educator);
+      try {
+        const educator = await mockDb.readById('educators', id);
+        if (!educator) return null;
+        // Transform old data structure to match GraphQL schema
+        return transformEducator(educator);
+      } catch (error) {
+        console.error('Error fetching educator:', id, error);
+        return null;
+      }
     },
     educatorsBySubject: async (_: any, { subject }: { subject: string }) => {
-      const educators = await mockDb.read('educators');
-      return educators
-        .filter((e: any) => e.subject === subject || e.subjects?.includes(subject))
-        .map((edu: any) => transformEducator(edu));
+      try {
+        const educators = await mockDb.read('educators');
+        return educators
+          .filter((e: any) => e.subject === subject || e.subjects?.includes(subject))
+          .map((edu: any) => transformEducator(edu))
+          .filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching educators by subject:', subject, error);
+        return [];
+      }
     },
 
     // Learner queries
     learners: async () => {
-      const learners = await mockDb.read('learners');
-      // Transform old data structure to match GraphQL schema
-      return learners.map((learner: any) => transformLearner(learner));
+      try {
+        const learners = await mockDb.read('learners');
+        // Transform old data structure to match GraphQL schema
+        return learners.map((learner: any) => transformLearner(learner)).filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching learners:', error);
+        return [];
+      }
     },
     learner: async (_: any, { id }: { id: string }) => {
-      const learner = await mockDb.readById('learners', id);
-      if (!learner) return null;
-      // Transform old data structure to match GraphQL schema
-      return transformLearner(learner);
+      try {
+        const learner = await mockDb.readById('learners', id);
+        if (!learner) return null;
+        // Transform old data structure to match GraphQL schema
+        return transformLearner(learner);
+      } catch (error) {
+        console.error('Error fetching learner:', id, error);
+        return null;
+      }
     },
     learnersByGrade: async (_: any, { grade }: { grade: string }) => {
-      const learners = await mockDb.read('learners');
-      return learners
-        .filter((l: any) => l.grade === grade)
-        .map((learner: any) => transformLearner(learner));
+      try {
+        const learners = await mockDb.read('learners');
+        return learners
+          .filter((l: any) => l.grade === grade)
+          .map((learner: any) => transformLearner(learner))
+          .filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching learners by grade:', grade, error);
+        return [];
+      }
     },
     learnersByBatch: async (_: any, { batchId }: { batchId: string }) => {
-      const learners = await mockDb.read('learners');
-      return learners
-        .filter((l: any) => l.batchIds?.includes(batchId) || l.batchId === batchId)
-        .map((learner: any) => transformLearner(learner));
+      try {
+        const learners = await mockDb.read('learners');
+        return learners
+          .filter((l: any) => l.batchIds?.includes(batchId) || l.batchId === batchId)
+          .map((learner: any) => transformLearner(learner))
+          .filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching learners by batch:', batchId, error);
+        return [];
+      }
     },
 
     // Guardian queries
     guardians: async () => {
-      const guardians = await mockDb.read('guardians');
-      // Transform old data structure to match GraphQL schema
-      return guardians.map((guardian: any) => transformGuardian(guardian));
+      try {
+        const guardians = await mockDb.read('guardians');
+        // Transform old data structure to match GraphQL schema
+        return guardians.map((guardian: any) => transformGuardian(guardian)).filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching guardians:', error);
+        return [];
+      }
     },
     guardian: async (_: any, { id }: { id: string }) => {
-      const guardian = await mockDb.readById('guardians', id);
-      if (!guardian) return null;
-      // Transform old data structure to match GraphQL schema
-      return transformGuardian(guardian);
+      try {
+        const guardian = await mockDb.readById('guardians', id);
+        if (!guardian) return null;
+        // Transform old data structure to match GraphQL schema
+        return transformGuardian(guardian);
+      } catch (error) {
+        console.error('Error fetching guardian:', id, error);
+        return null;
+      }
     },
     guardiansByLearner: async (_: any, { learnerId }: { learnerId: string }) => {
-      const guardians = await mockDb.read('guardians');
-      return guardians
-        .filter((g: any) => g.learnerIds?.includes(learnerId))
-        .map((guardian: any) => transformGuardian(guardian));
+      try {
+        const guardians = await mockDb.read('guardians');
+        return guardians
+          .filter((g: any) => g.learnerIds?.includes(learnerId))
+          .map((guardian: any) => transformGuardian(guardian))
+          .filter(Boolean);
+      } catch (error) {
+        console.error('Error fetching guardians by learner:', learnerId, error);
+        return [];
+      }
     },
 
     // Employee queries

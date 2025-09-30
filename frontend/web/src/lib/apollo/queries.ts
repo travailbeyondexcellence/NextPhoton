@@ -48,25 +48,6 @@ export const GET_EDUCATOR = gql`
       isActive
       createdAt
       updatedAt
-      classSessions {
-        id
-        date
-        topic
-        startTime
-        endTime
-      }
-      assignments {
-        id
-        title
-        dueDate
-        status
-      }
-      batches {
-        id
-        name
-        subject
-        grade
-      }
     }
   }
 `;

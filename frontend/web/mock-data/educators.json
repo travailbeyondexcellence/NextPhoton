@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "lastUpdated": "2025-09-30T07:47:21.947Z",
+    "lastUpdated": "2025-09-30T14:12:33.575Z",
     "version": "1.0",
-    "count": 10,
+    "count": 9,
     "description": "Educator profiles with qualifications, subjects, reviews, and admin notes"
   },
   "data": [
@@ -315,7 +315,31 @@
         }
       ],
       "createdAt": "2021-11-01T00:00:00Z",
-      "updatedAt": "2024-03-22T10:00:00Z"
+      "updatedAt": "2025-09-30T13:59:43.909Z",
+      "firstName": "Dr.",
+      "lastName": "Farhan Qureshi",
+      "email": "farahqureshi@nextphoton.com",
+      "subject": "Biology",
+      "qualifications": [
+        "Ph.D. in Genetics, AIIMS"
+      ],
+      "experience": 4,
+      "bio": "Award-winning Biology Olympiad coach. Popular for her crash courses and test series.",
+      "availability": {
+        "username": "@farah.bio",
+        "levels": [
+          "NEET",
+          "Olympiads"
+        ],
+        "exams": [
+          "NEET",
+          "Olympiads"
+        ],
+        "priceTier": "premium-2",
+        "studentsTaught": 1300,
+        "hoursTaught": 2800,
+        "profileImage": "https://educators/edufarahqureshi.png"
+      }
     },
     {
       "id": "e008",
@@ -399,38 +423,31 @@
         }
       ],
       "createdAt": "2022-04-01T00:00:00Z",
-      "updatedAt": "2024-03-22T10:00:00Z"
-    },
-    {
-      "firstName": "Sabyasachi",
-      "lastName": "Sahani",
-      "email": "sibuspd@gmail.com",
-      "subject": "Physics, Mathematics, Computer Science, English",
+      "updatedAt": "2025-09-30T14:12:33.575Z",
+      "firstName": "Ms.",
+      "lastName": "Shruti K. Desai",
+      "email": "shrutidesai@nextphoton.com",
+      "subject": "Computer Science",
       "qualifications": [
-        "B.Tech"
+        "M.Tech Computer Science, VIT"
       ],
-      "experience": 1,
-      "bio": "sdfkdsfdskfjdkfj",
+      "experience": 4,
+      "bio": "Computer Science coach for ICSE and CBSE. Focuses on logic building and Python.",
       "availability": {
-        "username": "@sibuspd",
+        "username": "@shruti.computer",
         "levels": [
-          "JEE Advanced",
           "Senior School",
-          "Olympiads"
+          "Junior College"
         ],
         "exams": [
-          "JEE Main",
-          "JEE Advanced"
+          "Boards",
+          "Olympiads"
         ],
-        "priceTier": "beginner-1",
-        "studentsTaught": 10,
-        "hoursTaught": 234,
-        "profileImage": "https://pbs.twimg.com/profile_images/1218624125339459585/OqbCDxdh_400x400.jpg"
-      },
-      "isActive": true,
-      "id": "5c2405cb-8381-4932-96c5-e67f0f645049",
-      "createdAt": "2025-09-30T07:47:21.947Z",
-      "updatedAt": "2025-09-30T07:47:21.947Z"
+        "priceTier": "intermediate-1",
+        "studentsTaught": 950,
+        "hoursTaught": 1800,
+        "profileImage": "https://educators.com/edushrutidesai.png"
+      }
     }
   ]
 }

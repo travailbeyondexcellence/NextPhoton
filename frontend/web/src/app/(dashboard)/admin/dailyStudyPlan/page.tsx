@@ -1,21 +1,33 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Calendar, Clock, BookOpen, CheckCircle, AlertCircle, Users, Filter, Plus } from "lucide-react"
-import { dailyStudyPlans } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { Calendar, Clock, BookOpen, CheckCircle, AlertCircle, Users, Filter, Plus, X } from "lucide-react"
+import { dailyStudyPlans as initialDailyStudyPlans, type DailyStudyPlan } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
 
 export default function DailyStudyPlanPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [plans, setPlans] = useState<DailyStudyPlan[]>(initialDailyStudyPlans)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+
+  // Form state
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    date: new Date().toISOString().split('T')[0],
+    subjects: "",
+    priority: "" as "High" | "Medium" | "Low" | "",
+    educatorName: "",
+  })
 
   // Calculate stats for today
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0]
-    const todayPlans = dailyStudyPlans.filter(plan => plan.date === today)
-    const completed = dailyStudyPlans.filter(plan => plan.status === "Completed").length
-    const pending = dailyStudyPlans.filter(plan => plan.status === "Pending").length
-    const active = dailyStudyPlans.filter(plan => plan.status === "Active").length
+    const todayPlans = plans.filter(plan => plan.date === today)
+    const completed = plans.filter(plan => plan.status === "Completed").length
+    const pending = plans.filter(plan => plan.status === "Pending").length
+    const active = plans.filter(plan => plan.status === "Active").length
 
     return {
       todayPlans: todayPlans.length,
@@ -23,16 +35,61 @@ export default function DailyStudyPlanPage() {
       pending,
       active
     }
-  }, [])
+  }, [plans])
 
   // Filter plans based on selected date and status
   const filteredPlans = useMemo(() => {
-    return dailyStudyPlans.filter(plan => {
+    return plans.filter(plan => {
       const matchesDate = plan.date === selectedDate
       const matchesStatus = statusFilter === "all" || plan.status === statusFilter
       return matchesDate && matchesStatus
     })
-  }, [selectedDate, statusFilter])
+  }, [plans, selectedDate, statusFilter])
+
+  // Handle form submission
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log('=== CREATING DAILY STUDY PLAN ===')
+    console.log('Form data:', formData)
+
+    // Generate new plan ID
+    const newId = `dsp${String(plans.length + 1).padStart(3, '0')}`
+    const subjectsArray = formData.subjects.split(',').map(s => s.trim()).filter(Boolean)
+
+    // Create new plan object
+    const newPlan: DailyStudyPlan = {
+      id: newId,
+      title: formData.title,
+      description: formData.description,
+      date: formData.date,
+      timeSlots: [], // Empty initially, can be added later
+      learnerIds: [],
+      educatorId: "admin",
+      educatorName: formData.educatorName || "Admin",
+      status: "Pending",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      totalStudyTime: 0,
+      completedTime: 0,
+      subjects: subjectsArray,
+      priority: formData.priority as "High" | "Medium" | "Low",
+    }
+
+    console.log('Adding new plan:', newPlan)
+    setPlans(prevPlans => [newPlan, ...prevPlans])
+
+    // Reset form and close dialog
+    setFormData({
+      title: "",
+      description: "",
+      date: new Date().toISOString().split('T')[0],
+      subjects: "",
+      priority: "",
+      educatorName: "",
+    })
+    setIsCreateDialogOpen(false)
+    alert('Study plan created successfully!')
+  }
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -159,7 +216,10 @@ export default function DailyStudyPlanPage() {
             </select>
           </div>
 
-          <button className="ml-auto px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+          <button
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="ml-auto px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             Create Plan
           </button>
@@ -323,6 +383,130 @@ export default function DailyStudyPlanPage() {
           ))
         )}
       </div>
+
+      {/* Create Plan Dialog */}
+      {isCreateDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#f5e6d3] border border-[#d4c5b0] rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Dialog Header */}
+            <div className="sticky top-0 bg-[#f5e6d3] border-b border-[#d4c5b0] p-6 flex items-center justify-between z-10">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground">Create Daily Study Plan</h2>
+                <p className="text-sm text-muted-foreground mt-1">Create a new study plan for learners</p>
+              </div>
+              <button
+                onClick={() => setIsCreateDialogOpen(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Dialog Content */}
+            <div className="overflow-y-auto flex-1">
+              <form onSubmit={handleCreatePlan} className="p-6 space-y-6">
+                {/* Basic Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Basic Information</h3>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Plan Title *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      placeholder="e.g., Mathematics Focus Week"
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Description *</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={formData.description}
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      placeholder="Brief description of the study plan..."
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500 resize-none"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Date *</label>
+                      <input
+                        type="date"
+                        required
+                        value={formData.date}
+                        onChange={(e) => setFormData({...formData, date: e.target.value})}
+                        className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Priority *</label>
+                      <select
+                        required
+                        value={formData.priority}
+                        onChange={(e) => setFormData({...formData, priority: e.target.value as any})}
+                        className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800"
+                      >
+                        <option value="">Select priority</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Subjects (comma-separated) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.subjects}
+                      onChange={(e) => setFormData({...formData, subjects: e.target.value})}
+                      placeholder="e.g., Mathematics, Physics, Chemistry"
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Educator Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.educatorName}
+                      onChange={(e) => setFormData({...formData, educatorName: e.target.value})}
+                      placeholder="e.g., Dr. Sarah Smith"
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t border-[#d4c5b0]">
+                  <button
+                    type="button"
+                    onClick={() => setIsCreateDialogOpen(false)}
+                    className="flex-1 px-4 py-3 bg-[#d4c5b0] hover:bg-[#c4b5a0] text-gray-800 rounded-lg transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-3 bg-[#8b7355] hover:bg-[#7b6345] text-white rounded-lg transition-colors font-medium"
+                  >
+                    Create Plan
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

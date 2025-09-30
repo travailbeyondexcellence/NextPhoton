@@ -140,7 +140,7 @@ export default function TravailExamsPage() {
           <FileText className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-3xl font-bold text-foreground">Examinations</h1>
-            <p className="text-muted-foreground">Manage and monitor student examinations</p>
+            <p className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Manage and monitor student examinations</p>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function TravailExamsPage() {
             <Calendar className="h-5 w-5 text-blue-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.upcoming}</p>
-          <p className="text-sm text-muted-foreground">Scheduled</p>
+          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Scheduled</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
@@ -162,7 +162,7 @@ export default function TravailExamsPage() {
             <Clock className="h-5 w-5 text-yellow-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.inProgress}</p>
-          <p className="text-sm text-muted-foreground">Currently active</p>
+          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Currently active</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
@@ -171,7 +171,7 @@ export default function TravailExamsPage() {
             <CheckCircle className="h-5 w-5 text-green-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.thisMonthCompleted}</p>
-          <p className="text-sm text-muted-foreground">This month</p>
+          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>This month</p>
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
@@ -180,7 +180,7 @@ export default function TravailExamsPage() {
             <TrendingUp className="h-5 w-5 text-purple-400" />
           </div>
           <p className="text-2xl font-bold text-foreground">{stats.averageScore}%</p>
-          <p className="text-sm text-muted-foreground">Overall average</p>
+          <p className="text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Overall average</p>
         </div>
       </div>
 
@@ -189,13 +189,14 @@ export default function TravailExamsPage() {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }} />
               <input
                 type="text"
                 placeholder="Search examinations by title, subject, educator..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                className="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder:opacity-70"
+                style={{ "--tw-placeholder-color": 'var(--sidebar-text-color, inherit)' } as React.CSSProperties}
               />
             </div>
           </div>
@@ -234,9 +235,9 @@ export default function TravailExamsPage() {
       <div className="space-y-4">
         {sortedExaminations.length === 0 ? (
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
-            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <FileText className="h-12 w-12 opacity-70 mx-auto mb-4" style={{ color: 'var(--sidebar-text-color, inherit)' }} />
             <h3 className="text-lg font-semibold text-foreground mb-2">No examinations found</h3>
-            <p className="text-muted-foreground">No examinations match your current filters.</p>
+            <p className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>No examinations match your current filters.</p>
           </div>
         ) : (
           sortedExaminations.map((exam) => (
@@ -256,9 +257,9 @@ export default function TravailExamsPage() {
                       {getStatusBadge(exam.status)}
                       {getExamTypeBadge(exam.examType)}
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">{exam.description}</p>
+                    <p className="text-sm opacity-70 mb-3" style={{ color: 'var(--sidebar-text-color, inherit)' }}>{exam.description}</p>
 
-                    <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                    <div className="flex flex-wrap gap-4 text-sm opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
                       <div className="flex items-center gap-1">
                         <FileText className="h-4 w-4" />
                         <span className="text-primary">{exam.subject}</span>
@@ -282,15 +283,15 @@ export default function TravailExamsPage() {
                 {/* Exam Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <span className="text-muted-foreground text-sm">Scheduled: </span>
+                    <span className="opacity-70 text-sm" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Scheduled: </span>
                     <div className="font-medium">{formatDateTime(exam.scheduledDate)}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground text-sm">Total Marks: </span>
+                    <span className="opacity-70 text-sm" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Total Marks: </span>
                     <div className="font-medium">{exam.totalMarks}</div>
                   </div>
                   <div>
-                    <span className="text-muted-foreground text-sm">Passing Marks: </span>
+                    <span className="opacity-70 text-sm" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Passing Marks: </span>
                     <div className="font-medium">{exam.passingMarks}</div>
                   </div>
                   <div className="flex items-center gap-1">
@@ -308,23 +309,23 @@ export default function TravailExamsPage() {
                     <h4 className="text-sm font-semibold mb-2">Results Summary</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Completed: </span>
+                        <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Completed: </span>
                         <span className="font-medium">{exam.examResults.filter(r => r.status === "Completed").length}</span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Average: </span>
+                        <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Average: </span>
                         <span className="font-medium">
                           {Math.round(exam.examResults.reduce((sum, r) => sum + r.percentage, 0) / exam.examResults.length)}%
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Highest: </span>
+                        <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Highest: </span>
                         <span className="font-medium text-green-400">
                           {Math.max(...exam.examResults.map(r => r.percentage))}%
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Pass Rate: </span>
+                        <span className="opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Pass Rate: </span>
                         <span className="font-medium">
                           {Math.round((exam.examResults.filter(r => r.obtainedMarks >= exam.passingMarks).length / exam.examResults.length) * 100)}%
                         </span>
@@ -339,7 +340,7 @@ export default function TravailExamsPage() {
                     {/* Instructions */}
                     <div className="mb-4">
                       <h4 className="text-sm font-semibold mb-2">Instructions</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
+                      <ul className="text-sm opacity-70 space-y-1" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
                         {exam.instructions.map((instruction, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <span className="text-primary mt-1">•</span>
@@ -378,7 +379,7 @@ export default function TravailExamsPage() {
                                   {result.status}
                                 </span>
                                 {result.rank && (
-                                  <span className="text-xs text-muted-foreground">Rank #{result.rank}</span>
+                                  <span className="text-xs opacity-70" style={{ color: 'var(--sidebar-text-color, inherit)' }}>Rank #{result.rank}</span>
                                 )}
                               </div>
                               <div className="text-right">
@@ -395,7 +396,7 @@ export default function TravailExamsPage() {
                             </div>
                           ))}
                           {exam.examResults.length > 5 && (
-                            <div className="text-xs text-muted-foreground text-center">
+                            <div className="text-xs opacity-70 text-center" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
                               +{exam.examResults.length - 5} more students
                             </div>
                           )}

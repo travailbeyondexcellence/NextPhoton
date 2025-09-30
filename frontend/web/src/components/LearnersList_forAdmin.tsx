@@ -1,7 +1,7 @@
 // Component for displaying learners in a table/list view for admin
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getInitials } from '@/lib/utils';
@@ -53,12 +53,16 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
     } | null>(null);
     const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
     const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+    const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
 
     const router = useRouter();
 
-    // Fetch learners using Apollo
+    // Fetch learners using Apollo with aggressive fetch policy
     const { data, loading, error, refetch } = useQuery(GET_LEARNERS, {
-        fetchPolicy: 'cache-and-network',
+        fetchPolicy: 'network-only', // Always fetch fresh data on mount to avoid stale cache
+        nextFetchPolicy: 'cache-first', // Then use cache for subsequent queries
+        notifyOnNetworkStatusChange: true,
+        errorPolicy: 'all',
     });
 
     // Delete learner mutation
@@ -91,6 +95,24 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                 variables: { id },
             });
         }
+    };
+
+    // Close action menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            if (openActionMenuId && !target.closest('.action-menu-container')) {
+                setOpenActionMenuId(null);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [openActionMenuId]);
+
+    // Toggle action menu
+    const toggleActionMenu = (learnerId: string) => {
+        setOpenActionMenuId(prev => prev === learnerId ? null : learnerId);
     };
 
     const learners = data?.learners || [];
@@ -185,12 +207,23 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
         }
     };
 
-    // Loading state
-    if (loading) {
+    // Loading state - show skeleton while loading first time
+    if (loading && !data) {
         return (
-            <div className="flex items-center justify-center p-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <span className="ml-2 text-muted-foreground">Loading learners...</span>
+            <div className="space-y-4">
+                {/* Skeleton loader */}
+                {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 animate-pulse">
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-full bg-white/10" />
+                            <div className="flex-1 space-y-2">
+                                <div className="h-4 bg-white/10 rounded w-1/4" />
+                                <div className="h-3 bg-white/10 rounded w-1/3" />
+                            </div>
+                            <div className="w-32 h-8 bg-white/10 rounded" />
+                        </div>
+                    </div>
+                ))}
             </div>
         );
     }
@@ -351,15 +384,53 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                         </span>
                                     </td>
                                     <td className="p-4 text-center">
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                // Handle actions menu
-                                            }}
-                                            className="p-1 hover:bg-white/10 rounded"
-                                        >
-                                            <MoreVertical className="w-4 h-4" />
-                                        </button>
+                                        <div className="relative action-menu-container">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleActionMenu(learner.id);
+                                                }}
+                                                className="p-1 hover:bg-white/10 rounded cursor-pointer"
+                                            >
+                                                <MoreVertical className="w-4 h-4" />
+                                            </button>
+
+                                            {/* Dropdown menu */}
+                                            {openActionMenuId === learner.id && (
+                                                <div className="absolute right-0 top-8 z-50 min-w-[160px] bg-background border border-white/20 rounded-lg shadow-lg overflow-hidden">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOpenActionMenuId(null);
+                                                            router.push(`/admin/learners/${learner.id}`);
+                                                        }}
+                                                        className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOpenActionMenuId(null);
+                                                            router.push(`/admin/learners/${learner.id}/edit`);
+                                                        }}
+                                                        className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                                                    >
+                                                        Edit Learner
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOpenActionMenuId(null);
+                                                            handleDelete(learner.id, learner.name);
+                                                        }}
+                                                        className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors text-red-400"
+                                                    >
+                                                        Delete Learner
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                                 {expandedRows.has(learner.id) && (
@@ -457,15 +528,53 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                     <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(learner.status)}`}>
                                         {learner.status}
                                     </span>
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            // Handle actions
-                                        }}
-                                        className="p-1 hover:bg-white/10 rounded"
-                                    >
-                                        <MoreVertical className="w-4 h-4" />
-                                    </button>
+                                    <div className="relative action-menu-container">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleActionMenu(learner.id);
+                                            }}
+                                            className="p-1 hover:bg-white/10 rounded cursor-pointer"
+                                        >
+                                            <MoreVertical className="w-4 h-4" />
+                                        </button>
+
+                                        {/* Dropdown menu */}
+                                        {openActionMenuId === learner.id && (
+                                            <div className="absolute right-0 top-8 z-50 min-w-[160px] bg-background border border-white/20 rounded-lg shadow-lg overflow-hidden">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenActionMenuId(null);
+                                                        router.push(`/admin/learners/${learner.id}`);
+                                                    }}
+                                                    className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                                                >
+                                                    View Details
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenActionMenuId(null);
+                                                        router.push(`/admin/learners/${learner.id}/edit`);
+                                                    }}
+                                                    className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors"
+                                                >
+                                                    Edit Learner
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setOpenActionMenuId(null);
+                                                        handleDelete(learner.id, learner.name);
+                                                    }}
+                                                    className="w-full px-4 py-2 text-left text-sm hover:bg-white/10 transition-colors text-red-400"
+                                                >
+                                                    Delete Learner
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3">

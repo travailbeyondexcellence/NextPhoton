@@ -1,11 +1,11 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@apollo/client';
-import { CREATE_EDUCATOR, GET_EDUCATORS } from '@/lib/apollo';
+import { UPDATE_EDUCATOR, GET_EDUCATORS } from '@/lib/apollo';
 import { useRouter } from 'next/navigation';
 import {
   User,
@@ -19,7 +19,8 @@ import {
   Clock,
   Image as ImageIcon,
   FileText,
-  Loader2
+  Loader2,
+  Save
 } from 'lucide-react';
 
 const educatorSchema = z.object({
@@ -57,6 +58,25 @@ const educatorSchema = z.object({
 
 type EducatorFormData = z.infer<typeof educatorSchema>;
 
+const subjectOptions = ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'Computer Science', 'English'];
+const levelOptions = ['Senior School', 'Junior College', 'JEE Advanced', 'NEET', 'Boards', 'Olympiads'];
+const examOptions = ['JEE Main', 'JEE Advanced', 'NEET', 'Boards', 'Olympiads', 'NTSE', 'KVPY'];
+const priceTiers = [
+  { value: 'beginner-1', label: 'Beginner 1', color: 'bg-[#F3E090FF]' },
+  { value: 'beginner-2', label: 'Beginner 2', color: 'bg-[#F8DD65FF]' },
+  { value: 'beginner-3', label: 'Beginner 3', color: 'bg-[#FFB303FF]' },
+  { value: 'intermediate-1', label: 'Intermediate 1', color: 'bg-[#51D9EBFF]' },
+  { value: 'intermediate-2', label: 'Intermediate 2', color: 'bg-[#0477FAFF]' },
+  { value: 'intermediate-3', label: 'Intermediate 3', color: 'bg-[#024EA6FF]' },
+  { value: 'premium-1', label: 'Premium 1', color: 'bg-[#F9618CFF]' },
+  { value: 'premium-2', label: 'Premium 2', color: 'bg-[#ff1e37]' },
+  { value: 'premium-3', label: 'Premium 3', color: 'bg-[#BA0419FF]' },
+];
+
+interface EditEducatorFormProps {
+  educator: any;
+}
+
 const defaultValues: EducatorFormData = {
   name: '',
   username: '',
@@ -73,70 +93,61 @@ const defaultValues: EducatorFormData = {
   profileImage: '',
 };
 
-const subjectOptions = ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'Computer Science', 'English'];
-const levelOptions = ['Senior School', 'Junior College', 'JEE Advanced', 'NEET', 'Boards', 'Olympiads'];
-const examOptions = ['JEE Main', 'JEE Advanced', 'NEET', 'Boards', 'Olympiads', 'NTSE', 'KVPY'];
-const priceTiers = [
-  { value: 'beginner-1', label: 'Beginner 1', color: 'bg-[#F3E090FF]' },
-  { value: 'beginner-2', label: 'Beginner 2', color: 'bg-[#F8DD65FF]' },
-  { value: 'beginner-3', label: 'Beginner 3', color: 'bg-[#FFB303FF]' },
-  { value: 'intermediate-1', label: 'Intermediate 1', color: 'bg-[#51D9EBFF]' },
-  { value: 'intermediate-2', label: 'Intermediate 2', color: 'bg-[#0477FAFF]' },
-  { value: 'intermediate-3', label: 'Intermediate 3', color: 'bg-[#024EA6FF]' },
-  { value: 'premium-1', label: 'Premium 1', color: 'bg-[#F9618CFF]' },
-  { value: 'premium-2', label: 'Premium 2', color: 'bg-[#ff1e37]' },
-  { value: 'premium-3', label: 'Premium 3', color: 'bg-[#BA0419FF]' },
-];
-
-export default function CreateEducatorForm() {
+export default function EditEducatorForm({ educator }: EditEducatorFormProps) {
   const router = useRouter();
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<EducatorFormData>({
     resolver: zodResolver(educatorSchema),
     defaultValues,
   });
 
-  // Apollo mutation for creating educator
-  const [createEducator, { loading: creating }] = useMutation(CREATE_EDUCATOR, {
-    // Update the cache after creating educator
-    update(cache, { data }) {
-      // Only update cache if we have valid data
-      if (!data?.createEducator) return;
+  // Pre-populate form with existing educator data
+  useEffect(() => {
+    if (educator) {
+      // Extract data from availability JSON if present
+      const availability = typeof educator.availability === 'object' ? educator.availability : {};
 
-      try {
-        const existingData: any = cache.readQuery({ query: GET_EDUCATORS });
-        if (existingData?.educators) {
-          cache.writeQuery({
-            query: GET_EDUCATORS,
-            data: {
-              educators: [...existingData.educators, data.createEducator],
-            },
-          });
-        }
-      } catch (error) {
-        // Query might not be in cache yet, which is fine
-        console.log('Cache update skipped - query not in cache yet');
-      }
-    },
+      // Parse subjects - handle both string and array
+      const subjectsArray = educator.subject
+        ? (Array.isArray(educator.subject) ? educator.subject : educator.subject.split(',').map((s: string) => s.trim()))
+        : [];
+
+      setValue('name', `${educator.firstName || ''} ${educator.lastName || ''}`.trim());
+      setValue('username', availability.username || '');
+      setValue('emailFallback', educator.email || '');
+      setValue('intro', educator.bio || '');
+      setValue('qualification', Array.isArray(educator.qualifications) && educator.qualifications[0]
+        ? educator.qualifications[0]
+        : (typeof educator.qualifications === 'string' ? educator.qualifications : ''));
+      setValue('subjects', subjectsArray);
+      setValue('levels', availability.levels || []);
+      setValue('exams', availability.exams || []);
+      setValue('priceTier', availability.priceTier || '');
+      setValue('yearsWithNextPhoton', educator.experience || 0);
+      setValue('studentsTaught', availability.studentsTaught || 0);
+      setValue('hoursTaught', availability.hoursTaught || 0);
+      setValue('profileImage', availability.profileImage || '');
+    }
+  }, [educator, setValue]);
+
+  // Apollo mutation for updating educator
+  const [updateEducator, { loading: updating }] = useMutation(UPDATE_EDUCATOR, {
     onCompleted: () => {
-      alert('Educator created successfully!');
-      reset();
-      // Navigate back to educators list
+      alert('Educator updated successfully!');
       router.push('/admin/educators');
     },
     onError: (error) => {
-      console.error('Error creating educator:', error);
-      alert('Failed to create educator. Please try again.');
+      console.error('Error updating educator:', error);
+      alert('Failed to update educator. Please try again.');
     },
+    refetchQueries: [{ query: GET_EDUCATORS }],
   });
 
   const onSubmit = async (data: EducatorFormData) => {
     try {
-      // Generate a unique ID for the educator
-      const educatorId = `edu-${Date.now()}`;
-
       // Transform form data to match GraphQL input
-      await createEducator({
+      await updateEducator({
         variables: {
+          id: educator.id,
           input: {
             firstName: data.name.split(' ')[0] || data.name,
             lastName: data.name.split(' ').slice(1).join(' ') || '',
@@ -164,7 +175,7 @@ export default function CreateEducatorForm() {
 
   // For multi-selects
   const handleMultiSelect = (field: keyof EducatorFormData, value: string) => {
-    const arr = watch(field) as string[];
+    const arr = (watch(field) || []) as string[];
     if (arr.includes(value)) {
       setValue(field, arr.filter((v) => v !== value) as any);
     } else {
@@ -185,10 +196,10 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <User className="w-4 h-4" /> Full Name
             </label>
-            <input 
-              {...register('name')} 
+            <input
+              {...register('name')}
               placeholder="Enter educator's full name"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -199,10 +210,10 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <AtSign className="w-4 h-4" /> Username
             </label>
-            <input 
-              {...register('username')} 
+            <input
+              {...register('username')}
               placeholder="@username"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -213,11 +224,11 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <Mail className="w-4 h-4" /> Email Address
             </label>
-            <input 
-              {...register('emailFallback')} 
+            <input
+              {...register('emailFallback')}
               type="email"
               placeholder="educator@example.com"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -228,10 +239,10 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <ImageIcon className="w-4 h-4" /> Profile Image URL (Optional)
             </label>
-            <input 
-              {...register('profileImage')} 
+            <input
+              {...register('profileImage')}
               placeholder="https://example.com/image.jpg"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -243,10 +254,10 @@ export default function CreateEducatorForm() {
           <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
             <FileText className="w-4 h-4" /> Introduction
           </label>
-          <textarea 
-            {...register('intro')} 
+          <textarea
+            {...register('intro')}
             placeholder="Brief introduction about the educator..."
-            className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+            className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                      text-foreground placeholder:text-muted-foreground
                      focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                      hover:bg-white/15 transition-all resize-none"
@@ -267,10 +278,10 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <GraduationCap className="w-4 h-4" /> Qualification
             </label>
-            <input 
-              {...register('qualification')} 
+            <input
+              {...register('qualification')}
               placeholder="e.g., M.Sc. Physics, IIT Delhi"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -281,9 +292,9 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <DollarSign className="w-4 h-4" /> Price Tier
             </label>
-            <select 
-              {...register('priceTier')} 
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+            <select
+              {...register('priceTier')}
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all cursor-pointer"
@@ -320,12 +331,12 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <Calendar className="w-4 h-4" /> Years with NextPhoton
             </label>
-            <input 
-              type="number" 
-              {...register('yearsWithNextPhoton', { valueAsNumber: true })} 
+            <input
+              type="number"
+              {...register('yearsWithNextPhoton', { valueAsNumber: true })}
               placeholder="0"
               min="0"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -336,12 +347,12 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <Users className="w-4 h-4" /> Students Taught
             </label>
-            <input 
-              type="number" 
-              {...register('studentsTaught', { valueAsNumber: true })} 
+            <input
+              type="number"
+              {...register('studentsTaught', { valueAsNumber: true })}
               placeholder="0"
               min="0"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -352,12 +363,12 @@ export default function CreateEducatorForm() {
             <label className="block mb-2 text-sm font-medium text-foreground flex items-center gap-1">
               <Clock className="w-4 h-4" /> Hours Taught
             </label>
-            <input 
-              type="number" 
-              {...register('hoursTaught', { valueAsNumber: true })} 
+            <input
+              type="number"
+              {...register('hoursTaught', { valueAsNumber: true })}
               placeholder="0"
               min="0"
-              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 
+              className="w-full rounded-lg px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20
                        text-foreground placeholder:text-muted-foreground
                        focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
                        hover:bg-white/15 transition-all"
@@ -381,9 +392,9 @@ export default function CreateEducatorForm() {
                 <label key={subject} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-white/10 transition-all">
                   <input
                     type="checkbox"
-                    checked={watch('subjects').includes(subject)}
+                    checked={(watch('subjects') || []).includes(subject)}
                     onChange={() => handleMultiSelect('subjects', subject)}
-                    className="w-4 h-4 text-primary bg-white/10 border-white/30 rounded 
+                    className="w-4 h-4 text-primary bg-white/10 border-white/30 rounded
                              focus:ring-primary focus:ring-2 focus:ring-offset-0
                              checked:bg-primary checked:border-primary"
                   />
@@ -400,9 +411,9 @@ export default function CreateEducatorForm() {
                 <label key={level} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-white/10 transition-all">
                   <input
                     type="checkbox"
-                    checked={watch('levels').includes(level)}
+                    checked={(watch('levels') || []).includes(level)}
                     onChange={() => handleMultiSelect('levels', level)}
-                    className="w-4 h-4 text-primary bg-white/10 border-white/30 rounded 
+                    className="w-4 h-4 text-primary bg-white/10 border-white/30 rounded
                              focus:ring-primary focus:ring-2 focus:ring-offset-0
                              checked:bg-primary checked:border-primary"
                   />
@@ -419,9 +430,9 @@ export default function CreateEducatorForm() {
                 <label key={exam} className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-white/10 transition-all">
                   <input
                     type="checkbox"
-                    checked={watch('exams').includes(exam)}
+                    checked={(watch('exams') || []).includes(exam)}
                     onChange={() => handleMultiSelect('exams', exam)}
-                    className="w-4 h-4 text-primary bg-white/10 border-white/30 rounded 
+                    className="w-4 h-4 text-primary bg-white/10 border-white/30 rounded
                              focus:ring-primary focus:ring-2 focus:ring-offset-0
                              checked:bg-primary checked:border-primary"
                   />
@@ -436,25 +447,25 @@ export default function CreateEducatorForm() {
 
       {/* Form Actions */}
       <div className="flex gap-4 justify-end">
-        <button 
-          type="button" 
-          className="px-6 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-lg 
+        <button
+          type="button"
+          className="px-6 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 text-foreground rounded-lg
                    hover:bg-white/15 hover:border-white/30 transition-all duration-200
                    focus:outline-none focus:ring-2 focus:ring-white/50"
-          onClick={() => reset()}
+          onClick={() => router.back()}
         >
-          Reset
+          Cancel
         </button>
         <button
           type="submit"
-          disabled={creating}
+          disabled={updating}
           className="px-6 py-2.5 bg-primary/20 backdrop-blur-sm border border-primary/30 text-primary rounded-lg
                    hover:bg-primary/30 hover:border-primary/40 transition-all duration-200
                    focus:outline-none focus:ring-2 focus:ring-primary/50 font-medium
                    disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          {creating && <Loader2 className="w-4 h-4 animate-spin" />}
-          {creating ? 'Creating...' : 'Create Educator'}
+          {updating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {updating ? 'Updating...' : 'Update Educator'}
         </button>
       </div>
     </form>

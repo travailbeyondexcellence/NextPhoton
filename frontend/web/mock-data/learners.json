@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "lastUpdated": "2025-09-30T09:52:22.535Z",
+    "lastUpdated": "2025-09-30T11:04:27.212Z",
     "version": "1.0",
-    "count": 10,
+    "count": 9,
     "description": "Learner profiles with academic information, guardian relationships, and progress tracking"
   },
   "data": [
@@ -731,45 +731,6 @@
       "lastActive": "2024-03-15",
       "createdAt": "2023-06-01T00:00:00Z",
       "updatedAt": "2024-03-15T10:00:00Z"
-    },
-    {
-      "firstName": "Marshal",
-      "lastName": "Inoue",
-      "email": "marshal@bolero.in",
-      "phoneNumber": "9861428670",
-      "dateOfBirth": null,
-      "grade": "9th Standard",
-      "guardianIds": [],
-      "batchIds": [
-        "fdfg"
-      ],
-      "profilePicture": "https://example.jpeg",
-      "address": {
-        "school": "dfgdd",
-        "board": "CBSE",
-        "academicLevel": "Senior School",
-        "targetExams": [
-          "Olympiads",
-          "NEET",
-          "NTSE",
-          "CLAT"
-        ],
-        "targetExamYear": 2026,
-        "guardianInfo": {
-          "name": "erifjdm skdfgjk",
-          "relation": "Father",
-          "phone": "9815497822",
-          "email": "dfdsfhnfd@gmail.com"
-        },
-        "remarkTags": [],
-        "enrollmentDate": "2025-09-30",
-        "username": "@marshalwa"
-      },
-      "enrollmentDate": "2025-09-30",
-      "isActive": true,
-      "id": "ac0bbd21-3621-4ba8-9f53-1e445579db1f",
-      "createdAt": "2025-09-30T09:52:22.535Z",
-      "updatedAt": "2025-09-30T09:52:22.535Z"
     }
   ]
 }

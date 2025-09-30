@@ -31,6 +31,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: "*.twimg.com",
       },
+      {
+        protocol: 'https',
+        hostname: "educators.com",
+      },
     ],
   },
   webpack: (config, { isServer }) => {

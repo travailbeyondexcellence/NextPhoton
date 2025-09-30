@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { BookOpen, Clock, Users, Tag, Search, Filter, Plus, Edit, Copy, Trash2, Eye, X } from "lucide-react"
-import { premadePlans } from "@/app/(features)/AcademicPlans/academicPlansDummyData"
+import { premadePlans as initialPremadePlans, type PremadePlan } from "@/app/(features)/AcademicPlans/academicPlansDummyData"
 
 export default function PremadePlansPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -10,23 +10,40 @@ export default function PremadePlansPage() {
   const [difficultyFilter, setDifficultyFilter] = useState("all")
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [plans, setPlans] = useState<PremadePlan[]>(initialPremadePlans)
+
+  // Form state
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    subject: "",
+    gradeLevel: "",
+    difficulty: "" as "Beginner" | "Intermediate" | "Advanced" | "",
+    duration: "",
+    estimatedHours: "",
+    objectives: "",
+    topics: "",
+    resources: "",
+    tags: "",
+    isPublic: true
+  })
 
   // Get unique subjects and calculate stats
   const { subjects, stats } = useMemo(() => {
-    const uniqueSubjects = [...new Set(premadePlans.map(p => p.subject))].sort()
-    const totalPlans = premadePlans.length
-    const totalUsage = premadePlans.reduce((sum, p) => sum + p.usageCount, 0)
-    const publicPlans = premadePlans.filter(p => p.isPublic).length
+    const uniqueSubjects = [...new Set(plans.map(p => p.subject))].sort()
+    const totalPlans = plans.length
+    const totalUsage = plans.reduce((sum, p) => sum + p.usageCount, 0)
+    const publicPlans = plans.filter(p => p.isPublic).length
 
     return {
       subjects: uniqueSubjects,
       stats: { totalPlans, totalUsage, publicPlans }
     }
-  }, [])
+  }, [plans])
 
   // Filter plans
   const filteredPlans = useMemo(() => {
-    return premadePlans.filter(plan => {
+    return plans.filter(plan => {
       const matchesSearch =
         plan.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         plan.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -37,7 +54,76 @@ export default function PremadePlansPage() {
 
       return matchesSearch && matchesSubject && matchesDifficulty
     })
-  }, [searchTerm, subjectFilter, difficultyFilter])
+  }, [plans, searchTerm, subjectFilter, difficultyFilter])
+
+  // Handle form submission
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log('=== FORM SUBMITTED ===')
+    console.log('Form data:', formData)
+    alert('Creating plan...')
+
+    // Generate new plan ID
+    const newId = `pp${String(plans.length + 1).padStart(3, '0')}`
+    console.log('Generated ID:', newId)
+
+    // Parse comma/newline-separated fields
+    const objectivesArray = formData.objectives.split('\n').filter(obj => obj.trim())
+    const topicsArray = formData.topics.split(',').map(t => t.trim()).filter(Boolean)
+    const resourcesArray = formData.resources ? formData.resources.split(',').map(r => r.trim()).filter(Boolean) : []
+    const tagsArray = formData.tags ? formData.tags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean) : []
+
+    // Create new plan object
+    const newPlan: PremadePlan = {
+      id: newId,
+      title: formData.title,
+      description: formData.description,
+      subject: formData.subject,
+      gradeLevel: formData.gradeLevel,
+      duration: formData.duration,
+      objectives: objectivesArray,
+      topics: topicsArray,
+      resources: resourcesArray,
+      assessmentCriteria: [], // Can be added later via edit
+      createdBy: "admin", // TODO: Replace with actual user ID
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      difficulty: formData.difficulty as "Beginner" | "Intermediate" | "Advanced",
+      estimatedHours: parseInt(formData.estimatedHours),
+      tags: tagsArray,
+      isPublic: formData.isPublic,
+      usageCount: 0
+    }
+
+    // Add to plans list
+    console.log('Adding new plan:', newPlan)
+    setPlans(prevPlans => {
+      const updatedPlans = [newPlan, ...prevPlans]
+      console.log('Plans updated! New count:', updatedPlans.length)
+      return updatedPlans
+    })
+
+    // Reset form and close dialog
+    console.log('Resetting form and closing dialog')
+    setFormData({
+      title: "",
+      description: "",
+      subject: "",
+      gradeLevel: "",
+      difficulty: "",
+      duration: "",
+      estimatedHours: "",
+      objectives: "",
+      topics: "",
+      resources: "",
+      tags: "",
+      isPublic: true
+    })
+    setIsCreateDialogOpen(false)
+
+    // Show success message (optional)
+    console.log('Plan created successfully:', newPlan)
+  }
 
   const getDifficultyBadge = (difficulty: string) => {
     const colors = {
@@ -275,10 +361,10 @@ export default function PremadePlansPage() {
 
       {/* Create New Plan Dialog */}
       {isCreateDialogOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-background border border-white/20 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#f5e6d3] border border-[#d4c5b0] rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Dialog Header */}
-            <div className="sticky top-0 bg-background border-b border-white/20 p-6 flex items-center justify-between">
+            <div className="sticky top-0 bg-[#f5e6d3] border-b border-[#d4c5b0] p-6 flex items-center justify-between z-10">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Create New Academic Plan</h2>
                 <p className="text-sm text-muted-foreground mt-1">Design a new premade academic plan template</p>
@@ -292,15 +378,11 @@ export default function PremadePlansPage() {
             </div>
 
             {/* Dialog Content */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                // TODO: Implement plan creation logic with GraphQL mutation
-                console.log('Creating new academic plan...')
-                setIsCreateDialogOpen(false)
-              }}
-              className="p-6 space-y-6"
-            >
+            <div className="overflow-y-auto flex-1">
+              <form
+                onSubmit={handleCreatePlan}
+                className="p-6 space-y-6"
+              >
               {/* Basic Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Basic Information</h3>
@@ -310,8 +392,10 @@ export default function PremadePlansPage() {
                   <input
                     type="text"
                     required
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
                     placeholder="e.g., Introduction to Calculus"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                    className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
                   />
                 </div>
 
@@ -320,8 +404,10 @@ export default function PremadePlansPage() {
                   <textarea
                     required
                     rows={3}
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
                     placeholder="Brief description of the academic plan..."
-                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground resize-none"
+                    className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500 resize-none"
                   />
                 </div>
 
@@ -330,7 +416,9 @@ export default function PremadePlansPage() {
                     <label className="block text-sm font-medium mb-2">Subject *</label>
                     <select
                       required
-                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground"
+                      value={formData.subject}
+                      onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800"
                     >
                       <option value="">Select subject</option>
                       {subjects.map(subject => (
@@ -344,7 +432,9 @@ export default function PremadePlansPage() {
                     <label className="block text-sm font-medium mb-2">Grade Level *</label>
                     <select
                       required
-                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground"
+                      value={formData.gradeLevel}
+                      onChange={(e) => setFormData({...formData, gradeLevel: e.target.value})}
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800"
                     >
                       <option value="">Select grade level</option>
                       <option value="Grade 6">Grade 6</option>
@@ -364,7 +454,9 @@ export default function PremadePlansPage() {
                     <label className="block text-sm font-medium mb-2">Difficulty *</label>
                     <select
                       required
-                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground"
+                      value={formData.difficulty}
+                      onChange={(e) => setFormData({...formData, difficulty: e.target.value as any})}
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800"
                     >
                       <option value="">Select</option>
                       <option value="Beginner">Beginner</option>
@@ -378,8 +470,10 @@ export default function PremadePlansPage() {
                     <input
                       type="text"
                       required
+                      value={formData.duration}
+                      onChange={(e) => setFormData({...formData, duration: e.target.value})}
                       placeholder="e.g., 6 weeks"
-                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
                     />
                   </div>
 
@@ -389,8 +483,10 @@ export default function PremadePlansPage() {
                       type="number"
                       required
                       min="1"
+                      value={formData.estimatedHours}
+                      onChange={(e) => setFormData({...formData, estimatedHours: e.target.value})}
                       placeholder="36"
-                      className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                      className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
                     />
                   </div>
                 </div>
@@ -404,8 +500,10 @@ export default function PremadePlansPage() {
                   <textarea
                     required
                     rows={4}
+                    value={formData.objectives}
+                    onChange={(e) => setFormData({...formData, objectives: e.target.value})}
                     placeholder="Enter learning objectives, one per line..."
-                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground resize-none"
+                    className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500 resize-none"
                   />
                 </div>
               </div>
@@ -418,8 +516,10 @@ export default function PremadePlansPage() {
                   <input
                     type="text"
                     required
+                    value={formData.topics}
+                    onChange={(e) => setFormData({...formData, topics: e.target.value})}
                     placeholder="e.g., Variables, Equations, Linear Functions, Graphing"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                    className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
                   />
                 </div>
               </div>
@@ -431,8 +531,10 @@ export default function PremadePlansPage() {
                   <label className="block text-sm font-medium mb-2">Resources (comma-separated)</label>
                   <input
                     type="text"
+                    value={formData.resources}
+                    onChange={(e) => setFormData({...formData, resources: e.target.value})}
                     placeholder="e.g., Textbook, Online Videos, Practice Worksheets"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                    className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
                   />
                 </div>
               </div>
@@ -444,8 +546,10 @@ export default function PremadePlansPage() {
                   <label className="block text-sm font-medium mb-2">Tags (comma-separated)</label>
                   <input
                     type="text"
+                    value={formData.tags}
+                    onChange={(e) => setFormData({...formData, tags: e.target.value})}
                     placeholder="e.g., STEM, Problem-Solving, Critical Thinking"
-                    className="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg focus:outline-none focus:border-primary text-foreground placeholder-muted-foreground"
+                    className="w-full px-4 py-2 bg-white/50 border border-[#d4c5b0] rounded-lg focus:outline-none focus:border-[#a89885] text-gray-800 placeholder-gray-500"
                   />
                 </div>
 
@@ -453,7 +557,8 @@ export default function PremadePlansPage() {
                   <input
                     type="checkbox"
                     id="isPublic"
-                    defaultChecked
+                    checked={formData.isPublic}
+                    onChange={(e) => setFormData({...formData, isPublic: e.target.checked})}
                     className="w-4 h-4 rounded border-white/10 bg-black/20 text-primary focus:ring-primary"
                   />
                   <label htmlFor="isPublic" className="text-sm">
@@ -463,22 +568,23 @@ export default function PremadePlansPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-white/20">
+              <div className="flex gap-3 pt-4 border-t border-[#d4c5b0]">
                 <button
                   type="button"
                   onClick={() => setIsCreateDialogOpen(false)}
-                  className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/15 text-foreground rounded-lg transition-colors"
+                  className="flex-1 px-4 py-3 bg-[#d4c5b0] hover:bg-[#c4b5a0] text-gray-800 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors font-medium"
+                  className="flex-1 px-4 py-3 bg-[#8b7355] hover:bg-[#7b6345] text-white rounded-lg transition-colors font-medium"
                 >
                   Create Plan
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

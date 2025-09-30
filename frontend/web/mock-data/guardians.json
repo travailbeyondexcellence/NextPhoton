@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "lastUpdated": "2025-09-30T10:41:10.783Z",
+    "lastUpdated": "2025-09-30T12:11:08.818Z",
     "version": "1.0",
-    "count": 14,
+    "count": 13,
     "description": "Guardian profiles with learner relationships, payment info, and communication preferences"
   },
   "data": [
@@ -726,49 +726,6 @@
       "lastInteraction": "2024-03-14",
       "createdAt": "2023-06-01T00:00:00Z",
       "updatedAt": "2024-03-14T10:00:00Z"
-    },
-    {
-      "firstName": "Ichigo",
-      "lastName": "Kurosaki",
-      "email": "bankai@zanghetsu.in",
-      "phoneNumber": "7842129995",
-      "relationship": "Father",
-      "occupation": "Soul Reaper",
-      "address": {
-        "street": "Tamhini Ghat, Paud",
-        "city": "Pune",
-        "state": "Maharashtra",
-        "pincode": "786512",
-        "alternatePhone": "9523446555",
-        "preferredContactTime": "Morning (8-10 AM)",
-        "assignedLearners": [
-          {
-            "learnerName": "Marshal Inoue",
-            "grade": "9th Standard",
-            "school": "davps",
-            "relation": "Father"
-          }
-        ],
-        "paymentInfo": {
-          "method": "online",
-          "billingCycle": "monthly",
-          "paymentStatus": "pending"
-        },
-        "communicationPreferences": {
-          "academicUpdates": true,
-          "attendanceAlerts": true,
-          "performanceReports": true,
-          "paymentReminders": true,
-          "generalNotifications": true
-        }
-      },
-      "emergencyContact": true,
-      "learnerIds": [],
-      "preferredContactMethod": "phone",
-      "isActive": true,
-      "id": "d3ae90d9-7ffc-42f9-b3f9-b244c11334ef",
-      "createdAt": "2025-09-30T10:41:10.783Z",
-      "updatedAt": "2025-09-30T10:41:10.783Z"
     }
   ]
 }

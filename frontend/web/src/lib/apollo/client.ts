@@ -15,12 +15,48 @@
  * to the NestJS GraphQL endpoint instead of the local API route.
  */
 
-import { ApolloClient, InMemoryCache, makeVar, createHttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, makeVar, createHttpLink, from } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
+import { RetryLink } from '@apollo/client/link/retry';
+
+// Error handling link
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      console.error(
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
+    );
+  }
+
+  if (networkError) {
+    console.error(`[Network error]: ${networkError}`);
+  }
+});
+
+// Retry link for failed requests
+const retryLink = new RetryLink({
+  delay: {
+    initial: 300,
+    max: 2000,
+    jitter: true,
+  },
+  attempts: {
+    max: 3,
+    retryIf: (error, _operation) => {
+      // Retry on network errors but not on GraphQL errors
+      return !!error && !error.message.includes('GraphQL');
+    },
+  },
+});
 
 // Create HTTP link pointing to our Next.js API route
 const httpLink = createHttpLink({
   uri: '/api/graphql',
   credentials: 'same-origin',
+  fetchOptions: {
+    timeout: 10000, // 10 second timeout
+  },
 });
 
 // Create reactive variables for global state management
@@ -108,9 +144,12 @@ const cache = new InMemoryCache({
   },
 });
 
+// Chain links: errorLink -> retryLink -> httpLink
+const link = from([errorLink, retryLink, httpLink]);
+
 // Create the Apollo Client instance
 export const apolloClient = new ApolloClient({
-  link: httpLink,
+  link,
   cache,
   // Enable Apollo DevTools in development
   connectToDevTools: process.env.NODE_ENV === 'development',
@@ -121,7 +160,7 @@ export const apolloClient = new ApolloClient({
       errorPolicy: 'all',
     },
     query: {
-      fetchPolicy: 'cache-first',
+      fetchPolicy: 'network-only',
       errorPolicy: 'all',
     },
     mutate: {
