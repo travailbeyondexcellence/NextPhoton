@@ -290,7 +290,7 @@ export default function ClassSessionsPage() {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+                    <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2">
                       <Video className="h-4 w-4" />
                       Join
                     </button>

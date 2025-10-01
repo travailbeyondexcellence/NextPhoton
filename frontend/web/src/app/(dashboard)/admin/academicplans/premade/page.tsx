@@ -222,7 +222,7 @@ export default function PremadePlansPage() {
 
           <button
             onClick={() => setIsCreateDialogOpen(true)}
-            className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             Create New Plan
@@ -338,7 +338,7 @@ export default function PremadePlansPage() {
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-4">
-                      <button className="flex-1 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center justify-center gap-2 text-sm">
+                      <button className="flex-1 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors flex items-center justify-center gap-2 text-sm">
                         <Eye className="h-4 w-4" />
                         Preview
                       </button>

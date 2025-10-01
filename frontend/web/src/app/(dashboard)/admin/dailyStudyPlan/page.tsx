@@ -10,6 +10,8 @@ export default function DailyStudyPlanPage() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [plans, setPlans] = useState<DailyStudyPlan[]>(initialDailyStudyPlans)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -46,39 +48,8 @@ export default function DailyStudyPlanPage() {
     })
   }, [plans, selectedDate, statusFilter])
 
-  // Handle form submission
-  const handleCreatePlan = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('=== CREATING DAILY STUDY PLAN ===')
-    console.log('Form data:', formData)
-
-    // Generate new plan ID
-    const newId = `dsp${String(plans.length + 1).padStart(3, '0')}`
-    const subjectsArray = formData.subjects.split(',').map(s => s.trim()).filter(Boolean)
-
-    // Create new plan object
-    const newPlan: DailyStudyPlan = {
-      id: newId,
-      title: formData.title,
-      description: formData.description,
-      date: formData.date,
-      timeSlots: [], // Empty initially, can be added later
-      learnerIds: [],
-      educatorId: "admin",
-      educatorName: formData.educatorName || "Admin",
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      totalStudyTime: 0,
-      completedTime: 0,
-      subjects: subjectsArray,
-      priority: formData.priority as "High" | "Medium" | "Low",
-    }
-
-    console.log('Adding new plan:', newPlan)
-    setPlans(prevPlans => [newPlan, ...prevPlans])
-
-    // Reset form and close dialog
+  // Reset form
+  const resetForm = () => {
     setFormData({
       title: "",
       description: "",
@@ -87,8 +58,96 @@ export default function DailyStudyPlanPage() {
       priority: "",
       educatorName: "",
     })
-    setIsCreateDialogOpen(false)
-    alert('Study plan created successfully!')
+    setIsEditMode(false)
+    setEditingPlanId(null)
+  }
+
+  // Handle edit plan click
+  const handleEditPlanClick = (plan: DailyStudyPlan) => {
+    // Populate form with existing plan data
+    setFormData({
+      title: plan.title,
+      description: plan.description,
+      date: plan.date,
+      subjects: plan.subjects.join(', '),
+      priority: plan.priority,
+      educatorName: plan.educatorName,
+    })
+
+    setIsEditMode(true)
+    setEditingPlanId(plan.id)
+    setIsCreateDialogOpen(true)
+  }
+
+  // Handle form submission (Create or Update)
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const subjectsArray = formData.subjects.split(',').map(s => s.trim()).filter(Boolean)
+
+    if (isEditMode && editingPlanId) {
+      // UPDATE existing plan
+      console.log('=== UPDATING DAILY STUDY PLAN ===')
+      console.log('Plan ID:', editingPlanId)
+      console.log('Form data:', formData)
+
+      const existingPlan = plans.find(p => p.id === editingPlanId)
+      if (!existingPlan) {
+        alert('Plan not found!')
+        return
+      }
+
+      const updatedPlan: DailyStudyPlan = {
+        ...existingPlan,
+        title: formData.title,
+        description: formData.description,
+        date: formData.date,
+        subjects: subjectsArray,
+        priority: formData.priority as "High" | "Medium" | "Low",
+        educatorName: formData.educatorName || "Admin",
+        updatedAt: new Date().toISOString(),
+      }
+
+      console.log('Updated plan:', updatedPlan)
+      setPlans(prevPlans => prevPlans.map(p => p.id === editingPlanId ? updatedPlan : p))
+
+      setIsCreateDialogOpen(false)
+      resetForm()
+      alert('Study plan updated successfully!')
+    } else {
+      // CREATE new plan
+      console.log('=== CREATING DAILY STUDY PLAN ===')
+      console.log('Form data:', formData)
+
+      // Generate new plan ID
+      const newId = `dsp${String(plans.length + 1).padStart(3, '0')}`
+
+      // Create new plan object
+      const newPlan: DailyStudyPlan = {
+        id: newId,
+        title: formData.title,
+        description: formData.description,
+        date: formData.date,
+        timeSlots: [], // Empty initially, can be added later
+        learnerIds: [],
+        educatorId: "admin",
+        educatorName: formData.educatorName || "Admin",
+        status: "Pending",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        totalStudyTime: 0,
+        completedTime: 0,
+        subjects: subjectsArray,
+        priority: formData.priority as "High" | "Medium" | "Low",
+      }
+
+      console.log('Adding new plan:', newPlan)
+      setPlans(prevPlans => [newPlan, ...prevPlans])
+
+      setIsCreateDialogOpen(false)
+      resetForm()
+      alert('Study plan created successfully!')
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -218,7 +277,7 @@ export default function DailyStudyPlanPage() {
 
           <button
             onClick={() => setIsCreateDialogOpen(true)}
-            className="ml-auto px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2"
+            className="ml-auto px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             Create Plan
@@ -366,7 +425,13 @@ export default function DailyStudyPlanPage() {
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                      <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditPlanClick(plan)
+                        }}
+                        className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors"
+                      >
                         Edit Plan
                       </button>
                       <button className="flex-1 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-colors">
@@ -391,11 +456,18 @@ export default function DailyStudyPlanPage() {
             {/* Dialog Header */}
             <div className="sticky top-0 bg-[#f5e6d3] border-b border-[#d4c5b0] p-6 flex items-center justify-between z-10">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Create Daily Study Plan</h2>
-                <p className="text-sm text-muted-foreground mt-1">Create a new study plan for learners</p>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {isEditMode ? 'Edit Daily Study Plan' : 'Create Daily Study Plan'}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {isEditMode ? 'Update the study plan details' : 'Create a new study plan for learners'}
+                </p>
               </div>
               <button
-                onClick={() => setIsCreateDialogOpen(false)}
+                onClick={() => {
+                  setIsCreateDialogOpen(false)
+                  resetForm()
+                }}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <X className="h-5 w-5" />
@@ -490,7 +562,10 @@ export default function DailyStudyPlanPage() {
                 <div className="flex gap-3 pt-4 border-t border-[#d4c5b0]">
                   <button
                     type="button"
-                    onClick={() => setIsCreateDialogOpen(false)}
+                    onClick={() => {
+                      setIsCreateDialogOpen(false)
+                      resetForm()
+                    }}
                     className="flex-1 px-4 py-3 bg-[#d4c5b0] hover:bg-[#c4b5a0] text-gray-800 rounded-lg transition-colors font-medium"
                   >
                     Cancel
@@ -499,7 +574,7 @@ export default function DailyStudyPlanPage() {
                     type="submit"
                     className="flex-1 px-4 py-3 bg-[#8b7355] hover:bg-[#7b6345] text-white rounded-lg transition-colors font-medium"
                   >
-                    Create Plan
+                    {isEditMode ? 'Update Plan' : 'Create Plan'}
                   </button>
                 </div>
               </form>

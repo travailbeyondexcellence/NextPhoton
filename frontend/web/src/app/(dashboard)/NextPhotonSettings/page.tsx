@@ -4,8 +4,10 @@ import { useState } from "react"
 import { Settings, Edit3, Save, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { useToast } from "@/hooks/use-toast"
 
 export default function NextPhotonSettingsPage() {
+  const { toast } = useToast()
   // State for all settings
   const [settings, setSettings] = useState({
     maintenanceMode: false,
@@ -34,6 +36,13 @@ export default function NextPhotonSettingsPage() {
       ...prev,
       [key]: value
     }))
+
+    // Provide user feedback
+    const settingName = key.replace(/([A-Z])/g, ' $1').trim()
+    toast({
+      title: "Setting Updated",
+      description: `${settingName} has been ${value ? 'enabled' : 'disabled'}`,
+    })
   }
 
   // Handle system limits editing
@@ -53,6 +62,11 @@ export default function NextPhotonSettingsPage() {
       ...tempLimits
     }))
     setEditingLimits(false)
+
+    toast({
+      title: "System Limits Updated",
+      description: "System limits have been saved successfully",
+    })
   }
 
   const handleCancelLimits = () => {
@@ -79,6 +93,11 @@ export default function NextPhotonSettingsPage() {
       passwordExpiry: 90
     })
     setEditingLimits(false)
+
+    toast({
+      title: "Settings Reset",
+      description: "All settings have been reset to default values",
+    })
   }
   return (
     <div className="min-h-full max-w-4xl mx-auto">
@@ -180,9 +199,12 @@ export default function NextPhotonSettingsPage() {
               </div>
               <Button
                 variant="outline"
-                className="hover:bg-white/10"
+                className="hover:bg-white/10 cursor-pointer"
                 onClick={() => {
-                  alert('Opening Travail Integration configuration...')
+                  toast({
+                    title: "Travail Integration",
+                    description: "Opening Travail Integration configuration...",
+                  })
                 }}
               >
                 Configure
@@ -195,9 +217,12 @@ export default function NextPhotonSettingsPage() {
               </div>
               <Button
                 variant="outline"
-                className="hover:bg-white/10"
+                className="hover:bg-white/10 cursor-pointer"
                 onClick={() => {
-                  alert('Opening Payment Gateway setup...')
+                  toast({
+                    title: "Payment Gateway",
+                    description: "Opening Payment Gateway setup...",
+                  })
                 }}
               >
                 Setup
@@ -210,9 +235,12 @@ export default function NextPhotonSettingsPage() {
               </div>
               <Button
                 variant="outline"
-                className="hover:bg-white/10"
+                className="hover:bg-white/10 cursor-pointer"
                 onClick={() => {
-                  alert('Opening SMS Provider configuration...')
+                  toast({
+                    title: "SMS Provider",
+                    description: "Opening SMS Provider configuration...",
+                  })
                 }}
               >
                 Configure
@@ -230,7 +258,7 @@ export default function NextPhotonSettingsPage() {
                 onClick={handleEditLimits}
                 variant="outline"
                 size="sm"
-                className="hover:bg-white/10"
+                className="hover:bg-white/10 cursor-pointer"
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit
@@ -322,14 +350,14 @@ export default function NextPhotonSettingsPage() {
                 onClick={handleCancelLimits}
                 variant="outline"
                 size="sm"
-                className="hover:bg-white/10"
+                className="hover:bg-white/10 cursor-pointer"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleSaveLimits}
                 size="sm"
-                className="bg-primary/90 hover:bg-primary"
+                className="bg-primary/90 hover:bg-primary cursor-pointer"
               >
                 <Save className="h-4 w-4 mr-2" />
                 Save
@@ -342,17 +370,20 @@ export default function NextPhotonSettingsPage() {
         <div className="flex justify-end gap-4 pb-6">
           <Button
             variant="outline"
-            className="hover:bg-white/10"
+            className="hover:bg-white/10 cursor-pointer"
             onClick={handleResetDefaults}
           >
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset to Defaults
           </Button>
           <Button
-            className="bg-primary/90 hover:bg-primary"
+            className="bg-primary/90 hover:bg-primary cursor-pointer"
             onClick={() => {
               // Here you would typically save to backend/API
-              alert('Settings saved successfully!')
+              toast({
+                title: "Settings Saved",
+                description: "All settings have been saved successfully!",
+              })
             }}
           >
             <Save className="h-4 w-4 mr-2" />

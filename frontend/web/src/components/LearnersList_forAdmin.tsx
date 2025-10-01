@@ -124,7 +124,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
             sortableLearners.sort((a, b) => {
                 let aValue: any = a;
                 let bValue: any = b;
-                
+
                 // Handle nested properties
                 const keys = sortConfig.key.split('.');
                 for (const key of keys) {
@@ -143,7 +143,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
             });
         }
         return sortableLearners;
-    }, [sortConfig]);
+    }, [sortConfig, learners]);
 
     // Handle sorting
     const handleSort = (key: string) => {

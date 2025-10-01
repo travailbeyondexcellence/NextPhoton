@@ -274,7 +274,7 @@ export default function AssignedPlansPage() {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors">
+                    <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors">
                       View Details
                     </button>
                     <button className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors">

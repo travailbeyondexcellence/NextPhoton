@@ -183,7 +183,7 @@ export default function MindmapsPage() {
             ))}
           </select>
 
-          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Create Mindmap
           </button>
@@ -297,7 +297,7 @@ export default function MindmapsPage() {
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                      <button className="flex-1 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors text-sm">
+                      <button className="flex-1 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors text-sm">
                         🗺️ Open Mindmap
                       </button>
                       <button className="flex-1 px-3 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors text-sm">

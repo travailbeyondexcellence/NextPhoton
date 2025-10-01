@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import {
   Megaphone,
   Plus,
@@ -22,7 +22,9 @@ import {
   FileText,
   Tag,
   ChevronDown,
-  X
+  X,
+  Upload,
+  Save
 } from 'lucide-react'
 import {
   announcements,
@@ -32,25 +34,277 @@ import {
   announcementTemplates,
   type Announcement
 } from '@/app/(features)/Announcements/announcementsDummyData'
+import { GlassModal } from '@/components/glass/GlassModal'
 
 export default function AnnouncementsPage() {
+  // Local state for announcements (loaded from API)
+  const [allAnnouncements, setAllAnnouncements] = useState<Announcement[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
   const [activeTab, setActiveTab] = useState<'active' | 'scheduled' | 'expired'>('active')
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
   const [filterPriority, setFilterPriority] = useState<string>('all')
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false) // Track if editing or creating
+  const [editingAnnouncementId, setEditingAnnouncementId] = useState<string | null>(null)
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null)
   const [expandedAnnouncement, setExpandedAnnouncement] = useState<string | null>(null)
 
-  // Get announcements based on active tab
+  // Fetch announcements from API on component mount
+  useEffect(() => {
+    fetchAnnouncements()
+  }, [])
+
+  const fetchAnnouncements = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/announcements')
+      const result = await response.json()
+
+      if (result.success) {
+        setAllAnnouncements(result.data)
+      } else {
+        console.error('Failed to fetch announcements:', result.error)
+        // Fallback to imported dummy data if API fails
+        setAllAnnouncements(announcements)
+      }
+    } catch (error) {
+      console.error('Error fetching announcements:', error)
+      // Fallback to imported dummy data if API fails
+      setAllAnnouncements(announcements)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Form state for creating new announcement
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    type: 'general' as Announcement['type'],
+    priority: 'medium' as Announcement['priority'],
+    visibility: 'all' as Announcement['visibility'],
+    publishDate: new Date().toISOString().slice(0, 16),
+    expiryDate: '',
+    isSticky: false,
+    emailNotification: false,
+    pushNotification: false,
+    tags: '',
+  })
+
+  // Handle form input changes
+  const handleFormChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      content: '',
+      type: 'general',
+      priority: 'medium',
+      visibility: 'all',
+      publishDate: new Date().toISOString().slice(0, 16),
+      expiryDate: '',
+      isSticky: false,
+      emailNotification: false,
+      pushNotification: false,
+      tags: '',
+    })
+    setIsEditMode(false)
+    setEditingAnnouncementId(null)
+  }
+
+  // Handle form submission (Create or Update)
+  const handleCreateAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Determine status based on publish date
+    const now = new Date()
+    const publishDate = new Date(formData.publishDate)
+    const expiryDate = formData.expiryDate ? new Date(formData.expiryDate) : null
+
+    let status: Announcement['status'] = 'active'
+    if (publishDate > now) {
+      status = 'scheduled'
+    } else if (expiryDate && expiryDate < now) {
+      status = 'expired'
+    }
+
+    if (isEditMode && editingAnnouncementId) {
+      // UPDATE existing announcement
+      const existingAnnouncement = allAnnouncements.find(a => a.id === editingAnnouncementId)
+
+      const updatedAnnouncement: Announcement = {
+        ...existingAnnouncement!,
+        title: formData.title,
+        content: formData.content,
+        type: formData.type,
+        priority: formData.priority,
+        status: status,
+        visibility: formData.visibility,
+        publishDate: new Date(formData.publishDate).toISOString(),
+        expiryDate: formData.expiryDate ? new Date(formData.expiryDate).toISOString() : null,
+        isSticky: formData.isSticky,
+        emailNotification: formData.emailNotification,
+        pushNotification: formData.pushNotification,
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+        updatedAt: new Date().toISOString(),
+      }
+
+      try {
+        // Update via API (mock database file)
+        const response = await fetch('/api/announcements', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedAnnouncement),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setAllAnnouncements(prev =>
+            prev.map(a => a.id === editingAnnouncementId ? updatedAnnouncement : a)
+          )
+
+          // Show success message
+          alert('Announcement updated and saved to database successfully!')
+
+          // Close modal and reset form
+          setShowCreateForm(false)
+          resetForm()
+        } else {
+          alert(`Failed to update announcement: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error updating announcement:', error)
+        alert('Failed to update announcement. Please try again.')
+      }
+    } else {
+      // CREATE new announcement
+      const newAnnouncement: Announcement = {
+        id: `annc${Date.now()}`, // Generate unique ID
+        title: formData.title,
+        content: formData.content,
+        type: formData.type,
+        priority: formData.priority,
+        status: status,
+        visibility: formData.visibility,
+        publishDate: new Date(formData.publishDate).toISOString(),
+        expiryDate: formData.expiryDate ? new Date(formData.expiryDate).toISOString() : null,
+        isSticky: formData.isSticky,
+        emailNotification: formData.emailNotification,
+        pushNotification: formData.pushNotification,
+        createdBy: {
+          userId: 'admin001', // TODO: Get from authenticated user
+          userName: 'Current Admin' // TODO: Get from authenticated user
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        viewCount: 0,
+        readReceipts: [],
+        tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()) : [],
+        attachments: []
+      }
+
+      try {
+        // Save to API (mock database file)
+        const response = await fetch('/api/announcements', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newAnnouncement),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state with the new announcement
+          setAllAnnouncements(prev => [newAnnouncement, ...prev])
+
+          // Show success message
+          alert('Announcement created and saved to database successfully!')
+
+          // Close modal and reset form
+          setShowCreateForm(false)
+          resetForm()
+        } else {
+          alert(`Failed to create announcement: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error creating announcement:', error)
+        alert('Failed to create announcement. Please try again.')
+      }
+    }
+  }
+
+  // Handle edit button click
+  const handleEditAnnouncement = (announcement: Announcement) => {
+    // Populate form with existing announcement data
+    setFormData({
+      title: announcement.title,
+      content: announcement.content,
+      type: announcement.type,
+      priority: announcement.priority,
+      visibility: announcement.visibility,
+      publishDate: new Date(announcement.publishDate).toISOString().slice(0, 16),
+      expiryDate: announcement.expiryDate ? new Date(announcement.expiryDate).toISOString().slice(0, 16) : '',
+      isSticky: announcement.isSticky,
+      emailNotification: announcement.emailNotification,
+      pushNotification: announcement.pushNotification,
+      tags: announcement.tags.join(', '),
+    })
+
+    setIsEditMode(true)
+    setEditingAnnouncementId(announcement.id)
+    setShowCreateForm(true)
+  }
+
+  // Handle delete button click
+  const handleDeleteAnnouncement = async (announcementId: string) => {
+    // Confirm deletion
+    if (!confirm('Are you sure you want to delete this announcement? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      // Delete via API (mock database file)
+      const response = await fetch(`/api/announcements?id=${announcementId}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Update local state - remove the deleted announcement
+        setAllAnnouncements(prev => prev.filter(a => a.id !== announcementId))
+
+        // Show success message
+        alert('Announcement deleted successfully!')
+      } else {
+        alert(`Failed to delete announcement: ${result.message}`)
+      }
+    } catch (error) {
+      console.error('Error deleting announcement:', error)
+      alert('Failed to delete announcement. Please try again.')
+    }
+  }
+
+  // Get announcements based on active tab (using local state)
   const tabAnnouncements = useMemo(() => {
     switch (activeTab) {
-      case 'active': return getActiveAnnouncements()
-      case 'scheduled': return getScheduledAnnouncements()
-      case 'expired': return getExpiredAnnouncements()
+      case 'active': return allAnnouncements.filter(a => a.status === 'active')
+      case 'scheduled': return allAnnouncements.filter(a => a.status === 'scheduled')
+      case 'expired': return allAnnouncements.filter(a => a.status === 'expired')
       default: return []
     }
-  }, [activeTab])
+  }, [activeTab, allAnnouncements])
 
   // Filter announcements based on search and filters
   const filteredAnnouncements = useMemo(() => {
@@ -131,7 +385,7 @@ export default function AnnouncementsPage() {
             <div className="text-muted-foreground">Active</div>
             <CheckCircle className="text-green-500" size={20} />
           </div>
-          <div className="text-3xl font-bold">{getActiveAnnouncements().length}</div>
+          <div className="text-3xl font-bold">{allAnnouncements.filter(a => a.status === 'active').length}</div>
           <div className="text-sm text-muted-foreground mt-2">Current announcements</div>
         </div>
 
@@ -148,7 +402,7 @@ export default function AnnouncementsPage() {
             <div className="text-muted-foreground">Scheduled</div>
             <Clock className="text-yellow-500" size={20} />
           </div>
-          <div className="text-3xl font-bold">{getScheduledAnnouncements().length}</div>
+          <div className="text-3xl font-bold">{allAnnouncements.filter(a => a.status === 'scheduled').length}</div>
           <div className="text-sm text-muted-foreground mt-2">Future announcements</div>
         </div>
 
@@ -165,7 +419,7 @@ export default function AnnouncementsPage() {
             <div className="text-muted-foreground">Expired</div>
             <Archive className="text-gray-500" size={20} />
           </div>
-          <div className="text-3xl font-bold">{getExpiredAnnouncements().length}</div>
+          <div className="text-3xl font-bold">{allAnnouncements.filter(a => a.status === 'expired').length}</div>
           <div className="text-sm text-muted-foreground mt-2">Past announcements</div>
         </div>
       </div>
@@ -217,7 +471,13 @@ export default function AnnouncementsPage() {
 
       {/* Announcements List */}
       <div className="space-y-4">
-        {filteredAnnouncements.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold mb-2">Loading announcements...</h3>
+            <p className="text-muted-foreground">Please wait while we fetch the data</p>
+          </div>
+        ) : filteredAnnouncements.length === 0 ? (
           <div className="text-center py-12">
             <Megaphone size={48} className="mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">No announcements found</h3>
@@ -268,16 +528,25 @@ export default function AnnouncementsPage() {
                       expandedAnnouncement === announcement.id ? null : announcement.id
                     )}
                     className="p-2 rounded-lg hover:bg-white/10 transition-all"
+                    title="Expand/Collapse"
                   >
                     <ChevronDown
                       size={16}
                       className={`transition-transform ${expandedAnnouncement === announcement.id ? 'rotate-180' : ''}`}
                     />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-white/10 transition-all">
+                  <button
+                    onClick={() => handleEditAnnouncement(announcement)}
+                    className="p-2 rounded-lg hover:bg-white/10 transition-all"
+                    title="Edit Announcement"
+                  >
                     <Edit size={16} />
                   </button>
-                  <button className="p-2 rounded-lg hover:bg-red-500/20 hover:text-red-500 transition-all">
+                  <button
+                    onClick={() => handleDeleteAnnouncement(announcement.id)}
+                    className="p-2 rounded-lg hover:bg-red-500/20 hover:text-red-500 transition-all"
+                    title="Delete Announcement"
+                  >
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -395,29 +664,265 @@ export default function AnnouncementsPage() {
         <h3 className="font-semibold mb-4">Announcement Statistics</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <div className="text-2xl font-bold">{announcements.length}</div>
+            <div className="text-2xl font-bold">{allAnnouncements.length}</div>
             <div className="text-sm text-muted-foreground">Total Announcements</div>
           </div>
           <div>
             <div className="text-2xl font-bold">
-              {announcements.reduce((sum, a) => sum + a.viewCount, 0)}
+              {allAnnouncements.reduce((sum, a) => sum + a.viewCount, 0)}
             </div>
             <div className="text-sm text-muted-foreground">Total Views</div>
           </div>
           <div>
             <div className="text-2xl font-bold">
-              {announcements.filter(a => a.isSticky).length}
+              {allAnnouncements.filter(a => a.isSticky).length}
             </div>
             <div className="text-sm text-muted-foreground">Pinned</div>
           </div>
           <div>
             <div className="text-2xl font-bold">
-              {announcements.reduce((sum, a) => sum + a.readReceipts.length, 0)}
+              {allAnnouncements.reduce((sum, a) => sum + a.readReceipts.length, 0)}
             </div>
             <div className="text-sm text-muted-foreground">Total Reads</div>
           </div>
         </div>
       </div>
+
+      {/* Create Announcement Modal */}
+      <GlassModal
+        isOpen={showCreateForm}
+        onClose={() => {
+          setShowCreateForm(false)
+          resetForm()
+        }}
+        size="xl"
+        className="max-h-[90vh] overflow-y-auto"
+      >
+        <div className="space-y-6">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <Megaphone className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-bold">
+                {isEditMode ? 'Edit Announcement' : 'Create New Announcement'}
+              </h2>
+            </div>
+            <button
+              onClick={() => {
+                setShowCreateForm(false)
+                resetForm()
+              }}
+              className="p-2 rounded-lg hover:bg-white/10 transition-all"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleCreateAnnouncement} className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleFormChange('title', e.target.value)}
+                placeholder="Enter announcement title..."
+                required
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+              />
+            </div>
+
+            {/* Content */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Content <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={formData.content}
+                onChange={(e) => handleFormChange('content', e.target.value)}
+                placeholder="Enter announcement content..."
+                required
+                rows={6}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all resize-none"
+              />
+            </div>
+
+            {/* Type and Priority Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Type */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => handleFormChange('type', e.target.value as Announcement['type'])}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                >
+                  <option value="general">General</option>
+                  <option value="academic">Academic</option>
+                  <option value="administrative">Administrative</option>
+                  <option value="emergency">Emergency</option>
+                  <option value="event">Event</option>
+                  <option value="holiday">Holiday</option>
+                </select>
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Priority <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.priority}
+                  onChange={(e) => handleFormChange('priority', e.target.value as Announcement['priority'])}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Visibility */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Visibility <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.visibility}
+                onChange={(e) => handleFormChange('visibility', e.target.value as Announcement['visibility'])}
+                required
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+              >
+                <option value="all">All Users</option>
+                <option value="learners">Learners Only</option>
+                <option value="educators">Educators Only</option>
+                <option value="admins">Admins Only</option>
+                <option value="guardians">Guardians Only</option>
+                <option value="employees">Employees Only</option>
+              </select>
+            </div>
+
+            {/* Date Fields Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Publish Date */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Publish Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.publishDate}
+                  onChange={(e) => handleFormChange('publishDate', e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+
+              {/* Expiry Date */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Expiry Date (Optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.expiryDate}
+                  onChange={(e) => handleFormChange('expiryDate', e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Tags (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.tags}
+                onChange={(e) => handleFormChange('tags', e.target.value)}
+                placeholder="Enter tags separated by commas (e.g., important, exam, event)"
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Separate multiple tags with commas
+              </p>
+            </div>
+
+            {/* Checkboxes */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.isSticky}
+                  onChange={(e) => handleFormChange('isSticky', e.target.checked)}
+                  className="w-5 h-5 rounded border-white/20 bg-white/10 text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <div className="flex items-center gap-2">
+                  <Pin size={16} className="text-primary" />
+                  <span className="text-sm">Pin this announcement (sticky)</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.emailNotification}
+                  onChange={(e) => handleFormChange('emailNotification', e.target.checked)}
+                  className="w-5 h-5 rounded border-white/20 bg-white/10 text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <div className="flex items-center gap-2">
+                  <FileText size={16} className="text-blue-500" />
+                  <span className="text-sm">Send email notification</span>
+                </div>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.pushNotification}
+                  onChange={(e) => handleFormChange('pushNotification', e.target.checked)}
+                  className="w-5 h-5 rounded border-white/20 bg-white/10 text-primary focus:ring-primary focus:ring-offset-0"
+                />
+                <div className="flex items-center gap-2">
+                  <Send size={16} className="text-green-500" />
+                  <span className="text-sm">Send push notification</span>
+                </div>
+              </label>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex gap-3 pt-4 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateForm(false)
+                  resetForm()
+                }}
+                className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 transition-all font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-6 py-3 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-all font-medium flex items-center justify-center gap-2"
+              >
+                <Save size={18} />
+                {isEditMode ? 'Update Announcement' : 'Create Announcement'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </GlassModal>
     </div>
   )
 }

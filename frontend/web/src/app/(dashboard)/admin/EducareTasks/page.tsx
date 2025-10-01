@@ -1,22 +1,230 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { PackageCheck, Clock, CheckCircle, AlertCircle, User, Calendar, TrendingUp, Filter, Search, ChevronDown, ChevronUp, Tag, MessageSquare, Paperclip, Target, Users, BookOpen, Heart, Briefcase, Star, Activity } from "lucide-react"
-import { eduCareTasks, getTaskStatistics, type EduCareTask } from "@/app/(features)/EduCareTasks/educareTasksDummyData"
+import { useState, useMemo, useEffect } from "react"
+import { PackageCheck, Clock, CheckCircle, AlertCircle, User, Calendar, TrendingUp, Filter, Search, ChevronDown, ChevronUp, Tag, MessageSquare, Paperclip, Target, Users, BookOpen, Heart, Briefcase, Star, Activity, X } from "lucide-react"
+import { type EduCareTask } from "@/app/(features)/EduCareTasks/educareTasksDummyData"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 export default function EduCareTasksPage() {
+  // State for tasks loaded from API
+  const [tasks, setTasks] = useState<EduCareTask[]>([])
+  const [statistics, setStatistics] = useState({
+    active: 0,
+    pending: 0,
+    completed: 0,
+    overdue: 0,
+    averageProgress: 0,
+    total: 0
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
   const [selectedStatus, setSelectedStatus] = useState<string>("all")
   const [selectedPriority, setSelectedPriority] = useState<string>("all")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [expandedTask, setExpandedTask] = useState<string | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [isNewTaskOpen, setIsNewTaskOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
 
-  const statistics = getTaskStatistics()
+  // Form state for new task creation
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: "",
+    category: "Academic Support" as EduCareTask['category'],
+    priority: "Medium" as EduCareTask['priority'],
+    status: "Active" as EduCareTask['status'],
+    studentName: "",
+    className: "",
+    assignedToName: "",
+    assignedToRole: "",
+    dueDate: "",
+    impact: "Medium" as EduCareTask['impact'],
+    tags: "",
+    followUpRequired: false,
+    parentNotificationSent: false,
+  })
+
+  // Fetch tasks from API on component mount
+  useEffect(() => {
+    fetchTasks()
+    fetchStatistics()
+  }, [])
+
+  // Function to fetch all tasks from API
+  const fetchTasks = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/educare-tasks')
+      const result = await response.json()
+
+      if (result.success) {
+        setTasks(result.data)
+      } else {
+        console.error('Failed to fetch tasks:', result.error)
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Function to fetch statistics from API
+  const fetchStatistics = async () => {
+    try {
+      const response = await fetch('/api/educare-tasks?stats=true')
+      const result = await response.json()
+
+      if (result.success) {
+        setStatistics(result.data)
+      }
+    } catch (error) {
+      console.error('Error fetching statistics:', error)
+    }
+  }
+
+  // Handle form input changes
+  const handleInputChange = (field: string, value: any) => {
+    setNewTask(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Handle Edit button click - Populate form with task data
+  const handleEditTask = (task: EduCareTask) => {
+    setNewTask({
+      title: task.title,
+      description: task.description,
+      category: task.category,
+      priority: task.priority,
+      status: task.status,
+      studentName: task.studentName,
+      className: task.className,
+      assignedToName: task.assignedTo.name,
+      assignedToRole: task.assignedTo.role,
+      dueDate: task.dueDate,
+      impact: task.impact,
+      tags: task.tags.join(', '),
+      followUpRequired: task.followUpRequired || false,
+      parentNotificationSent: task.parentNotificationSent || false,
+    })
+    setIsEditMode(true)
+    setEditingTaskId(task.taskId)
+    setIsNewTaskOpen(true)
+  }
+
+  // Handle Delete button click
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/educare-tasks?taskId=${taskId}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Success - refresh tasks and statistics
+        await fetchTasks()
+        await fetchStatistics()
+        alert('Task deleted successfully!')
+      } else {
+        alert(`Failed to delete task: ${result.message}`)
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error)
+      alert('An error occurred while deleting the task')
+    }
+  }
+
+  // Handle form submission - Create or Update task via API
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      // Convert tags string to array
+      const tagsArray = newTask.tags
+        ? newTask.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0)
+        : []
+
+      // Prepare task data for API
+      const taskData = {
+        title: newTask.title,
+        description: newTask.description,
+        category: newTask.category,
+        priority: newTask.priority,
+        status: newTask.status,
+        studentName: newTask.studentName,
+        className: newTask.className,
+        assignedToName: newTask.assignedToName,
+        assignedToRole: newTask.assignedToRole,
+        dueDate: newTask.dueDate,
+        impact: newTask.impact,
+        tags: tagsArray,
+        followUpRequired: newTask.followUpRequired,
+        parentNotificationSent: newTask.parentNotificationSent,
+      }
+
+      // Call API to create or update task
+      const response = await fetch('/api/educare-tasks', {
+        method: isEditMode ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(isEditMode ? { ...taskData, taskId: editingTaskId } : taskData),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Success - refresh tasks and statistics
+        await fetchTasks()
+        await fetchStatistics()
+
+        // Reset form and close sheet
+        setNewTask({
+          title: "",
+          description: "",
+          category: "Academic Support",
+          priority: "Medium",
+          status: "Active",
+          studentName: "",
+          className: "",
+          assignedToName: "",
+          assignedToRole: "",
+          dueDate: "",
+          impact: "Medium",
+          tags: "",
+          followUpRequired: false,
+          parentNotificationSent: false,
+        })
+        setIsNewTaskOpen(false)
+        setIsEditMode(false)
+        setEditingTaskId(null)
+
+        alert(isEditMode ? "Task updated successfully!" : "Task created successfully!")
+      } else {
+        alert(`Failed to ${isEditMode ? 'update' : 'create'} task: ${result.message}`)
+      }
+    } catch (error) {
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} task:`, error)
+      alert(`An error occurred while ${isEditMode ? 'updating' : 'creating'} the task`)
+    }
+  }
 
   // Filter tasks based on selections
   const filteredTasks = useMemo(() => {
-    return eduCareTasks.filter(task => {
+    return tasks.filter(task => {
       const statusMatch = selectedStatus === "all" || task.status === selectedStatus
       const priorityMatch = selectedPriority === "all" || task.priority === selectedPriority
       const categoryMatch = selectedCategory === "all" || task.category === selectedCategory
@@ -27,7 +235,7 @@ export default function EduCareTasksPage() {
 
       return statusMatch && priorityMatch && categoryMatch && searchMatch
     })
-  }, [selectedStatus, selectedPriority, selectedCategory, searchTerm])
+  }, [tasks, selectedStatus, selectedPriority, selectedCategory, searchTerm])
 
   const getStatusColor = (status: EduCareTask['status']) => {
     switch (status) {
@@ -84,9 +292,258 @@ export default function EduCareTasksPage() {
               <p className="text-muted-foreground">Manage educational care and support tasks</p>
             </div>
           </div>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-            + New Task
-          </button>
+
+          {/* New Task Sheet Trigger */}
+          <Sheet open={isNewTaskOpen} onOpenChange={setIsNewTaskOpen}>
+            <SheetTrigger asChild>
+              <button
+                onClick={() => {
+                  setIsEditMode(false)
+                  setEditingTaskId(null)
+                }}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-primary-action"
+              >
+                + New Task
+              </button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gradient-to-br from-emerald-950/95 to-emerald-900/95 backdrop-blur-xl border-emerald-500/20">
+              <SheetHeader>
+                <SheetTitle className="text-foreground">
+                  {isEditMode ? 'Edit EduCare Task' : 'Create New EduCare Task'}
+                </SheetTitle>
+                <SheetDescription className="text-muted-foreground">
+                  {isEditMode
+                    ? 'Update the details below to modify this educational care task'
+                    : 'Fill in the details below to create a new educational care task'}
+                </SheetDescription>
+              </SheetHeader>
+
+              {/* New Task Form */}
+              <form onSubmit={handleCreateTask} className="space-y-6 mt-6">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Task Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newTask.title}
+                    onChange={(e) => handleInputChange("title", e.target.value)}
+                    placeholder="e.g., Math Tutoring Session - Algebra Basics"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Description *</label>
+                  <textarea
+                    required
+                    value={newTask.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    placeholder="Provide detailed description of the task..."
+                    rows={4}
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
+                  />
+                </div>
+
+                {/* Row 1: Category, Priority, Status */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Category *</label>
+                    <select
+                      required
+                      value={newTask.category}
+                      onChange={(e) => handleInputChange("category", e.target.value as EduCareTask['category'])}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    >
+                      <option value="Academic Support">Academic Support</option>
+                      <option value="Behavioral Guidance">Behavioral Guidance</option>
+                      <option value="Parent Communication">Parent Communication</option>
+                      <option value="Student Wellness">Student Wellness</option>
+                      <option value="Career Counseling">Career Counseling</option>
+                      <option value="Special Needs">Special Needs</option>
+                      <option value="Extracurricular">Extracurricular</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Priority *</label>
+                    <select
+                      required
+                      value={newTask.priority}
+                      onChange={(e) => handleInputChange("priority", e.target.value as EduCareTask['priority'])}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Status *</label>
+                    <select
+                      required
+                      value={newTask.status}
+                      onChange={(e) => handleInputChange("status", e.target.value as EduCareTask['status'])}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="In Progress">In Progress</option>
+                      <option value="Pending Review">Pending Review</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Row 2: Student Name, Class Name */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Student Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTask.studentName}
+                      onChange={(e) => handleInputChange("studentName", e.target.value)}
+                      placeholder="e.g., Sarah Johnson"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Class Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTask.className}
+                      onChange={(e) => handleInputChange("className", e.target.value)}
+                      placeholder="e.g., 10-A Mathematics"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Assigned To Name, Role */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Assigned To (Name) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTask.assignedToName}
+                      onChange={(e) => handleInputChange("assignedToName", e.target.value)}
+                      placeholder="e.g., Dr. Emily Roberts"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Assigned To (Role) *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newTask.assignedToRole}
+                      onChange={(e) => handleInputChange("assignedToRole", e.target.value)}
+                      placeholder="e.g., Math Educator"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 4: Due Date, Impact */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Due Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={newTask.dueDate}
+                      onChange={(e) => handleInputChange("dueDate", e.target.value)}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Impact Level *</label>
+                    <select
+                      required
+                      value={newTask.impact}
+                      onChange={(e) => handleInputChange("impact", e.target.value as EduCareTask['impact'])}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    >
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                      <option value="Critical">Critical</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Tags */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tags</label>
+                  <input
+                    type="text"
+                    value={newTask.tags}
+                    onChange={(e) => handleInputChange("tags", e.target.value)}
+                    placeholder="Separate tags with commas (e.g., Mathematics, Algebra, One-on-One)"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Separate multiple tags with commas</p>
+                </div>
+
+                {/* Checkboxes */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="followUpRequired"
+                      checked={newTask.followUpRequired}
+                      onChange={(e) => handleInputChange("followUpRequired", e.target.checked)}
+                      className="w-4 h-4 rounded border-white/20"
+                    />
+                    <label htmlFor="followUpRequired" className="text-sm font-medium">
+                      Follow-up Required
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="parentNotificationSent"
+                      checked={newTask.parentNotificationSent}
+                      onChange={(e) => handleInputChange("parentNotificationSent", e.target.checked)}
+                      className="w-4 h-4 rounded border-white/20"
+                    />
+                    <label htmlFor="parentNotificationSent" className="text-sm font-medium">
+                      Send Parent Notification
+                    </label>
+                  </div>
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex gap-3 pt-4 border-t border-white/10">
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-primary-action font-medium"
+                  >
+                    {isEditMode ? 'Update Task' : 'Create Task'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNewTaskOpen(false)
+                      setIsEditMode(false)
+                      setEditingTaskId(null)
+                    }}
+                    className="px-4 py-2 bg-white/10 text-foreground rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
@@ -223,13 +680,22 @@ export default function EduCareTasksPage() {
         )}
 
         <div className="text-sm text-muted-foreground mt-4">
-          Showing {filteredTasks.length} of {eduCareTasks.length} tasks
+          Showing {filteredTasks.length} of {tasks.length} tasks
         </div>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+          <p className="mt-4 text-muted-foreground">Loading tasks...</p>
+        </div>
+      )}
+
       {/* Tasks List */}
-      <div className="space-y-4">
-        {filteredTasks.map((task) => (
+      {!isLoading && (
+        <div className="space-y-4">
+          {filteredTasks.map((task) => (
           <div key={task.taskId} className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden">
             {/* Task Header */}
             <div
@@ -426,17 +892,26 @@ export default function EduCareTasksPage() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 mt-4">
-                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm">
+                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-primary-action text-sm">
                     Update Progress
                   </button>
                   <button className="px-4 py-2 bg-secondary/20 text-secondary rounded-lg hover:bg-secondary/30 transition-colors text-sm">
                     Add Comment
                   </button>
-                  <button className="px-4 py-2 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 transition-colors text-sm">
+                  <button
+                    onClick={() => handleEditTask(task)}
+                    className="px-4 py-2 bg-accent/20 text-accent rounded-lg hover:bg-accent/30 btn-primary-action text-sm"
+                  >
                     Edit Task
                   </button>
+                  <button
+                    onClick={() => handleDeleteTask(task.taskId)}
+                    className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 btn-primary-action text-sm"
+                  >
+                    Delete
+                  </button>
                   {task.status !== 'Completed' && (
-                    <button className="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 transition-colors text-sm">
+                    <button className="px-4 py-2 bg-green-500/20 text-green-400 rounded-lg hover:bg-green-500/30 btn-primary-action text-sm">
                       Mark Complete
                     </button>
                   )}
@@ -445,15 +920,16 @@ export default function EduCareTasksPage() {
             )}
           </div>
         ))}
-      </div>
 
-      {/* Empty State */}
-      {filteredTasks.length === 0 && (
-        <div className="text-center py-12">
-          <PackageCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium mb-2">No tasks found</h3>
-          <p className="text-muted-foreground">Try adjusting your filters or search criteria</p>
-        </div>
+        {/* Empty State */}
+        {filteredTasks.length === 0 && (
+          <div className="text-center py-12">
+            <PackageCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">No tasks found</h3>
+            <p className="text-muted-foreground">Try adjusting your filters or search criteria</p>
+          </div>
+        )}
+      </div>
       )}
     </div>
   )

@@ -304,16 +304,47 @@
     transition: all 0.3s;
     background: rgb(var(--primary) / 0.1);
     border: 1px solid rgb(var(--primary) / 0.2);
+    cursor: pointer;
   }
-  
+
   .glass-button:hover {
     background: rgb(var(--primary) / 0.15);
     transform: scale(1.02);
+    box-shadow: 0 0 20px rgb(var(--primary) / 0.3);
   }
-  
+
   .glass-button:active {
     background: rgb(var(--primary) / 0.2);
     transform: scale(0.98);
+  }
+
+  /* Action buttons - consistent style for all action buttons across the app */
+  .btn-action {
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Enhance primary action buttons with border and glow */
+  .btn-primary-action {
+    cursor: pointer;
+    border: 1px solid rgb(var(--primary) / 0.3);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .btn-primary-action:hover {
+    border-color: rgb(var(--primary) / 0.5);
+    box-shadow:
+      0 0 15px rgb(var(--primary) / 0.4),
+      0 0 30px rgb(var(--primary) / 0.2),
+      inset 0 0 10px rgb(var(--primary) / 0.1);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary-action:active {
+    transform: translateY(0);
+    box-shadow:
+      0 0 10px rgb(var(--primary) / 0.3),
+      inset 0 0 8px rgb(var(--primary) / 0.15);
   }
   
   /* Glass navigation */

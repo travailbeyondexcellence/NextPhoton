@@ -1,0 +1,234 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-10-01T12:08:24.749Z",
+    "version": "1.0",
+    "count": 6,
+    "description": "Home tasks and homework assignments for students"
+  },
+  "data": [
+    {
+      "id": "ht001",
+      "title": "Algebra Problem Set",
+      "description": "Complete exercises 1-20 from Chapter 5 on linear equations",
+      "subject": "Mathematics",
+      "type": "Homework",
+      "assignedTo": [
+        "l001",
+        "l002",
+        "l003"
+      ],
+      "assignedBy": "e001",
+      "educatorName": "Dr. Sarah Smith",
+      "assignedDate": "2025-10-01T00:00:00.000Z",
+      "dueDate": "2025-10-03T00:00:00.000Z",
+      "status": "Assigned Today",
+      "priority": "High",
+      "estimatedHours": 2,
+      "resources": [
+        "Textbook Chapter 5",
+        "Online Practice Platform",
+        "Formula Reference Sheet"
+      ],
+      "instructions": [
+        "Show all working steps",
+        "Check answers using substitution",
+        "If stuck, review worked examples first"
+      ],
+      "totalMarks": 20
+    },
+    {
+      "id": "ht002",
+      "title": "Physics Lab Report",
+      "description": "Write a detailed report on the pendulum experiment conducted in class",
+      "subject": "Physics",
+      "type": "Assignment",
+      "assignedTo": [
+        "l003",
+        "l004",
+        "l005"
+      ],
+      "assignedBy": "e003",
+      "educatorName": "Dr. Emily Brown",
+      "assignedDate": "2025-09-28T00:00:00.000Z",
+      "dueDate": "2025-10-05T00:00:00.000Z",
+      "submittedAt": "2025-09-30T00:00:00.000Z",
+      "status": "Submitted",
+      "priority": "Medium",
+      "estimatedHours": 4,
+      "actualHours": 3.5,
+      "resources": [
+        "Lab Manual",
+        "Experimental Data Sheet",
+        "Report Template"
+      ],
+      "instructions": [
+        "Include all measurements and calculations",
+        "Analyze sources of error",
+        "Conclude with real-world applications"
+      ],
+      "submissions": [
+        {
+          "studentId": "l003",
+          "studentName": "Charlie Davis",
+          "submittedAt": "2025-09-30T00:00:00.000Z",
+          "files": [
+            "pendulum_report_charlie.pdf"
+          ],
+          "notes": "Included additional analysis on air resistance",
+          "lateSubmission": false
+        }
+      ],
+      "totalMarks": 25
+    },
+    {
+      "id": "ht003",
+      "title": "Hamlet Character Analysis",
+      "description": "Write a 1000-word essay analyzing the character development of Hamlet",
+      "subject": "English Literature",
+      "type": "Assignment",
+      "assignedTo": [
+        "l006",
+        "l007",
+        "l008"
+      ],
+      "assignedBy": "e002",
+      "educatorName": "Prof. Michael Johnson",
+      "assignedDate": "2025-09-24T00:00:00.000Z",
+      "dueDate": "2025-09-30T00:00:00.000Z",
+      "submittedAt": "2025-09-30T00:00:00.000Z",
+      "gradedAt": "2025-10-01T00:00:00.000Z",
+      "status": "Graded",
+      "priority": "High",
+      "estimatedHours": 6,
+      "actualHours": 7,
+      "resources": [
+        "Hamlet Full Text",
+        "Character Analysis Guide",
+        "Critical Essays Collection"
+      ],
+      "instructions": [
+        "Use MLA citation format",
+        "Include at least 5 quotes with analysis",
+        "Focus on character development throughout the play"
+      ],
+      "submissions": [
+        {
+          "studentId": "l007",
+          "studentName": "Grace Wilson",
+          "submittedAt": "2025-09-30T00:00:00.000Z",
+          "files": [
+            "hamlet_analysis_grace.docx"
+          ],
+          "lateSubmission": false,
+          "grade": "A-",
+          "marks": 22,
+          "feedback": "Excellent analysis with strong textual evidence. Consider exploring the psychological aspects further."
+        }
+      ],
+      "totalMarks": 25,
+      "obtainedMarks": 22,
+      "grade": "A-"
+    },
+    {
+      "id": "ht004",
+      "title": "Chemistry Research Project",
+      "description": "Research and present on a modern application of organic chemistry",
+      "subject": "Chemistry",
+      "type": "Project",
+      "assignedTo": [
+        "l005",
+        "l006"
+      ],
+      "assignedBy": "e005",
+      "educatorName": "Dr. Linda Davis",
+      "assignedDate": "2025-09-17T00:00:00.000Z",
+      "dueDate": "2025-10-08T00:00:00.000Z",
+      "status": "Pending",
+      "priority": "Medium",
+      "estimatedHours": 10,
+      "resources": [
+        "Scientific Journal Access",
+        "Presentation Template",
+        "Research Guidelines"
+      ],
+      "instructions": [
+        "Choose a specific application (pharmaceuticals, materials, etc.)",
+        "Include chemical structures and reactions",
+        "Prepare a 10-minute presentation",
+        "Cite at least 5 peer-reviewed sources"
+      ],
+      "totalMarks": 50
+    },
+    {
+      "id": "ht005",
+      "title": "History Timeline Project",
+      "description": "Create an interactive timeline of Ancient Roman Empire events",
+      "subject": "History",
+      "type": "Project",
+      "assignedTo": [
+        "l004",
+        "l008",
+        "l009"
+      ],
+      "assignedBy": "e004",
+      "educatorName": "Mr. James Wilson",
+      "assignedDate": "2025-09-21T00:00:00.000Z",
+      "dueDate": "2025-09-28T00:00:00.000Z",
+      "status": "Overdue",
+      "priority": "High",
+      "estimatedHours": 8,
+      "resources": [
+        "History Textbook Chapters 8-12",
+        "Online Timeline Tools",
+        "Primary Source Documents"
+      ],
+      "instructions": [
+        "Include major political, military, and cultural events",
+        "Add images and maps where relevant",
+        "Minimum 20 significant events",
+        "Include impact analysis for each event"
+      ],
+      "totalMarks": 40
+    },
+    {
+      "id": "ht006",
+      "title": "Weekly Math Practice",
+      "description": "Daily practice problems to reinforce concepts learned this week",
+      "subject": "Mathematics",
+      "type": "Homework",
+      "assignedTo": [
+        "l001",
+        "l002"
+      ],
+      "assignedBy": "e001",
+      "educatorName": "Dr. Sarah Smith",
+      "assignedDate": "2025-09-29T00:00:00.000Z",
+      "dueDate": "2025-10-01T00:00:00.000Z",
+      "submittedAt": "2025-10-01T00:00:00.000Z",
+      "status": "Submitted",
+      "priority": "Medium",
+      "estimatedHours": 1.5,
+      "actualHours": 2,
+      "resources": [
+        "Practice Problem Set",
+        "Solution Manual (for checking)"
+      ],
+      "instructions": [
+        "Complete 5 problems daily",
+        "Check solutions and note any difficulties"
+      ],
+      "submissions": [
+        {
+          "studentId": "l001",
+          "studentName": "Alice Johnson",
+          "submittedAt": "2025-10-01T00:00:00.000Z",
+          "files": [
+            "weekly_practice_alice.pdf"
+          ],
+          "lateSubmission": false
+        }
+      ],
+      "totalMarks": 15
+    }
+  ]
+}

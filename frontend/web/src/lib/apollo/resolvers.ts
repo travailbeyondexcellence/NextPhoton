@@ -204,10 +204,13 @@ function transformLearner(learner: any) {
       academicLevel: learner.address?.academicLevel || learner.academicLevel || 'Not specified',
       targetExams: learner.address?.targetExams || learner.targetExams || [],
       targetExamYear: learner.address?.targetExamYear || learner.targetExamYear || _currentYear,
+      lastActive: learner.lastActive || _currentDate,
       guardians: learner.guardians || [],
       assignedEducators: learner.assignedEducators || [],
       attendance: learner.attendance || { overall: 0, lastMonth: 0 },
       performance: learner.performance || { averageScore: 0, lastTestScore: 0, trend: 'stable' },
+      reviewedEducators: learner.reviewedEducators || [],
+      learnerNotes: learner.learnerNotes || [],
       remarkTags: learner.remarkTags || [],
     };
   } catch (error) {

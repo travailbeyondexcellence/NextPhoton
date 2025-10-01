@@ -205,7 +205,7 @@ export default function TravailPractisePage() {
             <option value="Hard">Hard</option>
           </select>
 
-          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Create Assignment
           </button>
@@ -371,7 +371,7 @@ export default function TravailPractisePage() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       {assignment.status === "Assigned" || assignment.status === "In Progress" ? (
-                        <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors">
+                        <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors">
                           Start Practice
                         </button>
                       ) : (

@@ -369,7 +369,7 @@ export default function StudentAttendancePage() {
             <div className="flex gap-2">
               <button
                 onClick={handleMarkAttendance}
-                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors text-sm cursor-pointer"
+                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors text-sm cursor-pointer"
               >
                 Mark Attendance
               </button>
