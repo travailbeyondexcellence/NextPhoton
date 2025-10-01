@@ -34,8 +34,8 @@ const Guardians = () => {
             >
               {view === "list" ? <LayoutGrid size={20} /> : <List size={20} />}
             </button>
-            <button 
-              className="p-2 bg-primary/20 backdrop-blur-sm rounded-lg hover:bg-primary/30 border border-primary/30 text-primary transition-all flex items-center gap-2 px-4"
+            <button
+              className="p-2 bg-primary/20 backdrop-blur-sm rounded-lg hover:bg-primary/30 border border-primary/30 text-primary transition-all flex items-center gap-2 px-4 cursor-pointer"
               onClick={() => router.push(`${pathname}/createNewGuardian`)}
             >
               <UserPlus size={20} />

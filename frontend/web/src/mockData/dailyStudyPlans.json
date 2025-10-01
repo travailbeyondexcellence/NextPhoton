@@ -1,0 +1,188 @@
+[
+  {
+    "id": "dsp001",
+    "title": "Mathematics Focus Week",
+    "description": "Intensive mathematics study schedule focusing on algebra and geometry",
+    "date": "2025-10-01",
+    "timeSlots": [
+      {
+        "id": "ts001",
+        "startTime": "09:00",
+        "endTime": "10:30",
+        "subject": "Mathematics",
+        "topic": "Linear Equations",
+        "activities": [
+          "Solve practice problems",
+          "Review formulas",
+          "Work through examples"
+        ],
+        "resources": [
+          "Algebra Textbook Ch. 5",
+          "Khan Academy Videos",
+          "Practice Worksheet"
+        ],
+        "isCompleted": true,
+        "completedAt": "2025-10-01T10:30:00.000Z",
+        "notes": "Completed all practice problems successfully"
+      },
+      {
+        "id": "ts002",
+        "startTime": "11:00",
+        "endTime": "12:00",
+        "subject": "Physics",
+        "topic": "Newton's Laws",
+        "activities": [
+          "Read chapter",
+          "Take notes",
+          "Solve numerical problems"
+        ],
+        "resources": [
+          "Physics Textbook Ch. 3",
+          "Lab Manual",
+          "Online Simulations"
+        ],
+        "isCompleted": true,
+        "completedAt": "2025-10-01T12:00:00.000Z"
+      },
+      {
+        "id": "ts003",
+        "startTime": "14:00",
+        "endTime": "15:30",
+        "subject": "English",
+        "topic": "Essay Writing",
+        "activities": [
+          "Practice essay structure",
+          "Vocabulary building",
+          "Grammar exercises"
+        ],
+        "resources": [
+          "Writing Guide",
+          "Vocabulary List",
+          "Sample Essays"
+        ],
+        "isCompleted": false
+      }
+    ],
+    "learnerIds": [
+      "l001",
+      "l002",
+      "l003"
+    ],
+    "educatorId": "e001",
+    "educatorName": "Dr. Sarah Smith",
+    "status": "Active",
+    "createdAt": "2025-09-30T14:29:00.000Z",
+    "updatedAt": "2025-10-01T14:29:00.000Z",
+    "totalStudyTime": 270,
+    "completedTime": 150,
+    "subjects": [
+      "Mathematics",
+      "Physics",
+      "English"
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "dsp002",
+    "title": "Science Review Session",
+    "description": "Comprehensive science review covering chemistry and biology",
+    "date": "2025-10-02",
+    "timeSlots": [
+      {
+        "id": "ts004",
+        "startTime": "10:00",
+        "endTime": "11:30",
+        "subject": "Chemistry",
+        "topic": "Organic Compounds",
+        "activities": [
+          "Study molecular structures",
+          "Practice naming",
+          "Review reactions"
+        ],
+        "resources": [
+          "Chemistry Textbook",
+          "Molecular Models",
+          "Reaction Charts"
+        ],
+        "isCompleted": false
+      },
+      {
+        "id": "ts005",
+        "startTime": "13:00",
+        "endTime": "14:30",
+        "subject": "Biology",
+        "topic": "Cell Biology",
+        "activities": [
+          "Study cell organelles",
+          "Review functions",
+          "Diagram practice"
+        ],
+        "resources": [
+          "Biology Textbook Ch. 2",
+          "Cell Diagrams",
+          "Interactive Models"
+        ],
+        "isCompleted": false
+      }
+    ],
+    "learnerIds": [
+      "l004",
+      "l005",
+      "l006"
+    ],
+    "educatorId": "e002",
+    "educatorName": "Prof. Michael Johnson",
+    "status": "Pending",
+    "createdAt": "2025-09-29T14:29:00.000Z",
+    "updatedAt": "2025-09-30T14:29:00.000Z",
+    "totalStudyTime": 180,
+    "completedTime": 0,
+    "subjects": [
+      "Chemistry",
+      "Biology"
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "dsp003",
+    "title": "Literature Analysis Day",
+    "description": "Deep dive into Shakespeare's works and literary analysis techniques",
+    "date": "2025-09-30",
+    "timeSlots": [
+      {
+        "id": "ts006",
+        "startTime": "09:30",
+        "endTime": "11:00",
+        "subject": "English Literature",
+        "topic": "Shakespearean Analysis",
+        "activities": [
+          "Read Act 3 of Hamlet",
+          "Character analysis",
+          "Theme identification"
+        ],
+        "resources": [
+          "Hamlet Text",
+          "Study Guide",
+          "Analysis Videos"
+        ],
+        "isCompleted": true,
+        "completedAt": "2025-09-30T11:00:00.000Z"
+      }
+    ],
+    "learnerIds": [
+      "l007",
+      "l008"
+    ],
+    "educatorId": "e003",
+    "educatorName": "Dr. Emily Brown",
+    "status": "Completed",
+    "createdAt": "2025-09-28T14:29:00.000Z",
+    "updatedAt": "2025-09-30T14:29:00.000Z",
+    "totalStudyTime": 90,
+    "completedTime": 90,
+    "subjects": [
+      "English Literature"
+    ],
+    "priority": "Low"
+  }
+]

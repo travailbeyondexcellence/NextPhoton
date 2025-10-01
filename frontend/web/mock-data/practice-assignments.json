@@ -1,0 +1,180 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-10-01T12:42:53.990Z",
+    "version": "1.0",
+    "count": 5,
+    "description": "Practice assignments for student learning activities"
+  },
+  "data": [
+    {
+      "id": "pa001",
+      "title": "Algebra Practice Set A",
+      "description": "Comprehensive practice problems covering linear equations and inequalities",
+      "subject": "Mathematics",
+      "topic": "Linear Equations",
+      "assignedTo": [
+        "l001",
+        "l002",
+        "l003"
+      ],
+      "assignedBy": "e001",
+      "educatorName": "Dr. Sarah Smith",
+      "createdAt": "2025-09-26",
+      "dueDate": "2025-10-03",
+      "submittedAt": "2025-09-30",
+      "gradedAt": "2025-10-01",
+      "status": "Graded",
+      "difficulty": "Medium",
+      "estimatedTime": 60,
+      "actualTime": 75,
+      "questions": [
+        {
+          "id": "q001",
+          "question": "Solve for x: 2x + 5 = 15",
+          "type": "Short Answer",
+          "correctAnswer": "x = 5",
+          "studentAnswer": "x = 5",
+          "marks": 5,
+          "obtainedMarks": 5,
+          "explanation": "Subtract 5 from both sides, then divide by 2"
+        },
+        {
+          "id": "q002",
+          "question": "Which of the following is a linear equation?",
+          "type": "MCQ",
+          "options": [
+            "x² + 2x = 5",
+            "2x + 3y = 7",
+            "xy = 10",
+            "x³ = 8"
+          ],
+          "correctAnswer": "2x + 3y = 7",
+          "studentAnswer": "2x + 3y = 7",
+          "marks": 3,
+          "obtainedMarks": 3
+        }
+      ],
+      "totalMarks": 25,
+      "obtainedMarks": 22,
+      "feedback": "Good work! Focus on checking your arithmetic in word problems.",
+      "attempts": 1,
+      "maxAttempts": 2
+    },
+    {
+      "id": "pa002",
+      "title": "Physics Mechanics Quiz",
+      "description": "Practice problems on Newton's laws and force calculations",
+      "subject": "Physics",
+      "topic": "Mechanics",
+      "assignedTo": [
+        "l003",
+        "l004"
+      ],
+      "assignedBy": "e003",
+      "educatorName": "Dr. Emily Brown",
+      "createdAt": "2025-09-28",
+      "dueDate": "2025-10-02",
+      "status": "In Progress",
+      "difficulty": "Hard",
+      "estimatedTime": 90,
+      "questions": [
+        {
+          "id": "q003",
+          "question": "Calculate the force required to accelerate a 10kg mass at 5m/s²",
+          "type": "Short Answer",
+          "correctAnswer": "50N",
+          "marks": 10
+        }
+      ],
+      "totalMarks": 50,
+      "attempts": 0,
+      "maxAttempts": 3
+    },
+    {
+      "id": "pa003",
+      "title": "Chemistry Bonding Practice",
+      "description": "Practice identifying chemical bonds and molecular structures",
+      "subject": "Chemistry",
+      "topic": "Chemical Bonding",
+      "assignedTo": [
+        "l005",
+        "l006"
+      ],
+      "assignedBy": "e005",
+      "educatorName": "Dr. Linda Davis",
+      "createdAt": "2025-09-24",
+      "dueDate": "2025-09-29",
+      "status": "Overdue",
+      "difficulty": "Medium",
+      "estimatedTime": 45,
+      "questions": [
+        {
+          "id": "q004",
+          "question": "H₂O has which type of bonding?",
+          "type": "MCQ",
+          "options": [
+            "Ionic",
+            "Covalent",
+            "Metallic",
+            "Hydrogen"
+          ],
+          "correctAnswer": "Covalent",
+          "marks": 5
+        }
+      ],
+      "totalMarks": 30,
+      "attempts": 0,
+      "maxAttempts": 2
+    },
+    {
+      "id": "pa004",
+      "title": "English Grammar Exercise",
+      "description": "Practice identifying parts of speech and sentence structure",
+      "subject": "English",
+      "topic": "Grammar",
+      "assignedTo": [
+        "l007",
+        "l008",
+        "l009"
+      ],
+      "assignedBy": "e002",
+      "educatorName": "Prof. Michael Johnson",
+      "createdAt": "2025-09-29",
+      "dueDate": "2025-10-04",
+      "status": "Assigned",
+      "difficulty": "Easy",
+      "estimatedTime": 30,
+      "questions": [
+        {
+          "id": "q005",
+          "question": "Identify the verb in: 'The cat ran quickly'",
+          "type": "Short Answer",
+          "correctAnswer": "ran",
+          "marks": 2
+        }
+      ],
+      "totalMarks": 20,
+      "attempts": 0,
+      "maxAttempts": 3
+    },
+    {
+      "id": "pa005",
+      "title": "Game Theory II",
+      "description": "Strategic Analysis using Maths",
+      "subject": "Mathematics",
+      "topic": "Multiple",
+      "assignedTo": [],
+      "assignedBy": "admin",
+      "educatorName": "Natrajan",
+      "createdAt": "2025-10-01",
+      "dueDate": "2025-10-16",
+      "status": "Assigned",
+      "difficulty": "Medium",
+      "estimatedTime": 30,
+      "questions": [],
+      "totalMarks": 435,
+      "attempts": 0,
+      "maxAttempts": 3
+    }
+  ]
+}

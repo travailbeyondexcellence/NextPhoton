@@ -1,45 +1,187 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Edit3, Clock, TrendingUp, CheckCircle, XCircle, AlertTriangle, BookOpen, Filter, Plus, Search } from "lucide-react"
-import { practiceAssignments } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { type PracticeAssignment } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 export default function TravailPractisePage() {
+  // State for assignments loaded from API
+  const [assignments, setAssignments] = useState<PracticeAssignment[]>([])
+  const [stats, setStats] = useState({
+    active: 0,
+    thisWeekCompleted: 0,
+    averageScore: 0,
+    overdue: 0
+  })
+  const [isLoading, setIsLoading] = useState(true)
+
   const [statusFilter, setStatusFilter] = useState("all")
   const [difficultyFilter, setDifficultyFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedAssignment, setSelectedAssignment] = useState<string | null>(null)
+  const [isNewAssignmentOpen, setIsNewAssignmentOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(null)
 
-  // Calculate stats
-  const stats = useMemo(() => {
-    const active = practiceAssignments.filter(p => p.status === "Assigned" || p.status === "In Progress").length
-    const thisWeekCompleted = practiceAssignments.filter(p => {
-      if (p.status !== "Graded" && p.status !== "Submitted") return false
-      const weekAgo = new Date()
-      weekAgo.setDate(weekAgo.getDate() - 7)
-      return new Date(p.submittedAt || p.gradedAt || "") >= weekAgo
-    }).length
+  // Form state for new assignment creation
+  const [newAssignment, setNewAssignment] = useState({
+    title: "",
+    description: "",
+    subject: "",
+    topic: "",
+    difficulty: "Medium" as "Easy" | "Medium" | "Hard",
+    estimatedTime: 30,
+    dueDate: "",
+    educatorName: "",
+    totalMarks: 0,
+    maxAttempts: 3
+  })
 
-    const completedWithScores = practiceAssignments.filter(p => p.obtainedMarks !== undefined)
-    const averageScore = completedWithScores.length > 0
-      ? Math.round(completedWithScores.reduce((sum, p) => sum + ((p.obtainedMarks! / p.totalMarks) * 100), 0) / completedWithScores.length)
-      : 0
-
-    const overdue = practiceAssignments.filter(p => p.status === "Overdue").length
-
-    return { active, thisWeekCompleted, averageScore, overdue }
+  // Fetch assignments from API on component mount
+  useEffect(() => {
+    fetchAssignments()
+    fetchStatistics()
   }, [])
+
+  // Function to fetch all assignments from API
+  const fetchAssignments = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/practice-assignments')
+      const result = await response.json()
+
+      if (result.success) {
+        setAssignments(result.data)
+      } else {
+        console.error('Failed to fetch assignments:', result.error)
+      }
+    } catch (error) {
+      console.error('Error fetching assignments:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Function to fetch statistics from API
+  const fetchStatistics = async () => {
+    try {
+      const response = await fetch('/api/practice-assignments?stats=true')
+      const result = await response.json()
+
+      if (result.success) {
+        setStats(result.data)
+      }
+    } catch (error) {
+      console.error('Error fetching statistics:', error)
+    }
+  }
+
+  // Handle form input changes
+  const handleInputChange = (field: string, value: any) => {
+    setNewAssignment(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Handle Edit button click - Populate form with assignment data
+  const handleEditAssignment = (assignment: PracticeAssignment) => {
+    setNewAssignment({
+      title: assignment.title,
+      description: assignment.description,
+      subject: assignment.subject,
+      topic: assignment.topic,
+      difficulty: assignment.difficulty,
+      estimatedTime: assignment.estimatedTime,
+      dueDate: assignment.dueDate,
+      educatorName: assignment.educatorName,
+      totalMarks: assignment.totalMarks,
+      maxAttempts: assignment.maxAttempts
+    })
+    setIsEditMode(true)
+    setEditingAssignmentId(assignment.id)
+    setIsNewAssignmentOpen(true)
+  }
+
+  // Handle form submission - Create or Update assignment via API
+  const handleCreateAssignment = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    try {
+      const assignmentData = {
+        title: newAssignment.title,
+        description: newAssignment.description,
+        subject: newAssignment.subject,
+        topic: newAssignment.topic,
+        difficulty: newAssignment.difficulty,
+        estimatedTime: Number(newAssignment.estimatedTime),
+        dueDate: newAssignment.dueDate,
+        educatorName: newAssignment.educatorName,
+        totalMarks: Number(newAssignment.totalMarks),
+        maxAttempts: Number(newAssignment.maxAttempts),
+        assignedTo: [],
+        assignedBy: "admin",
+        questions: []
+      }
+
+      // Call API to create or update assignment
+      const response = await fetch('/api/practice-assignments', {
+        method: isEditMode ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(isEditMode ? { ...assignmentData, id: editingAssignmentId } : assignmentData),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Success - refresh assignments and statistics
+        await fetchAssignments()
+        await fetchStatistics()
+
+        // Reset form and close sheet
+        setNewAssignment({
+          title: "",
+          description: "",
+          subject: "",
+          topic: "",
+          difficulty: "Medium",
+          estimatedTime: 30,
+          dueDate: "",
+          educatorName: "",
+          totalMarks: 0,
+          maxAttempts: 3
+        })
+        setIsNewAssignmentOpen(false)
+        setIsEditMode(false)
+        setEditingAssignmentId(null)
+
+        alert(isEditMode ? "Assignment updated successfully!" : "Assignment created successfully!")
+      } else {
+        alert(`Failed to ${isEditMode ? 'update' : 'create'} assignment: ${result.message}`)
+      }
+    } catch (error) {
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} assignment:`, error)
+      alert(`An error occurred while ${isEditMode ? 'updating' : 'creating'} the assignment`)
+    }
+  }
 
   // Get unique subjects and difficulties
   const { subjects, difficulties } = useMemo(() => {
-    const uniqueSubjects = [...new Set(practiceAssignments.map(p => p.subject))].sort()
-    const uniqueDifficulties = [...new Set(practiceAssignments.map(p => p.difficulty))].sort()
+    const uniqueSubjects = [...new Set(assignments.map(p => p.subject))].sort()
+    const uniqueDifficulties = [...new Set(assignments.map(p => p.difficulty))].sort()
     return { subjects: uniqueSubjects, difficulties: uniqueDifficulties }
-  }, [])
+  }, [assignments])
 
   // Filter assignments
   const filteredAssignments = useMemo(() => {
-    return practiceAssignments.filter(assignment => {
+    return assignments.filter(assignment => {
       const matchesSearch =
         assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         assignment.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -51,7 +193,7 @@ export default function TravailPractisePage() {
 
       return matchesSearch && matchesStatus && matchesDifficulty
     })
-  }, [searchTerm, statusFilter, difficultyFilter])
+  }, [assignments, searchTerm, statusFilter, difficultyFilter])
 
   // Sort by status priority and due date
   const sortedAssignments = useMemo(() => {
@@ -205,23 +347,215 @@ export default function TravailPractisePage() {
             <option value="Hard">Hard</option>
           </select>
 
-          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Create Assignment
-          </button>
+          {/* Create Assignment Sheet */}
+          <Sheet open={isNewAssignmentOpen} onOpenChange={setIsNewAssignmentOpen}>
+            <SheetTrigger asChild>
+              <button
+                onClick={() => {
+                  setIsEditMode(false)
+                  setEditingAssignmentId(null)
+                }}
+                className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Create Assignment
+              </button>
+            </SheetTrigger>
+            <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gradient-to-br from-emerald-950/95 to-emerald-900/95 backdrop-blur-xl border-emerald-500/20">
+              <SheetHeader>
+                <SheetTitle className="text-foreground">
+                  {isEditMode ? 'Edit Practice Assignment' : 'Create New Practice Assignment'}
+                </SheetTitle>
+                <SheetDescription className="text-muted-foreground">
+                  {isEditMode
+                    ? 'Update the details below to modify this practice assignment'
+                    : 'Fill in the details below to create a new practice assignment'}
+                </SheetDescription>
+              </SheetHeader>
+
+              {/* New Assignment Form */}
+              <form onSubmit={handleCreateAssignment} className="space-y-6 mt-6">
+                {/* Title */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Assignment Title *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newAssignment.title}
+                    onChange={(e) => handleInputChange("title", e.target.value)}
+                    placeholder="e.g., Algebra Practice Set B"
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Description *</label>
+                  <textarea
+                    required
+                    value={newAssignment.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    placeholder="Provide detailed description of the assignment..."
+                    rows={3}
+                    className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
+                  />
+                </div>
+
+                {/* Row 1: Subject, Topic */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Subject *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newAssignment.subject}
+                      onChange={(e) => handleInputChange("subject", e.target.value)}
+                      placeholder="e.g., Mathematics"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Topic *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newAssignment.topic}
+                      onChange={(e) => handleInputChange("topic", e.target.value)}
+                      placeholder="e.g., Linear Equations"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 2: Difficulty, Estimated Time */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Difficulty *</label>
+                    <select
+                      required
+                      value={newAssignment.difficulty}
+                      onChange={(e) => handleInputChange("difficulty", e.target.value as "Easy" | "Medium" | "Hard")}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    >
+                      <option value="Easy">Easy</option>
+                      <option value="Medium">Medium</option>
+                      <option value="Hard">Hard</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Estimated Time (minutes) *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={newAssignment.estimatedTime}
+                      onChange={(e) => handleInputChange("estimatedTime", e.target.value)}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 3: Educator Name, Due Date */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Educator Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={newAssignment.educatorName}
+                      onChange={(e) => handleInputChange("educatorName", e.target.value)}
+                      placeholder="e.g., Dr. Sarah Smith"
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Due Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={newAssignment.dueDate}
+                      onChange={(e) => handleInputChange("dueDate", e.target.value)}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Row 4: Total Marks, Max Attempts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Total Marks *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      value={newAssignment.totalMarks}
+                      onChange={(e) => handleInputChange("totalMarks", e.target.value)}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Maximum Attempts *</label>
+                    <input
+                      type="number"
+                      required
+                      min="1"
+                      max="10"
+                      value={newAssignment.maxAttempts}
+                      onChange={(e) => handleInputChange("maxAttempts", e.target.value)}
+                      className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex gap-3 pt-4 border-t border-white/10">
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-primary-action font-medium"
+                  >
+                    {isEditMode ? 'Update Assignment' : 'Create Assignment'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNewAssignmentOpen(false)
+                      setIsEditMode(false)
+                      setEditingAssignmentId(null)
+                    }}
+                    className="px-4 py-2 bg-white/10 text-foreground rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+          <p className="mt-4 text-muted-foreground">Loading assignments...</p>
+        </div>
+      )}
+
       {/* Assignments List */}
-      <div className="space-y-4">
-        {sortedAssignments.length === 0 ? (
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">No practice assignments found</h3>
-            <p className="text-muted-foreground">No assignments match your current filters.</p>
-          </div>
-        ) : (
-          sortedAssignments.map((assignment) => (
+      {!isLoading && (
+        <div className="space-y-4">
+          {sortedAssignments.length === 0 ? (
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
+              <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">No practice assignments found</h3>
+              <p className="text-muted-foreground">No assignments match your current filters.</p>
+            </div>
+          ) : (
+            sortedAssignments.map((assignment) => (
             <div
               key={assignment.id}
               className={`bg-white/10 backdrop-blur-sm rounded-lg border ${
@@ -382,7 +716,13 @@ export default function TravailPractisePage() {
                       <button className="flex-1 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-colors">
                         View Details
                       </button>
-                      <button className="flex-1 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditAssignment(assignment)
+                        }}
+                        className="flex-1 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors"
+                      >
                         Edit Assignment
                       </button>
                     </div>
@@ -392,7 +732,8 @@ export default function TravailPractisePage() {
             </div>
           ))
         )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

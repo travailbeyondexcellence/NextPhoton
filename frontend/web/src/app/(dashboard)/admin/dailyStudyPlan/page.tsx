@@ -1,17 +1,45 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Calendar, Clock, BookOpen, CheckCircle, AlertCircle, Users, Filter, Plus, X } from "lucide-react"
-import { dailyStudyPlans as initialDailyStudyPlans, type DailyStudyPlan } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { dailyStudyPlans as fallbackDailyStudyPlans, type DailyStudyPlan } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
 
 export default function DailyStudyPlanPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const [plans, setPlans] = useState<DailyStudyPlan[]>(initialDailyStudyPlans)
+  const [plans, setPlans] = useState<DailyStudyPlan[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
+
+  // Fetch plans from API on component mount
+  useEffect(() => {
+    fetchPlans()
+  }, [])
+
+  const fetchPlans = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/dailyStudyPlans')
+      const result = await response.json()
+
+      if (result.success) {
+        setPlans(result.data)
+      } else {
+        console.error('Failed to fetch daily study plans:', result.error)
+        // Fallback to imported dummy data if API fails
+        setPlans(fallbackDailyStudyPlans)
+      }
+    } catch (error) {
+      console.error('Error fetching daily study plans:', error)
+      // Fallback to imported dummy data if API fails
+      setPlans(fallbackDailyStudyPlans)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   // Form state
   const [formData, setFormData] = useState({
@@ -80,7 +108,7 @@ export default function DailyStudyPlanPage() {
   }
 
   // Handle form submission (Create or Update)
-  const handleCreatePlan = (e: React.FormEvent) => {
+  const handleCreatePlan = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const subjectsArray = formData.subjects.split(',').map(s => s.trim()).filter(Boolean)
@@ -108,19 +136,38 @@ export default function DailyStudyPlanPage() {
         updatedAt: new Date().toISOString(),
       }
 
-      console.log('Updated plan:', updatedPlan)
-      setPlans(prevPlans => prevPlans.map(p => p.id === editingPlanId ? updatedPlan : p))
+      try {
+        const response = await fetch('/api/dailyStudyPlans', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedPlan),
+        })
 
-      setIsCreateDialogOpen(false)
-      resetForm()
-      alert('Study plan updated successfully!')
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setPlans(prevPlans => prevPlans.map(p => p.id === editingPlanId ? updatedPlan : p))
+
+          setIsCreateDialogOpen(false)
+          resetForm()
+          alert('Study plan updated and saved to database successfully!')
+        } else {
+          alert(`Failed to update plan: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error updating plan:', error)
+        alert('Failed to update plan. Please try again.')
+      }
     } else {
       // CREATE new plan
       console.log('=== CREATING DAILY STUDY PLAN ===')
       console.log('Form data:', formData)
 
       // Generate new plan ID
-      const newId = `dsp${String(plans.length + 1).padStart(3, '0')}`
+      const newId = `dsp${Date.now()}`
 
       // Create new plan object
       const newPlan: DailyStudyPlan = {
@@ -141,12 +188,31 @@ export default function DailyStudyPlanPage() {
         priority: formData.priority as "High" | "Medium" | "Low",
       }
 
-      console.log('Adding new plan:', newPlan)
-      setPlans(prevPlans => [newPlan, ...prevPlans])
+      try {
+        const response = await fetch('/api/dailyStudyPlans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPlan),
+        })
 
-      setIsCreateDialogOpen(false)
-      resetForm()
-      alert('Study plan created successfully!')
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setPlans(prevPlans => [newPlan, ...prevPlans])
+
+          setIsCreateDialogOpen(false)
+          resetForm()
+          alert('Study plan created and saved to database successfully!')
+        } else {
+          alert(`Failed to create plan: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error creating plan:', error)
+        alert('Failed to create plan. Please try again.')
+      }
     }
   }
 
@@ -287,7 +353,13 @@ export default function DailyStudyPlanPage() {
 
       {/* Study Plans List */}
       <div className="space-y-4">
-        {filteredPlans.length === 0 ? (
+        {isLoading ? (
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Loading study plans...</h3>
+            <p className="text-muted-foreground">Please wait while we fetch the data</p>
+          </div>
+        ) : filteredPlans.length === 0 ? (
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No study plans found</h3>

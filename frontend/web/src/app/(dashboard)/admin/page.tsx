@@ -123,7 +123,7 @@ const AdminPage = ({
               {/* Add New User - Dropdown menu with user type options */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
+                  <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer">
                     <div className="font-medium">Add New User</div>
                     <div className="text-xs text-muted-foreground">Create educator or learner account</div>
                   </button>
@@ -149,7 +149,7 @@ const AdminPage = ({
               {/* Create Course - Direct navigation to academic plans */}
               <button
                 onClick={handleCreateCourse}
-                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left"
+                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer"
               >
                 <div className="font-medium">Create Course</div>
                 <div className="text-xs text-muted-foreground">Set up new educational content</div>
@@ -158,7 +158,7 @@ const AdminPage = ({
               {/* View Reports - Direct navigation to performance page */}
               <button
                 onClick={handleViewReports}
-                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left"
+                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer"
               >
                 <div className="font-medium">View Reports</div>
                 <div className="text-xs text-muted-foreground">Analytics and performance metrics</div>
@@ -167,7 +167,7 @@ const AdminPage = ({
               {/* System Settings - Direct navigation to settings page */}
               <button
                 onClick={handleSystemSettings}
-                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left"
+                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer"
               >
                 <div className="font-medium">System Settings</div>
                 <div className="text-xs text-muted-foreground">Configure platform preferences</div>
