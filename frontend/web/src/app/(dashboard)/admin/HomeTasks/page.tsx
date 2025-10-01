@@ -1,43 +1,231 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { Home, Clock, CheckCircle, AlertTriangle, Award, FileText, Calendar, Users, Plus, Search, Filter } from "lucide-react"
-import { homeTasks } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { useState, useMemo, useEffect } from "react"
+import { Home, Clock, CheckCircle, AlertTriangle, Award, FileText, Calendar, Users, Plus, Search, Filter, Pencil, Trash2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
+
+// Define HomeTask interface
+interface HomeTask {
+  id: string
+  title: string
+  description: string
+  subject: string
+  type: "Homework" | "Assignment" | "Project" | "Reading" | "Research"
+  assignedTo: string[]
+  assignedBy: string
+  educatorName: string
+  assignedDate: string
+  dueDate: string
+  submittedAt?: string
+  gradedAt?: string
+  status: "Assigned Today" | "Pending" | "Submitted" | "Graded" | "Overdue"
+  priority: "High" | "Medium" | "Low"
+  estimatedHours: number
+  actualHours?: number
+  resources: string[]
+  instructions: string[]
+  submissions?: Array<{
+    studentId: string
+    studentName: string
+    submittedAt: string
+    files: string[]
+    notes?: string
+    lateSubmission: boolean
+    grade?: string
+    marks?: number
+    feedback?: string
+  }>
+  totalMarks: number
+  obtainedMarks?: number
+  grade?: string
+  feedback?: string
+}
 
 export default function HomeTasksPage() {
+  const [tasks, setTasks] = useState<HomeTask[]>([])
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
   const [priorityFilter, setPriorityFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedTask, setSelectedTask] = useState<string | null>(null)
+  const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    description: "",
+    subject: "",
+    type: "Homework" as HomeTask["type"],
+    priority: "Medium" as HomeTask["priority"],
+    estimatedHours: "",
+    totalMarks: "",
+    dueDate: "",
+    instructions: "",
+    resources: ""
+  })
+
+  // Load tasks from JSON on mount
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        const response = await fetch('/api/home-tasks')
+        const result = await response.json()
+        if (result.success) {
+          setTasks(result.data)
+        } else {
+          throw new Error(result.message)
+        }
+      } catch (err) {
+        console.error('Error loading tasks:', err)
+        toast.error('Failed to load tasks')
+      }
+    }
+    loadTasks()
+  }, [])
+
+  // CRUD Handlers
+  const handleOpenCreate = () => {
+    setIsEditMode(false)
+    setEditingTaskId(null)
+    setTaskForm({
+      title: "",
+      description: "",
+      subject: "",
+      type: "Homework",
+      priority: "Medium",
+      estimatedHours: "",
+      totalMarks: "",
+      dueDate: "",
+      instructions: "",
+      resources: ""
+    })
+    setIsCreateTaskOpen(true)
+  }
+
+  const handleOpenEdit = (task: HomeTask) => {
+    setIsEditMode(true)
+    setEditingTaskId(task.id)
+    setTaskForm({
+      title: task.title,
+      description: task.description,
+      subject: task.subject,
+      type: task.type,
+      priority: task.priority,
+      estimatedHours: task.estimatedHours.toString(),
+      totalMarks: task.totalMarks.toString(),
+      dueDate: task.dueDate.split('T')[0],
+      instructions: task.instructions.join('\n'),
+      resources: task.resources.join(', ')
+    })
+    setIsCreateTaskOpen(true)
+  }
+
+  const handleSubmit = async () => {
+    // Validate required fields
+    if (!taskForm.title || !taskForm.subject || !taskForm.dueDate) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    const newTask: HomeTask = {
+      id: isEditMode ? editingTaskId! : `ht${String(tasks.length + 1).padStart(3, '0')}`,
+      title: taskForm.title,
+      description: taskForm.description,
+      subject: taskForm.subject,
+      type: taskForm.type,
+      priority: taskForm.priority,
+      estimatedHours: parseInt(taskForm.estimatedHours) || 0,
+      totalMarks: parseInt(taskForm.totalMarks) || 0,
+      dueDate: new Date(taskForm.dueDate).toISOString(),
+      assignedDate: new Date().toISOString(),
+      assignedTo: [],
+      assignedBy: "current_user",
+      educatorName: "Current Educator",
+      status: "Assigned Today",
+      instructions: taskForm.instructions.split('\n').filter(i => i.trim()),
+      resources: taskForm.resources.split(',').map(r => r.trim()).filter(r => r)
+    }
+
+    try {
+      let updatedTasks: HomeTask[]
+      if (isEditMode) {
+        updatedTasks = tasks.map(t => t.id === editingTaskId ? { ...t, ...newTask } : t)
+      } else {
+        updatedTasks = [...tasks, newTask]
+      }
+
+      // Call API to update JSON file
+      const response = await fetch('/api/home-tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: updatedTasks })
+      })
+
+      if (!response.ok) throw new Error('Failed to save task')
+
+      setTasks(updatedTasks)
+      setIsCreateTaskOpen(false)
+      toast.success(isEditMode ? 'Task updated successfully' : 'Task created successfully')
+    } catch (error) {
+      console.error('Error saving task:', error)
+      toast.error('Failed to save task')
+    }
+  }
+
+  const handleDeleteTask = async (taskId: string, taskTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${taskTitle}"?`)) return
+
+    try {
+      const updatedTasks = tasks.filter(t => t.id !== taskId)
+
+      const response = await fetch('/api/home-tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: updatedTasks })
+      })
+
+      if (!response.ok) throw new Error('Failed to delete task')
+
+      setTasks(updatedTasks)
+      toast.success('Task deleted successfully')
+    } catch (error) {
+      console.error('Error deleting task:', error)
+      toast.error('Failed to delete task')
+    }
+  }
 
   // Calculate stats
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0]
-    const assignedToday = homeTasks.filter(task => task.assignedDate.split('T')[0] === today).length
-    const pending = homeTasks.filter(task => task.status === "Pending").length
-    const submitted = homeTasks.filter(task => task.status === "Submitted").length
+    const assignedToday = tasks.filter(task => task.assignedDate.split('T')[0] === today).length
+    const pending = tasks.filter(task => task.status === "Pending").length
+    const submitted = tasks.filter(task => task.status === "Submitted").length
 
     const weekAgo = new Date()
     weekAgo.setDate(weekAgo.getDate() - 7)
-    const gradedThisWeek = homeTasks.filter(task => {
+    const gradedThisWeek = tasks.filter(task => {
       if (task.status !== "Graded") return false
       return new Date(task.gradedAt || "") >= weekAgo
     }).length
 
     return { assignedToday, pending, submitted, gradedThisWeek }
-  }, [])
+  }, [tasks])
 
   // Get unique types and priorities
   const { types, priorities } = useMemo(() => {
-    const uniqueTypes = [...new Set(homeTasks.map(t => t.type))].sort()
-    const uniquePriorities = [...new Set(homeTasks.map(t => t.priority))].sort()
+    const uniqueTypes = [...new Set(tasks.map(t => t.type))].sort()
+    const uniquePriorities = [...new Set(tasks.map(t => t.priority))].sort()
     return { types: uniqueTypes, priorities: uniquePriorities }
-  }, [])
+  }, [tasks])
 
   // Filter tasks
   const filteredTasks = useMemo(() => {
-    return homeTasks.filter(task => {
+    return tasks.filter(task => {
       const matchesSearch =
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,7 +237,7 @@ export default function HomeTasksPage() {
 
       return matchesSearch && matchesStatus && matchesType && matchesPriority
     })
-  }, [searchTerm, statusFilter, typeFilter, priorityFilter])
+  }, [tasks, searchTerm, statusFilter, typeFilter, priorityFilter])
 
   // Sort by status priority and due date
   const sortedTasks = useMemo(() => {
@@ -231,7 +419,10 @@ export default function HomeTasksPage() {
             <option value="Low">Low Priority</option>
           </select>
 
-          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+          <button
+            onClick={handleOpenCreate}
+            className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2 cursor-pointer"
+          >
             <Plus className="h-4 w-4" />
             Create Task
           </button>
@@ -440,7 +631,7 @@ export default function HomeTasksPage() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       {task.status === "Pending" || task.status === "Assigned Today" ? (
-                        <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors">
+                        <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action">
                           Submit Task
                         </button>
                       ) : (
@@ -451,8 +642,25 @@ export default function HomeTasksPage() {
                       <button className="flex-1 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-colors">
                         View Details
                       </button>
-                      <button className="flex-1 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors">
-                        Edit Task
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleOpenEdit(task)
+                        }}
+                        className="flex-1 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-300 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Pencil className="h-4 w-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteTask(task.id, task.title)
+                        }}
+                        className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -462,6 +670,177 @@ export default function HomeTasksPage() {
           ))
         )}
       </div>
+
+      {/* Create/Edit Task Sheet */}
+      <Sheet open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen}>
+        <SheetContent className="w-full sm:max-w-2xl overflow-y-auto bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl border-white/10">
+          <SheetHeader>
+            <SheetTitle className="text-2xl font-bold text-foreground">
+              {isEditMode ? "Edit Home Task" : "Create New Home Task"}
+            </SheetTitle>
+            <SheetDescription className="text-muted-foreground">
+              {isEditMode ? "Update the task details below" : "Fill in the details to create a new homework assignment"}
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="mt-6 space-y-6">
+            {/* Title */}
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-foreground font-medium">
+                Title <span className="text-red-400">*</span>
+              </Label>
+              <Input
+                id="title"
+                placeholder="e.g., History Timeline Project"
+                value={taskForm.title}
+                onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+                className="bg-black/30 border-white/20 text-foreground"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-foreground font-medium">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Brief description..."
+                value={taskForm.description}
+                onChange={(e) => setTaskForm({ ...taskForm, description: e.target.value })}
+                className="bg-black/30 border-white/20 text-foreground min-h-[100px]"
+              />
+            </div>
+
+            {/* Subject and Type */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="subject" className="text-foreground font-medium">
+                  Subject <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="subject"
+                  placeholder="e.g., History"
+                  value={taskForm.subject}
+                  onChange={(e) => setTaskForm({ ...taskForm, subject: e.target.value })}
+                  className="bg-black/30 border-white/20 text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="type" className="text-foreground font-medium">Type</Label>
+                <select
+                  id="type"
+                  value={taskForm.type}
+                  onChange={(e) => setTaskForm({ ...taskForm, type: e.target.value as HomeTask["type"] })}
+                  className="w-full px-3 py-2 bg-black/30 border border-white/20 rounded-md text-foreground"
+                >
+                  <option value="Homework">Homework</option>
+                  <option value="Assignment">Assignment</option>
+                  <option value="Project">Project</option>
+                  <option value="Reading">Reading</option>
+                  <option value="Research">Research</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Priority and Estimated Hours */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="priority" className="text-foreground font-medium">Priority</Label>
+                <select
+                  id="priority"
+                  value={taskForm.priority}
+                  onChange={(e) => setTaskForm({ ...taskForm, priority: e.target.value as HomeTask["priority"] })}
+                  className="w-full px-3 py-2 bg-black/30 border border-white/20 rounded-md text-foreground"
+                >
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="estimatedHours" className="text-foreground font-medium">Estimated Hours</Label>
+                <Input
+                  id="estimatedHours"
+                  type="number"
+                  placeholder="e.g., 8"
+                  value={taskForm.estimatedHours}
+                  onChange={(e) => setTaskForm({ ...taskForm, estimatedHours: e.target.value })}
+                  className="bg-black/30 border-white/20 text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Total Marks and Due Date */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="totalMarks" className="text-foreground font-medium">Total Marks</Label>
+                <Input
+                  id="totalMarks"
+                  type="number"
+                  placeholder="e.g., 40"
+                  value={taskForm.totalMarks}
+                  onChange={(e) => setTaskForm({ ...taskForm, totalMarks: e.target.value })}
+                  className="bg-black/30 border-white/20 text-foreground"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="dueDate" className="text-foreground font-medium">
+                  Due Date <span className="text-red-400">*</span>
+                </Label>
+                <Input
+                  id="dueDate"
+                  type="date"
+                  value={taskForm.dueDate}
+                  onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
+                  className="bg-black/30 border-white/20 text-foreground"
+                />
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="space-y-2">
+              <Label htmlFor="instructions" className="text-foreground font-medium">Instructions</Label>
+              <Textarea
+                id="instructions"
+                placeholder="Enter instructions (one per line)..."
+                value={taskForm.instructions}
+                onChange={(e) => setTaskForm({ ...taskForm, instructions: e.target.value })}
+                className="bg-black/30 border-white/20 text-foreground min-h-[100px]"
+              />
+            </div>
+
+            {/* Resources */}
+            <div className="space-y-2">
+              <Label htmlFor="resources" className="text-foreground font-medium">Resources</Label>
+              <Input
+                id="resources"
+                placeholder="Enter resources (comma-separated)..."
+                value={taskForm.resources}
+                onChange={(e) => setTaskForm({ ...taskForm, resources: e.target.value })}
+                className="bg-black/30 border-white/20 text-foreground"
+              />
+            </div>
+          </div>
+
+          <SheetFooter className="mt-8 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsCreateTaskOpen(false)}
+              className="bg-black/30 border-white/20 text-foreground hover:bg-black/40"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              className="bg-primary hover:bg-primary/90 text-white"
+            >
+              {isEditMode ? "Update Task" : "Create Task"}
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   )
 }

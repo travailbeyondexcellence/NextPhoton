@@ -1,15 +1,45 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Calendar, Clock, BookOpen, CheckCircle, AlertCircle, Users, Filter, Plus, X } from "lucide-react"
-import { dailyStudyPlans as initialDailyStudyPlans, type DailyStudyPlan } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { dailyStudyPlans as fallbackDailyStudyPlans, type DailyStudyPlan } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
 
 export default function DailyStudyPlanPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const [plans, setPlans] = useState<DailyStudyPlan[]>(initialDailyStudyPlans)
+  const [plans, setPlans] = useState<DailyStudyPlan[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null)
+
+  // Fetch plans from API on component mount
+  useEffect(() => {
+    fetchPlans()
+  }, [])
+
+  const fetchPlans = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/dailyStudyPlans')
+      const result = await response.json()
+
+      if (result.success) {
+        setPlans(result.data)
+      } else {
+        console.error('Failed to fetch daily study plans:', result.error)
+        // Fallback to imported dummy data if API fails
+        setPlans(fallbackDailyStudyPlans)
+      }
+    } catch (error) {
+      console.error('Error fetching daily study plans:', error)
+      // Fallback to imported dummy data if API fails
+      setPlans(fallbackDailyStudyPlans)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   // Form state
   const [formData, setFormData] = useState({
@@ -46,39 +76,8 @@ export default function DailyStudyPlanPage() {
     })
   }, [plans, selectedDate, statusFilter])
 
-  // Handle form submission
-  const handleCreatePlan = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('=== CREATING DAILY STUDY PLAN ===')
-    console.log('Form data:', formData)
-
-    // Generate new plan ID
-    const newId = `dsp${String(plans.length + 1).padStart(3, '0')}`
-    const subjectsArray = formData.subjects.split(',').map(s => s.trim()).filter(Boolean)
-
-    // Create new plan object
-    const newPlan: DailyStudyPlan = {
-      id: newId,
-      title: formData.title,
-      description: formData.description,
-      date: formData.date,
-      timeSlots: [], // Empty initially, can be added later
-      learnerIds: [],
-      educatorId: "admin",
-      educatorName: formData.educatorName || "Admin",
-      status: "Pending",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      totalStudyTime: 0,
-      completedTime: 0,
-      subjects: subjectsArray,
-      priority: formData.priority as "High" | "Medium" | "Low",
-    }
-
-    console.log('Adding new plan:', newPlan)
-    setPlans(prevPlans => [newPlan, ...prevPlans])
-
-    // Reset form and close dialog
+  // Reset form
+  const resetForm = () => {
     setFormData({
       title: "",
       description: "",
@@ -87,8 +86,134 @@ export default function DailyStudyPlanPage() {
       priority: "",
       educatorName: "",
     })
-    setIsCreateDialogOpen(false)
-    alert('Study plan created successfully!')
+    setIsEditMode(false)
+    setEditingPlanId(null)
+  }
+
+  // Handle edit plan click
+  const handleEditPlanClick = (plan: DailyStudyPlan) => {
+    // Populate form with existing plan data
+    setFormData({
+      title: plan.title,
+      description: plan.description,
+      date: plan.date,
+      subjects: plan.subjects.join(', '),
+      priority: plan.priority,
+      educatorName: plan.educatorName,
+    })
+
+    setIsEditMode(true)
+    setEditingPlanId(plan.id)
+    setIsCreateDialogOpen(true)
+  }
+
+  // Handle form submission (Create or Update)
+  const handleCreatePlan = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const subjectsArray = formData.subjects.split(',').map(s => s.trim()).filter(Boolean)
+
+    if (isEditMode && editingPlanId) {
+      // UPDATE existing plan
+      console.log('=== UPDATING DAILY STUDY PLAN ===')
+      console.log('Plan ID:', editingPlanId)
+      console.log('Form data:', formData)
+
+      const existingPlan = plans.find(p => p.id === editingPlanId)
+      if (!existingPlan) {
+        alert('Plan not found!')
+        return
+      }
+
+      const updatedPlan: DailyStudyPlan = {
+        ...existingPlan,
+        title: formData.title,
+        description: formData.description,
+        date: formData.date,
+        subjects: subjectsArray,
+        priority: formData.priority as "High" | "Medium" | "Low",
+        educatorName: formData.educatorName || "Admin",
+        updatedAt: new Date().toISOString(),
+      }
+
+      try {
+        const response = await fetch('/api/dailyStudyPlans', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedPlan),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setPlans(prevPlans => prevPlans.map(p => p.id === editingPlanId ? updatedPlan : p))
+
+          setIsCreateDialogOpen(false)
+          resetForm()
+          alert('Study plan updated and saved to database successfully!')
+        } else {
+          alert(`Failed to update plan: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error updating plan:', error)
+        alert('Failed to update plan. Please try again.')
+      }
+    } else {
+      // CREATE new plan
+      console.log('=== CREATING DAILY STUDY PLAN ===')
+      console.log('Form data:', formData)
+
+      // Generate new plan ID
+      const newId = `dsp${Date.now()}`
+
+      // Create new plan object
+      const newPlan: DailyStudyPlan = {
+        id: newId,
+        title: formData.title,
+        description: formData.description,
+        date: formData.date,
+        timeSlots: [], // Empty initially, can be added later
+        learnerIds: [],
+        educatorId: "admin",
+        educatorName: formData.educatorName || "Admin",
+        status: "Pending",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        totalStudyTime: 0,
+        completedTime: 0,
+        subjects: subjectsArray,
+        priority: formData.priority as "High" | "Medium" | "Low",
+      }
+
+      try {
+        const response = await fetch('/api/dailyStudyPlans', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPlan),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setPlans(prevPlans => [newPlan, ...prevPlans])
+
+          setIsCreateDialogOpen(false)
+          resetForm()
+          alert('Study plan created and saved to database successfully!')
+        } else {
+          alert(`Failed to create plan: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error creating plan:', error)
+        alert('Failed to create plan. Please try again.')
+      }
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -218,7 +343,7 @@ export default function DailyStudyPlanPage() {
 
           <button
             onClick={() => setIsCreateDialogOpen(true)}
-            className="ml-auto px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2"
+            className="ml-auto px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             Create Plan
@@ -228,7 +353,13 @@ export default function DailyStudyPlanPage() {
 
       {/* Study Plans List */}
       <div className="space-y-4">
-        {filteredPlans.length === 0 ? (
+        {isLoading ? (
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Loading study plans...</h3>
+            <p className="text-muted-foreground">Please wait while we fetch the data</p>
+          </div>
+        ) : filteredPlans.length === 0 ? (
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No study plans found</h3>
@@ -366,7 +497,13 @@ export default function DailyStudyPlanPage() {
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                      <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditPlanClick(plan)
+                        }}
+                        className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors"
+                      >
                         Edit Plan
                       </button>
                       <button className="flex-1 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition-colors">
@@ -391,11 +528,18 @@ export default function DailyStudyPlanPage() {
             {/* Dialog Header */}
             <div className="sticky top-0 bg-[#f5e6d3] border-b border-[#d4c5b0] p-6 flex items-center justify-between z-10">
               <div>
-                <h2 className="text-2xl font-bold text-foreground">Create Daily Study Plan</h2>
-                <p className="text-sm text-muted-foreground mt-1">Create a new study plan for learners</p>
+                <h2 className="text-2xl font-bold text-foreground">
+                  {isEditMode ? 'Edit Daily Study Plan' : 'Create Daily Study Plan'}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {isEditMode ? 'Update the study plan details' : 'Create a new study plan for learners'}
+                </p>
               </div>
               <button
-                onClick={() => setIsCreateDialogOpen(false)}
+                onClick={() => {
+                  setIsCreateDialogOpen(false)
+                  resetForm()
+                }}
                 className="p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <X className="h-5 w-5" />
@@ -490,7 +634,10 @@ export default function DailyStudyPlanPage() {
                 <div className="flex gap-3 pt-4 border-t border-[#d4c5b0]">
                   <button
                     type="button"
-                    onClick={() => setIsCreateDialogOpen(false)}
+                    onClick={() => {
+                      setIsCreateDialogOpen(false)
+                      resetForm()
+                    }}
                     className="flex-1 px-4 py-3 bg-[#d4c5b0] hover:bg-[#c4b5a0] text-gray-800 rounded-lg transition-colors font-medium"
                   >
                     Cancel
@@ -499,7 +646,7 @@ export default function DailyStudyPlanPage() {
                     type="submit"
                     className="flex-1 px-4 py-3 bg-[#8b7355] hover:bg-[#7b6345] text-white rounded-lg transition-colors font-medium"
                   >
-                    Create Plan
+                    {isEditMode ? 'Update Plan' : 'Create Plan'}
                   </button>
                 </div>
               </form>

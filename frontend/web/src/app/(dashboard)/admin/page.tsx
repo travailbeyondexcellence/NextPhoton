@@ -1,11 +1,38 @@
 
+"use client"
 
+import { useRouter } from "next/navigation"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const AdminPage = ({
   searchParams,
 }: {
   searchParams: { [keys: string]: string | undefined };
 }) => {
+  const router = useRouter()
+
+  // Handler for Create Course button - navigates to academic plans premade section
+  const handleCreateCourse = () => {
+    router.push("/admin/academicplans/premade")
+  }
+
+  // Handler for View Reports button - navigates to performance page
+  const handleViewReports = () => {
+    router.push("/admin/performance")
+  }
+
+  // Handler for System Settings button - navigates to settings page
+  const handleSystemSettings = () => {
+    router.push("/settings")
+  }
+
   return (
     <div className="min-h-full">
       {/* Header Section */}
@@ -93,19 +120,55 @@ const AdminPage = ({
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
             <div className="space-y-2">
-              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
-                <div className="font-medium">Add New User</div>
-                <div className="text-xs text-muted-foreground">Create educator or learner account</div>
-              </button>
-              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
+              {/* Add New User - Dropdown menu with user type options */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer">
+                    <div className="font-medium">Add New User</div>
+                    <div className="text-xs text-muted-foreground">Create educator or learner account</div>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Select User Type</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => router.push("/admin/educators/createNewEducator")}>
+                    <span className="mr-2">👨‍🏫</span>
+                    Create Educator
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push("/admin/learners/createNewLearner")}>
+                    <span className="mr-2">👨‍🎓</span>
+                    Create Learner
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push("/admin/guardians/createNewGuardian")}>
+                    <span className="mr-2">👨‍👩‍👧</span>
+                    Create Guardian
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Create Course - Direct navigation to academic plans */}
+              <button
+                onClick={handleCreateCourse}
+                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
                 <div className="font-medium">Create Course</div>
                 <div className="text-xs text-muted-foreground">Set up new educational content</div>
               </button>
-              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
+
+              {/* View Reports - Direct navigation to performance page */}
+              <button
+                onClick={handleViewReports}
+                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
                 <div className="font-medium">View Reports</div>
                 <div className="text-xs text-muted-foreground">Analytics and performance metrics</div>
               </button>
-              <button className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left">
+
+              {/* System Settings - Direct navigation to settings page */}
+              <button
+                onClick={handleSystemSettings}
+                className="w-full p-3 bg-white/5 text-foreground rounded-lg border border-white/10 hover:bg-white/10 transition-all text-left cursor-pointer"
+              >
                 <div className="font-medium">System Settings</div>
                 <div className="text-xs text-muted-foreground">Configure platform preferences</div>
               </button>

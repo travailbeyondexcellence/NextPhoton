@@ -124,7 +124,7 @@ const GuardiansList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewT
             sortableGuardians.sort((a, b) => {
                 let aValue: any = a;
                 let bValue: any = b;
-                
+
                 // Handle nested properties
                 const keys = sortConfig.key.split('.');
                 for (const key of keys) {
@@ -143,7 +143,7 @@ const GuardiansList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewT
             });
         }
         return sortableGuardians;
-    }, [sortConfig]);
+    }, [sortConfig, guardians]);
 
     // Handle sorting
     const handleSort = (key: string) => {

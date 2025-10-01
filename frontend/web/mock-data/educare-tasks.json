@@ -1,0 +1,543 @@
+{
+  "metadata": {
+    "lastUpdated": "2025-10-01T11:46:51.887Z",
+    "version": "1.0",
+    "count": 8,
+    "description": "EduCare tasks for managing educational care and support activities"
+  },
+  "data": [
+    {
+      "taskId": "ect001",
+      "title": "Math Tutoring Session - Algebra Basics",
+      "description": "Provide one-on-one tutoring for student struggling with algebraic equations and linear functions.",
+      "status": "Active",
+      "priority": "High",
+      "category": "Academic Support",
+      "studentName": "Sarah Johnson",
+      "studentId": "l001",
+      "className": "10-A Mathematics",
+      "assignedTo": {
+        "id": "emp003",
+        "name": "Dr. Emily Roberts",
+        "role": "Math Educator"
+      },
+      "createdBy": "Admin",
+      "dueDate": "2025-10-05",
+      "createdAt": "2025-09-25",
+      "updatedAt": "2025-09-28",
+      "progress": 65,
+      "impact": "High",
+      "tags": [
+        "Mathematics",
+        "Algebra",
+        "One-on-One"
+      ],
+      "followUpRequired": true,
+      "parentNotificationSent": true,
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Initial assessment",
+          "completed": true,
+          "completedBy": "Dr. Emily Roberts",
+          "completedAt": "2025-09-26"
+        },
+        {
+          "id": "st2",
+          "title": "Create personalized learning plan",
+          "completed": true,
+          "completedBy": "Dr. Emily Roberts",
+          "completedAt": "2025-09-27"
+        },
+        {
+          "id": "st3",
+          "title": "Conduct first tutoring session",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Dr. Emily Roberts",
+          "role": "Math Educator",
+          "text": "Student shows good progress with basic concepts. Need to focus more on word problems.",
+          "timestamp": "2025-09-28"
+        }
+      ]
+    },
+    {
+      "taskId": "ect002",
+      "title": "Behavioral Monitoring - Classroom Disruption",
+      "description": "Monitor and document behavioral patterns. Implement positive reinforcement strategies.",
+      "status": "In Progress",
+      "priority": "High",
+      "category": "Behavioral Guidance",
+      "studentName": "Michael Chen",
+      "studentId": "l002",
+      "className": "9-B Science",
+      "assignedTo": {
+        "id": "emp005",
+        "name": "Ms. Lisa Anderson",
+        "role": "Behavioral Counselor"
+      },
+      "createdBy": "Principal",
+      "dueDate": "2025-10-10",
+      "createdAt": "2025-09-20",
+      "updatedAt": "2025-09-29",
+      "progress": 40,
+      "impact": "Critical",
+      "tags": [
+        "Behavior",
+        "Counseling",
+        "Urgent"
+      ],
+      "followUpRequired": true,
+      "parentNotificationSent": true,
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Initial behavior assessment",
+          "completed": true,
+          "completedBy": "Ms. Lisa Anderson",
+          "completedAt": "2025-09-21"
+        },
+        {
+          "id": "st2",
+          "title": "Parent meeting scheduled",
+          "completed": true,
+          "completedBy": "Ms. Lisa Anderson",
+          "completedAt": "2025-09-25"
+        },
+        {
+          "id": "st3",
+          "title": "Implement behavior plan",
+          "completed": false
+        },
+        {
+          "id": "st4",
+          "title": "Weekly progress review",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Ms. Lisa Anderson",
+          "role": "Behavioral Counselor",
+          "text": "Met with parents. They are cooperative and willing to work with us.",
+          "timestamp": "2025-09-25"
+        },
+        {
+          "id": "c2",
+          "author": "Ms. Lisa Anderson",
+          "role": "Behavioral Counselor",
+          "text": "Seeing slight improvement in morning classes. Still challenging in afternoon sessions.",
+          "timestamp": "2025-09-29"
+        }
+      ]
+    },
+    {
+      "taskId": "ect003",
+      "title": "Parent Communication - Progress Report Discussion",
+      "description": "Schedule and conduct parent meeting to discuss academic progress and areas of improvement.",
+      "status": "Pending Review",
+      "priority": "Medium",
+      "category": "Parent Communication",
+      "studentName": "Emma Davis",
+      "studentId": "l003",
+      "className": "11-A English",
+      "assignedTo": {
+        "id": "emp007",
+        "name": "Mr. James Wilson",
+        "role": "English Educator"
+      },
+      "createdBy": "Department Head",
+      "dueDate": "2025-10-08",
+      "createdAt": "2025-09-22",
+      "updatedAt": "2025-09-30",
+      "progress": 85,
+      "impact": "Medium",
+      "tags": [
+        "Parent Meeting",
+        "Progress Report"
+      ],
+      "followUpRequired": false,
+      "parentNotificationSent": true,
+      "attachments": [
+        "progress_report.pdf",
+        "meeting_notes.docx"
+      ],
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Prepare progress report",
+          "completed": true,
+          "completedBy": "Mr. James Wilson",
+          "completedAt": "2025-09-23"
+        },
+        {
+          "id": "st2",
+          "title": "Schedule parent meeting",
+          "completed": true,
+          "completedBy": "Mr. James Wilson",
+          "completedAt": "2025-09-24"
+        },
+        {
+          "id": "st3",
+          "title": "Conduct meeting",
+          "completed": true,
+          "completedBy": "Mr. James Wilson",
+          "completedAt": "2025-09-28"
+        },
+        {
+          "id": "st4",
+          "title": "Submit meeting summary",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Mr. James Wilson",
+          "role": "English Educator",
+          "text": "Very productive meeting with parents. They appreciate the detailed feedback.",
+          "timestamp": "2025-09-28"
+        }
+      ]
+    },
+    {
+      "taskId": "ect004",
+      "title": "Student Wellness Check - Anxiety Support",
+      "description": "Regular wellness checks and provide resources for managing test anxiety.",
+      "status": "Active",
+      "priority": "High",
+      "category": "Student Wellness",
+      "studentName": "Alex Thompson",
+      "studentId": "l004",
+      "className": "12-A Psychology",
+      "assignedTo": {
+        "id": "emp009",
+        "name": "Dr. Sarah Martinez",
+        "role": "School Counselor"
+      },
+      "createdBy": "Class Teacher",
+      "dueDate": "2025-10-15",
+      "createdAt": "2025-09-18",
+      "updatedAt": "2025-09-29",
+      "progress": 50,
+      "impact": "High",
+      "tags": [
+        "Mental Health",
+        "Anxiety",
+        "Wellness"
+      ],
+      "followUpRequired": true,
+      "parentNotificationSent": true,
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Initial wellness assessment",
+          "completed": true,
+          "completedBy": "Dr. Sarah Martinez",
+          "completedAt": "2025-09-19"
+        },
+        {
+          "id": "st2",
+          "title": "Provide coping strategies",
+          "completed": true,
+          "completedBy": "Dr. Sarah Martinez",
+          "completedAt": "2025-09-22"
+        },
+        {
+          "id": "st3",
+          "title": "Weekly check-in sessions",
+          "completed": false
+        },
+        {
+          "id": "st4",
+          "title": "Evaluate progress",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Dr. Sarah Martinez",
+          "role": "School Counselor",
+          "text": "Student is responsive to mindfulness techniques. Will continue weekly sessions.",
+          "timestamp": "2025-09-22"
+        },
+        {
+          "id": "c2",
+          "author": "Dr. Sarah Martinez",
+          "role": "School Counselor",
+          "text": "Parents are very supportive. Coordinating with them for home support strategies.",
+          "timestamp": "2025-09-29"
+        }
+      ]
+    },
+    {
+      "taskId": "ect005",
+      "title": "Career Counseling - College Application Guidance",
+      "description": "Guide student through college application process, essay writing, and university selection.",
+      "status": "Completed",
+      "priority": "Medium",
+      "category": "Career Counseling",
+      "studentName": "Rachel Kim",
+      "studentId": "l005",
+      "className": "12-B Career Development",
+      "assignedTo": {
+        "id": "emp011",
+        "name": "Ms. Jennifer Lee",
+        "role": "Career Counselor"
+      },
+      "createdBy": "Career Department",
+      "dueDate": "2025-09-30",
+      "createdAt": "2025-09-10",
+      "updatedAt": "2025-09-30",
+      "completedAt": "2025-09-30",
+      "progress": 100,
+      "impact": "Medium",
+      "tags": [
+        "Career",
+        "College",
+        "Applications"
+      ],
+      "followUpRequired": false,
+      "parentNotificationSent": true,
+      "attachments": [
+        "college_list.pdf",
+        "essay_draft.docx"
+      ],
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "University research and selection",
+          "completed": true,
+          "completedBy": "Ms. Jennifer Lee",
+          "completedAt": "2025-09-15"
+        },
+        {
+          "id": "st2",
+          "title": "Personal statement draft",
+          "completed": true,
+          "completedBy": "Ms. Jennifer Lee",
+          "completedAt": "2025-09-22"
+        },
+        {
+          "id": "st3",
+          "title": "Application review",
+          "completed": true,
+          "completedBy": "Ms. Jennifer Lee",
+          "completedAt": "2025-09-28"
+        },
+        {
+          "id": "st4",
+          "title": "Final submission checklist",
+          "completed": true,
+          "completedBy": "Ms. Jennifer Lee",
+          "completedAt": "2025-09-30"
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Ms. Jennifer Lee",
+          "role": "Career Counselor",
+          "text": "Excellent work by Rachel. All applications submitted successfully.",
+          "timestamp": "2025-09-30"
+        }
+      ]
+    },
+    {
+      "taskId": "ect006",
+      "title": "Special Needs Support - IEP Implementation",
+      "description": "Implement and monitor Individualized Education Plan for student with learning differences.",
+      "status": "Active",
+      "priority": "High",
+      "category": "Special Needs",
+      "studentName": "Noah Williams",
+      "studentId": "l006",
+      "className": "8-A Special Education",
+      "assignedTo": {
+        "id": "emp013",
+        "name": "Dr. Patricia Brown",
+        "role": "Special Ed Coordinator"
+      },
+      "createdBy": "Special Ed Department",
+      "dueDate": "2025-10-20",
+      "createdAt": "2025-09-15",
+      "updatedAt": "2025-09-29",
+      "progress": 45,
+      "impact": "Critical",
+      "tags": [
+        "IEP",
+        "Special Needs",
+        "Accommodations"
+      ],
+      "followUpRequired": true,
+      "parentNotificationSent": true,
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Review IEP with team",
+          "completed": true,
+          "completedBy": "Dr. Patricia Brown",
+          "completedAt": "2025-09-16"
+        },
+        {
+          "id": "st2",
+          "title": "Train teachers on accommodations",
+          "completed": true,
+          "completedBy": "Dr. Patricia Brown",
+          "completedAt": "2025-09-20"
+        },
+        {
+          "id": "st3",
+          "title": "Weekly progress monitoring",
+          "completed": false
+        },
+        {
+          "id": "st4",
+          "title": "Mid-term IEP review",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Dr. Patricia Brown",
+          "role": "Special Ed Coordinator",
+          "text": "All teachers are implementing accommodations. Student showing positive response.",
+          "timestamp": "2025-09-25"
+        }
+      ]
+    },
+    {
+      "taskId": "ect007",
+      "title": "Extracurricular - Debate Team Preparation",
+      "description": "Prepare student for upcoming state debate competition. Focus on research and argumentation skills.",
+      "status": "Overdue",
+      "priority": "Medium",
+      "category": "Extracurricular",
+      "studentName": "Olivia Martinez",
+      "studentId": "l007",
+      "className": "10-B Debate Club",
+      "assignedTo": {
+        "id": "emp015",
+        "name": "Mr. David Clark",
+        "role": "Debate Coach"
+      },
+      "createdBy": "Activities Coordinator",
+      "dueDate": "2025-09-28",
+      "createdAt": "2025-09-12",
+      "updatedAt": "2025-09-30",
+      "progress": 70,
+      "impact": "Low",
+      "tags": [
+        "Debate",
+        "Competition",
+        "Skills Development"
+      ],
+      "followUpRequired": true,
+      "parentNotificationSent": false,
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Research topic preparation",
+          "completed": true,
+          "completedBy": "Mr. David Clark",
+          "completedAt": "2025-09-15"
+        },
+        {
+          "id": "st2",
+          "title": "Practice sessions",
+          "completed": true,
+          "completedBy": "Mr. David Clark",
+          "completedAt": "2025-09-25"
+        },
+        {
+          "id": "st3",
+          "title": "Final mock debate",
+          "completed": false
+        },
+        {
+          "id": "st4",
+          "title": "Competition day briefing",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Mr. David Clark",
+          "role": "Debate Coach",
+          "text": "Student is well-prepared. Need to schedule final mock debate before competition.",
+          "timestamp": "2025-09-26"
+        }
+      ]
+    },
+    {
+      "taskId": "ect008",
+      "title": "Academic Support - Science Project Mentoring",
+      "description": "Mentor student through science fair project from concept to presentation.",
+      "status": "In Progress",
+      "priority": "Low",
+      "category": "Academic Support",
+      "studentName": "Ethan Brown",
+      "studentId": "l008",
+      "className": "9-A Science",
+      "assignedTo": {
+        "id": "emp017",
+        "name": "Dr. Michael Green",
+        "role": "Science Educator"
+      },
+      "createdBy": "Science Department",
+      "dueDate": "2025-10-25",
+      "createdAt": "2025-09-20",
+      "updatedAt": "2025-09-29",
+      "progress": 35,
+      "impact": "Low",
+      "tags": [
+        "Science Fair",
+        "Project Work",
+        "Mentoring"
+      ],
+      "followUpRequired": false,
+      "parentNotificationSent": true,
+      "subtasks": [
+        {
+          "id": "st1",
+          "title": "Project topic selection",
+          "completed": true,
+          "completedBy": "Dr. Michael Green",
+          "completedAt": "2025-09-22"
+        },
+        {
+          "id": "st2",
+          "title": "Research phase",
+          "completed": false
+        },
+        {
+          "id": "st3",
+          "title": "Experimentation",
+          "completed": false
+        },
+        {
+          "id": "st4",
+          "title": "Presentation preparation",
+          "completed": false
+        }
+      ],
+      "comments": [
+        {
+          "id": "c1",
+          "author": "Dr. Michael Green",
+          "role": "Science Educator",
+          "text": "Student chose an interesting topic on renewable energy. Good enthusiasm!",
+          "timestamp": "2025-09-23"
+        }
+      ]
+    }
+  ]
+}

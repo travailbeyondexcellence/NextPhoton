@@ -125,34 +125,54 @@ export const GET_LEARNER = gql`
       address
       createdAt
       updatedAt
+      # Backward compatibility fields for UI
+      name
+      username
+      phone
+      profileImage
+      school
+      board
+      academicLevel
+      targetExams
+      targetExamYear
+      status
+      lastActive
+      assignedEducators
       guardians {
-        id
-        firstName
-        lastName
-        relationship
-        phoneNumber
-      }
-      batches {
-        id
-        name
-        subject
-        grade
+        guardianId
+        guardianName
+        relation
       }
       attendance {
-        id
-        status
+        overall
+        lastMonth
+      }
+      performance {
+        averageScore
+        lastTestScore
+        trend
+      }
+      reviewedEducators {
+        educatorId
+        educatorName
+        exam
+        rating
+        comment
         date
-        remarks
       }
-      testResults {
-        id
-        testName
-        percentage
-        grade
+      learnerNotes {
+        author
+        timestamp
+        note
+        type
       }
+      remarkTags
     }
   }
 `;
+
+// Alias for backward compatibility
+export const GET_LEARNER_BY_ID = GET_LEARNER;
 
 export const GET_LEARNERS_BY_GRADE = gql`
   query GetLearnersByGrade($grade: String!) {

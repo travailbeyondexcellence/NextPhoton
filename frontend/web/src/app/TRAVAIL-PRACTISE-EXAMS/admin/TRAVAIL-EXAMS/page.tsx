@@ -1,28 +1,264 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import { FileText, Calendar, Clock, TrendingUp, Users, MapPin, Monitor, CheckCircle, AlertCircle, Plus, Filter, Search } from "lucide-react"
-import { examinations } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { useState, useMemo, useEffect } from "react"
+import { FileText, Calendar, Clock, TrendingUp, Users, MapPin, Monitor, CheckCircle, AlertCircle, Plus, Filter, Search, X, Save, Edit, Trash2 } from "lucide-react"
+import { examinations as fallbackExaminations, type Examination } from "@/app/(features)/LearningActivities/learningActivitiesDummyData"
+import { GlassModal } from "@/components/glass/GlassModal"
 
 export default function TravailExamsPage() {
+  // Local state for examinations (loaded from API)
+  const [allExaminations, setAllExaminations] = useState<Examination[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
   const [statusFilter, setStatusFilter] = useState("all")
   const [examTypeFilter, setExamTypeFilter] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedExam, setSelectedExam] = useState<string | null>(null)
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingExamId, setEditingExamId] = useState<string | null>(null)
+
+  // Fetch examinations from API on component mount
+  useEffect(() => {
+    fetchExaminations()
+  }, [])
+
+  const fetchExaminations = async () => {
+    try {
+      setIsLoading(true)
+      const response = await fetch('/api/examinations')
+      const result = await response.json()
+
+      if (result.success) {
+        setAllExaminations(result.data)
+      } else {
+        console.error('Failed to fetch examinations:', result.error)
+        // Fallback to imported dummy data if API fails
+        setAllExaminations(fallbackExaminations)
+      }
+    } catch (error) {
+      console.error('Error fetching examinations:', error)
+      // Fallback to imported dummy data if API fails
+      setAllExaminations(fallbackExaminations)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Form state for scheduling new exam
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    subject: '',
+    examType: 'Quiz' as Examination['examType'],
+    scheduledDate: new Date().toISOString().slice(0, 16),
+    duration: 60,
+    totalMarks: 100,
+    passingMarks: 40,
+    isOnline: true,
+    venue: '',
+    instructions: '',
+    syllabus: '',
+  })
+
+  // Handle form input changes
+  const handleFormChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      description: '',
+      subject: '',
+      examType: 'Quiz',
+      scheduledDate: new Date().toISOString().slice(0, 16),
+      duration: 60,
+      totalMarks: 100,
+      passingMarks: 40,
+      isOnline: true,
+      venue: '',
+      instructions: '',
+      syllabus: '',
+    })
+    setIsEditMode(false)
+    setEditingExamId(null)
+  }
+
+  // Handle form submission (Create or Update)
+  const handleScheduleExam = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Determine status based on scheduled date
+    const now = new Date()
+    const scheduledDate = new Date(formData.scheduledDate)
+    let status: Examination['status'] = 'Scheduled'
+    if (scheduledDate < now) {
+      status = 'Completed'
+    }
+
+    if (isEditMode && editingExamId) {
+      // UPDATE existing examination
+      const existingExam = allExaminations.find(e => e.id === editingExamId)
+
+      const updatedExamination: Examination = {
+        ...existingExam!,
+        title: formData.title,
+        description: formData.description,
+        subject: formData.subject,
+        examType: formData.examType,
+        scheduledDate: new Date(formData.scheduledDate).toISOString(),
+        duration: formData.duration,
+        totalMarks: formData.totalMarks,
+        passingMarks: formData.passingMarks,
+        isOnline: formData.isOnline,
+        venue: formData.isOnline ? undefined : formData.venue,
+        instructions: formData.instructions ? formData.instructions.split('\n').filter(i => i.trim()) : [],
+        syllabus: formData.syllabus ? formData.syllabus.split(',').map(s => s.trim()).filter(s => s) : [],
+        status: status,
+      }
+
+      try {
+        const response = await fetch('/api/examinations', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedExamination),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setAllExaminations(prev =>
+            prev.map(e => e.id === editingExamId ? updatedExamination : e)
+          )
+
+          alert('Examination updated successfully!')
+          setShowScheduleModal(false)
+          resetForm()
+        } else {
+          alert(`Failed to update examination: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error updating examination:', error)
+        alert('Failed to update examination. Please try again.')
+      }
+    } else {
+      // CREATE new examination
+      const newExamination: Examination = {
+        id: `exam${Date.now()}`,
+        title: formData.title,
+        description: formData.description,
+        subject: formData.subject,
+        examType: formData.examType,
+        scheduledDate: new Date(formData.scheduledDate).toISOString(),
+        duration: formData.duration,
+        totalMarks: formData.totalMarks,
+        passingMarks: formData.passingMarks,
+        educatorId: 'admin001', // TODO: Get from authenticated user
+        educatorName: 'Current Admin', // TODO: Get from authenticated user
+        enrolledStudents: [],
+        status: status,
+        instructions: formData.instructions ? formData.instructions.split('\n').filter(i => i.trim()) : [],
+        syllabus: formData.syllabus ? formData.syllabus.split(',').map(s => s.trim()).filter(s => s) : [],
+        createdAt: new Date().toISOString(),
+        isOnline: formData.isOnline,
+        venue: formData.isOnline ? undefined : formData.venue,
+      }
+
+      try {
+        const response = await fetch('/api/examinations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newExamination),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Update local state
+          setAllExaminations(prev => [newExamination, ...prev])
+
+          alert('Examination scheduled successfully!')
+          setShowScheduleModal(false)
+          resetForm()
+        } else {
+          alert(`Failed to schedule examination: ${result.message}`)
+        }
+      } catch (error) {
+        console.error('Error scheduling examination:', error)
+        alert('Failed to schedule examination. Please try again.')
+      }
+    }
+  }
+
+  // Handle edit button click
+  const handleEditExamination = (examination: Examination) => {
+    // Populate form with existing examination data
+    setFormData({
+      title: examination.title,
+      description: examination.description,
+      subject: examination.subject,
+      examType: examination.examType,
+      scheduledDate: new Date(examination.scheduledDate).toISOString().slice(0, 16),
+      duration: examination.duration,
+      totalMarks: examination.totalMarks,
+      passingMarks: examination.passingMarks,
+      isOnline: examination.isOnline,
+      venue: examination.venue || '',
+      instructions: examination.instructions.join('\n'),
+      syllabus: examination.syllabus.join(', '),
+    })
+
+    setIsEditMode(true)
+    setEditingExamId(examination.id)
+    setShowScheduleModal(true)
+  }
+
+  // Handle delete button click
+  const handleDeleteExamination = async (examinationId: string) => {
+    if (!confirm('Are you sure you want to delete this examination? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/examinations?id=${examinationId}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Update local state
+        setAllExaminations(prev => prev.filter(e => e.id !== examinationId))
+        alert('Examination deleted successfully!')
+      } else {
+        alert(`Failed to delete examination: ${result.message}`)
+      }
+    } catch (error) {
+      console.error('Error deleting examination:', error)
+      alert('Failed to delete examination. Please try again.')
+    }
+  }
 
   // Calculate stats
   const stats = useMemo(() => {
-    const upcoming = examinations.filter(exam => exam.status === "Scheduled").length
-    const inProgress = examinations.filter(exam => exam.status === "In Progress").length
+    const upcoming = allExaminations.filter(exam => exam.status === "Scheduled").length
+    const inProgress = allExaminations.filter(exam => exam.status === "In Progress").length
 
-    const thisMonthCompleted = examinations.filter(exam => {
+    const thisMonthCompleted = allExaminations.filter(exam => {
       if (exam.status !== "Completed") return false
       const monthAgo = new Date()
       monthAgo.setMonth(monthAgo.getMonth() - 1)
       return new Date(exam.scheduledDate) >= monthAgo
     }).length
 
-    const completedWithResults = examinations.filter(exam =>
+    const completedWithResults = allExaminations.filter(exam =>
       exam.examResults && exam.examResults.length > 0
     )
     const averageScore = completedWithResults.length > 0
@@ -35,18 +271,18 @@ export default function TravailExamsPage() {
       : 0
 
     return { upcoming, inProgress, thisMonthCompleted, averageScore }
-  }, [])
+  }, [allExaminations])
 
   // Get unique exam types and subjects
   const { examTypes, subjects } = useMemo(() => {
-    const uniqueExamTypes = [...new Set(examinations.map(e => e.examType))].sort()
-    const uniqueSubjects = [...new Set(examinations.map(e => e.subject))].sort()
+    const uniqueExamTypes = [...new Set(allExaminations.map(e => e.examType))].sort()
+    const uniqueSubjects = [...new Set(allExaminations.map(e => e.subject))].sort()
     return { examTypes: uniqueExamTypes, subjects: uniqueSubjects }
-  }, [])
+  }, [allExaminations])
 
   // Filter examinations
   const filteredExaminations = useMemo(() => {
-    return examinations.filter(exam => {
+    return allExaminations.filter(exam => {
       const matchesSearch =
         exam.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         exam.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -57,7 +293,7 @@ export default function TravailExamsPage() {
 
       return matchesSearch && matchesStatus && matchesExamType
     })
-  }, [searchTerm, statusFilter, examTypeFilter])
+  }, [allExaminations, searchTerm, statusFilter, examTypeFilter])
 
   // Sort by status priority and date
   const sortedExaminations = useMemo(() => {
@@ -223,7 +459,10 @@ export default function TravailExamsPage() {
             ))}
           </select>
 
-          <button className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors flex items-center gap-2">
+          <button
+            onClick={() => setShowScheduleModal(true)}
+            className="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action flex items-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             Schedule Exam
           </button>
@@ -232,7 +471,13 @@ export default function TravailExamsPage() {
 
       {/* Examinations List */}
       <div className="space-y-4">
-        {sortedExaminations.length === 0 ? (
+        {isLoading ? (
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Loading examinations...</h3>
+            <p className="text-muted-foreground">Please wait while we fetch the data</p>
+          </div>
+        ) : sortedExaminations.length === 0 ? (
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 border border-white/20 text-center">
             <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">No examinations found</h3>
@@ -406,7 +651,7 @@ export default function TravailExamsPage() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       {exam.status === "Scheduled" && (
-                        <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors">
+                        <button className="flex-1 px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg btn-primary-action transition-colors">
                           Start Exam
                         </button>
                       )}
@@ -415,11 +660,25 @@ export default function TravailExamsPage() {
                           View Results
                         </button>
                       )}
-                      <button className="flex-1 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEditExamination(exam)
+                        }}
+                        className="flex-1 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Edit size={16} />
                         Edit Exam
                       </button>
-                      <button className="flex-1 px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 rounded-lg transition-colors">
-                        View Details
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteExamination(exam.id)
+                        }}
+                        className="flex-1 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                        <Trash2 size={16} />
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -429,6 +688,285 @@ export default function TravailExamsPage() {
           ))
         )}
       </div>
+
+      {/* Schedule Exam Modal */}
+      <GlassModal
+        isOpen={showScheduleModal}
+        onClose={() => {
+          setShowScheduleModal(false)
+          resetForm()
+        }}
+        size="xl"
+        className="max-h-[90vh] overflow-y-auto"
+      >
+        <div className="space-y-6">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3">
+              <FileText className="h-6 w-6 text-primary" />
+              <h2 className="text-2xl font-bold">
+                {isEditMode ? 'Edit Exam' : 'Schedule New Exam'}
+              </h2>
+            </div>
+            <button
+              onClick={() => {
+                setShowScheduleModal(false)
+                resetForm()
+              }}
+              className="p-2 rounded-lg hover:bg-white/10 transition-all"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleScheduleExam} className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Exam Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleFormChange('title', e.target.value)}
+                placeholder="e.g., Physics Unit Test - Mechanics"
+                required
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleFormChange('description', e.target.value)}
+                placeholder="Enter exam description..."
+                required
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all resize-none"
+              />
+            </div>
+
+            {/* Subject and Exam Type Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Subject */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Subject <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.subject}
+                  onChange={(e) => handleFormChange('subject', e.target.value)}
+                  placeholder="e.g., Physics, Mathematics"
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+
+              {/* Exam Type */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Exam Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.examType}
+                  onChange={(e) => handleFormChange('examType', e.target.value as Examination['examType'])}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                >
+                  <option value="Quiz">Quiz</option>
+                  <option value="Unit Test">Unit Test</option>
+                  <option value="Mid-term">Mid-term</option>
+                  <option value="Final">Final</option>
+                  <option value="Practice Test">Practice Test</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Scheduled Date and Duration Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Scheduled Date */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Scheduled Date & Time <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.scheduledDate}
+                  onChange={(e) => handleFormChange('scheduledDate', e.target.value)}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+
+              {/* Duration */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Duration (minutes) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.duration}
+                  onChange={(e) => handleFormChange('duration', parseInt(e.target.value))}
+                  placeholder="60"
+                  min="1"
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Marks Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Total Marks */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Total Marks <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.totalMarks}
+                  onChange={(e) => handleFormChange('totalMarks', parseInt(e.target.value))}
+                  placeholder="100"
+                  min="1"
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+
+              {/* Passing Marks */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Passing Marks <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={formData.passingMarks}
+                  onChange={(e) => handleFormChange('passingMarks', parseInt(e.target.value))}
+                  placeholder="40"
+                  min="1"
+                  max={formData.totalMarks}
+                  required
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Exam Mode */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Exam Mode <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="examMode"
+                    checked={formData.isOnline === true}
+                    onChange={() => handleFormChange('isOnline', true)}
+                    className="w-5 h-5"
+                  />
+                  <div className="flex items-center gap-2">
+                    <Monitor size={16} className="text-blue-400" />
+                    <span className="text-sm">Online</span>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="examMode"
+                    checked={formData.isOnline === false}
+                    onChange={() => handleFormChange('isOnline', false)}
+                    className="w-5 h-5"
+                  />
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-orange-400" />
+                    <span className="text-sm">Offline</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Venue (only for offline exams) */}
+            {!formData.isOnline && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Venue <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.venue}
+                  onChange={(e) => handleFormChange('venue', e.target.value)}
+                  placeholder="e.g., Physics Lab, Room 101"
+                  required={!formData.isOnline}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all"
+                />
+              </div>
+            )}
+
+            {/* Instructions */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Instructions (Optional)
+              </label>
+              <textarea
+                value={formData.instructions}
+                onChange={(e) => handleFormChange('instructions', e.target.value)}
+                placeholder="Enter exam instructions, one per line..."
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all resize-none"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Enter each instruction on a new line
+              </p>
+            </div>
+
+            {/* Syllabus Coverage */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Syllabus Coverage (Optional)
+              </label>
+              <textarea
+                value={formData.syllabus}
+                onChange={(e) => handleFormChange('syllabus', e.target.value)}
+                placeholder="Enter topics covered, separated by commas..."
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 focus:outline-none focus:border-primary/50 transition-all resize-none"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Separate topics with commas (e.g., Newton's Laws, Forces, Motion)
+              </p>
+            </div>
+
+            {/* Form Actions */}
+            <div className="flex gap-3 pt-4 border-t border-white/10">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowScheduleModal(false)
+                  resetForm()
+                }}
+                className="flex-1 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 transition-all font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 px-6 py-3 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-all font-medium flex items-center justify-center gap-2"
+              >
+                <Save size={18} />
+                {isEditMode ? 'Update Exam' : 'Schedule Exam'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </GlassModal>
     </div>
   )
 }
