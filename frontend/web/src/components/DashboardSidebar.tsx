@@ -77,7 +77,7 @@ export function DashboardSidebar() {
     <div className="flex flex-col h-full" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
       {/* Fixed Header */}
       <div className="flex-shrink-0">
-        <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-white/5 backdrop-blur-sm border-b border-white/10">
+        <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-sidebar-accent/20 theme-backdrop-blur border-b border-sidebar-border/30">
           <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer group transition-all duration-300 ease-out hover:scale-105" onClick={() => router.push("/")}>
             <div className="transition-all duration-300 ease-out group-hover:rotate-3 group-hover:drop-shadow-lg">
               <LogoComponent 
@@ -122,13 +122,13 @@ export function DashboardSidebar() {
                               )
                             )
                           }>
-                          <CollapsibleTrigger className="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-white/10 hover:backdrop-blur-sm rounded-md transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-sm" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
+                          <CollapsibleTrigger className="group flex items-center justify-between w-full px-3 py-2 text-sm font-medium hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-sm" style={{ color: 'var(--sidebar-text-color, inherit)' }}>
                             <span className="flex items-center gap-2 transition-all duration-200 ease-out group-hover:translate-x-1">
                               <item.icon size={20} className="transition-all duration-200 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100" />
                               <span className="transition-all duration-200 ease-out opacity-95 group-hover:opacity-100">{item.label}</span>
                             </span>
 
-                            <div className="p-1 hover:bg-white/20 rounded transition-all duration-200 ease-out hover:scale-110">
+                            <div className="p-1 hover:bg-sidebar-accent/50 rounded transition-all duration-200 ease-out hover:scale-110">
                               {openStates[groupIndex][itemIndex] ? (
                                 <Minus size={16} className="opacity-70 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:scale-x-125" />
                               ) : (
@@ -146,10 +146,10 @@ export function DashboardSidebar() {
                                     href={subItem.href || "#"}
                                     className={cn(
                                       "group flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-all duration-200 ease-out",
-                                      "bg-white/5 hover:bg-white/15 hover:backdrop-blur-sm",
+                                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                                       "opacity-85 hover:opacity-100",
                                       "hover:scale-[1.02] hover:shadow-sm",
-                                      isSubActive && "bg-white/15 opacity-100 font-medium shadow-sm"
+                                      isSubActive && "bg-sidebar-accent text-sidebar-accent-foreground opacity-100 font-medium shadow-sm"
                                     )}
                                     style={{ color: 'var(--sidebar-text-color, inherit)' }}
                                   >
@@ -173,9 +173,9 @@ export function DashboardSidebar() {
                           data-active={isActive}
                           className={cn(
                             "w-full justify-start transition-all duration-200 ease-out",
-                            "hover:bg-white/10 hover:backdrop-blur-sm hover:scale-[1.02] hover:shadow-sm",
+                            "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.02] hover:shadow-sm",
                             "group",
-                            isActive && "bg-white/15 font-medium shadow-sm"
+                            isActive && "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-sm"
                           )}
                           style={{ color: 'var(--sidebar-text-color, inherit)' }}
                           onClick={item.hasSecondaryDrawer ? (e) => {

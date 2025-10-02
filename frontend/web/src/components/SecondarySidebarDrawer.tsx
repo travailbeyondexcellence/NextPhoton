@@ -69,7 +69,7 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
         aria-label="Secondary options"
         className={cn(
           "fixed top-0 left-72 h-screen w-72 z-[60]",
-          "backdrop-blur-xl border-r border-white/10",
+          "theme-backdrop-blur border-r border-sidebar-border/30",
           "transition-transform duration-300 ease-in-out",
           "focus:outline-none",
           isSecondarySidebarOpen ? "translate-x-0" : "-translate-x-full",
@@ -84,13 +84,13 @@ export function SecondarySidebarDrawer({ className }: SecondarySidebarDrawerProp
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-sidebar-border/30">
           <h3 className="text-lg font-semibold">
             {getDrawerTitle(secondarySidebarContent)}
           </h3>
           <button
             onClick={closeSecondarySidebar}
-            className="p-2 rounded-md hover:bg-white/10 transition-all duration-200 ease-out hover:scale-110 group"
+            className="p-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200 ease-out hover:scale-110 group"
             aria-label="Close secondary sidebar"
           >
             <X size={20} className="opacity-75 transition-all duration-200 ease-out group-hover:opacity-100 group-hover:rotate-90" />
@@ -133,7 +133,7 @@ function renderSecondaryContent(content: string | null, router: any, closeSecond
       return (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Performance Analytics</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-sidebar-accent/30 py-2 rounded-md theme-backdrop-blur">Performance Analytics</h4>
             <div className="space-y-1">
               <SecondaryMenuItem
                 label="Overall Performance Dashboard"
@@ -166,7 +166,7 @@ function renderSecondaryContent(content: string | null, router: any, closeSecond
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Reports</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-sidebar-accent/30 py-2 rounded-md theme-backdrop-blur">Reports</h4>
             <div className="space-y-1">
               <SecondaryMenuItem
                 label="Generate Performance Report"
@@ -204,7 +204,7 @@ function renderSecondaryContent(content: string | null, router: any, closeSecond
       return (
         <div className="space-y-4">
           <div>
-            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Quick Actions</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-sidebar-accent/30 py-2 rounded-md theme-backdrop-blur">Quick Actions</h4>
             <div className="space-y-1">
               <SecondaryMenuItem
                 label="Compose New Message"
@@ -230,7 +230,7 @@ function renderSecondaryContent(content: string | null, router: any, closeSecond
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Message Management</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-sidebar-accent/30 py-2 rounded-md theme-backdrop-blur">Message Management</h4>
             <div className="space-y-1">
               <SecondaryMenuItem
                 label="Sent Messages"
@@ -263,7 +263,7 @@ function renderSecondaryContent(content: string | null, router: any, closeSecond
             </div>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-white/10 py-2 rounded-md backdrop-blur-sm">Recipients</h4>
+            <h4 className="text-sm font-bold text-foreground mb-3 px-3 uppercase tracking-wider bg-sidebar-accent/30 py-2 rounded-md theme-backdrop-blur">Recipients</h4>
             <div className="space-y-1">
               <SecondaryMenuItem
                 label="Message to Educators"
@@ -315,9 +315,9 @@ function SecondaryMenuItem({ label, onClick }: { label: string; onClick?: () => 
       className={cn(
         "w-full text-left px-4 py-2 rounded-md text-xs font-normal",
         "transition-all duration-200 ease-out",
-        "hover:bg-white/5 hover:backdrop-blur-sm hover:scale-[1.01] hover:shadow-sm",
-        "text-muted-foreground hover:text-foreground/90",
-        "hover:translate-x-1 border-l-2 border-transparent hover:border-primary/30",
+        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.01] hover:shadow-sm",
+        "text-muted-foreground hover:text-sidebar-accent-foreground",
+        "hover:translate-x-1 border-l-2 border-transparent hover:border-sidebar-accent",
         "ml-2"
       )}
     >

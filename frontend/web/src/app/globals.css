@@ -530,10 +530,12 @@
   }
   
   /* Override bg-opacity utilities for modern themes */
+  /* REMOVED: This was causing sidebar hover states to always show background
   [data-theme-type="modern"] [class*="bg-white/"],
   [data-theme-type="modern"] [class*="bg-black/"] {
     background-color: rgb(var(--card)) !important;
   }
+  */
   
   /* Sidebar gradient styles */
   .sidebar-theme-gradient {
