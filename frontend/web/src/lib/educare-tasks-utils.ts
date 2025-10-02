@@ -9,7 +9,7 @@
  * to simulate database persistence.
  */
 
-import { type EduCareTask } from "@/app/(features)/EduCareTasks/educareTasksDummyData"
+import { type EduCareTask } from "@/app/(features)/EduCareTasks/educare-task-types"
 import fs from 'fs'
 import path from 'path'
 
