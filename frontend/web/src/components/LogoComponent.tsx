@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTheme } from "@/hooks/useTheme";
-import themes from '@/../../themes.json';
+import glassThemes from '@/../../glass-themes.json';
 
 interface LogoComponentProps {
   width?: number;
@@ -50,7 +50,7 @@ export function LogoComponent({
     };
     
     // COMMENTED OUT: Theme-aware logo colors - always use default earth colors
-    // const theme = (themes as any).themes[currentTheme];
+    // const theme = (glassThemes as any).themes[currentTheme];
     // 
     // // Only certain themes have custom logo colors
     // if (theme?.logo?.logoOnSidebarHeader) {

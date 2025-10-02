@@ -12,6 +12,11 @@ export default function ThemeScript() {
           try {
             // Get saved theme or default to 'celeste'
             const savedTheme = localStorage.getItem('app-theme') || 'celeste';
+            // Get saved theme type or default to 'glass'
+            const savedThemeType = localStorage.getItem('app-theme-type') || 'glass';
+            
+            // Set theme type as data attribute
+            document.documentElement.setAttribute('data-theme-type', savedThemeType);
             
             // Map theme keys to gradient classes
             const themeToGradient = {
@@ -29,15 +34,17 @@ export default function ThemeScript() {
               'hicon': 'gradient-hicon'
             };
             
-            // Apply gradient class
-            const gradientClass = themeToGradient[savedTheme] || 'gradient-celeste';
-            document.documentElement.classList.add(gradientClass);
+            // Apply gradient class only for glass themes
+            if (savedThemeType === 'glass') {
+              const gradientClass = themeToGradient[savedTheme] || 'gradient-celeste';
+              document.documentElement.classList.add(gradientClass);
+            }
             
-            // Fetch and apply theme colors
-            fetch('/api/themes')
+            // Fetch and apply theme colors with the correct type
+            fetch('/api/themes?type=' + savedThemeType)
               .then(res => res.json())
               .then(data => {
-                const theme = data.themes?.[savedTheme];
+                const theme = data.themes?.themes?.[savedTheme];
                 if (theme && theme.colors) {
                   const root = document.documentElement;
                   
@@ -51,8 +58,8 @@ export default function ThemeScript() {
                     root.style.setProperty(cssVarName, r + ' ' + g + ' ' + b);
                   });
                   
-                  // Apply glass variables
-                  if (theme.glass) {
+                  // Apply glass variables only for glass themes
+                  if (savedThemeType === 'glass' && theme.glass) {
                     root.style.setProperty('--glass-bg-opacity', theme.glass.cardOpacity);
                     root.style.setProperty('--glass-border-opacity', theme.glass.borderOpacity);
                     root.style.setProperty('--glass-hover-opacity', theme.glass.hoverOpacity);
@@ -90,8 +97,8 @@ export default function ThemeScript() {
                     }
                   }
                   
-                  // Apply sidebar colors and gradients
-                  if (theme.sidebar) {
+                  // Apply sidebar colors and gradients only for glass themes
+                  if (savedThemeType === 'glass' && theme.sidebar) {
                     if (theme.sidebar.gradientFrom) {
                       const hexValue = theme.sidebar.gradientFrom.replace('#', '');
                       const r = parseInt(hexValue.substring(0, 2), 16);
@@ -132,8 +139,8 @@ export default function ThemeScript() {
                     }
                   }
                   
-                  // Apply dashboard header colors and gradients
-                  if (theme.dashboardHeader) {
+                  // Apply dashboard header colors and gradients only for glass themes
+                  if (savedThemeType === 'glass' && theme.dashboardHeader) {
                     if (theme.dashboardHeader.gradientFrom) {
                       const hexValue = theme.dashboardHeader.gradientFrom.replace('#', '');
                       const r = parseInt(hexValue.substring(0, 2), 16);

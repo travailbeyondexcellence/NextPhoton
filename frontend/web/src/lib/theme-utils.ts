@@ -1,19 +1,43 @@
-import themes from '@/../../themes.json';
+import glassThemes from '@/../../glass-themes.json';
+import modernThemes from '@/../../modern-themes.json';
 
-export interface Theme {
+export type ThemeType = 'modern' | 'glass';
+
+export interface BaseTheme {
   key: string;
   name: string;
   description: string;
   backgroundColor: string;
   primaryColor: string;
+}
+
+export interface GlassTheme extends BaseTheme {
   glass: {
-    backgroundGradient: string;
+    backgroundGradient?: string;
+    backgroundGradientFrom?: string;
+    backgroundGradientVia?: string;
+    backgroundGradientTo?: string;
+    backgroundGradientOpacity?: number;
     cardOpacity: number;
     borderOpacity: number;
-    blurIntensity: string;
+    blurIntensity: number | string;
     hoverOpacity: number;
+    activeOpacity?: number;
+    gradientOverlayFrom?: string;
+    gradientOverlayFromOpacity?: number;
+    gradientOverlayTo?: string;
+    gradientOverlayToOpacity?: number;
+    glassTint?: string;
+    glassTextColor?: string;
+    mainSectionBackgroundOverlay?: number;
   };
 }
+
+export interface ModernTheme extends BaseTheme {
+  // Modern themes don't have glass properties
+}
+
+export type Theme = GlassTheme | ModernTheme;
 
 export type ThemeKey = 
   | 'celeste' 
@@ -30,27 +54,67 @@ export type ThemeKey =
   | 'hicon';
 
 /**
+ * Get the current theme type from localStorage or default to glass
+ */
+export function getCurrentThemeType(): ThemeType {
+  if (typeof window !== 'undefined') {
+    return (localStorage.getItem('app-theme-type') as ThemeType) || 'glass';
+  }
+  return 'glass';
+}
+
+/**
+ * Set the theme type in localStorage
+ */
+export function setThemeType(type: ThemeType): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('app-theme-type', type);
+  }
+}
+
+/**
+ * Get themes data based on theme type
+ */
+function getThemesData(type: ThemeType = 'glass'): any {
+  return type === 'modern' ? modernThemes : glassThemes;
+}
+
+/**
  * Get all available themes sorted by order
  */
-export function getAllThemes(): Theme[] {
-  const themesData = (themes as any).themes || {};
-  return Object.entries(themesData)
+export function getAllThemes(type: ThemeType = 'glass'): Theme[] {
+  const themesData = getThemesData(type);
+  const themes = themesData.themes || {};
+  
+  return Object.entries(themes)
     .sort((a: any, b: any) => (a[1].order || 0) - (b[1].order || 0))
-    .map(([key, theme]: [string, any]) => ({
-      key,
-      name: theme.name,
-      description: theme.description,
-      backgroundColor: theme.colors.background,
-      primaryColor: theme.colors.primary,
-      glass: theme.glass
-    }));
+    .map(([key, theme]: [string, any]) => {
+      const baseTheme = {
+        key,
+        name: theme.name,
+        description: theme.description,
+        backgroundColor: theme.colors.background,
+        primaryColor: theme.colors.primary,
+      };
+      
+      // Add glass properties only for glass themes
+      if (type === 'glass' && theme.glass) {
+        return {
+          ...baseTheme,
+          glass: theme.glass
+        } as GlassTheme;
+      }
+      
+      return baseTheme as ModernTheme;
+    });
 }
 
 /**
  * Get a specific theme by key
  */
-export function getTheme(key: ThemeKey): any {
-  return (themes as any).themes[key];
+export function getTheme(key: ThemeKey, type: ThemeType = 'glass'): any {
+  const themesData = getThemesData(type);
+  return themesData.themes[key];
 }
 
 /**
@@ -67,14 +131,20 @@ export function hexToRgb(hex: string): string {
 /**
  * Apply theme colors to CSS variables
  */
-export function applyTheme(themeKey: ThemeKey): void {
-  const theme = getTheme(themeKey);
+export function applyTheme(themeKey: ThemeKey, type?: ThemeType): void {
+  // Get the theme type (use current type if not provided)
+  const themeType = type || getCurrentThemeType();
+  const theme = getTheme(themeKey, themeType);
+  
   if (!theme || !theme.colors) {
     console.error('Invalid theme:', themeKey);
     return;
   }
 
   const root = document.documentElement;
+  
+  // Set theme type as data attribute for conditional CSS
+  root.setAttribute('data-theme-type', themeType);
   
   // Apply color variables
   Object.entries(theme.colors).forEach(([key, value]) => {

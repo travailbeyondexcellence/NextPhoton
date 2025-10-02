@@ -5,6 +5,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { GlassCard } from '@/components/glass';
 import { cn } from '@/lib/utils';
 import { Palette } from 'lucide-react';
+import { ThemeType } from '@/lib/theme-utils';
 
 /**
  * ThemeSelector Component
@@ -15,7 +16,7 @@ import { Palette } from 'lucide-react';
 export function ThemeSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { currentTheme, changeTheme, themes, isLoading } = useTheme();
+  const { currentTheme, currentThemeType, changeTheme, changeThemeType, themes, isLoading } = useTheme();
 
   // Inject CSS to hide scrollbar for webkit browsers
   useEffect(() => {
@@ -128,7 +129,38 @@ export function ThemeSelector() {
             {/* Theme selector background overlay for theme-based darkening */}
             <div className="theme-selector-overlay rounded-xl"></div>
             <div className="relative z-10">
-              <h3 className="text-lg font-semibold mb-4">Choose Theme</h3>
+              <h3 className="text-lg font-semibold mb-2">Choose Theme</h3>
+              
+              {/* Theme Type Tabs */}
+              <div className="flex gap-1 p-1 rounded-lg mb-4" style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(4px)',
+                WebkitBackdropFilter: 'blur(4px)'
+              }}>
+                <button
+                  onClick={() => changeThemeType('modern')}
+                  className={cn(
+                    "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                    currentThemeType === 'modern'
+                      ? "bg-white/20 text-white shadow-sm"
+                      : "text-white/70 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  Modern
+                </button>
+                <button
+                  onClick={() => changeThemeType('glass')}
+                  className={cn(
+                    "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                    currentThemeType === 'glass'
+                      ? "bg-white/20 text-white shadow-sm"
+                      : "text-white/70 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  Glass
+                </button>
+              </div>
+              
               <div className="grid grid-cols-2 gap-3">
               {/* Two column layout - themes alternate left/right based on order */}
               {getThemedIcons().map((theme, index) => (
