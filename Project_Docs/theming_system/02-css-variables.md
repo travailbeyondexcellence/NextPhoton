@@ -2,11 +2,11 @@
 
 ## Overview
 
-The CSS variable system is the foundation of the theming mechanism, providing dynamic color values that can be changed at runtime without page reload.
+The CSS variable system is the foundation of the NextPhoton theming mechanism, providing dynamic color values that can be changed at runtime for both modern and glass theme systems.
 
 ## CSS Variable Structure
 
-All theme colors are defined as RGB triplets in CSS custom properties (variables) on the `:root` element.
+All theme colors are defined as RGB triplets in CSS custom properties (variables) on the `:root` element, with additional variables for glass morphism effects.
 
 ## globals.css Configuration
 
@@ -17,7 +17,7 @@ All theme colors are defined as RGB triplets in CSS custom properties (variables
 
 @layer base {
   :root {
-    /* Default theme (Emerald) colors - RGB format */
+    /* Default theme colors - RGB format */
     --background: 234 255 242;
     --foreground: 9 9 11;
     --card: 230 255 232;
@@ -40,7 +40,79 @@ All theme colors are defined as RGB triplets in CSS custom properties (variables
     --success-foreground: 255 255 255;
     --warning: 217 119 6;
     --warning-foreground: 255 255 255;
+    
+    /* Glass theme specific variables */
+    --glass-opacity: 0.1;
+    --glass-border-opacity: 0.2;
+    --glass-blur: 12;
+    --glass-hover-opacity: 0.15;
+    --glass-active-opacity: 0.2;
+    
+    /* Gradient variables for glass themes */
+    --gradient-from: 17 24 39;
+    --gradient-via: 30 58 138;
+    --gradient-to: 91 33 182;
+    
+    /* Sidebar variables */
+    --sidebar-gradient-from: 45 55 72;
+    --sidebar-gradient-via: 45 55 72;
+    --sidebar-gradient-to: 26 32 44;
+    --sidebar-gradient-opacity: 1;
+    --sidebar-text-color: var(--foreground);
+    
+    /* Dashboard header variables */
+    --dashboard-header-gradient-from: 45 55 72;
+    --dashboard-header-gradient-via: 45 55 72;
+    --dashboard-header-gradient-to: 26 32 44;
+    --dashboard-header-gradient-opacity: 0.75;
+    --dashboard-header-text-color: var(--foreground);
   }
+}
+```
+
+## Theme-Specific Styling
+
+### Modern Themes
+Modern themes use solid colors without transparency effects:
+
+```css
+/* Modern theme component styling */
+[data-theme-type="modern"] .component {
+  background: rgb(var(--card));
+  color: rgb(var(--card-foreground));
+  border: 1px solid rgb(var(--border));
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Modern theme sidebar */
+[data-theme-type="modern"] .sidebar-theme-gradient {
+  background: rgb(var(--card)) !important;
+  color: rgb(var(--foreground)) !important;
+}
+```
+
+### Glass Themes
+Glass themes apply morphism effects using CSS variables:
+
+```css
+/* Glass theme component styling */
+[data-theme-type="glass"] .glass {
+  background: rgb(var(--card) / var(--glass-opacity));
+  backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+  border: 1px solid rgb(var(--border) / var(--glass-border-opacity));
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Glass theme sidebar with gradient */
+[data-theme-type="glass"] .sidebar-theme-gradient {
+  background: linear-gradient(135deg, 
+    rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity)) 0%, 
+    rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity)) 50%, 
+    rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity)) 100%) !important;
+  color: var(--sidebar-text-color) !important;
 }
 ```
 
@@ -64,6 +136,8 @@ Colors are stored as space-separated RGB values (e.g., `234 255 242`) instead of
 - Prefixed with double dash (`--`)
 - Semantic naming for clarity
 - Foreground suffix for text colors on that background
+- Glass-specific variables prefixed with `--glass-`
+- Gradient variables use `-from`, `-via`, `-to` suffixes
 
 ## Core CSS Utilities
 
@@ -80,11 +154,71 @@ Colors are stored as space-separated RGB values (e.g., `234 255 242`) instead of
     -moz-osx-font-smoothing: grayscale;
   }
   
+  /* Glass theme gradient background */
+  [data-theme-type="glass"] body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(to bottom right,
+      rgb(var(--gradient-from)),
+      rgb(var(--gradient-via)),
+      rgb(var(--gradient-to)));
+    opacity: var(--background-gradient-opacity, 0.75);
+    z-index: -1;
+  }
+  
   /* Text selection styling */
   ::selection {
     background-color: rgb(var(--selection) / 0.5);
     color: rgb(var(--foreground));
   }
+}
+```
+
+## Theme-Aware Component Classes
+
+### Glass Effect Classes
+```css
+/* Base glass effect */
+.glass {
+  /* Modern theme fallback */
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+}
+
+[data-theme-type="glass"] .glass {
+  background: rgb(var(--card) / var(--glass-opacity));
+  backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+  border: 1px solid rgb(var(--border) / var(--glass-border-opacity));
+}
+
+/* Glass button with theme awareness */
+.glass-button {
+  /* Modern theme style */
+  background: transparent;
+  color: rgb(var(--foreground));
+  border: 1px solid rgb(var(--border));
+}
+
+[data-theme-type="glass"] .glass-button {
+  background: rgb(var(--primary) / 0.1);
+  color: rgb(var(--primary));
+  backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+}
+```
+
+### Hover States
+```css
+/* Modern theme hover */
+[data-theme-type="modern"] .hover\:bg-sidebar-accent:hover {
+  background-color: rgb(var(--accent)) !important;
+  color: rgb(var(--accent-foreground)) !important;
+}
+
+/* Glass theme hover with transparency */
+[data-theme-type="glass"] .hover\:bg-sidebar-accent:hover {
+  background-color: rgb(var(--accent) / 0.2) !important;
+  color: var(--sidebar-text-color) !important;
 }
 ```
 
@@ -95,205 +229,45 @@ Smooth transitions when switching themes:
 ```css
 /* Applied temporarily during theme change */
 .theme-transition * {
-  @apply transition-colors duration-200 ease-in-out;
+  transition: color 200ms ease-in-out, 
+              background-color 200ms ease-in-out, 
+              border-color 200ms ease-in-out;
+}
+
+/* Prevent layout shifts during transitions */
+.theme-transition {
+  overflow: hidden;
 }
 ```
 
-## Special Theme Variables
+## Dynamic Theme Application
 
-Additional CSS variables for theme-specific features:
-
-```css
-/* Progress gradient colors */
---progress-gradient-from: #10b981;
---progress-gradient-to: #059669;
-
-/* Recent edit highlight */
---recent-edit-color: #fef08a4d; /* Includes alpha */
-```
-
-## Scrollbar Theming
-
-Custom scrollbar colors that adapt to theme:
-
-```css
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgb(var(--border)) transparent;
-}
-
-*:hover {
-  scrollbar-color: rgb(var(--muted)) transparent;
-}
-
-/* Webkit browsers */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgb(var(--border));
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(var(--muted));
-}
-```
-
-## Typography Theming
-
-Prose content adapts to theme colors:
-
-```css
-@layer utilities {
-  .prose-reading :where(p) {
-    @apply text-justify leading-relaxed;
-  }
-  
-  .prose-reading :where(a) {
-    @apply text-link no-underline hover:text-link-hover hover:underline;
-  }
-  
-  .prose-reading :where(pre) {
-    @apply bg-muted text-card-foreground;
-  }
-  
-  .prose-reading :where(code):not(:where(pre code)) {
-    @apply bg-muted text-foreground px-1 py-0.5 rounded;
-  }
-  
-  .prose-reading :where(strong) {
-    @apply text-foreground font-semibold;
-  }
-  
-  .prose-reading :where(hr) {
-    @apply border-border;
-  }
-  
-  .prose-reading :where(blockquote) {
-    @apply font-serif text-muted-foreground;
-  }
-}
-```
-
-## Form Input Theming
-
-Prevent autofill from breaking theme:
-
-```css
-/* Webkit autofill override */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px rgb(var(--card)) inset !important;
-  -webkit-text-fill-color: rgb(var(--foreground)) !important;
-  transition: background-color 5000s ease-in-out 0s;
-}
-
-/* Standard autofill */
-input:autofill {
-  background-color: rgb(var(--card)) !important;
-  color: rgb(var(--foreground)) !important;
-}
-```
-
-## Animation Variables
-
-Special variables for animations:
-
-```css
-/* Edit highlight animation */
-@keyframes highlightFade {
-  0% {
-    background-color: var(--recent-edit-color);
-    box-shadow: 0 0 8px var(--recent-edit-color);
-  }
-  100% {
-    background-color: transparent;
-    box-shadow: 0 0 0px transparent;
-  }
-}
-
-.edited-text-highlight {
-  animation: highlightFade 3s ease-out forwards;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-```
-
-## Dynamic Variable Updates
-
-Variables are updated via JavaScript:
+Variables are set dynamically via JavaScript:
 
 ```javascript
-// Convert hex to RGB and set variable
-const root = document.documentElement;
-const hexToRgb = (hex) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `${r} ${g} ${b}`;
-};
-
-// Set CSS variable
+// From theme-utils.ts
 root.style.setProperty('--primary', hexToRgb('#059669'));
-```
-
-## Variable Scoping
-
-Variables can be scoped to specific components:
-
-```css
-/* Component-specific override */
-.dark-section {
-  --background: 2 44 34;
-  --foreground: 209 250 229;
-}
-```
-
-## Fallback Values
-
-Always provide fallbacks for critical styles:
-
-```css
-.important-element {
-  /* Fallback if variable undefined */
-  background-color: rgb(var(--primary, 5 150 105));
-  color: rgb(var(--primary-foreground, 255 255 255));
-}
+root.style.setProperty('--glass-blur', theme.glass.blurIntensity.toString());
+root.style.setProperty('--sidebar-text-color', hexToRgb(theme.sidebar.textColor));
 ```
 
 ## Performance Considerations
 
-1. **CSS variables are performant** - Changes don't trigger layout recalculation
-2. **Use transitions sparingly** - Only on color properties
-3. **Batch updates** - Change all variables at once
-4. **Avoid frequent changes** - Cache theme selection
+1. **CSS Variables are performant** - No re-parsing of stylesheets
+2. **Backdrop filters can be expensive** - Limit usage on low-end devices
+3. **Transitions are GPU accelerated** - Use transform and opacity when possible
+4. **Reduce repaints** - Batch CSS variable updates
 
-## Browser Support
+## Browser Compatibility
 
-CSS variables are supported in all modern browsers:
-- Chrome 49+
-- Firefox 31+
-- Safari 9.1+
-- Edge 15+
-
-For older browsers, provide static fallback theme.
+- CSS Variables: All modern browsers
+- Backdrop-filter: Chrome 76+, Safari 9+, Firefox 103+
+- For older browsers, glass effects gracefully degrade to solid colors
 
 ## Best Practices
 
-1. **Always use RGB format** for Tailwind compatibility
-2. **Maintain consistency** in variable naming
-3. **Document special variables** in comments
-4. **Test with CSS disabled** to ensure fallbacks work
-5. **Use semantic names** not color names (primary vs blue)
-6. **Group related variables** in comments
-7. **Validate contrast ratios** after variable changes
+1. **Always provide fallbacks** for glass effects
+2. **Use semantic variable names** for maintainability
+3. **Test color contrast** in both theme systems
+4. **Minimize specificity** in theme-aware selectors
+5. **Document custom properties** in code comments
