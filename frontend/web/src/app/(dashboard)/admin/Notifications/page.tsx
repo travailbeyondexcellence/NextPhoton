@@ -2,7 +2,193 @@
 
 import { useState, useMemo } from "react"
 import { MessageSquare, Bell, Send, Clock, Users, Filter, Search, ChevronDown, ChevronUp, AlertCircle, CheckCircle, Archive, Star, Paperclip, Calendar, Mail, Smartphone, Monitor, AlertTriangle } from "lucide-react"
-import { notifications, getNotificationStats, messageTemplates, recipientGroups, type Notification } from "@/app/(features)/Notifications/notificationsDummyData"
+import notifications, { type Notification } from "@/app/(features)/Notifications/notificationsDummyData"
+
+// Extended notification type with all required fields
+interface ExtendedNotification extends Notification {
+  content: string;
+  type: 'announcement' | 'task' | 'event' | 'alert' | 'reminder';
+  category: 'academic' | 'administrative' | 'personal' | 'system';
+  priority: 'urgent' | 'high' | 'normal' | 'low';
+  status: 'read' | 'unread';
+  deliveryStatus: 'scheduled' | 'sent' | 'delivered' | 'failed';
+  sender: {
+    id: string;
+    name: string;
+    role: string;
+    avatar?: string;
+  };
+  attachments?: {
+    name: string;
+    type: string;
+    size: string;
+  }[];
+  channels?: ('email' | 'sms' | 'push')[];
+  scheduledFor?: string;
+}
+
+// Dummy extended notifications data
+const extendedNotifications: ExtendedNotification[] = [
+  {
+    id: "noti001",
+    title: "Maintenance Window",
+    message: "Platform will be under maintenance on May 25 from 2–4 PM.",
+    content: "Platform will be under maintenance on May 25 from 2–4 PM. Please save your work before this time.",
+    type: "alert",
+    category: "system",
+    priority: "high",
+    status: "unread",
+    deliveryStatus: "delivered",
+    targetRoles: ["learner", "educator", "admin"],
+    sentAt: "2024-05-15T08:00:00.000Z",
+    sender: {
+      id: "system",
+      name: "System Administrator",
+      role: "admin"
+    },
+    channels: ["email", "push"]
+  },
+  {
+    id: "noti002",
+    title: "New Assignment Posted",
+    content: "A new assignment 'Mathematics Problem Set 5' has been posted. Due date: May 30, 2024.",
+    message: "New assignment available",
+    type: "task",
+    category: "academic",
+    priority: "normal",
+    status: "unread",
+    deliveryStatus: "delivered",
+    targetRoles: ["learner"],
+    sentAt: "2024-05-20T10:30:00.000Z",
+    sender: {
+      id: "edu001",
+      name: "John Smith",
+      role: "educator"
+    },
+    attachments: [
+      {
+        name: "problem_set_5.pdf",
+        type: "application/pdf",
+        size: "1.2 MB"
+      }
+    ],
+    channels: ["email", "push"]
+  },
+  {
+    id: "noti003",
+    title: "Parent-Teacher Meeting Scheduled",
+    content: "A parent-teacher meeting has been scheduled for June 5, 2024 at 3:00 PM. Please confirm your attendance.",
+    message: "Meeting scheduled",
+    type: "event",
+    category: "administrative",
+    priority: "high",
+    status: "read",
+    deliveryStatus: "delivered",
+    targetRoles: ["guardian", "educator"],
+    sentAt: "2024-05-22T14:00:00.000Z",
+    sender: {
+      id: "admin001",
+      name: "School Admin",
+      role: "admin"
+    },
+    channels: ["email", "sms"]
+  },
+  {
+    id: "noti004",
+    title: "Upcoming Quiz Reminder",
+    content: "Reminder: You have a Chemistry quiz tomorrow at 10:00 AM. Good luck!",
+    message: "Quiz reminder",
+    type: "reminder",
+    category: "academic",
+    priority: "normal",
+    status: "read",
+    deliveryStatus: "scheduled",
+    targetRoles: ["learner"],
+    sentAt: "2024-05-24T18:00:00.000Z",
+    scheduledFor: "2024-05-25T08:00:00.000Z",
+    sender: {
+      id: "edu002",
+      name: "Sarah Johnson",
+      role: "educator"
+    },
+    channels: ["push"]
+  }
+];
+
+// Message templates
+const messageTemplates = [
+  {
+    id: "temp001",
+    name: "Assignment Reminder",
+    content: "Dear {{studentName}}, this is a reminder that {{assignmentName}} is due on {{dueDate}}.",
+    category: "academic",
+    variables: ["studentName", "assignmentName", "dueDate"]
+  },
+  {
+    id: "temp002",
+    name: "Meeting Invitation",
+    content: "You are invited to a {{meetingType}} on {{date}} at {{time}}. Location: {{location}}",
+    category: "administrative",
+    variables: ["meetingType", "date", "time", "location"]
+  },
+  {
+    id: "temp003",
+    name: "System Maintenance",
+    content: "The system will be under maintenance from {{startTime}} to {{endTime}} on {{date}}.",
+    category: "system",
+    variables: ["startTime", "endTime", "date"]
+  }
+];
+
+// Recipient groups
+const recipientGroups = [
+  {
+    id: "group001",
+    name: "All Students",
+    description: "All enrolled students",
+    memberCount: 150,
+    roles: ["learner"]
+  },
+  {
+    id: "group002",
+    name: "All Teachers",
+    description: "All teaching staff",
+    memberCount: 25,
+    roles: ["educator"]
+  },
+  {
+    id: "group003",
+    name: "Parents & Guardians",
+    description: "All registered parents and guardians",
+    memberCount: 120,
+    roles: ["guardian"]
+  },
+  {
+    id: "group004",
+    name: "Grade 10 Students",
+    description: "Students enrolled in Grade 10",
+    memberCount: 30,
+    roles: ["learner"],
+    filters: { grade: "10" }
+  }
+];
+
+// Stats calculation function
+const getNotificationStats = () => {
+  const total = extendedNotifications.length;
+  const unread = extendedNotifications.filter(n => n.status === 'unread').length;
+  const sent = extendedNotifications.filter(n => n.deliveryStatus === 'sent' || n.deliveryStatus === 'delivered').length;
+  const scheduled = extendedNotifications.filter(n => n.deliveryStatus === 'scheduled').length;
+  const failed = extendedNotifications.filter(n => n.deliveryStatus === 'failed').length;
+  
+  return {
+    total,
+    unread,
+    sent,
+    scheduled,
+    failed
+  };
+};
 
 export default function NotificationsPage() {
   const [selectedTab, setSelectedTab] = useState<'all' | 'unread' | 'sent' | 'scheduled'>('all')
@@ -16,7 +202,7 @@ export default function NotificationsPage() {
 
   // Filter notifications based on selections
   const filteredNotifications = useMemo(() => {
-    return notifications.filter(notification => {
+    return extendedNotifications.filter(notification => {
       const tabMatch =
         selectedTab === 'all' ||
         (selectedTab === 'unread' && notification.status === 'unread') ||
@@ -34,7 +220,7 @@ export default function NotificationsPage() {
     })
   }, [selectedTab, selectedCategory, selectedType, searchTerm])
 
-  const getTypeIcon = (type: Notification['type']) => {
+  const getTypeIcon = (type: ExtendedNotification['type']) => {
     switch (type) {
       case 'task': return <Mail className="h-4 w-4" />
       case 'alert': return <AlertTriangle className="h-4 w-4" />
@@ -45,7 +231,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const getTypeColor = (type: Notification['type']) => {
+  const getTypeColor = (type: ExtendedNotification['type']) => {
     switch (type) {
       case 'task': return 'text-blue-400 bg-blue-500/20'
       case 'alert': return 'text-red-400 bg-red-500/20'
@@ -56,7 +242,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const getPriorityColor = (priority: Notification['priority']) => {
+  const getPriorityColor = (priority: ExtendedNotification['priority']) => {
     switch (priority) {
       case 'high': return 'text-red-400'
       case 'medium': return 'text-yellow-400'
@@ -65,7 +251,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const getDeliveryStatusColor = (status: Notification['deliveryStatus']) => {
+  const getDeliveryStatusColor = (status: ExtendedNotification['deliveryStatus']) => {
     switch (status) {
       case 'sent': return 'text-blue-400'
       case 'delivered': return 'text-green-400'
@@ -165,7 +351,7 @@ export default function NotificationsPage() {
         <div className="flex items-center justify-between border-b border-white/10">
           <div className="flex">
             {[
-              { key: 'all', label: 'All', count: notifications.length },
+              { key: 'all', label: 'All', count: extendedNotifications.length },
               { key: 'unread', label: 'Unread', count: stats.unread },
               { key: 'sent', label: 'Sent', count: stats.sent },
               { key: 'scheduled', label: 'Scheduled', count: stats.scheduled }
