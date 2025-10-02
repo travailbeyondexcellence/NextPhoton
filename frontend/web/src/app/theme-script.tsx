@@ -128,13 +128,14 @@ export default function ThemeScript() {
                       root.style.setProperty('--sidebar-gradient-opacity', theme.sidebar.opacity.toString());
                     }
                     if (theme.sidebar.textColor) {
-                      root.style.setProperty('--sidebar-text-color', theme.sidebar.textColor);
-                      
-                      // Also set Tailwind sidebar CSS variables for consistency
+                      // Convert hex to RGB for CSS variable usage
                       const textHexValue = theme.sidebar.textColor.replace('#', '');
                       const textR = parseInt(textHexValue.substring(0, 2), 16);
                       const textG = parseInt(textHexValue.substring(2, 4), 16);
                       const textB = parseInt(textHexValue.substring(4, 6), 16);
+                      root.style.setProperty('--sidebar-text-color', textR + ' ' + textG + ' ' + textB);
+                      
+                      // Also set Tailwind sidebar CSS variables for consistency
                       root.style.setProperty('--sidebar-foreground', textR + ' ' + textG + ' ' + textB);
                       root.style.setProperty('--sidebar-primary', textR + ' ' + textG + ' ' + textB);
                       root.style.setProperty('--sidebar-accent-foreground', textR + ' ' + textG + ' ' + textB);

@@ -120,6 +120,8 @@
     --sidebar-accent-foreground: var(--accent-foreground);
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
+    /* Default sidebar text color */
+    --sidebar-text-color: var(--foreground);
   }
 
   /* Dark Mode Theme */
@@ -146,6 +148,9 @@
     --success-foreground: 255 255 255;
     --warning: 217 119 6;
     --warning-foreground: 255 255 255;
+    
+    /* Sidebar text color - default to foreground for dark mode */
+    --sidebar-text-color: var(--foreground);
 
     /* Dark mode gradients - darker tones */
     --gradient-from: 15 23 42;
@@ -586,13 +591,11 @@
   [data-theme-type="glass"] .sidebar-theme-gradient .hover\:bg-sidebar-accent:hover {
     background-color: rgb(var(--accent) / 0.2) !important;
     backdrop-filter: blur(8px);
-    color: rgb(var(--accent-foreground)) !important;
   }
   
   [data-theme-type="glass"] .sidebar-theme-gradient .bg-sidebar-accent {
     background-color: rgb(var(--accent) / 0.3) !important;
     backdrop-filter: blur(8px);
-    color: rgb(var(--accent-foreground)) !important;
   }
   
   /* Fix for bg-sidebar-accent/20 (header section) */
@@ -612,7 +615,6 @@
   
   [data-theme-type="glass"] .hover\:bg-sidebar-accent:hover {
     background-color: rgb(var(--accent) / 0.2) !important;
-    color: rgb(var(--accent-foreground)) !important;
   }
   
   /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
@@ -635,6 +637,54 @@
       rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
       rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
       rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%) !important;
+    /* Apply sidebar text color to all text in glass theme sidebar */
+    color: rgb(var(--sidebar-text-color, var(--foreground))) !important;
+  }
+  
+  /* Ensure all child elements inherit the sidebar text color in glass themes */
+  [data-theme-type="glass"] .sidebar-theme-gradient * {
+    color: inherit !important;
+  }
+  
+  /* Override opacity utilities to preserve text color inheritance in glass sidebar */
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-70,
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-85,
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-90,
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-95 {
+    opacity: 1 !important;
+    filter: opacity(var(--tw-opacity));
+  }
+  
+  /* Dim the opacity visually without affecting color inheritance */
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-70 {
+    --tw-opacity: 0.7;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-85 {
+    --tw-opacity: 0.85;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-90 {
+    --tw-opacity: 0.9;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-95 {
+    --tw-opacity: 0.95;
+  }
+  
+  /* Logo text color inheritance - ensure it uses sidebar text color in glass themes */
+  [data-theme-type="glass"] .sidebar-theme-gradient .font-semibold {
+    color: inherit !important;
+  }
+  
+  /* Default logo text color for non-sidebar contexts */
+  .font-semibold.text-lg.tracking-wide {
+    color: rgb(var(--foreground));
+  }
+  
+  /* Override for glass theme sidebars */
+  [data-theme-type="glass"] .sidebar-theme-gradient .font-semibold.text-lg.tracking-wide {
+    color: inherit !important;
   }
   
   /* Dashboard header gradient styles */
@@ -676,6 +726,13 @@
       rgb(var(--dashboard-header-gradient-from) / var(--dashboard-header-gradient-opacity, 1)) 0%, 
       rgb(var(--dashboard-header-gradient-via) / var(--dashboard-header-gradient-opacity, 1)) 50%, 
       rgb(var(--dashboard-header-gradient-to) / var(--dashboard-header-gradient-opacity, 1)) 100%);
+    /* Apply dashboard header text color for glass themes */
+    color: var(--dashboard-header-text-color, #ffffff) !important;
+  }
+  
+  /* Ensure all child elements inherit the dashboard header text color in glass themes */
+  [data-theme-type="glass"] .dashboard-header-gradient * {
+    color: inherit !important;
   }
   
   /* Theme selector panel styles */

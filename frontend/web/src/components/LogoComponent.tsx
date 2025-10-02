@@ -156,7 +156,7 @@ export function LogoComponent({
         <span 
           key={`text-${currentTheme}`}
           className={`font-semibold text-lg tracking-wide ${textClassName}`}
-          style={{ color: logoColors.textColor }}
+          // Remove inline color style to allow CSS inheritance from parent (e.g., sidebar)
         >
           NextPhoton
         </span>

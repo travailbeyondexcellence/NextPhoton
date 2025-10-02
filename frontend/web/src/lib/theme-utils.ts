@@ -203,7 +203,8 @@ export function applyTheme(themeKey: ThemeKey, type?: ThemeType): void {
         root.style.setProperty('--sidebar-gradient-opacity', theme.sidebar.opacity.toString());
       }
       if (theme.sidebar.textColor) {
-        root.style.setProperty('--sidebar-text-color', theme.sidebar.textColor);
+        // Convert hex to RGB for CSS variable usage
+        root.style.setProperty('--sidebar-text-color', hexToRgb(theme.sidebar.textColor));
         
         // Also set Tailwind sidebar CSS variables for consistency
         root.style.setProperty('--sidebar-foreground', hexToRgb(theme.sidebar.textColor));
