@@ -24,7 +24,12 @@
       "Bash(lsof:*)",
       "Bash(cat:*)",
       "Bash(awk:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(bun run:*)",
+      "Read(//proc/sys/fs/inotify/**)",
+      "Bash(sudo tee:*)",
+      "Read(//etc/**)"
     ],
     "deny": [],
     "ask": []

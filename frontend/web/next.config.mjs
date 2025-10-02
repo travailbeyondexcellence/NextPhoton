@@ -37,7 +37,24 @@ const nextConfig = {
       },
     ],
   },
+  // Fix Watchpack file watcher errors by using snapshot mode instead of watching
   webpack: (config, { isServer }) => {
+    // Use snapshot mode to avoid file watching issues
+    config.snapshot = {
+      managedPaths: [/^(.+?\/node_modules\/)/],
+      immutablePaths: [],
+      buildDependencies: {
+        hash: true,
+        timestamp: true,
+      },
+    };
+
+    // Configure file watcher with proper ignore patterns
+    config.watchOptions = {
+      ignored: ['**/node_modules/**', '**/.git/**', '**/.next/**'],
+      aggregateTimeout: 300,
+    };
+
     // Exclude server-only modules from client bundle
     if (!isServer) {
       config.resolve.alias = {
