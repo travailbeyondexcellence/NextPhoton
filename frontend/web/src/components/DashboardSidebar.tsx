@@ -77,7 +77,7 @@ export function DashboardSidebar() {
     <div className="flex flex-col h-full">
       {/* Fixed Header */}
       <div className="flex-shrink-0">
-        <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-sidebar-accent/20 theme-backdrop-blur border-b border-sidebar-border/30">
+        <div className="px-0 pl-4 ml-0 flex h-16 justify-start items-center bg-sidebar-accent/20 theme-backdrop-blur">
           <span className="pl-0 p-0 flex items-center gap-2 justify-start hover:cursor-pointer group transition-all duration-300 ease-out hover:scale-105" onClick={() => router.push("/")}>
             <div className="transition-all duration-300 ease-out group-hover:rotate-3 group-hover:drop-shadow-lg">
               <LogoComponent 
