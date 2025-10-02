@@ -540,7 +540,7 @@
   /* Sidebar gradient styles */
   .sidebar-theme-gradient {
     /* Default: Use muted color */
-    background: rgb(var(--muted));
+    background: rgb(var(--muted)) !important;
     border-right-color: rgb(var(--border));
   }
   
@@ -549,7 +549,7 @@
   [data-theme-type="modern"][data-theme="storm"] .sidebar-theme-gradient,
   [data-theme-type="modern"][data-theme="emnight"] .sidebar-theme-gradient,
   [data-theme-type="modern"][data-theme="mono"] .sidebar-theme-gradient {
-    background: rgb(var(--muted));
+    background: rgb(var(--muted)) !important;
     filter: brightness(1.2);
   }
   
@@ -562,7 +562,7 @@
   [data-theme-type="modern"][data-theme="coral"] .sidebar-theme-gradient,
   [data-theme-type="modern"][data-theme="rosegarden"] .sidebar-theme-gradient,
   [data-theme-type="modern"][data-theme="hicon"] .sidebar-theme-gradient {
-    background: rgb(var(--muted));
+    background: rgb(var(--muted)) !important;
     filter: brightness(0.92);
   }
   
@@ -570,7 +570,7 @@
     background: linear-gradient(135deg, 
       rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
       rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
-      rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%);
+      rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%) !important;
   }
   
   /* Dashboard header gradient styles */
