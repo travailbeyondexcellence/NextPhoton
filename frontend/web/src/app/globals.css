@@ -389,6 +389,13 @@
     cursor: pointer;
   }
   
+  /* Modern theme header buttons - more subtle styling */
+  [data-theme-type="modern"] .dashboard-header-gradient .glass-button {
+    background: transparent;
+    color: rgb(var(--foreground));
+    border: 1px solid rgb(var(--border));
+  }
+  
   [data-theme-type="glass"] .glass-button {
     backdrop-filter: blur(calc(var(--glass-blur) * 1px));
     -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
@@ -402,6 +409,14 @@
     color: rgb(var(--primary-foreground));
     transform: scale(1.02);
     box-shadow: 0 4px 12px 0 rgb(var(--primary) / 0.3);
+  }
+  
+  /* Modern theme header buttons hover */
+  [data-theme-type="modern"] .dashboard-header-gradient .glass-button:hover {
+    background: rgb(var(--accent));
+    color: rgb(var(--accent-foreground));
+    border-color: rgb(var(--accent));
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
   }
   
   [data-theme-type="glass"] .glass-button:hover {
