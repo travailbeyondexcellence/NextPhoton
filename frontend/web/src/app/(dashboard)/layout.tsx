@@ -5,6 +5,7 @@ import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { SecondarySidebarDrawer } from "@/components/SecondarySidebarDrawer";
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 // Outer wrapper with SidebarProvider
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -27,33 +28,18 @@ function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex w-screen h-screen overflow-hidden relative">
-      {/* Background gradient that extends to full content */}
-      <div 
-        className="fixed inset-0 z-0"
-        style={{
-          background: `linear-gradient(to bottom right,
-            rgb(var(--gradient-from)),
-            rgb(var(--gradient-via)),
-            rgb(var(--gradient-to)))`,
-          opacity: `var(--background-gradient-opacity, 0.75)`
-        }}
-      />
+      {/* Background gradient that extends to full content - handled by CSS */}
+      <div className="fixed inset-0 z-0 bg-background" />
       
-      {/* Sidebar with glass effect */}
+      {/* Sidebar with conditional glass effect */}
       <aside
-        className={`
-          sidebar fixed top-0 left-0 h-screen p-0 w-72 z-50 
-          transition-transform duration-300 ease-in-out
-          backdrop-blur-xl border-r border-white/10
-          overflow-y-auto
-          ${open ? "translate-x-0" : "-translate-x-full"}
-        `}
-        style={{
-          background: `linear-gradient(135deg, 
-            rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
-            rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
-            rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%)`
-        }}
+        className={cn(
+          "sidebar fixed top-0 left-0 h-screen p-0 w-72 z-50",
+          "transition-transform duration-300 ease-in-out",
+          "theme-backdrop-blur border-r theme-border-glass",
+          "overflow-y-auto sidebar-theme-gradient",
+          open ? "translate-x-0" : "-translate-x-full"
+        )}
       >
         <DashboardSidebar />
       </aside>
