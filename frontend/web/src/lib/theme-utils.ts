@@ -145,6 +145,8 @@ export function applyTheme(themeKey: ThemeKey, type?: ThemeType): void {
   
   // Set theme type as data attribute for conditional CSS
   root.setAttribute('data-theme-type', themeType);
+  // Set theme name as data attribute for theme-specific CSS
+  root.setAttribute('data-theme', themeKey);
   
   // Apply color variables
   Object.entries(theme.colors).forEach(([key, value]) => {

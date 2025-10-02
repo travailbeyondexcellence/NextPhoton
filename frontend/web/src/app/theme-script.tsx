@@ -17,6 +17,8 @@ export default function ThemeScript() {
             
             // Set theme type as data attribute
             document.documentElement.setAttribute('data-theme-type', savedThemeType);
+            // Set theme name as data attribute
+            document.documentElement.setAttribute('data-theme', savedTheme);
             
             // Map theme keys to gradient classes
             const themeToGradient = {
