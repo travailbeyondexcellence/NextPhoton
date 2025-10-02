@@ -143,6 +143,7 @@ export function ThemeSelector() {
                   )}
                   <span className="relative z-10">Glass</span>
                 </button>
+                </div>
               </div>
               
               <div className="grid grid-cols-2 gap-3">
