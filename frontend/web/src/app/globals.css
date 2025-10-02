@@ -539,10 +539,21 @@
   
   /* Sidebar gradient styles */
   .sidebar-theme-gradient {
-    /* Default: Use muted color */
-    background: rgb(var(--muted)) !important;
+    /* Default: Use background color for modern themes */
+    background: rgb(var(--background)) !important;
     border-right-color: rgb(var(--border));
     position: relative;
+  }
+  
+  /* Modern themes - use card background for slight contrast */
+  [data-theme-type="modern"] .sidebar-theme-gradient {
+    background: rgb(var(--card)) !important;
+    color: rgb(var(--foreground)) !important;
+  }
+  
+  /* Modern themes - ensure all text in sidebar uses proper foreground color */
+  [data-theme-type="modern"] .sidebar-theme-gradient * {
+    color: inherit !important;
   }
   
   /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
@@ -554,24 +565,10 @@
     background: transparent;
   }
   
-  /* Modern theme - Dark themes use slightly lighter sidebar background */
-  [data-theme-type="modern"][data-theme="midnight"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="storm"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="emnight"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="mono"] .sidebar-theme-gradient::before {
-    background: rgba(255, 255, 255, 0.08);
-  }
-  
-  /* Modern theme - Light themes use darker sidebar background overlay */
-  [data-theme-type="modern"][data-theme="celeste"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="emerald"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="arctic"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="sunset"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="sepia"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="coral"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="rosegarden"] .sidebar-theme-gradient::before,
-  [data-theme-type="modern"][data-theme="hicon"] .sidebar-theme-gradient::before {
-    background: rgba(0, 0, 0, 0.08);
+  /* Modern theme - No overlay, keep opacity 0 */
+  [data-theme-type="modern"] .sidebar-theme-gradient::before {
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
   }
   
   [data-theme-type="glass"] .sidebar-theme-gradient {
@@ -583,10 +580,21 @@
   
   /* Dashboard header gradient styles */
   .dashboard-header-gradient {
-    /* Default: Use muted color */
-    background: rgb(var(--muted));
+    /* Default: Use background color for modern themes */
+    background: rgb(var(--background));
     border-bottom-color: rgb(var(--border));
     position: relative;
+  }
+  
+  /* Modern themes - use card background for slight contrast */
+  [data-theme-type="modern"] .dashboard-header-gradient {
+    background: rgb(var(--card)) !important;
+    color: rgb(var(--foreground)) !important;
+  }
+  
+  /* Modern themes - ensure all text in header uses proper foreground color */
+  [data-theme-type="modern"] .dashboard-header-gradient * {
+    color: inherit !important;
   }
   
   /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
@@ -598,24 +606,10 @@
     background: transparent;
   }
   
-  /* Modern theme - Dark themes use slightly lighter header background */
-  [data-theme-type="modern"][data-theme="midnight"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="storm"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="emnight"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="mono"] .dashboard-header-gradient::before {
-    background: rgba(255, 255, 255, 0.08);
-  }
-  
-  /* Modern theme - Light themes use darker header background overlay */
-  [data-theme-type="modern"][data-theme="celeste"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="emerald"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="arctic"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="sunset"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="sepia"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="coral"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="rosegarden"] .dashboard-header-gradient::before,
-  [data-theme-type="modern"][data-theme="hicon"] .dashboard-header-gradient::before {
-    background: rgba(0, 0, 0, 0.08);
+  /* Modern theme - No overlay, keep opacity 0 */
+  [data-theme-type="modern"] .dashboard-header-gradient::before {
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
   }
   
   [data-theme-type="glass"] .dashboard-header-gradient {
