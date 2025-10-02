@@ -571,6 +571,50 @@
     color: inherit !important;
   }
   
+  /* Modern themes - sidebar hover and active states */
+  [data-theme-type="modern"] .sidebar-theme-gradient .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent)) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  [data-theme-type="modern"] .sidebar-theme-gradient .bg-sidebar-accent {
+    background-color: rgb(var(--accent)) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  /* Glass themes - sidebar hover and active states with transparency */
+  [data-theme-type="glass"] .sidebar-theme-gradient .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent) / 0.2) !important;
+    backdrop-filter: blur(8px);
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .bg-sidebar-accent {
+    background-color: rgb(var(--accent) / 0.3) !important;
+    backdrop-filter: blur(8px);
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  /* Fix for bg-sidebar-accent/20 (header section) */
+  [data-theme-type="modern"] .sidebar-theme-gradient .bg-sidebar-accent\/20 {
+    background-color: rgb(var(--accent) / 0.2) !important;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .bg-sidebar-accent\/20 {
+    background-color: rgb(var(--accent) / 0.1) !important;
+  }
+  
+  /* Ensure hover states work for all sidebar-related components */
+  [data-theme-type="modern"] .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent)) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  [data-theme-type="glass"] .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent) / 0.2) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
   /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
   [data-theme-type="modern"] .sidebar-theme-gradient::before {
     content: "";
