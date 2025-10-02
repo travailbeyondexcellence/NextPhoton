@@ -89,21 +89,9 @@ export function ThemeSelector() {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "flex items-center justify-center p-2 rounded-lg",
-          "border border-white/10",
-          "hover:border-white/15",
+          "glass-button",
           "transition-all duration-200"
         )}
-        style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-        }}
         aria-label="Select theme"
       >
         <Palette className="w-5 h-5" />
@@ -117,33 +105,21 @@ export function ThemeSelector() {
             msOverflowStyle: 'none'
           }}
         >
-          <div 
-            className="rounded-xl p-5 border border-white/20 shadow-2xl relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, rgb(var(--gradient-from)) 0%, rgb(var(--gradient-via)) 50%, rgb(var(--gradient-to)) 100%)',
-              opacity: '0.95',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)'
-            }}
-          >
+          <div className="glass-panel p-5 shadow-2xl relative overflow-hidden theme-selector-panel">
             {/* Theme selector background overlay for theme-based darkening */}
             <div className="theme-selector-overlay rounded-xl"></div>
             <div className="relative z-10">
               <h3 className="text-lg font-semibold mb-2">Choose Theme</h3>
               
               {/* Theme Type Tabs */}
-              <div className="flex gap-1 p-1 rounded-lg mb-4" style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(4px)',
-                WebkitBackdropFilter: 'blur(4px)'
-              }}>
+              <div className="flex gap-1 p-1 rounded-lg mb-4 bg-muted/50">
                 <button
                   onClick={() => changeThemeType('modern')}
                   className={cn(
                     "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                     currentThemeType === 'modern'
-                      ? "bg-white/20 text-white shadow-sm"
-                      : "text-white/70 hover:text-white hover:bg-white/10"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   Modern
@@ -153,8 +129,8 @@ export function ThemeSelector() {
                   className={cn(
                     "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
                     currentThemeType === 'glass'
-                      ? "bg-white/20 text-white shadow-sm"
-                      : "text-white/70 hover:text-white hover:bg-white/10"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   Glass
@@ -171,29 +147,11 @@ export function ThemeSelector() {
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "text-left p-3 rounded-lg relative overflow-hidden border",
+                    "text-left p-3 rounded-lg relative overflow-hidden border transition-all duration-200",
                     currentTheme === theme.key 
-                      ? "border-white/30" 
-                      : "border-white/10 hover:border-white/20",
-                    "transition-all duration-200"
+                      ? "border-primary bg-accent" 
+                      : "border-border hover:border-primary/50 hover:bg-accent/50"
                   )}
-                  style={{
-                    backgroundColor: currentTheme === theme.key 
-                      ? 'rgba(255, 255, 255, 0.15)' 
-                      : 'rgba(255, 255, 255, 0.05)',
-                    backdropFilter: 'blur(4px)',
-                    WebkitBackdropFilter: 'blur(4px)'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentTheme !== theme.key) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (currentTheme !== theme.key) {
-                      e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                    }
-                  }}
                 >
                   {/* Theme icon/graphic */}
                   <div className="absolute -left-2 -top-2 text-6xl opacity-20">

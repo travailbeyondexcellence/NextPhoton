@@ -51,8 +51,7 @@ export function ProfileDropdown() {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "w-10 h-10 rounded-full flex items-center justify-center",
-          "bg-primary/10 backdrop-blur-sm border border-white/10",
-          "hover:bg-primary/15 hover:border-white/15",
+          "glass-button border",
           "transition-all duration-200"
         )}
         aria-label="User menu"
@@ -62,20 +61,12 @@ export function ProfileDropdown() {
 
       {isOpen && (
         <div className="absolute right-0 mt-2 w-72 z-50">
-          <div 
-            className="rounded-xl border border-white/20 shadow-2xl overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, rgb(var(--gradient-from)) 0%, rgb(var(--gradient-via)) 50%, rgb(var(--gradient-to)) 100%)',
-              opacity: '0.95',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)'
-            }}
-          >
+          <div className="glass-panel shadow-2xl overflow-hidden">
             {/* User Info Header */}
-            <div className="p-4 border-b border-white/10">
+            <div className="p-4 border-b theme-border-glass">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-lg font-semibold text-primary">{user.initials}</span>
+                <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                  <span className="text-lg font-semibold">{user.initials}</span>
                 </div>
                 <div className="flex-1">
                   <div className="font-medium">{user.name}</div>
@@ -93,7 +84,7 @@ export function ProfileDropdown() {
                   router.push('/profile');
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors text-left"
               >
                 <User className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">Profile</span>
@@ -105,7 +96,7 @@ export function ProfileDropdown() {
                   router.push('/settings');
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors text-left"
               >
                 <Settings className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">Account Settings</span>
@@ -117,12 +108,12 @@ export function ProfileDropdown() {
                   router.push('/admin/Notifications');
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors text-left"
               >
                 <Bell className="w-4 h-4 text-muted-foreground" />
                 <div className="flex-1 flex items-center justify-between">
                   <span className="text-sm">Notifications</span>
-                  <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">3</span>
+                  <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">3</span>
                 </div>
               </button>
 
@@ -132,14 +123,14 @@ export function ProfileDropdown() {
                   router.push('/help-support');
                   setIsOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors text-left"
               >
                 <HelpCircle className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">Help & Support</span>
               </button>
 
               {/* Divider */}
-              <div className="my-2 border-t border-white/10" />
+              <div className="my-2 border-t border-border" />
 
               <button
                 onClick={async () => {

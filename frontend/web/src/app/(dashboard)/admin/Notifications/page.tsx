@@ -36,24 +36,22 @@ export default function NotificationsPage() {
 
   const getTypeIcon = (type: Notification['type']) => {
     switch (type) {
-      case 'message': return <Mail className="h-4 w-4" />
+      case 'task': return <Mail className="h-4 w-4" />
       case 'alert': return <AlertTriangle className="h-4 w-4" />
       case 'announcement': return <MessageSquare className="h-4 w-4" />
       case 'reminder': return <Clock className="h-4 w-4" />
-      case 'system': return <Monitor className="h-4 w-4" />
-      case 'achievement': return <Star className="h-4 w-4" />
+      case 'event': return <Calendar className="h-4 w-4" />
       default: return <Bell className="h-4 w-4" />
     }
   }
 
   const getTypeColor = (type: Notification['type']) => {
     switch (type) {
-      case 'message': return 'text-blue-400 bg-blue-500/20'
+      case 'task': return 'text-blue-400 bg-blue-500/20'
       case 'alert': return 'text-red-400 bg-red-500/20'
       case 'announcement': return 'text-purple-400 bg-purple-500/20'
       case 'reminder': return 'text-yellow-400 bg-yellow-500/20'
-      case 'system': return 'text-gray-400 bg-gray-500/20'
-      case 'achievement': return 'text-green-400 bg-green-500/20'
+      case 'event': return 'text-green-400 bg-green-500/20'
       default: return 'text-primary bg-primary/20'
     }
   }
@@ -78,7 +76,7 @@ export default function NotificationsPage() {
     }
   }
 
-  const getChannelIcon = (channel: Notification['channel']) => {
+  const getChannelIcon = (channel: 'email' | 'sms' | 'push') => {
     switch (channel) {
       case 'email': return <Mail className="h-3 w-3" />
       case 'sms': return <Smartphone className="h-3 w-3" />
@@ -111,7 +109,7 @@ export default function NotificationsPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
         {/* Unread Card */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+        <div className="glass-card p-6 hover:bg-accent/50 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Unread</div>
             <Bell className="h-5 w-5 text-primary" />
@@ -121,7 +119,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* Sent Today Card */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+        <div className="glass-card p-6 hover:bg-accent/50 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Sent</div>
             <Send className="h-5 w-5 text-green-400" />
@@ -131,7 +129,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* Scheduled Card */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+        <div className="glass-card p-6 hover:bg-accent/50 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Scheduled</div>
             <Clock className="h-5 w-5 text-purple-400" />
@@ -141,7 +139,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* Failed Card */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+        <div className="glass-card p-6 hover:bg-accent/50 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Failed</div>
             <AlertCircle className="h-5 w-5 text-red-400" />
@@ -151,18 +149,18 @@ export default function NotificationsPage() {
         </div>
 
         {/* Total Recipients Card */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 hover:bg-white/15 transition-all">
+        <div className="glass-card p-6 hover:bg-accent/50 transition-all">
           <div className="flex items-center justify-between mb-4">
             <div className="text-muted-foreground">Recipients</div>
             <Users className="h-5 w-5 text-blue-400" />
           </div>
-          <div className="text-2xl font-bold">{recipientGroups.reduce((sum, g) => sum + g.members.length, 0)}</div>
+          <div className="text-2xl font-bold">{recipientGroups.reduce((sum, g) => sum + g.memberCount, 0)}</div>
           <div className="text-xs text-muted-foreground mt-2">Active users</div>
         </div>
       </div>
 
       {/* Tabs and Filters */}
-      <div className="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 mb-6">
+      <div className="glass-panel mb-6">
         {/* Tabs */}
         <div className="flex items-center justify-between border-b border-white/10">
           <div className="flex">
@@ -223,12 +221,10 @@ export default function NotificationsPage() {
                   className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
                 >
                   <option value="all">All Categories</option>
-                  <option value="Academic">Academic</option>
-                  <option value="Administrative">Administrative</option>
-                  <option value="Emergency">Emergency</option>
-                  <option value="General">General</option>
-                  <option value="Personal">Personal</option>
-                  <option value="System">System</option>
+                  <option value="academic">Academic</option>
+                  <option value="administrative">Administrative</option>
+                  <option value="personal">Personal</option>
+                  <option value="system">System</option>
                 </select>
               </div>
 
@@ -240,12 +236,11 @@ export default function NotificationsPage() {
                   className="w-full px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-foreground focus:outline-none focus:border-primary"
                 >
                   <option value="all">All Types</option>
-                  <option value="message">Message</option>
-                  <option value="alert">Alert</option>
                   <option value="announcement">Announcement</option>
+                  <option value="task">Task</option>
+                  <option value="event">Event</option>
+                  <option value="alert">Alert</option>
                   <option value="reminder">Reminder</option>
-                  <option value="system">System</option>
-                  <option value="achievement">Achievement</option>
                 </select>
               </div>
             </div>
@@ -258,7 +253,7 @@ export default function NotificationsPage() {
         {filteredNotifications.map((notification) => (
           <div
             key={notification.id}
-            className={`bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden ${
+            className={`glass-panel overflow-hidden ${
               notification.status === 'unread' ? 'border-primary/50' : ''
             }`}
           >
@@ -300,33 +295,27 @@ export default function NotificationsPage() {
                       </div>
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <Calendar className="h-3 w-3" />
-                        <span>{new Date(notification.timestamp).toLocaleString()}</span>
+                        <span>{new Date(notification.sentAt).toLocaleString()}</span>
                       </div>
                       <div className={`flex items-center gap-1 ${getDeliveryStatusColor(notification.deliveryStatus)}`}>
                         <CheckCircle className="h-3 w-3" />
                         <span>{notification.deliveryStatus}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-muted-foreground">
-                        {getChannelIcon(notification.channel)}
-                        <span>{notification.channel}</span>
-                      </div>
+                      {notification.channels && notification.channels.length > 0 && (
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          {getChannelIcon(notification.channels[0])}
+                          <span>{notification.channels.join(', ')}</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Actions */}
-                    {notification.actions && notification.actions.length > 0 && (
+                    {/* Attachments preview */}
+                    {notification.attachments && notification.attachments.length > 0 && (
                       <div className="flex gap-2 mt-3">
-                        {notification.actions.map((action, idx) => (
-                          <button
-                            key={idx}
-                            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                              action.type === 'primary' ? 'bg-primary text-primary-foreground hover:bg-primary/90' :
-                              action.type === 'secondary' ? 'bg-secondary/20 text-secondary hover:bg-secondary/30' :
-                              'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                            }`}
-                          >
-                            {action.label}
-                          </button>
-                        ))}
+                        <Paperclip className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">
+                          {notification.attachments.length} attachment{notification.attachments.length > 1 ? 's' : ''}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -351,56 +340,50 @@ export default function NotificationsPage() {
                     <h4 className="font-medium text-sm mb-2">Recipient Details</h4>
                     <div className="bg-black/20 rounded-lg p-3 space-y-2 text-sm">
                       <div>
-                        <span className="text-muted-foreground">To: </span>
-                        <span>{notification.recipient.name}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Role: </span>
-                        <span>{notification.recipient.role}</span>
-                      </div>
-                      <div>
-                        <span className="text-muted-foreground">Type: </span>
-                        <span className="capitalize">{notification.recipient.type}</span>
+                        <span className="text-muted-foreground">Target Roles: </span>
+                        <span>{notification.targetRoles.join(', ')}</span>
                       </div>
                       <div>
                         <span className="text-muted-foreground">Category: </span>
-                        <span>{notification.category}</span>
+                        <span className="capitalize">{notification.category}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Priority: </span>
+                        <span className="capitalize">{notification.priority}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Type: </span>
+                        <span className="capitalize">{notification.type}</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Metadata */}
-                  {notification.metadata && (
-                    <div>
-                      <h4 className="font-medium text-sm mb-2">Additional Information</h4>
-                      <div className="bg-black/20 rounded-lg p-3 space-y-2 text-sm">
-                        {notification.metadata.className && (
-                          <div>
-                            <span className="text-muted-foreground">Class: </span>
-                            <span>{notification.metadata.className}</span>
-                          </div>
-                        )}
-                        {notification.metadata.subjectName && (
-                          <div>
-                            <span className="text-muted-foreground">Subject: </span>
-                            <span>{notification.metadata.subjectName}</span>
-                          </div>
-                        )}
-                        {notification.scheduledFor && (
-                          <div>
-                            <span className="text-muted-foreground">Scheduled: </span>
-                            <span>{new Date(notification.scheduledFor).toLocaleString()}</span>
-                          </div>
-                        )}
-                        {notification.expiresAt && (
-                          <div>
-                            <span className="text-muted-foreground">Expires: </span>
-                            <span>{new Date(notification.expiresAt).toLocaleString()}</span>
-                          </div>
-                        )}
+                  {/* Additional Information */}
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Additional Information</h4>
+                    <div className="bg-black/20 rounded-lg p-3 space-y-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Sender: </span>
+                        <span>{notification.sender.name} ({notification.sender.role})</span>
                       </div>
+                      {notification.scheduledFor && (
+                        <div>
+                          <span className="text-muted-foreground">Scheduled: </span>
+                          <span>{new Date(notification.scheduledFor).toLocaleString()}</span>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-muted-foreground">Delivery Status: </span>
+                        <span className="capitalize">{notification.deliveryStatus}</span>
+                      </div>
+                      {notification.channels && (
+                        <div>
+                          <span className="text-muted-foreground">Channels: </span>
+                          <span>{notification.channels.join(', ')}</span>
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 {/* Attachments */}
@@ -424,9 +407,9 @@ export default function NotificationsPage() {
                   <div className="mt-4">
                     <h4 className="font-medium text-sm mb-2">Read By ({notification.readBy.length})</h4>
                     <div className="flex flex-wrap gap-2">
-                      {notification.readBy.map((reader, idx) => (
+                      {notification.readBy.map((userId, idx) => (
                         <span key={idx} className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">
-                          User {reader.userId} - {new Date(reader.readAt).toLocaleDateString()}
+                          User {userId}
                         </span>
                       ))}
                     </div>
@@ -466,7 +449,7 @@ export default function NotificationsPage() {
       )}
 
       {/* Quick Templates Section */}
-      <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+      <div className="mt-8 glass-panel p-6">
         <h2 className="text-xl font-semibold mb-4">Quick Message Templates</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {messageTemplates.slice(0, 3).map((template) => (
@@ -474,7 +457,7 @@ export default function NotificationsPage() {
               <h3 className="font-medium mb-2">{template.name}</h3>
               <p className="text-xs text-muted-foreground mb-3">{template.category}</p>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-primary">Used {template.usageCount} times</span>
+                <span className="text-xs text-primary">{template.variables.length} variables</span>
                 <button className="text-xs px-2 py-1 bg-primary/20 text-primary rounded hover:bg-primary/30">
                   Use Template
                 </button>

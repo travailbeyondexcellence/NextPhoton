@@ -608,6 +608,19 @@
       rgb(var(--dashboard-header-gradient-via) / var(--dashboard-header-gradient-opacity, 1)) 50%, 
       rgb(var(--dashboard-header-gradient-to) / var(--dashboard-header-gradient-opacity, 1)) 100%);
   }
+  
+  /* Theme selector panel styles */
+  .theme-selector-panel {
+    /* Modern themes use solid background */
+  }
+  
+  [data-theme-type="glass"] .theme-selector-panel {
+    background: linear-gradient(135deg, 
+      rgb(var(--gradient-from)) 0%, 
+      rgb(var(--gradient-via)) 50%, 
+      rgb(var(--gradient-to)) 100%) !important;
+    opacity: 0.95;
+  }
 }
 
 /* Theme transition animations */
