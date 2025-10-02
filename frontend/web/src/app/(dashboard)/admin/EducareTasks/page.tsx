@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react"
 import { PackageCheck, Clock, CheckCircle, AlertCircle, User, Calendar, TrendingUp, Filter, Search, ChevronDown, ChevronUp, Tag, MessageSquare, Paperclip, Target, Users, BookOpen, Heart, Briefcase, Star, Activity, X } from "lucide-react"
-import { type EduCareTask } from "@/app/(features)/EduCareTasks/educareTasksDummyData"
+import { type EduCareTask } from "@/app/(features)/EduCareTasks/educare-task-types"
 import {
   Sheet,
   SheetContent,

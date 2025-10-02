@@ -26,14 +26,7 @@ import {
   Upload,
   Save
 } from 'lucide-react'
-import {
-  announcements,
-  getActiveAnnouncements,
-  getScheduledAnnouncements,
-  getExpiredAnnouncements,
-  announcementTemplates,
-  type Announcement
-} from '@/app/(features)/Announcements/announcementsDummyData'
+import { type Announcement } from '@/app/(features)/Announcements/announcement-types'
 import { GlassModal } from '@/components/glass/GlassModal'
 
 export default function AnnouncementsPage() {
@@ -66,13 +59,13 @@ export default function AnnouncementsPage() {
         setAllAnnouncements(result.data)
       } else {
         console.error('Failed to fetch announcements:', result.error)
-        // Fallback to imported dummy data if API fails
-        setAllAnnouncements(announcements)
+        // No fallback data - show empty state
+        setAllAnnouncements([])
       }
     } catch (error) {
       console.error('Error fetching announcements:', error)
-      // Fallback to imported dummy data if API fails
-      setAllAnnouncements(announcements)
+      // No fallback data - show empty state
+      setAllAnnouncements([])
     } finally {
       setIsLoading(false)
     }
@@ -641,23 +634,8 @@ export default function AnnouncementsPage() {
         )}
       </div>
 
-      {/* Quick Templates Section */}
-      <div className="mt-8 p-6 rounded-xl border border-white/10 backdrop-blur-sm bg-white/5">
-        <h3 className="font-semibold mb-4">Quick Templates</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {announcementTemplates.map(template => (
-            <button
-              key={template.id}
-              className="p-4 text-left rounded-lg bg-white/10 hover:bg-white/20 transition-all"
-            >
-              <div className="font-medium text-sm">{template.name}</div>
-              <div className="text-xs text-muted-foreground mt-1 capitalize">
-                {template.type} • {template.priority} priority
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Quick Templates Section - TODO: Implement template system */}
+      {/* Templates have been moved to a dedicated feature and will be implemented later */}
 
       {/* Statistics Summary */}
       <div className="mt-8 p-6 rounded-xl border border-white/10 backdrop-blur-sm bg-white/5">

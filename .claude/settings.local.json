@@ -23,7 +23,8 @@
       "Bash(ss:*)",
       "Bash(lsof:*)",
       "Bash(cat:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []
