@@ -542,28 +542,36 @@
     /* Default: Use muted color */
     background: rgb(var(--muted)) !important;
     border-right-color: rgb(var(--border));
+    position: relative;
   }
   
-  /* Modern theme - Dark themes use slightly lighter sidebar */
-  [data-theme-type="modern"][data-theme="midnight"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="storm"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="emnight"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="mono"] .sidebar-theme-gradient {
-    background: rgb(var(--muted)) !important;
-    filter: brightness(1.2);
+  /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
+  [data-theme-type="modern"] .sidebar-theme-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: transparent;
   }
   
-  /* Modern theme - Light themes use darker sidebar for contrast */
-  [data-theme-type="modern"][data-theme="celeste"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="emerald"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="arctic"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="sunset"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="sepia"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="coral"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="rosegarden"] .sidebar-theme-gradient,
-  [data-theme-type="modern"][data-theme="hicon"] .sidebar-theme-gradient {
-    background: rgb(var(--muted)) !important;
-    filter: brightness(0.92);
+  /* Modern theme - Dark themes use slightly lighter sidebar background */
+  [data-theme-type="modern"][data-theme="midnight"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="storm"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="emnight"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="mono"] .sidebar-theme-gradient::before {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  /* Modern theme - Light themes use darker sidebar background overlay */
+  [data-theme-type="modern"][data-theme="celeste"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="emerald"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="arctic"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="sunset"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="sepia"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="coral"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="rosegarden"] .sidebar-theme-gradient::before,
+  [data-theme-type="modern"][data-theme="hicon"] .sidebar-theme-gradient::before {
+    background: rgba(0, 0, 0, 0.08);
   }
   
   [data-theme-type="glass"] .sidebar-theme-gradient {
@@ -578,28 +586,36 @@
     /* Default: Use muted color */
     background: rgb(var(--muted));
     border-bottom-color: rgb(var(--border));
+    position: relative;
   }
   
-  /* Modern theme - Dark themes use slightly lighter header */
-  [data-theme-type="modern"][data-theme="midnight"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="storm"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="emnight"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="mono"] .dashboard-header-gradient {
-    background: rgb(var(--muted));
-    filter: brightness(1.2);
+  /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
+  [data-theme-type="modern"] .dashboard-header-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: transparent;
   }
   
-  /* Modern theme - Light themes use darker header for contrast */
-  [data-theme-type="modern"][data-theme="celeste"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="emerald"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="arctic"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="sunset"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="sepia"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="coral"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="rosegarden"] .dashboard-header-gradient,
-  [data-theme-type="modern"][data-theme="hicon"] .dashboard-header-gradient {
-    background: rgb(var(--muted));
-    filter: brightness(0.92);
+  /* Modern theme - Dark themes use slightly lighter header background */
+  [data-theme-type="modern"][data-theme="midnight"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="storm"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="emnight"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="mono"] .dashboard-header-gradient::before {
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  /* Modern theme - Light themes use darker header background overlay */
+  [data-theme-type="modern"][data-theme="celeste"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="emerald"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="arctic"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="sunset"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="sepia"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="coral"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="rosegarden"] .dashboard-header-gradient::before,
+  [data-theme-type="modern"][data-theme="hicon"] .dashboard-header-gradient::before {
+    background: rgba(0, 0, 0, 0.08);
   }
   
   [data-theme-type="glass"] .dashboard-header-gradient {
