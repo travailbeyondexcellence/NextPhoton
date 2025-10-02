@@ -1,9 +1,11 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getInitials } from "@/lib/utils";
+import { useState } from "react";
 
-import { educator as defaultEducator } from "@/app/(dashboard)/admin/educators/[educatorID]/dummyData";
+import educatorsData from '../../mock-data/educators.json';
 
-type Educator = typeof defaultEducator;
+type Educator = typeof educatorsData.data[0];
 
 // type Educator = {
 //   id: string;
@@ -49,33 +51,45 @@ const getPriceTagColor = (tier: string) => {
 
 const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educator }) => {
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="relative flex flex-col xl:flex-row bg-background text-foreground rounded-xl overflow-hidden shadow-lg border border-muted dark:bg-gray-900 dark:text-gray-100 dark:border-gray-800 w-full max-w-4xl cursor-pointer hover:scale-[1.015] transition-transform duration-300">
+    <div className="relative flex flex-col md:flex-row bg-white/[0.02] backdrop-blur-sm rounded-xl overflow-hidden border border-white/10 w-full min-h-[250px] md:min-h-[220px] cursor-pointer hover:bg-white/[0.04] hover:border-white/20 transition-all duration-300">
       {/* Price Tag */}
       <div
-        className={`absolute top-2 right-2 text-xs font-semibold px-3 py-1 rounded ${getPriceTagColor(educator.priceTier)}`}
+        className={`absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded z-10 ${getPriceTagColor(educator.priceTier)}`}
       >
         Price Range: {educator.priceTier}
       </div>
 
       {/* Educator Image */}
-      <Image
-        src={educator.profileImage}
-        alt={educator.name}
-        width={240}
-        height={192}
-        className="w-full md:w-56 object-cover bg-muted dark:bg-gray-800 hover:scale-[1.05] transition-transform duration-300"
-      />
+      {educator.profileImage && !imageError ? (
+        <Image
+          src={educator.profileImage}
+          alt={educator.name}
+          width={240}
+          height={192}
+          className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full object-cover bg-white/[0.01]"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <div className="w-full md:w-48 lg:w-56 xl:w-64 h-48 md:h-full md:min-h-[200px] bg-primary/[0.05] flex items-center justify-center md:border-r border-white/5">
+          <div className="w-24 h-24 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center">
+            <span className="text-3xl font-bold text-primary">
+              {getInitials(educator.name)}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Info Section */}
-      <div className="flex-1 p-3 space-y-2">
-        <div className="text-xl font-semibold">{educator.name}</div>
-        <div className="text-sm text-muted-foreground dark:text-gray-400">
+      <div className="flex-1 p-4 md:p-5 space-y-2">
+        <div className="text-xl font-semibold text-foreground">{educator.name}</div>
+        <div className="text-sm text-muted-foreground">
           {educator.username || educator.emailFallback}
         </div>
-        <p className="text-sm italic">{educator.intro}</p>
-        <div className="text-sm">
+        <p className="text-sm italic text-foreground line-clamp-2">{educator.intro}</p>
+        <div className="text-sm text-foreground line-clamp-1">
           <span className="font-semibold text-muted-foreground">Qualification:</span>{" "}
           {educator.qualification}
         </div>
@@ -110,27 +124,27 @@ const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educ
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-3 pt-1">
+        <div className="flex flex-wrap gap-2 pt-2">
           <button
-            className="bg-primary text-white px-4 py-1.5 rounded-md dark:bg-slate-500 dark:text-slate-900"
+            className="bg-primary/10 text-primary px-4 py-2 rounded-md border border-primary/20 hover:bg-primary/20 transition-all text-sm"
             onClick={() => router.push(`/admin/educators/${educator.id}`)}
           >
             View Profile
           </button>
-          <button className="border px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800">
+          <button className="bg-white/[0.02] px-4 py-2 rounded-md border border-white/5 hover:bg-white/[0.05] transition-all text-foreground text-sm">
             Message
           </button>
-          <button className="border px-4 py-1.5 rounded-md dark:border-gray-700 dark:bg-gray-800">
+          <button className="bg-white/[0.02] px-4 py-2 rounded-md border border-white/5 hover:bg-white/[0.05] transition-all text-foreground text-sm">
             Call
           </button>
         </div>
 
         {/* Footer */}
-        <div className="footer-container bg-gray-200 dark:bg-gray-700 flex items-center justify-between p-1 ml-2 rounded-sm text-sm font-semibold">
-          <span className="text-muted-foreground px-2">Demo Lecture(s)</span>
-          <div className="border px-3 py-1 rounded bg-muted dark:bg-gray-800">
+        <div className="footer-container bg-white/[0.01] flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 rounded-md text-xs border border-white/5 gap-2 mt-2">
+          <span className="text-muted-foreground font-medium">Demo Lecture(s)</span>
+          <div className="px-2 py-1 rounded bg-white/[0.02] border border-white/5">
             <span className="text-muted-foreground">Subjects:</span>{" "}
-            {educator.subjects.join(", ")}
+            <span className="text-foreground font-medium">{educator.subjects.join(", ")}</span>
           </div>
         </div>
       </div>

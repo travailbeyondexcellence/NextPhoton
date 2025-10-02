@@ -29,7 +29,7 @@ type Educator = {
     yearsWithNextPhoton: number;
     studentsTaught: number;
     hoursTaught: number;
-    profileImage: string;
+    profileImage: string | null;
     educatorReviews: Review[];
     adminNotes: AdminNote[];
 };
@@ -93,7 +93,7 @@ const educators: Educator[] = [
         yearsWithNextPhoton: 3,
         studentsTaught: 1200,
         hoursTaught: 2500,
-        profileImage: "https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5",
+        profileImage: "",
         educatorReviews: [
             {
                 studentName: "Simran Jain",
@@ -189,7 +189,7 @@ const educators: Educator[] = [
         yearsWithNextPhoton: 2,
         studentsTaught: 800,
         hoursTaught: 1400,
-        profileImage: "/educators/edutanyakapoor.png",
+        profileImage: null,
         educatorReviews: [
             {
                 studentName: "Nikhil Rao",
@@ -285,7 +285,7 @@ const educators: Educator[] = [
         yearsWithNextPhoton: 1,
         studentsTaught: 600,
         hoursTaught: 900,
-        profileImage: "/educators/eduarvindmenon.png",
+        profileImage: "",
         educatorReviews: [
             {
                 studentName: "Rehan Khan",

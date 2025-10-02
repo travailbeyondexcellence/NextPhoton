@@ -1,50 +1,28 @@
 "use client"
 
-import { Bell, Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import ThemeToggle from "@/components/ThemeToggle"
-
-
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { useState } from "react"
-
-import { useTheme } from "next-themes";
-
-// Clerk has been remoed from the Application UI
-
-interface NavbarProps {
-  
-}
+import { ThemeSelector } from "@/components/ThemeSelector"
+import { ProfileDropdown } from "@/components/ProfileDropdown"
+import { GlassNavbar } from "@/components/glass"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export function DashboardNavbar() {
-
-
-  const themeObject = useTheme();
-  const dashboardNavbarBackground = themeObject.theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100';
-  const dashboardNavbarText = themeObject.theme === 'dark' ? 'text-gray-400' : 'text-gray-700';
-
-
-
   return (
-    <header className={`w-full h-16  light:bg-gray-300 light:text-gray-900 px-4 flex items-center justify-between ${dashboardNavbarBackground} ${dashboardNavbarText}`}>
-      {/* Left: Sidebar trigger + title */}
-      <div className="flex items-center gap-4 min-w-0">
-      
-        {/* SidebarTrigger with dark mode styles */}
-        <div className=" rounded-md">
-          <SidebarTrigger className="text-foreground" />
+    <div 
+      className="h-16 w-full border-b theme-border-glass theme-backdrop-blur relative z-40 dashboard-header-gradient"
+    >
+      <div className="h-full px-4 flex items-center justify-between">
+        {/* Left: Sidebar trigger + title */}
+        <div className="flex items-center gap-4">
+          <SidebarTrigger className="theme-bg-glass-hover rounded-md p-2 transition-colors" />
+          <h2 className="text-lg font-semibold">Dashboard</h2>
         </div>
-        <h2 className="text-lg font-semibold truncate text-foreground">Dashboard</h2>
-      </div>
 
-      {/* Right: Theme, notifications, profile */}
-      <div className="flex items-center gap-4 shrink-0">
-        <ThemeToggle />
-        <Button variant="ghost" size="icon">
-          <Bell className="h-5 w-5 text-foreground" />
-        </Button>
-    
+        {/* Right: Theme selector + Profile dropdown */}
+        <div className="flex items-center gap-2">
+          <ThemeSelector />
+          <ProfileDropdown />
+        </div>
       </div>
-    </header>
+    </div>
   );
 }

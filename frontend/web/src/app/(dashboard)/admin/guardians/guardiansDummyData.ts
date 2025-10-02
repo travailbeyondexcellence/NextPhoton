@@ -1,44 +1,752 @@
+// This file contains dummy data for guardians in the NextPhoton platform
+// Guardians are parents, relatives, or legal guardians responsible for learners
+
 type Guardian = {
     id: string;
     name: string;
     relation: string;
     email: string;
-    phone?: string;
-    assignedLearners: string[];
-    notes?: string[];
+    phone: string;
+    alternatePhone?: string;
+    occupation: string;
+    address: {
+        street: string;
+        city: string;
+        state: string;
+        pincode: string;
+    };
+    assignedLearners: {
+        learnerId: string;
+        learnerName: string;
+        relation: string;
+        grade: string;
+        school: string;
+    }[];
+    preferredContactMethod: "phone" | "whatsapp" | "email" | "sms";
+    preferredContactTime: string;
+    paymentInfo: {
+        method: "online" | "bank-transfer" | "cheque" | "cash";
+        billingCycle: "monthly" | "quarterly" | "semester" | "annual";
+        paymentStatus: "paid" | "pending" | "overdue";
+        lastPaymentDate: string;
+        nextDueDate: string;
+    };
+    communicationPreferences: {
+        academicUpdates: boolean;
+        attendanceAlerts: boolean;
+        performanceReports: boolean;
+        paymentReminders: boolean;
+        generalNotifications: boolean;
+    };
+    notes: {
+        author: string;
+        timestamp: string;
+        note: string;
+        type: "payment" | "communication" | "general";
+    }[];
+    profileImage?: string | null;
+    status: "active" | "inactive";
+    registeredDate: string;
+    lastInteraction: string;
 };
-  
-
 
 const guardians: Guardian[] = [
     {
         id: "g001",
         name: "Rajesh Patel",
         relation: "Father",
-        email: "rajeshpatel@example.com",
+        email: "rajesh.patel@gmail.com",
         phone: "+91-9898989898",
-        assignedLearners: ["l001"],
-        notes: ["Wants regular academic updates via WhatsApp."],
+        alternatePhone: "+91-9898989897",
+        occupation: "IT Professional",
+        address: {
+            street: "45, Shanti Nagar",
+            city: "Mumbai",
+            state: "Maharashtra",
+            pincode: "400070"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l001", 
+                learnerName: "Aarav Patel", 
+                relation: "Father",
+                grade: "11th Standard",
+                school: "DPS International School"
+            }
+        ],
+        preferredContactMethod: "whatsapp",
+        preferredContactTime: "Evening (6-8 PM)",
+        paymentInfo: {
+            method: "online",
+            billingCycle: "quarterly",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-01-15",
+            nextDueDate: "2024-04-15"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "ECM – Priya Singh",
+                timestamp: "2024-03-10",
+                note: "Wants regular academic updates via WhatsApp. Very involved in son's education.",
+                type: "communication"
+            },
+            {
+                author: "Admin – Accounts",
+                timestamp: "2024-01-15",
+                note: "Always pays on time. Prefers online payment.",
+                type: "payment"
+            }
+        ],
+        profileImage: "/guardians/rajesh_patel.png",
+        status: "active",
+        registeredDate: "2023-06-15",
+        lastInteraction: "2024-03-20"
     },
     {
         id: "g002",
         name: "Sneha Patel",
         relation: "Mother",
-        email: "snehapatel@example.com",
+        email: "sneha.patel@gmail.com",
         phone: "+91-9797979797",
-        assignedLearners: ["l001"],
-        notes: ["Available only in the evenings."],
+        occupation: "Homemaker",
+        address: {
+            street: "45, Shanti Nagar",
+            city: "Mumbai",
+            state: "Maharashtra",
+            pincode: "400070"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l001", 
+                learnerName: "Aarav Patel", 
+                relation: "Mother",
+                grade: "11th Standard",
+                school: "DPS International School"
+            }
+        ],
+        preferredContactMethod: "phone",
+        preferredContactTime: "Morning (10 AM - 12 PM)",
+        paymentInfo: {
+            method: "online",
+            billingCycle: "quarterly",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-01-15",
+            nextDueDate: "2024-04-15"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: false,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "ECM – Arjun Mehta",
+                timestamp: "2024-02-20",
+                note: "Available only in the evenings. Prefers to be contacted for urgent matters only.",
+                type: "communication"
+            }
+        ],
+        profileImage: null,
+        status: "active",
+        registeredDate: "2023-06-15",
+        lastInteraction: "2024-03-15"
     },
     {
         id: "g003",
         name: "Anil Reddy",
         relation: "Father",
-        email: "anilreddy@example.com",
+        email: "anil.reddy@techcorp.com",
         phone: "+91-9676767676",
-        assignedLearners: ["l002"],
-        notes: ["Prefers email communication."],
+        occupation: "Software Engineer",
+        address: {
+            street: "123, Tech Park Road",
+            city: "Hyderabad",
+            state: "Telangana",
+            pincode: "500081"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l002", 
+                learnerName: "Ishita Reddy", 
+                relation: "Father",
+                grade: "12th Standard",
+                school: "St. Mary's Convent School"
+            },
+            { 
+                learnerId: "l008", 
+                learnerName: "Nikhil Rao", 
+                relation: "Uncle",
+                grade: "10th Standard",
+                school: "Ryan International School"
+            }
+        ],
+        preferredContactMethod: "email",
+        preferredContactTime: "Any time",
+        paymentInfo: {
+            method: "bank-transfer",
+            billingCycle: "semester",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-01-01",
+            nextDueDate: "2024-07-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: false
+        },
+        notes: [
+            {
+                author: "ECM – Priya Singh",
+                timestamp: "2024-03-01",
+                note: "Prefers email communication. Responds promptly to important matters.",
+                type: "communication"
+            },
+            {
+                author: "Admin – Accounts",
+                timestamp: "2024-01-01",
+                note: "Pays for both children together via bank transfer.",
+                type: "payment"
+            }
+        ],
+        profileImage: "/guardians/anil_reddy.png",
+        status: "active",
+        registeredDate: "2023-07-01",
+        lastInteraction: "2024-03-18"
     },
+    {
+        id: "g004",
+        name: "Priya Reddy",
+        relation: "Mother",
+        email: "priya.reddy@medicalhospital.com",
+        phone: "+91-9565656565",
+        occupation: "Doctor",
+        address: {
+            street: "123, Tech Park Road",
+            city: "Hyderabad",
+            state: "Telangana",
+            pincode: "500081"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l002", 
+                learnerName: "Ishita Reddy", 
+                relation: "Mother",
+                grade: "12th Standard",
+                school: "St. Mary's Convent School"
+            }
+        ],
+        preferredContactMethod: "whatsapp",
+        preferredContactTime: "Late Evening (9-10 PM)",
+        paymentInfo: {
+            method: "bank-transfer",
+            billingCycle: "semester",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-01-01",
+            nextDueDate: "2024-07-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: false,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "ECM – Arjun Mehta",
+                timestamp: "2024-02-15",
+                note: "Very busy schedule. Best to contact after 9 PM or on weekends.",
+                type: "communication"
+            }
+        ],
+        profileImage: "",
+        status: "active",
+        registeredDate: "2023-07-01",
+        lastInteraction: "2024-03-10"
+    },
+    {
+        id: "g005",
+        name: "Vikram Verma",
+        relation: "Father",
+        email: "vikram.verma@business.com",
+        phone: "+91-9454545454",
+        occupation: "Business Owner",
+        address: {
+            street: "78, Commercial Complex",
+            city: "Delhi",
+            state: "Delhi",
+            pincode: "110001"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l003", 
+                learnerName: "Rohan Verma", 
+                relation: "Father",
+                grade: "10th Standard",
+                school: "Delhi Public School"
+            }
+        ],
+        preferredContactMethod: "phone",
+        preferredContactTime: "Morning (9-11 AM)",
+        paymentInfo: {
+            method: "cheque",
+            billingCycle: "monthly",
+            paymentStatus: "pending",
+            lastPaymentDate: "2024-02-01",
+            nextDueDate: "2024-03-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "Admin – Accounts",
+                timestamp: "2024-03-05",
+                note: "Payment delayed this month. Follow up required.",
+                type: "payment"
+            }
+        ],
+        profileImage: null,
+        status: "active",
+        registeredDate: "2023-08-01",
+        lastInteraction: "2024-03-05"
+    },
+    {
+        id: "g006",
+        name: "Suresh Desai",
+        relation: "Father",
+        email: "suresh.desai@bank.com",
+        phone: "+91-9343434343",
+        occupation: "Bank Manager",
+        address: {
+            street: "56, Green Valley",
+            city: "Pune",
+            state: "Maharashtra",
+            pincode: "411001"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l004", 
+                learnerName: "Ananya Desai", 
+                relation: "Father",
+                grade: "12th Standard",
+                school: "Vidya Valley School"
+            }
+        ],
+        preferredContactMethod: "email",
+        preferredContactTime: "Evening (5-7 PM)",
+        paymentInfo: {
+            method: "online",
+            billingCycle: "annual",
+            paymentStatus: "paid",
+            lastPaymentDate: "2023-06-01",
+            nextDueDate: "2024-06-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: false,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: false
+        },
+        notes: [
+            {
+                author: "ECM – Rohan D.",
+                timestamp: "2024-01-10",
+                note: "Very supportive. Wants detailed monthly progress reports.",
+                type: "communication"
+            }
+        ],
+        profileImage: "/guardians/suresh_desai.png",
+        status: "active",
+        registeredDate: "2023-05-20",
+        lastInteraction: "2024-03-19"
+    },
+    {
+        id: "g007",
+        name: "Kavita Desai",
+        relation: "Mother",
+        email: "kavita.desai@school.edu",
+        phone: "+91-9232323232",
+        occupation: "School Teacher",
+        address: {
+            street: "56, Green Valley",
+            city: "Pune",
+            state: "Maharashtra",
+            pincode: "411001"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l004", 
+                learnerName: "Ananya Desai", 
+                relation: "Mother",
+                grade: "12th Standard",
+                school: "Vidya Valley School"
+            }
+        ],
+        preferredContactMethod: "whatsapp",
+        preferredContactTime: "Afternoon (2-4 PM)",
+        paymentInfo: {
+            method: "online",
+            billingCycle: "annual",
+            paymentStatus: "paid",
+            lastPaymentDate: "2023-06-01",
+            nextDueDate: "2024-06-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: false,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "Ms. Tanya Kapoor",
+                timestamp: "2024-02-25",
+                note: "Being a teacher herself, very understanding about academic processes.",
+                type: "general"
+            }
+        ],
+        profileImage: null,
+        status: "active",
+        registeredDate: "2023-05-20",
+        lastInteraction: "2024-03-21"
+    },
+    {
+        id: "g008",
+        name: "Imran Sheikh",
+        relation: "Father",
+        email: "imran.sheikh@export.com",
+        phone: "+91-9121212121",
+        occupation: "Export Business",
+        address: {
+            street: "34, Old City",
+            city: "Mumbai",
+            state: "Maharashtra",
+            pincode: "400008"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l005", 
+                learnerName: "Sana Sheikh", 
+                relation: "Father",
+                grade: "11th Standard",
+                school: "Sophia College"
+            }
+        ],
+        preferredContactMethod: "phone",
+        preferredContactTime: "Morning (8-10 AM)",
+        paymentInfo: {
+            method: "cash",
+            billingCycle: "monthly",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-03-01",
+            nextDueDate: "2024-04-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "ECM – Priya Singh",
+                timestamp: "2024-01-20",
+                note: "Very keen on daughter's Olympiad preparation. Requests extra study materials.",
+                type: "general"
+            }
+        ],
+        profileImage: "/guardians/imran_sheikh.png",
+        status: "active",
+        registeredDate: "2023-06-10",
+        lastInteraction: "2024-03-15"
+    },
+    {
+        id: "g009",
+        name: "Fatima Sheikh",
+        relation: "Mother",
+        email: "fatima.sheikh@gmail.com",
+        phone: "+91-9010101010",
+        occupation: "Homemaker",
+        address: {
+            street: "34, Old City",
+            city: "Mumbai",
+            state: "Maharashtra",
+            pincode: "400008"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l005", 
+                learnerName: "Sana Sheikh", 
+                relation: "Mother",
+                grade: "11th Standard",
+                school: "Sophia College"
+            }
+        ],
+        preferredContactMethod: "whatsapp",
+        preferredContactTime: "Any time",
+        paymentInfo: {
+            method: "cash",
+            billingCycle: "monthly",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-03-01",
+            nextDueDate: "2024-04-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: false,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "Dr. Farah Qureshi",
+                timestamp: "2024-03-01",
+                note: "Very supportive of advanced Biology program. Attends all parent meetings.",
+                type: "general"
+            }
+        ],
+        profileImage: "",
+        status: "active",
+        registeredDate: "2023-06-10",
+        lastInteraction: "2024-03-20"
+    },
+    {
+        id: "g010",
+        name: "Krishnan Nair",
+        relation: "Father",
+        email: "krishnan.nair@tech.com",
+        phone: "+91-8909090909",
+        occupation: "IT Consultant",
+        address: {
+            street: "12, IT Park",
+            city: "Bangalore",
+            state: "Karnataka",
+            pincode: "560001"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l006", 
+                learnerName: "Arjun Nair", 
+                relation: "Father",
+                grade: "12th Standard",
+                school: "Kendriya Vidyalaya"
+            }
+        ],
+        preferredContactMethod: "email",
+        preferredContactTime: "Late Evening (8-10 PM)",
+        paymentInfo: {
+            method: "online",
+            billingCycle: "quarterly",
+            paymentStatus: "overdue",
+            lastPaymentDate: "2023-12-01",
+            nextDueDate: "2024-03-01"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: false
+        },
+        notes: [
+            {
+                author: "Admin – Accounts",
+                timestamp: "2024-03-10",
+                note: "Payment overdue. Multiple reminders sent.",
+                type: "payment"
+            },
+            {
+                author: "ECM – Priya Singh",
+                timestamp: "2024-03-15",
+                note: "Concerned about son's attendance. Requested meeting.",
+                type: "communication"
+            }
+        ],
+        profileImage: null,
+        status: "active",
+        registeredDate: "2023-07-15",
+        lastInteraction: "2024-03-15"
+    },
+    {
+        id: "g011",
+        name: "Deepak Mehta",
+        relation: "Father",
+        email: "deepak.mehta@legal.com",
+        phone: "+91-8787878787",
+        occupation: "Lawyer",
+        address: {
+            street: "45, Court Road",
+            city: "Delhi",
+            state: "Delhi",
+            pincode: "110002"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l007", 
+                learnerName: "Priya Mehta", 
+                relation: "Father",
+                grade: "11th Standard",
+                school: "Mount Carmel School"
+            }
+        ],
+        preferredContactMethod: "phone",
+        preferredContactTime: "Evening (6-8 PM)",
+        paymentInfo: {
+            method: "bank-transfer",
+            billingCycle: "semester",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-01-15",
+            nextDueDate: "2024-07-15"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: false,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: false
+        },
+        notes: [
+            {
+                author: "Mr. Arvind Menon",
+                timestamp: "2024-02-10",
+                note: "Very interested in CLAT preparation. Wants regular updates on progress.",
+                type: "general"
+            }
+        ],
+        profileImage: "/guardians/deepak_mehta.png",
+        status: "active",
+        registeredDate: "2023-08-20",
+        lastInteraction: "2024-03-18"
+    },
+    {
+        id: "g012",
+        name: "Sunita Mehta",
+        relation: "Mother",
+        email: "sunita.mehta@hospital.com",
+        phone: "+91-8676767676",
+        occupation: "Nurse",
+        address: {
+            street: "45, Court Road",
+            city: "Delhi",
+            state: "Delhi",
+            pincode: "110002"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l007", 
+                learnerName: "Priya Mehta", 
+                relation: "Mother",
+                grade: "11th Standard",
+                school: "Mount Carmel School"
+            }
+        ],
+        preferredContactMethod: "whatsapp",
+        preferredContactTime: "Afternoon (2-4 PM)",
+        paymentInfo: {
+            method: "bank-transfer",
+            billingCycle: "semester",
+            paymentStatus: "paid",
+            lastPaymentDate: "2024-01-15",
+            nextDueDate: "2024-07-15"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: false,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "Ms. Tanya Kapoor",
+                timestamp: "2024-03-05",
+                note: "Very encouraging. Always appreciates daughter's progress in English.",
+                type: "general"
+            }
+        ],
+        profileImage: null,
+        status: "active",
+        registeredDate: "2023-08-20",
+        lastInteraction: "2024-03-22"
+    },
+    {
+        id: "g013",
+        name: "Salman Khan",
+        relation: "Father",
+        email: "salman.khan@restaurant.com",
+        phone: "+91-8565656565",
+        occupation: "Restaurant Owner",
+        address: {
+            street: "23, Food Street",
+            city: "Mumbai",
+            state: "Maharashtra",
+            pincode: "400011"
+        },
+        assignedLearners: [
+            { 
+                learnerId: "l009", 
+                learnerName: "Rehan Khan", 
+                relation: "Father",
+                grade: "12th Standard",
+                school: "St. Xavier's College"
+            }
+        ],
+        preferredContactMethod: "phone",
+        preferredContactTime: "Late Night (10 PM - 12 AM)",
+        paymentInfo: {
+            method: "cash",
+            billingCycle: "monthly",
+            paymentStatus: "pending",
+            lastPaymentDate: "2024-02-15",
+            nextDueDate: "2024-03-15"
+        },
+        communicationPreferences: {
+            academicUpdates: true,
+            attendanceAlerts: true,
+            performanceReports: true,
+            paymentReminders: true,
+            generalNotifications: true
+        },
+        notes: [
+            {
+                author: "ECM – Arjun Mehta",
+                timestamp: "2024-03-14",
+                note: "Worried about son's dual track (JEE + NEET). Needs counseling session.",
+                type: "general"
+            },
+            {
+                author: "Admin – Accounts",
+                timestamp: "2024-03-16",
+                note: "Payment delayed due to son being on break.",
+                type: "payment"
+            }
+        ],
+        profileImage: "/guardians/salman_khan.png",
+        status: "active",
+        registeredDate: "2023-06-01",
+        lastInteraction: "2024-03-14"
+    }
 ];
 
-export default guardians;
-  
+export { guardians };
+export type { Guardian };

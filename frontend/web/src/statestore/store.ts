@@ -20,4 +20,32 @@ interface UserState {
 export const useUserStore = create<UserState>((set) => ({
     user: null,
     setUser: (user) => set({ user }),
+}));
+
+// Combined store for all app state
+interface AppState {
+    // Secondary Sidebar Drawer state
+    isSecondarySidebarOpen: boolean;
+    secondarySidebarContent: string | null;
+    openSecondarySidebar: (content: string) => void;
+    closeSecondarySidebar: () => void;
+    toggleSecondarySidebar: (content?: string) => void;
+}
+
+export const useStore = create<AppState>((set) => ({
+    // Secondary Sidebar Drawer state
+    isSecondarySidebarOpen: false,
+    secondarySidebarContent: null,
+    openSecondarySidebar: (content) => set({ 
+        isSecondarySidebarOpen: true, 
+        secondarySidebarContent: content 
+    }),
+    closeSecondarySidebar: () => set({ 
+        isSecondarySidebarOpen: false, 
+        secondarySidebarContent: null 
+    }),
+    toggleSecondarySidebar: (content) => set((state) => ({
+        isSecondarySidebarOpen: !state.isSecondarySidebarOpen,
+        secondarySidebarContent: content || state.secondarySidebarContent
+    })),
 })); 

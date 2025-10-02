@@ -10,6 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 3. **NEVER run `bun run start:all` or ANY command that starts servers**
 4. **NEVER run build commands that might trigger installations**
 5. **NEVER run any background processes or servers**
+6. **NEVER run `git pull`, `git push`, or ANY git commands that modify the repository**
+7. **NEVER run `bun run prisma:generate`, `bun run prisma:push`, or ANY Prisma commands**
+8. **NEVER run ANY terminal commands that modify files, install packages, or change system state**
 
 ### ✅ WHAT YOU SHOULD DO INSTEAD:
 - **ONLY** write, read, edit, and analyze code
@@ -17,12 +20,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **ONLY** provide instructions for the user to run commands
 - When testing is needed, **TELL THE USER** what commands to run
 - When installations are needed, **TELL THE USER** to run `bun install`
+- You MAY run `git diff` to check changes (read-only command)
+- You MAY run `git status` to check repository status (read-only command)
+- You MAY run `ls`, `cat`, `pwd` and other read-only commands
 
 ### 📝 REMEMBER:
 - The user will ALWAYS handle running servers
 - The user will ALWAYS handle installing packages
+- The user will ALWAYS handle git operations (pull, push, etc.)
+- The user will ALWAYS handle Prisma commands
 - You are ONLY responsible for code changes and configuration
 - **NEVER EVER** run installation or server commands under any circumstances
+- **ALWAYS** inform the user when commands need to be run
 
 ## Project Context - REQUIRED READING
 
@@ -98,22 +107,22 @@ NextPhoton/
 └── tsconfig.base.json      # Base TypeScript configuration
 ```
 
-- **Frontend**: Next.js 15 with App Router, Tailwind CSS v4, TypeScript, Better-Auth
+- **Frontend**: Next.js 15 with App Router, Tailwind CSS v4, TypeScript
 - **Backend**: NestJS with GraphQL, Express, TypeScript, JWT authentication
 - **Shared**: Prisma schema, database utilities, shared types
 
 ### Key Technologies
 - **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Better-auth with Prisma adapter
+- **Authentication**: JWT (JSON Web Tokens) implemented in NestJS backend
 - **Frontend**: Next.js 15, Radix UI components, React Hook Form with Zod validation, ShadCN
-- **Backend**: NestJS framework
+- **Backend**: NestJS framework with Passport JWT strategy
 - **Styling**: Tailwind CSS v4 with dark mode support
 - **State Management**: Zustand
 
 ### Database Schema Location & Prisma Architecture
 - **Primary schema**: `shared/prisma/schema.prisma` - Single source of truth
 - **Centralized client**: `shared/db/index.ts` - Singleton Prisma client for entire monorepo
-- **Better-auth models**: User, Session, Account, Verification tables
+- **Auth models**: User, Role, Permission tables for JWT authentication
 - **Database client**: Generated to `node_modules/.prisma/client` from shared schema
 
 #### ✅ CORRECT Prisma Setup (NextPhoton Architecture):
@@ -148,10 +157,10 @@ backend/server_NestJS/prisma.service.ts     # ❌ Separate client
 - Route access controlled via `lib/routeAccessMap.ts`
 
 ### Authentication Flow
-- Better-auth configuration in `client/src/lib/auth.ts`
-- Email/password authentication enabled
-- Session management with database persistence
-- Auth client utilities in `client/src/lib/auth-client.ts`
+- JWT authentication implemented in NestJS backend
+- Email/password authentication with JWT tokens
+- Token-based session management
+- Auth endpoints in `backend/server_NestJS/src/auth/*`
 
 ### Important File Locations
 
@@ -162,8 +171,8 @@ backend/server_NestJS/prisma.service.ts     # ❌ Separate client
 - **Connection Test**: `shared/db/test-connection.ts` - Database validation
 
 #### Frontend (Next.js):
-- **Auth Config**: `frontend/web/src/lib/auth.ts` - Better-auth setup
-- **Auth Schemas**: `frontend/web/src/lib/auth-schema.ts` - Authentication types
+- **Auth Utils**: `frontend/web/src/lib/auth-utils.ts` - JWT token management
+- **Auth Context**: `frontend/web/src/contexts/auth-context.tsx` - Authentication state
 - **Form Validation**: `frontend/web/src/lib/formValidationSchemas.ts` - Zod schemas
 - **Global State**: `frontend/web/src/statestore/store.ts` - Zustand store
 - **Route Access**: `frontend/web/src/lib/routeAccessMap.ts` - ABAC route control
@@ -172,7 +181,9 @@ backend/server_NestJS/prisma.service.ts     # ❌ Separate client
 - **Main Entry**: `backend/server_NestJS/src/main.ts` - Server bootstrap
 - **App Module**: `backend/server_NestJS/src/app.module.ts` - Root module
 - **GraphQL Config**: `backend/server_NestJS/src/graphql/*` - GraphQL resolvers
-- **Auth Module**: `backend/server_NestJS/src/auth/*` - JWT authentication
+- **Auth Module**: `backend/server_NestJS/src/auth/*` - JWT authentication with Passport
+- **JWT Strategy**: `backend/server_NestJS/src/auth/strategies/jwt.strategy.ts`
+- **Auth Guards**: `backend/server_NestJS/src/auth/guards/*` - JWT validation guards
 
 ### Development Notes
 

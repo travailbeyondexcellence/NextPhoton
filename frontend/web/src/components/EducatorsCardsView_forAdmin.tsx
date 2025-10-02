@@ -2,11 +2,9 @@
 
 import React, { useState } from 'react';
 import EducatorCard_forAdmin from './EducatorCard_forAdmin';
-import { educator as educator1 } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData';
+import educatorsData from '../../mock-data/educators.json';
 
-import { educators } from '@/app/(dashboard)/admin/educators/[educatorID]/dummyData1.ts';
-
-const educatorsArr = [...educators];
+const educatorsArr = educatorsData.data;
 
 // const dummyEducators = [
 //   educator1,
@@ -36,7 +34,7 @@ const EducatorsCardsView_forAdmin = () => {
     const [educators, setEducators] = useState(educatorsArr);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 max-w-[1600px] mx-auto">
       {educators.map((edu: any) => (
         <EducatorCard_forAdmin key={edu.id} educator={edu} />
       ))}

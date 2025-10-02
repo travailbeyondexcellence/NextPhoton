@@ -32,7 +32,7 @@ export const learnerMenu: SidebarGroup[] = [
   {
     title: "MENU",
     items: [
-      { icon: Home, label: "Home", href: "/" },
+      { icon: Home, label: "Home", href: "/learner" },
       { icon: Users, label: "Teachers", href: "/list/teachers" },
       { icon: GraduationCap, label: "Students", href: "/list/students" },
       { icon: User, label: "Parents", href: "/list/parents" },

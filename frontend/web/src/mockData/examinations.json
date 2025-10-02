@@ -1,0 +1,166 @@
+[
+  {
+    "id": "exam001",
+    "title": "Mathematics Mid-term Examination",
+    "description": "Comprehensive assessment covering algebra, geometry, and trigonometry",
+    "subject": "Mathematics",
+    "examType": "Mid-term",
+    "scheduledDate": "2025-10-08T03:00:00.000Z",
+    "duration": 120,
+    "totalMarks": 100,
+    "passingMarks": 40,
+    "educatorId": "e001",
+    "educatorName": "Dr. Sarah Smith",
+    "enrolledStudents": [
+      "l001",
+      "l002",
+      "l003",
+      "l004"
+    ],
+    "status": "Scheduled",
+    "instructions": [
+      "Use only black or blue pen",
+      "Show all working clearly",
+      "Calculators are allowed",
+      "Answer all questions"
+    ],
+    "syllabus": [
+      "Linear Equations and Inequalities",
+      "Quadratic Equations",
+      "Basic Trigonometry",
+      "Coordinate Geometry"
+    ],
+    "createdAt": "2025-09-17T14:29:00.000Z",
+    "venue": "Room 101",
+    "isOnline": false
+  },
+  {
+    "id": "exam002",
+    "title": "Physics Unit Test - Mechanics",
+    "description": "Assessment on Newton's laws, forces, and motion",
+    "subject": "Physics",
+    "examType": "Unit Test",
+    "scheduledDate": "2025-10-04T14:59:00.000Z",
+    "duration": 90,
+    "totalMarks": 75,
+    "passingMarks": 30,
+    "educatorId": "e003",
+    "educatorName": "Dr. Emily Brown",
+    "enrolledStudents": [
+      "l002",
+      "l003",
+      "l004",
+      "l005"
+    ],
+    "status": "Scheduled",
+    "instructions": [
+      "Formula sheet provided",
+      "Show all calculations",
+      "Diagrams must be labeled"
+    ],
+    "syllabus": [
+      "Newton's Laws of Motion",
+      "Force and Acceleration",
+      "Work, Energy and Power",
+      "Momentum and Collisions"
+    ],
+    "createdAt": "2025-09-21T14:29:00.000Z",
+    "venue": "Physics Lab",
+    "isOnline": false
+  },
+  {
+    "id": "exam003",
+    "title": "English Literature Quiz",
+    "description": "Assessment on Shakespeare's Hamlet",
+    "subject": "English Literature",
+    "examType": "Quiz",
+    "scheduledDate": "2025-09-29T14:29:00.000Z",
+    "duration": 45,
+    "totalMarks": 50,
+    "passingMarks": 20,
+    "educatorId": "e002",
+    "educatorName": "Prof. Michael Johnson",
+    "enrolledStudents": [
+      "l006",
+      "l007",
+      "l008"
+    ],
+    "status": "Completed",
+    "instructions": [
+      "Quote references required",
+      "Support answers with evidence"
+    ],
+    "syllabus": [
+      "Hamlet Characters",
+      "Major Themes",
+      "Plot Analysis"
+    ],
+    "examResults": [
+      {
+        "studentId": "l006",
+        "studentName": "Frank Thompson",
+        "startTime": "2025-09-29T14:29:00.000Z",
+        "endTime": "2025-09-29T15:09:00.000Z",
+        "obtainedMarks": 42,
+        "percentage": 84,
+        "grade": "A",
+        "rank": 1,
+        "timeSpent": 40,
+        "answers": [],
+        "status": "Completed"
+      },
+      {
+        "studentId": "l007",
+        "studentName": "Grace Wilson",
+        "startTime": "2025-09-29T14:29:00.000Z",
+        "endTime": "2025-09-29T15:12:00.000Z",
+        "obtainedMarks": 38,
+        "percentage": 76,
+        "grade": "B+",
+        "rank": 2,
+        "timeSpent": 43,
+        "answers": [],
+        "status": "Completed"
+      }
+    ],
+    "createdAt": "2025-09-24T14:29:00.000Z",
+    "isOnline": true
+  },
+  {
+    "id": "exam004",
+    "title": "Chemistry Final Examination",
+    "description": "Comprehensive final exam covering organic and inorganic chemistry",
+    "subject": "Chemistry",
+    "examType": "Final",
+    "scheduledDate": "2025-10-22T14:29:00.000Z",
+    "duration": 180,
+    "totalMarks": 150,
+    "passingMarks": 60,
+    "educatorId": "e005",
+    "educatorName": "Dr. Linda Davis",
+    "enrolledStudents": [
+      "l001",
+      "l004",
+      "l005",
+      "l006",
+      "l008"
+    ],
+    "status": "Scheduled",
+    "instructions": [
+      "Periodic table provided",
+      "Use chemical formulas correctly",
+      "Balance all equations",
+      "Show all working"
+    ],
+    "syllabus": [
+      "Atomic Structure",
+      "Chemical Bonding",
+      "Organic Chemistry Basics",
+      "Acid-Base Reactions",
+      "Electrochemistry"
+    ],
+    "createdAt": "2025-09-01T14:29:00.000Z",
+    "venue": "Chemistry Lab",
+    "isOnline": false
+  }
+]

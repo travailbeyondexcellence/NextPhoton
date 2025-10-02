@@ -1,179 +1,1012 @@
 @import "tailwindcss";
 
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
-
-
-/* @theme {
-  --color-lamaSky: #C3EBFA;
-  --color-lamaSkyLight: #EDF9FD;
-  --color-lamaPurple: #CFCEFF;
-  --color-lamaPurpleLight: #F1F0FF;
-  --color-lamaYellow: #FAE27C;
-  --color-lamaYellowLight: #FEFCE8;
-  --background: hsl(var(--background));
-  --foreground: hsl(var(--foreground));
-  --card: hsl(var(--card));
-  --card-foreground: hsl(var(--card-foreground));
-  --popover: hsl(var(--popover));
-  --popover-foreground: hsl(var(--popover-foreground));
-  --primary: hsl(var(--primary));
-  --primary-foreground: hsl(var(--primary-foreground));
-  --secondary: hsl(var(--secondary));
-  --secondary-foreground: hsl(var(--secondary-foreground));
-  --muted: hsl(var(--muted));
-  --muted-foreground: hsl(var(--muted-foreground));
-  --accent: hsl(var(--accent));
-  --accent-foreground: hsl(var(--accent-foreground));
-  --destructive: hsl(var(--destructive));
-  --destructive-foreground: hsl(var(--destructive-foreground));
-  --border: hsl(var(--border));
-  --input: hsl(var(--input));
-  --ring: hsl(var(--ring));
-  --chart-1: hsl(var(--chart-1));
-  --chart-2: hsl(var(--chart-2));
-  --chart-3: hsl(var(--chart-3));
-  --chart-4: hsl(var(--chart-4));
-  --chart-5: hsl(var(--chart-5));
-  --sidebar-background: hsl(var(--sidebar-background));
-  --sidebar-foreground: hsl(var(--sidebar-foreground));
-  --sidebar-primary: hsl(var(--sidebar-primary));
-  --sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --sidebar-accent: hsl(var(--sidebar-accent));
-  --sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --sidebar-border: hsl(var(--sidebar-border));
-  --sidebar-ring: hsl(var(--sidebar-ring));
-
-  --gradient-radial: radial-gradient(var(--tw-gradient-stops));
-  --gradient-conic: conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops));
-
-  --radius: var(--radius);
-  --borderRadius-lg: var(--radius);
-  --borderRadius-md: calc(var(--radius) - 2px);
-  --borderRadius-sm: calc(var(--radius) - 4px);
-} */
-
-/* Add any base styles or custom utilities here */
-
-/* // ... existing code ... */
-
-
-
-
-@layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
+/* Override Next.js default loader styles */
+@layer base {
+  /* Hide default Next.js development loader */
+  #__next-dev-overlay-logo {
+    display: none !important;
   }
 
-  .scrollbar-track-transparent {
-    background-color: transparent;
+  /* Ensure our custom loaders have proper z-index */
+  .minimalistic-loader-overlay {
+    z-index: 9999 !important;
   }
 
-  .scrollbar-thumb-muted {
-    background-color: rgba(255, 255, 255, 0.2);
+  /* Smooth transitions for page content */
+  .page-transition {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+
+  /* Shimmer animation keyframes */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s ease-in-out infinite;
   }
 }
 
-/* Hide scrollbar buttons (arrows) in WebKit-based browsers (Chrome, Edge, Safari) */
-.scrollbar-hide-buttons::-webkit-scrollbar-button {
-  display: none;
-  height: 0;
-  width: 0;
+/* PRIORITY: Remove scrollbar arrow buttons first */
+@layer base {
+  /* Remove all scrollbar buttons */
+  ::-webkit-scrollbar-button {
+    display: none !important;
+  }
+  
+  /* Target specific button states */
+  ::-webkit-scrollbar-button:horizontal:start:decrement,
+  ::-webkit-scrollbar-button:horizontal:end:increment,
+  ::-webkit-scrollbar-button:vertical:start:decrement,
+  ::-webkit-scrollbar-button:vertical:end:increment,
+  ::-webkit-scrollbar-button:horizontal:start:increment,
+  ::-webkit-scrollbar-button:horizontal:end:decrement,
+  ::-webkit-scrollbar-button:vertical:start:increment,
+  ::-webkit-scrollbar-button:vertical:end:decrement {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
 }
 
-/* Hide scrollbar arrows (buttons) in WebKit browsers */
-::-webkit-scrollbar-button {
-  display: none !important;
-  height: 0 !important;
-  width: 0 !important;
+/* Theme CSS Variables */
+@layer base {
+  :root {
+    /* Default theme (Celeste) - RGB values for Tailwind alpha support */
+    --background: 240 248 255;
+    --foreground: 2 71 159;
+    --card: 230 242 255;
+    --card-foreground: 30 41 59;
+    --primary: 0 82 255;
+    --primary-foreground: 255 255 255;
+    --secondary: 14 165 233;
+    --secondary-foreground: 255 255 255;
+    --accent: 56 189 248;
+    --accent-foreground: 12 74 110;
+    --muted: 204 230 255;
+    --muted-foreground: 100 116 139;
+    --border: 179 217 255;
+    --selection: 186 230 253;
+    --link: 37 99 235;
+    --link-hover: 29 78 216;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --success: 34 197 94;
+    --success-foreground: 255 255 255;
+    --warning: 245 158 11;
+    --warning-foreground: 255 255 255;
+    
+    /* Background gradient - populated from themes.json */
+    --gradient-from: 17 24 39;
+    --gradient-via: 30 58 138;
+    --gradient-to: 91 33 182;
+    
+    /* Glass properties - populated from themes.json */
+    --glass-opacity: 0.1;
+    --glass-border-opacity: 0.2;
+    --glass-blur: 12;
+    --glass-hover-opacity: 0.15;
+    --glass-active-opacity: 0.2;
+    
+    /* Gradient overlay - populated from themes.json */
+    --gradient-overlay-from: 56 189 248;
+    --gradient-overlay-to: 0 82 255;
+    --gradient-overlay-from-opacity: 0.1;
+    --gradient-overlay-to-opacity: 0.05;
+    
+    /* Additional UI variables */
+    --radius: 0.5rem;
+    --input: var(--border);
+    --ring: var(--primary);
+    
+    /* Chart colors */
+    --chart-1: 12 76 122;
+    --chart-2: 0 149 199;
+    --chart-3: 0 196 159;
+    --chart-4: 84 78 195;
+    --chart-5: 189 53 88;
+    
+    /* Sidebar colors */
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+    /* Default sidebar text color */
+    --sidebar-text-color: var(--foreground);
+  }
+
+  /* Dark Mode Theme */
+  .dark {
+    --background: 15 23 42;
+    --foreground: 226 232 240;
+    --card: 30 41 59;
+    --card-foreground: 226 232 240;
+    --primary: 59 130 246;
+    --primary-foreground: 255 255 255;
+    --secondary: 51 65 85;
+    --secondary-foreground: 226 232 240;
+    --accent: 71 85 105;
+    --accent-foreground: 226 232 240;
+    --muted: 51 65 85;
+    --muted-foreground: 148 163 184;
+    --border: 51 65 85;
+    --selection: 30 58 138;
+    --link: 96 165 250;
+    --link-hover: 59 130 246;
+    --destructive: 220 38 38;
+    --destructive-foreground: 255 255 255;
+    --success: 22 163 74;
+    --success-foreground: 255 255 255;
+    --warning: 217 119 6;
+    --warning-foreground: 255 255 255;
+    
+    /* Sidebar text color - default to foreground for dark mode */
+    --sidebar-text-color: var(--foreground);
+
+    /* Dark mode gradients - darker tones */
+    --gradient-from: 15 23 42;
+    --gradient-via: 30 41 59;
+    --gradient-to: 51 65 85;
+
+    /* Glass properties for dark mode */
+    --glass-opacity: 0.15;
+    --glass-border-opacity: 0.25;
+    --glass-hover-opacity: 0.2;
+    --glass-active-opacity: 0.25;
+  }
 }
 
-/* General scrollbar settings */
-.custom-scrollbar {
+/* Glass Morphism Base Styles */
+@layer base {
+  * {
+    border-color: rgb(var(--border));
+  }
+  
+  body {
+    color: rgb(var(--foreground));
+    min-height: 100vh;
+    position: relative;
+    background: transparent;
+  }
+  
+  /* Theme-aware gradient background - only for glass themes */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(var(--background));
+    z-index: -1;
+  }
+  
+  /* Glass theme gradient background */
+  [data-theme-type="glass"] body::before {
+    background: linear-gradient(to bottom right,
+      rgb(var(--gradient-from)),
+      rgb(var(--gradient-via)),
+      rgb(var(--gradient-to)));
+    opacity: var(--background-gradient-opacity, 0.75);
+  }
+  
+  /* Main section background overlay for darkening effect */
+  .main-section-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 100%;
+    background: #000000;
+    opacity: var(--main-section-background-overlay, 0);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  /* Theme selector background overlay with gradient */
+  .theme-selector-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgb(var(--theme-selector-overlay-gradient-from, 0 0 0)) 0%, 
+      rgb(var(--theme-selector-overlay-gradient-via, 0 0 0)) 50%, 
+      rgb(var(--theme-selector-overlay-gradient-to, 0 0 0)) 100%);
+    opacity: var(--theme-selector-background-overlay, 0);
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  /* Hide scrollbar for theme selector while maintaining scroll functionality */
+  .theme-selector-scrollable {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+  }
+  
+  .theme-selector-scrollable::-webkit-scrollbar {
+    display: none; /* WebKit */
+  }
+  
+  /* More aggressive scrollbar hiding for theme selector */
+  .theme-selector-no-scrollbar {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* Internet Explorer 10+ */
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar {
+    display: none !important; /* WebKit */
+    width: 0 !important;
+    height: 0 !important;
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar-track {
+    display: none !important;
+  }
+  
+  .theme-selector-no-scrollbar::-webkit-scrollbar-thumb {
+    display: none !important;
+  }
+  
+  ::selection {
+    background-color: rgb(var(--selection) / 0.5);
+    color: rgb(var(--foreground));
+  }
+}
+
+/* Glass Morphism Utilities - Only apply for glass themes */
+@layer components {
+  /* Base glass effect */
+  .glass {
+    background: rgb(var(--card));
+    border: 1px solid rgb(var(--border));
+    border-radius: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Glass effects only when data-theme-type="glass" */
+  [data-theme-type="glass"] .glass {
+    background: rgb(var(--card) / var(--glass-opacity));
+    backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    border: 1px solid rgb(var(--border) / var(--glass-border-opacity));
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.15),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Glass card variant */
+  .glass-card {
+    background: rgb(var(--card));
+    border: 1px solid rgb(var(--border));
+    border-radius: 0.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Glass effects only when data-theme-type="glass" */
+  [data-theme-type="glass"] .glass-card {
+    background: rgb(var(--card) / var(--glass-opacity));
+    backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    border: 1px solid rgb(var(--border) / var(--glass-border-opacity));
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.15),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-card:hover {
+    background: rgb(var(--card));
+    border-color: rgb(var(--primary) / 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  [data-theme-type="glass"] .glass-card:hover {
+    background: rgb(var(--card) / var(--glass-hover-opacity));
+    box-shadow: 
+      0 12px 40px 0 rgba(31, 38, 135, 0.25),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Ensure glass effects work in all scroll contexts */
+  [data-theme-type="glass"] .glass,
+  [data-theme-type="glass"] .glass-card,
+  [data-theme-type="glass"] [class*="backdrop-blur"] {
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  
+  /* Theme-aware glass utilities to replace hard-coded values */
+  .theme-bg-glass {
+    background: rgb(var(--card)) !important;
+  }
+  
+  [data-theme-type="glass"] .theme-bg-glass {
+    background: rgb(var(--card) / var(--glass-opacity)) !important;
+  }
+  
+  .theme-bg-glass-hover:hover {
+    background: rgb(var(--card)) !important;
+  }
+  
+  [data-theme-type="glass"] .theme-bg-glass-hover:hover {
+    background: rgb(var(--card) / var(--glass-hover-opacity)) !important;
+  }
+  
+  .theme-backdrop-blur {
+    /* No effect for modern themes */
+  }
+  
+  [data-theme-type="glass"] .theme-backdrop-blur {
+    backdrop-filter: blur(calc(var(--glass-blur) * 1px)) !important;
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px)) !important;
+  }
+  
+  .theme-border-glass {
+    border-color: rgb(var(--border)) !important;
+  }
+  
+  [data-theme-type="glass"] .theme-border-glass {
+    border-color: rgb(var(--border) / var(--glass-border-opacity)) !important;
+  }
+  
+  /* Glass panel for larger areas */
+  .glass-panel {
+    background: rgb(var(--card));
+    border: 1px solid rgb(var(--border));
+    border-radius: 0.75rem;
+  }
+  
+  [data-theme-type="glass"] .glass-panel {
+    background: linear-gradient(
+      135deg,
+      rgb(var(--card) / var(--glass-opacity)),
+      rgb(var(--background) / calc(var(--glass-opacity) * 0.5))
+    );
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5px));
+    border: 1px solid rgb(var(--border) / calc(var(--glass-border-opacity) * 0.8));
+  }
+  
+  /* Glass button */
+  .glass-button {
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    background: rgb(var(--primary));
+    color: rgb(var(--primary-foreground));
+    border: 1px solid rgb(var(--primary));
+    cursor: pointer;
+  }
+  
+  /* Modern theme header buttons - more subtle styling */
+  [data-theme-type="modern"] .dashboard-header-gradient .glass-button {
+    background: transparent;
+    color: rgb(var(--foreground));
+    border: 1px solid rgb(var(--border));
+  }
+  
+  [data-theme-type="glass"] .glass-button {
+    backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1px));
+    background: rgb(var(--primary) / 0.1);
+    border: 1px solid rgb(var(--primary) / 0.2);
+    color: rgb(var(--primary));
+  }
+
+  .glass-button:hover {
+    background: rgb(var(--primary));
+    color: rgb(var(--primary-foreground));
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px 0 rgb(var(--primary) / 0.3);
+  }
+  
+  /* Modern theme header buttons hover */
+  [data-theme-type="modern"] .dashboard-header-gradient .glass-button:hover {
+    background: rgb(var(--accent));
+    color: rgb(var(--accent-foreground));
+    border-color: rgb(var(--accent));
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  [data-theme-type="glass"] .glass-button:hover {
+    background: rgb(var(--primary) / 0.15);
+    color: rgb(var(--primary));
+    box-shadow: 0 0 20px rgb(var(--primary) / 0.3);
+  }
+
+  .glass-button:active {
+    transform: scale(0.98);
+  }
+  
+  [data-theme-type="glass"] .glass-button:active {
+    background: rgb(var(--primary) / 0.2);
+  }
+
+  /* Action buttons - consistent style for all action buttons across the app */
+  .btn-action {
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+
+  /* Enhance primary action buttons with border and glow */
+  .btn-primary-action {
+    cursor: pointer;
+    border: 1px solid rgb(var(--primary) / 0.3);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .btn-primary-action:hover {
+    border-color: rgb(var(--primary) / 0.5);
+    box-shadow:
+      0 0 15px rgb(var(--primary) / 0.4),
+      0 0 30px rgb(var(--primary) / 0.2),
+      inset 0 0 10px rgb(var(--primary) / 0.1);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary-action:active {
+    transform: translateY(0);
+    box-shadow:
+      0 0 10px rgb(var(--primary) / 0.3),
+      inset 0 0 8px rgb(var(--primary) / 0.15);
+  }
+  
+  /* Glass navigation */
+  .glass-nav {
+    background: rgb(var(--background));
+    border-bottom: 1px solid rgb(var(--border));
+  }
+  
+  [data-theme-type="glass"] .glass-nav {
+    background: rgb(var(--background) / 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgb(var(--border) / 0.1);
+  }
+  
+  /* Glass modal/overlay */
+  .glass-modal {
+    background: rgb(var(--background));
+    border: 1px solid rgb(var(--border));
+  }
+  
+  [data-theme-type="glass"] .glass-modal {
+    background: rgb(var(--background) / 0.2);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgb(var(--border) / 0.3);
+  }
+  
+  /* Glass input */
+  .glass-input {
+    background: rgb(var(--background));
+    border: 1px solid rgb(var(--border));
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  [data-theme-type="glass"] .glass-input {
+    background: rgb(var(--background) / 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgb(var(--border) / 0.2);
+  }
+  
+  .glass-input:focus {
+    border-color: rgb(var(--primary));
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--primary) / 0.1);
+  }
+  
+  [data-theme-type="glass"] .glass-input:focus {
+    background: rgb(var(--background) / 0.08);
+    border-color: rgb(var(--primary) / 0.5);
+  }
+  
+  /* Modern theme styles - clean, solid colors without glass effects */
+  [data-theme-type="modern"] .glass,
+  [data-theme-type="modern"] .glass-card,
+  [data-theme-type="modern"] .glass-panel {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  [data-theme-type="modern"] .glass:hover,
+  [data-theme-type="modern"] .glass-card:hover,
+  [data-theme-type="modern"] .glass-panel:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Fix backdrop-blur utilities for Tailwind classes */
+  [data-theme-type="modern"] [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* Disable glass morphism for common Tailwind utilities in modern theme */
+  [data-theme-type="modern"] .backdrop-blur-sm,
+  [data-theme-type="modern"] .backdrop-blur-md,
+  [data-theme-type="modern"] .backdrop-blur-lg,
+  [data-theme-type="modern"] .backdrop-blur-xl,
+  [data-theme-type="modern"] .backdrop-blur-2xl,
+  [data-theme-type="modern"] .backdrop-blur-3xl {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  
+  /* Override bg-opacity utilities for modern themes */
+  /* REMOVED: This was causing sidebar hover states to always show background
+  [data-theme-type="modern"] [class*="bg-white/"],
+  [data-theme-type="modern"] [class*="bg-black/"] {
+    background-color: rgb(var(--card)) !important;
+  }
+  */
+  
+  /* Sidebar gradient styles */
+  .sidebar-theme-gradient {
+    /* Default: Use background color for modern themes */
+    background: rgb(var(--background)) !important;
+    border-right-color: rgb(var(--border));
+    position: relative;
+  }
+  
+  /* Modern themes - use card background for slight contrast */
+  [data-theme-type="modern"] .sidebar-theme-gradient {
+    background: rgb(var(--card)) !important;
+    color: rgb(var(--foreground)) !important;
+  }
+  
+  /* Modern themes - ensure all text in sidebar uses proper foreground color */
+  [data-theme-type="modern"] .sidebar-theme-gradient * {
+    color: inherit !important;
+  }
+  
+  /* Modern themes - sidebar hover and active states */
+  [data-theme-type="modern"] .sidebar-theme-gradient .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent)) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  [data-theme-type="modern"] .sidebar-theme-gradient .bg-sidebar-accent {
+    background-color: rgb(var(--accent)) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  /* Glass themes - sidebar hover and active states with transparency */
+  [data-theme-type="glass"] .sidebar-theme-gradient .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent) / 0.2) !important;
+    backdrop-filter: blur(8px);
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .bg-sidebar-accent {
+    background-color: rgb(var(--accent) / 0.3) !important;
+    backdrop-filter: blur(8px);
+  }
+  
+  /* Fix for bg-sidebar-accent/20 (header section) */
+  [data-theme-type="modern"] .sidebar-theme-gradient .bg-sidebar-accent\/20 {
+    background-color: rgb(var(--accent) / 0.2) !important;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .bg-sidebar-accent\/20 {
+    background-color: rgb(var(--accent) / 0.1) !important;
+  }
+  
+  /* Ensure hover states work for all sidebar-related components */
+  [data-theme-type="modern"] .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent)) !important;
+    color: rgb(var(--accent-foreground)) !important;
+  }
+  
+  [data-theme-type="glass"] .hover\:bg-sidebar-accent:hover {
+    background-color: rgb(var(--accent) / 0.2) !important;
+  }
+  
+  /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
+  [data-theme-type="modern"] .sidebar-theme-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: transparent;
+  }
+  
+  /* Modern theme - No overlay, keep opacity 0 */
+  [data-theme-type="modern"] .sidebar-theme-gradient::before {
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient {
+    background: linear-gradient(135deg, 
+      rgb(var(--sidebar-gradient-from) / var(--sidebar-gradient-opacity, 1)) 0%, 
+      rgb(var(--sidebar-gradient-via) / var(--sidebar-gradient-opacity, 1)) 50%, 
+      rgb(var(--sidebar-gradient-to) / var(--sidebar-gradient-opacity, 1)) 100%) !important;
+    /* Apply sidebar text color to all text in glass theme sidebar */
+    color: rgb(var(--sidebar-text-color, var(--foreground))) !important;
+  }
+  
+  /* Ensure all child elements inherit the sidebar text color in glass themes */
+  [data-theme-type="glass"] .sidebar-theme-gradient * {
+    color: inherit !important;
+  }
+  
+  /* Override opacity utilities to preserve text color inheritance in glass sidebar */
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-70,
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-85,
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-90,
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-95 {
+    opacity: 1 !important;
+    filter: opacity(var(--tw-opacity));
+  }
+  
+  /* Dim the opacity visually without affecting color inheritance */
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-70 {
+    --tw-opacity: 0.7;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-85 {
+    --tw-opacity: 0.85;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-90 {
+    --tw-opacity: 0.9;
+  }
+  
+  [data-theme-type="glass"] .sidebar-theme-gradient .opacity-95 {
+    --tw-opacity: 0.95;
+  }
+  
+  /* Logo text color inheritance - ensure it uses sidebar text color in glass themes */
+  [data-theme-type="glass"] .sidebar-theme-gradient .font-semibold {
+    color: inherit !important;
+  }
+  
+  /* Default logo text color for non-sidebar contexts */
+  .font-semibold.text-lg.tracking-wide {
+    color: rgb(var(--foreground));
+  }
+  
+  /* Override for glass theme sidebars */
+  [data-theme-type="glass"] .sidebar-theme-gradient .font-semibold.text-lg.tracking-wide {
+    color: inherit !important;
+  }
+  
+  /* Dashboard header gradient styles */
+  .dashboard-header-gradient {
+    /* Default: Use background color for modern themes */
+    background: rgb(var(--background));
+    border-bottom-color: rgb(var(--border));
+    position: relative;
+  }
+  
+  /* Modern themes - use card background for slight contrast */
+  [data-theme-type="modern"] .dashboard-header-gradient {
+    background: rgb(var(--card)) !important;
+    color: rgb(var(--foreground)) !important;
+  }
+  
+  /* Modern themes - ensure all text in header uses proper foreground color */
+  [data-theme-type="modern"] .dashboard-header-gradient * {
+    color: inherit !important;
+  }
+  
+  /* Modern theme - Use pseudo-element overlay for background dimming without affecting content */
+  [data-theme-type="modern"] .dashboard-header-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: transparent;
+  }
+  
+  /* Modern theme - No overlay, keep opacity 0 */
+  [data-theme-type="modern"] .dashboard-header-gradient::before {
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+  }
+  
+  [data-theme-type="glass"] .dashboard-header-gradient {
+    background: linear-gradient(135deg, 
+      rgb(var(--dashboard-header-gradient-from) / var(--dashboard-header-gradient-opacity, 1)) 0%, 
+      rgb(var(--dashboard-header-gradient-via) / var(--dashboard-header-gradient-opacity, 1)) 50%, 
+      rgb(var(--dashboard-header-gradient-to) / var(--dashboard-header-gradient-opacity, 1)) 100%);
+    /* Apply dashboard header text color for glass themes */
+    color: var(--dashboard-header-text-color, #ffffff) !important;
+  }
+  
+  /* Ensure all child elements inherit the dashboard header text color in glass themes */
+  [data-theme-type="glass"] .dashboard-header-gradient * {
+    color: inherit !important;
+  }
+  
+  /* Theme selector panel styles */
+  .theme-selector-panel {
+    /* Modern themes use solid background */
+  }
+  
+  [data-theme-type="glass"] .theme-selector-panel {
+    background: linear-gradient(135deg, 
+      rgb(var(--gradient-from)) 0%, 
+      rgb(var(--gradient-via)) 50%, 
+      rgb(var(--gradient-to)) 100%) !important;
+    opacity: 0.95;
+  }
+}
+
+/* Theme transition animations */
+.theme-transition * {
+  transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
+}
+
+/* Force scrollbar repaint on theme change */
+.theme-transition *::-webkit-scrollbar-thumb {
+  transition: background 200ms ease-in-out, box-shadow 200ms ease-in-out;
+}
+
+/* Gradient animations */
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Scrollbar Styles - Ultra thin & Theme-aware */
+
+/* Global scrollbar - using theme accent colors for visibility */
+* {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 100, 100, 0.3) transparent; /* Firefox fallback */
+  scrollbar-color: rgb(var(--accent)) rgb(var(--border));
 }
 
-.custom-scrollbar::-webkit-scrollbar {
+*::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+*::-webkit-scrollbar-track {
+  background: rgb(var(--border));
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--accent));
+  border-radius: 3px;
+  min-height: 30px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--secondary));
+}
+
+/* Force hide all scrollbar buttons globally */
+*::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Windows Edge/Chrome specific scrollbar button removal */
+::-webkit-scrollbar:vertical {
+  width: 6px !important;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 6px !important;
+}
+
+/* Ensure no space is reserved for buttons */
+::-webkit-scrollbar-track-piece:start {
+  margin: 0 !important;
+}
+
+::-webkit-scrollbar-track-piece:end {
+  margin: 0 !important;
+}
+
+/* Alternative visible scrollbar using link colors */
+.theme-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--link)) rgb(var(--muted));
+}
+
+.theme-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.theme-scrollbar::-webkit-scrollbar-track {
+  background: rgb(var(--muted));
+  border-radius: 3px;
+}
+
+.theme-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(var(--link));
+  border-radius: 3px;
+}
+
+.theme-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--link-hover));
+}
+
+/* Hide scrollbar buttons - force removal */
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Additional specificity to ensure buttons are hidden */
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment {
+  display: none !important;
+}
+
+/* Hide scrollbar arrows for all scrollbar states */
+::-webkit-scrollbar-button:vertical:start:decrement,
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:horizontal:start:decrement,
+::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none !important;
+}
+
+/* SimpleBar scrollbar - INVISIBLE but functional */
+.simplebar-scrollbar {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+}
+
+.simplebar-scrollbar::before {
   background: transparent !important;
+  opacity: 0 !important;
+  width: 0 !important;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(120, 120, 120, 0.4);
-  border-radius: 0;
+.simplebar-scrollbar.simplebar-visible:before {
+  opacity: 0 !important;
 }
 
-.dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.15);
+.simplebar-scrollbar:hover::before {
+  background: transparent !important;
+  opacity: 0 !important;
 }
 
-/* Remove visual right edge line */
+.simplebar-track {
+  background: transparent !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+}
+
+.simplebar-track.simplebar-vertical {
+  width: 0 !important;
+  right: 0 !important;
+}
+
+.simplebar-track.simplebar-horizontal {
+  height: 0 !important;
+}
+
+/* Force SimpleBar to respect invisible scrollbar */
+.simplebar-content-wrapper::-webkit-scrollbar,
+.simplebar-hide-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* SimpleBar placeholder element */
+.simplebar-placeholder {
+  max-width: 100% !important;
+}
+
+/* Ensure scrolling still works but scrollbar is invisible */
+.simplebar-content-wrapper {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.simplebar-content-wrapper::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+
+/* Sidebar styles */
 .no-border-sidebar {
   border-right: none !important;
-  
   border-color: transparent !important;
   outline: none !important;
   box-shadow: none !important;
 }
 
-/* Ensure this also applies to sidebar track if needed */
 .no-border-sidebar::-webkit-scrollbar-track {
   border: none !important;
   background-color: transparent !important;
 }
 
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(12px)) {
+  .glass,
+  .glass-card,
+  .glass-panel,
+  .glass-button,
+  .glass-nav,
+  .glass-modal,
+  .glass-input {
+    background: rgb(var(--card) / 0.95);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+}
 
-
-
-
-/* 
-.react-calendar {
-  width: 100% !important;
+/* FINAL OVERRIDE: Absolutely remove all scrollbar buttons */
+html *::-webkit-scrollbar-button,
+body *::-webkit-scrollbar-button,
+div::-webkit-scrollbar-button,
+main::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
   border: none !important;
-  font-family: "Inter", sans-serif !important;
-  background-color: white !important;
-  color: #222 !important;
-}
-.dark .react-calendar {
-  background-color: #1a202c !important;
-  color: #f3f4f6 !important;
 }
 
-.react-calendar__navigation__label__labelText {
-  font-weight: 600;
+/* Remove scrollbar buttons with maximum specificity */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+  display: none !important;
+  height: 0 !important;
 }
 
-.react-calendar__tile--active {
-  background-color: #c3ebfa !important;
-  color: black !important;
-}
-.dark .react-calendar__tile--active {
-  background-color: #374151 !important;
-  color: #f3f4f6 !important;
-} */
-
-
-@layer base {
-  :root {
-   
-  
-  }
-  .dark {
- 
-  }
+::-webkit-scrollbar-button:single-button:vertical:increment {
+  display: none !important;
+  height: 0 !important;
 }
 
-@layer base {
-  * {
-    /* @reference border-border; */
-  }
-  body {
-    @reference bg-background text-foreground;
-  }
+::-webkit-scrollbar-button:single-button:horizontal:decrement {
+  display: none !important;
+  width: 0 !important;
+}
+
+::-webkit-scrollbar-button:single-button:horizontal:increment {
+  display: none !important;
+  width: 0 !important;
+}
+
+/* Target Windows-specific scrollbar buttons */
+::-webkit-scrollbar-button:double-button:vertical:decrement {
+  display: none !important;
+}
+
+::-webkit-scrollbar-button:double-button:vertical:increment {
+  display: none !important;
+}
+
+/* Override any inline styles or user agent styles */
+*::-webkit-scrollbar-button:start {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+*::-webkit-scrollbar-button:end {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
 }

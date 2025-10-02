@@ -11,7 +11,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -246,10 +246,9 @@ async function createRoleProfile(tx: any, userId: string, role: string, userName
       await tx.internProfile.create({
         data: {
           ...profileData,
-          university: 'Tech University',
-          major: 'Computer Science',
-          year: 3,
-          skills: ['JavaScript', 'TypeScript', 'React'],
+          institution: 'Tech University',
+          course: 'Computer Science',
+          year: '3',
           department: 'Engineering',
           internshipType: 'full-time',
           mentorId: null,

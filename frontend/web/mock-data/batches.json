@@ -1,0 +1,475 @@
+{
+  "metadata": {
+    "lastUpdated": "2024-03-22T10:00:00Z",
+    "version": "1.0",
+    "count": 12,
+    "description": "Batch information with enrolled learners, educators, and schedules"
+  },
+  "data": [
+    {
+      "id": "batch_jee_2026_01",
+      "batchName": "JEE 2026 Advanced Batch",
+      "batchCode": "JEE-ADV-2026-A",
+      "program": "JEE Advanced Preparation",
+      "targetExam": "JEE Advanced",
+      "targetYear": 2026,
+      "status": "active",
+      "startDate": "2024-06-01",
+      "endDate": "2026-05-31",
+      "batchType": "regular",
+      "mode": "hybrid",
+      "capacity": 50,
+      "enrolled": 45,
+      "availableSeats": 5,
+      "educators": [
+        { "educatorId": "e001", "name": "Dr. Meera Sharma", "subject": "Physics", "role": "lead" },
+        { "educatorId": "e002", "name": "Prof. Anand Iyer", "subject": "Chemistry", "role": "lead" },
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 18,
+        "classesPerWeek": 9,
+        "timing": [
+          { "day": "Monday", "time": "16:00-18:00", "subject": "Physics" },
+          { "day": "Tuesday", "time": "16:00-18:00", "subject": "Chemistry" },
+          { "day": "Wednesday", "time": "16:00-18:00", "subject": "Mathematics" },
+          { "day": "Thursday", "time": "16:00-18:00", "subject": "Physics" },
+          { "day": "Friday", "time": "16:00-18:00", "subject": "Chemistry" },
+          { "day": "Saturday", "time": "16:00-18:00", "subject": "Mathematics" },
+          { "day": "Sunday", "time": "09:00-12:00", "subject": "Mock Test/Doubt Session" }
+        ]
+      },
+      "learners": ["l001", "l009"],
+      "fee": {
+        "amount": 150000,
+        "installments": 4,
+        "perInstallment": 37500,
+        "currency": "INR"
+      },
+      "performance": {
+        "averageAttendance": 92,
+        "averageScore": 72,
+        "topPerformer": "l001",
+        "completionRate": 35
+      },
+      "resources": {
+        "studyMaterial": "provided",
+        "onlineAccess": true,
+        "recordedLectures": true,
+        "mockTests": "weekly"
+      },
+      "createdAt": "2024-05-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_neet_2025_01",
+      "batchName": "NEET 2025 Foundation",
+      "batchCode": "NEET-FND-2025-A",
+      "program": "NEET Medical Preparation",
+      "targetExam": "NEET",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-01-01",
+      "endDate": "2025-06-30",
+      "batchType": "regular",
+      "mode": "online",
+      "capacity": 45,
+      "enrolled": 42,
+      "availableSeats": 3,
+      "educators": [
+        { "educatorId": "e009", "name": "Dr. Vikram Reddy", "subject": "Physics", "role": "lead" },
+        { "educatorId": "e002", "name": "Prof. Anand Iyer", "subject": "Chemistry", "role": "lead" },
+        { "educatorId": "e003", "name": "Dr. Priya Nair", "subject": "Biology", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 16,
+        "classesPerWeek": 8,
+        "timing": [
+          { "day": "Monday", "time": "10:00-12:00", "subject": "Biology" },
+          { "day": "Tuesday", "time": "14:00-16:00", "subject": "Chemistry" },
+          { "day": "Wednesday", "time": "10:00-12:00", "subject": "Biology" },
+          { "day": "Thursday", "time": "16:00-18:00", "subject": "Physics" },
+          { "day": "Friday", "time": "14:00-16:00", "subject": "Chemistry" },
+          { "day": "Saturday", "time": "10:00-12:00", "subject": "Biology" },
+          { "day": "Saturday", "time": "14:00-16:00", "subject": "Physics" },
+          { "day": "Sunday", "time": "09:00-13:00", "subject": "Mock Test" }
+        ]
+      },
+      "learners": ["l002", "l006"],
+      "fee": {
+        "amount": 120000,
+        "installments": 3,
+        "perInstallment": 40000,
+        "currency": "INR"
+      },
+      "performance": {
+        "averageAttendance": 88,
+        "averageScore": 75,
+        "topPerformer": "l002",
+        "completionRate": 40
+      },
+      "createdAt": "2023-12-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_10th_cbse_01",
+      "batchName": "10th CBSE Board Prep",
+      "batchCode": "10-CBSE-2025-A",
+      "program": "Board Exam Preparation",
+      "targetExam": "10th CBSE Board",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "hybrid",
+      "capacity": 40,
+      "enrolled": 35,
+      "availableSeats": 5,
+      "educators": [
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" },
+        { "educatorId": "e003", "name": "Dr. Priya Nair", "subject": "Science", "role": "lead" },
+        { "educatorId": "e006", "name": "Ms. Kavita Menon", "subject": "English", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 12,
+        "classesPerWeek": 6,
+        "timing": [
+          { "day": "Monday", "time": "17:00-19:00", "subject": "Mathematics" },
+          { "day": "Tuesday", "time": "17:00-19:00", "subject": "Science" },
+          { "day": "Wednesday", "time": "17:00-19:00", "subject": "English" },
+          { "day": "Thursday", "time": "17:00-19:00", "subject": "Mathematics" },
+          { "day": "Friday", "time": "17:00-19:00", "subject": "Science" },
+          { "day": "Saturday", "time": "10:00-12:00", "subject": "Doubt Session" }
+        ]
+      },
+      "learners": ["l003", "l006"],
+      "fee": {
+        "amount": 60000,
+        "installments": 3,
+        "perInstallment": 20000,
+        "currency": "INR"
+      },
+      "performance": {
+        "averageAttendance": 90,
+        "averageScore": 78,
+        "topPerformer": "l006",
+        "completionRate": 25
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_8th_cbse_01",
+      "batchName": "8th CBSE Regular",
+      "batchCode": "8-CBSE-2025-A",
+      "program": "Regular Academic Program",
+      "targetExam": "8th Annual Exam",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "online",
+      "capacity": 30,
+      "enrolled": 25,
+      "availableSeats": 5,
+      "educators": [
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" },
+        { "educatorId": "e003", "name": "Dr. Priya Nair", "subject": "Science", "role": "lead" },
+        { "educatorId": "e006", "name": "Ms. Kavita Menon", "subject": "English", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 8,
+        "classesPerWeek": 4
+      },
+      "learners": ["l004"],
+      "fee": {
+        "amount": 48000,
+        "installments": 3,
+        "perInstallment": 16000,
+        "currency": "INR"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_12th_humanities_01",
+      "batchName": "12th Humanities",
+      "batchCode": "12-HUM-2025-A",
+      "program": "Humanities Board Preparation",
+      "targetExam": "12th CBSE Board",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "hybrid",
+      "capacity": 30,
+      "enrolled": 28,
+      "availableSeats": 2,
+      "educators": [
+        { "educatorId": "e005", "name": "Prof. Sanjay Gupta", "subject": "History/Pol Science", "role": "lead" },
+        { "educatorId": "e006", "name": "Ms. Kavita Menon", "subject": "English", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 10,
+        "classesPerWeek": 5
+      },
+      "learners": ["l005"],
+      "fee": {
+        "amount": 55000,
+        "installments": 3,
+        "perInstallment": 18333,
+        "currency": "INR"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_11th_cs_01",
+      "batchName": "11th Computer Science",
+      "batchCode": "11-CS-2025-A",
+      "program": "Computer Science Specialization",
+      "targetExam": "11th Annual Exam",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "online",
+      "capacity": 30,
+      "enrolled": 30,
+      "availableSeats": 0,
+      "educators": [
+        { "educatorId": "e007", "name": "Mr. Arun Kumar", "subject": "Computer Science", "role": "lead" },
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "supporting" },
+        { "educatorId": "e001", "name": "Dr. Meera Sharma", "subject": "Physics", "role": "supporting" }
+      ],
+      "schedule": {
+        "weeklyHours": 12,
+        "classesPerWeek": 6
+      },
+      "learners": ["l003"],
+      "fee": {
+        "amount": 65000,
+        "installments": 3,
+        "perInstallment": 21667,
+        "currency": "INR"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_9th_cbse_01",
+      "batchName": "9th CBSE Regular",
+      "batchCode": "9-CBSE-2025-A",
+      "program": "Regular Academic Program",
+      "targetExam": "9th Annual Exam",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "online",
+      "capacity": 35,
+      "enrolled": 33,
+      "availableSeats": 2,
+      "educators": [
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" },
+        { "educatorId": "e003", "name": "Dr. Priya Nair", "subject": "Science", "role": "lead" },
+        { "educatorId": "e008", "name": "Ms. Neha Singh", "subject": "Geography", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 8,
+        "classesPerWeek": 4
+      },
+      "learners": ["l007"],
+      "fee": {
+        "amount": 50000,
+        "installments": 3,
+        "perInstallment": 16667,
+        "currency": "INR"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_7th_cbse_01",
+      "batchName": "7th CBSE Regular",
+      "batchCode": "7-CBSE-2025-A",
+      "program": "Regular Academic Program",
+      "targetExam": "7th Annual Exam",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "online",
+      "capacity": 35,
+      "enrolled": 30,
+      "availableSeats": 5,
+      "educators": [
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" },
+        { "educatorId": "e003", "name": "Dr. Priya Nair", "subject": "Science", "role": "lead" },
+        { "educatorId": "e006", "name": "Ms. Kavita Menon", "subject": "English", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 8,
+        "classesPerWeek": 4
+      },
+      "learners": ["l008"],
+      "fee": {
+        "amount": 45000,
+        "installments": 3,
+        "perInstallment": 15000,
+        "currency": "INR"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "batch_12th_cbse_01",
+      "batchName": "12th CBSE Science",
+      "batchCode": "12-SCI-2025-A",
+      "program": "Science Stream Board Prep",
+      "targetExam": "12th CBSE Board",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-04-01",
+      "endDate": "2025-02-28",
+      "batchType": "regular",
+      "mode": "hybrid",
+      "capacity": 40,
+      "enrolled": 36,
+      "availableSeats": 4,
+      "educators": [
+        { "educatorId": "e001", "name": "Dr. Meera Sharma", "subject": "Physics", "role": "lead" },
+        { "educatorId": "e002", "name": "Prof. Anand Iyer", "subject": "Chemistry", "role": "lead" },
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 12,
+        "classesPerWeek": 6
+      },
+      "fee": {
+        "amount": 70000,
+        "installments": 3,
+        "perInstallment": 23333,
+        "currency": "INR"
+      },
+      "createdAt": "2024-03-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "special_olympiad",
+      "batchName": "Olympiad Excellence Program",
+      "batchCode": "OLYMPIAD-2025",
+      "program": "Olympiad Preparation",
+      "targetExam": "IMO/NSO/NCO",
+      "targetYear": 2025,
+      "status": "active",
+      "startDate": "2024-03-01",
+      "endDate": "2025-02-28",
+      "batchType": "special",
+      "mode": "online",
+      "capacity": 20,
+      "enrolled": 18,
+      "availableSeats": 2,
+      "educators": [
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 4,
+        "classesPerWeek": 2,
+        "timing": [
+          { "day": "Wednesday", "time": "18:00-20:00", "subject": "Problem Solving" },
+          { "day": "Saturday", "time": "16:00-18:00", "subject": "Advanced Topics" }
+        ]
+      },
+      "learners": ["l001", "l003", "l008"],
+      "selectionCriteria": "Merit-based selection",
+      "fee": {
+        "amount": 30000,
+        "installments": 2,
+        "perInstallment": 15000,
+        "currency": "INR"
+      },
+      "createdAt": "2024-02-15T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "summer_crash_2024",
+      "batchName": "Summer Crash Course 2024",
+      "batchCode": "SUMMER-2024",
+      "program": "Intensive Revision Program",
+      "targetExam": "Board Exams",
+      "targetYear": 2025,
+      "status": "upcoming",
+      "startDate": "2024-05-01",
+      "endDate": "2024-06-30",
+      "batchType": "crash-course",
+      "mode": "online",
+      "capacity": 25,
+      "enrolled": 12,
+      "availableSeats": 13,
+      "educators": [
+        { "educatorId": "e001", "name": "Dr. Meera Sharma", "subject": "Physics", "role": "visiting" },
+        { "educatorId": "e002", "name": "Prof. Anand Iyer", "subject": "Chemistry", "role": "visiting" },
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "visiting" }
+      ],
+      "schedule": {
+        "weeklyHours": 20,
+        "classesPerWeek": 10,
+        "intensive": true
+      },
+      "fee": {
+        "amount": 15000,
+        "installments": 1,
+        "perInstallment": 15000,
+        "currency": "INR"
+      },
+      "earlyBirdDiscount": "10% before April 15",
+      "createdAt": "2024-03-01T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "foundation_6th",
+      "batchName": "6th Grade Foundation",
+      "batchCode": "6-FND-2025",
+      "program": "Foundation Program",
+      "targetExam": "6th Annual Exam",
+      "targetYear": 2025,
+      "status": "enrolling",
+      "startDate": "2024-06-01",
+      "endDate": "2025-03-31",
+      "batchType": "foundation",
+      "mode": "online",
+      "capacity": 30,
+      "enrolled": 8,
+      "availableSeats": 22,
+      "educators": [
+        { "educatorId": "e004", "name": "Mr. Ramesh Kulkarni", "subject": "Mathematics", "role": "lead" },
+        { "educatorId": "e003", "name": "Dr. Priya Nair", "subject": "Science", "role": "lead" }
+      ],
+      "schedule": {
+        "weeklyHours": 6,
+        "classesPerWeek": 3
+      },
+      "fee": {
+        "amount": 36000,
+        "installments": 3,
+        "perInstallment": 12000,
+        "currency": "INR"
+      },
+      "features": [
+        "Activity-based learning",
+        "Regular parent-teacher meetings",
+        "Quarterly assessments",
+        "Personalized attention"
+      ],
+      "createdAt": "2024-03-20T10:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    }
+  ]
+}

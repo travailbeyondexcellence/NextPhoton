@@ -1,0 +1,82 @@
+{
+  "metadata": {
+    "lastUpdated": "2024-03-22T10:00:00Z",
+    "version": "1.0",
+    "count": 3,
+    "description": "Intern profiles with departments, mentors, and stipend information"
+  },
+  "data": [
+    {
+      "id": "int001",
+      "name": "Ritika Bansal",
+      "email": "ritikab@nextphoton.com",
+      "phone": "+91-9876543211",
+      "role": "content",
+      "department": "Academic Content",
+      "mentorId": "emp001",
+      "assignedClasses": [],
+      "profileImage": "/interns/ritika.png",
+      "startDate": "2024-03-01",
+      "endDate": "2024-05-31",
+      "stipend": "₹7,000/month",
+      "tags": ["NEET Flashcards", "DPP Typing"],
+      "notes": [
+        {
+          "author": "Mentor – Priya Singh",
+          "timestamp": "2024-03-15",
+          "note": "Fast learner. Needs some guidance on formatting consistency."
+        }
+      ],
+      "createdAt": "2024-03-01T00:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "int002",
+      "name": "Kunal Joshi",
+      "email": "kunalj@nextphoton.com",
+      "phone": null,
+      "role": "support",
+      "department": "IT Infrastructure",
+      "mentorId": "emp004",
+      "assignedClasses": [],
+      "profileImage": "/interns/kunal.png",
+      "startDate": "2024-04-10",
+      "endDate": "2024-06-10",
+      "stipend": "₹5,000/month",
+      "tags": ["Mic Testing", "Device Logs"],
+      "notes": [
+        {
+          "author": "Mentor – Ravi Nair",
+          "timestamp": "2024-04-20",
+          "note": "Quick with device swaps. Needs improvement in documentation."
+        }
+      ],
+      "createdAt": "2024-04-10T00:00:00Z",
+      "updatedAt": "2024-04-20T10:00:00Z"
+    },
+    {
+      "id": "int003",
+      "name": "Sara D'Costa",
+      "email": "sarad@nextphoton.com",
+      "phone": null,
+      "role": "counselling-assist",
+      "department": "Admissions",
+      "mentorId": "emp003",
+      "assignedClasses": [],
+      "profileImage": "/interns/sara.png",
+      "startDate": "2024-02-01",
+      "endDate": "2024-04-30",
+      "stipend": "₹6,000/month",
+      "tags": ["Lead Tracker", "Walk-in Data"],
+      "notes": [
+        {
+          "author": "Mentor – Sonal Deshpande",
+          "timestamp": "2024-02-18",
+          "note": "Very warm communicator. Can improve in CRM tagging accuracy."
+        }
+      ],
+      "createdAt": "2024-02-01T00:00:00Z",
+      "updatedAt": "2024-02-18T10:00:00Z"
+    }
+  ]
+}

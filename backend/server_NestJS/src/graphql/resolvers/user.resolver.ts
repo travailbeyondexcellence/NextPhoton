@@ -3,7 +3,8 @@ import { UseGuards, ValidationPipe } from '@nestjs/common';
 import { UserOutput } from '../../dto/outputs/user.output';
 import { CreateUserInput } from '../../dto/inputs/create-user.input';
 import { PaginationInput, PaginationInfo } from '../../dto/common/pagination.dto';
-import { GqlAuthGuard, OptionalGqlAuthGuard } from '../guards/gql-auth.guard';
+import { GqlJwtAuthGuard } from '../../auth/guards/gql-jwt-auth.guard';
+import { OptionalGqlAuthGuard } from '../guards/gql-auth.guard';
 import { UsersService } from '../../users/users.service';
 
 /**
@@ -32,9 +33,9 @@ export class UserResolver {
   @Query(() => UserOutput, { 
     description: 'Get current authenticated user profile' 
   })
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlJwtAuthGuard)
   async me(@Context() context): Promise<UserOutput> {
-    const user = context.req.currentUser;
+    const user = context.req.user;
     
     // Convert user data to GraphQL output format
     return {
@@ -96,7 +97,7 @@ export class UserResolver {
   @Query(() => UsersResponse, { 
     description: 'Get paginated list of users' 
   })
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlJwtAuthGuard)
   async users(
     @Args('pagination', { nullable: true }) pagination?: PaginationInput,
     @Context() context?

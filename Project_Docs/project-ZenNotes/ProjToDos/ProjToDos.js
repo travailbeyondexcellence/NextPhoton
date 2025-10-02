@@ -3,13 +3,13 @@
 const Todos = [
     {
         id: todo1,
-        title: "Clerk Access Issues as per role matching - BETTER AUTH REPLACE CLERK by Better Auth",
-        description: "Clerk Access Issues as per role matching",
-        completed: false,
+        title: "JWT Authentication Role-Based Access Control Implementation",
+        description: "Implement comprehensive ABAC (Attribute-Based Access Control) system with JWT authentication for role-based access across all user types (Learner, Guardian, Educator, EduCare Manager, Employee, Intern, Admin)",
+        completed: true,
         assignedTo: "Zenith",
         dueDate: "2025-10-01",
         priority: "High",
-        tags: ["tag1", "tag2"],
+        tags: ["authentication", "jwt", "abac", "security"],
     },
 
     {

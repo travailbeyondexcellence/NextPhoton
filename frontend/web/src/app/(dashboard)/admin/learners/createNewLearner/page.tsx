@@ -1,16 +1,43 @@
-import React from 'react'
+'use client';
 
-import CreateLearnerForm from '@/components/CreateLearnerForm'
+import React from 'react';
+import CreateLearnerForm from '@/components/CreateLearnerForm';
+import { ArrowLeft, GraduationCap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
-const CreateNewEducator = () => {
+const CreateNewLearner = () => {
+  const router = useRouter();
+  
   return (
+    <div className="min-h-screen">
       <div className="p-6">
-          
-          
-          <CreateLearnerForm/>
-      
-      </div>
-  )
-}
+        {/* Header */}
+        <div className="mb-6">
+          <button 
+            onClick={() => router.back()}
+            className="mb-4 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={20} />
+            <span className="text-sm">Back to Learners</span>
+          </button>
+          <div className="flex items-center gap-3">
+            <div className="bg-white/10 backdrop-blur-sm p-3 rounded-full text-primary border border-white/20">
+              <GraduationCap size={28} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Add New Learner</h1>
+              <p className="text-sm text-muted-foreground">Create a new learner profile</p>
+            </div>
+          </div>
+        </div>
 
-export default CreateNewEducator
+        {/* Form Container */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+          <CreateLearnerForm />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreateNewLearner;

@@ -12,7 +12,7 @@
 import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -385,10 +385,9 @@ export class AuthService {
         await tx.internProfile.create({
           data: {
             ...profileData,
-            university: '',
-            major: '',
-            year: 1,
-            skills: [],
+            institution: '',
+            course: '',
+            year: '1',
             department: '',
             internshipType: 'full-time',
             mentorId: null,

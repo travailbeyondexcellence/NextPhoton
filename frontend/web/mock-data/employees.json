@@ -1,0 +1,98 @@
+{
+  "metadata": {
+    "lastUpdated": "2024-03-22T10:00:00Z",
+    "version": "1.0",
+    "count": 4,
+    "description": "Employee profiles with roles, departments, and performance notes"
+  },
+  "data": [
+    {
+      "id": "emp001",
+      "name": "Priya Singh",
+      "email": "priyasingh@nextphoton.com",
+      "phone": "+91-9812345678",
+      "role": "admin",
+      "department": "Academic Operations",
+      "assignedClasses": [],
+      "reportsTo": null,
+      "profileImage": "/employees/priyasingh.png",
+      "joinDate": "2022-03-01",
+      "tags": ["Shift Lead", "Scheduler"],
+      "notes": [
+        {
+          "author": "Founder – Zenith Patil",
+          "timestamp": "2023-11-12",
+          "note": "Efficient in managing educator schedules and internal reporting."
+        }
+      ],
+      "createdAt": "2022-03-01T00:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "emp002",
+      "name": "Arjun Mehta",
+      "email": "arjunmehta@nextphoton.com",
+      "phone": null,
+      "role": "educare-manager",
+      "department": "Learner Success",
+      "assignedClasses": ["class_jc_01", "class_neet_batch02"],
+      "reportsTo": "emp001",
+      "profileImage": "/employees/arjunmehta.png",
+      "joinDate": "2021-08-10",
+      "tags": ["Batch Mentor", "Parent Liaison"],
+      "notes": [
+        {
+          "author": "Admin – Priya Singh",
+          "timestamp": "2024-01-05",
+          "note": "Follows up proactively with learners and guardians."
+        }
+      ],
+      "createdAt": "2021-08-10T00:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "emp003",
+      "name": "Sonal Deshpande",
+      "email": "sonald@nextphoton.com",
+      "phone": null,
+      "role": "counsellor",
+      "department": "Admissions",
+      "assignedClasses": [],
+      "reportsTo": "emp001",
+      "profileImage": "/employees/sonaldeshpande.png",
+      "joinDate": "2023-05-20",
+      "tags": ["NEET Desk", "Warm Leads"],
+      "notes": [
+        {
+          "author": "Head – Admissions",
+          "timestamp": "2024-02-11",
+          "note": "Maintains excellent rapport with walk-ins and referrals."
+        }
+      ],
+      "createdAt": "2023-05-20T00:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    },
+    {
+      "id": "emp004",
+      "name": "Ravi Nair",
+      "email": "ravinair@nextphoton.com",
+      "phone": null,
+      "role": "support",
+      "department": "Tech Support",
+      "assignedClasses": [],
+      "reportsTo": "emp001",
+      "profileImage": "/employees/ravinair.png",
+      "joinDate": "2022-12-01",
+      "tags": ["Hardware", "Classroom Setup"],
+      "notes": [
+        {
+          "author": "Admin – Arjun Mehta",
+          "timestamp": "2023-10-15",
+          "note": "Handles urgent class tech issues promptly."
+        }
+      ],
+      "createdAt": "2022-12-01T00:00:00Z",
+      "updatedAt": "2024-03-22T10:00:00Z"
+    }
+  ]
+}
