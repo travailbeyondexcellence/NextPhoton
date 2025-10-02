@@ -109,31 +109,39 @@ export function ThemeSelector() {
             {/* Theme selector background overlay for theme-based darkening */}
             <div className="theme-selector-overlay rounded-xl"></div>
             <div className="relative z-10">
-              <h3 className="text-lg font-semibold mb-2">Choose Theme</h3>
-              
-              {/* Theme Type Tabs */}
-              <div className="flex gap-1 p-1 rounded-lg mb-4 bg-muted/50">
+              {/* Header with title and theme type switcher on same line */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Choose a Theme</h3>
+                
+                {/* Theme Type Tabs */}
+                <div className="flex gap-2 p-1 rounded-lg bg-muted/30 border border-border/50">
                 <button
                   onClick={() => changeThemeType('modern')}
                   className={cn(
-                    "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                    "flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 relative",
                     currentThemeType === 'modern'
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-primary text-primary-foreground shadow-lg border-2 border-primary/30 scale-105 font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/70 hover:scale-102"
                   )}
                 >
-                  Modern
+                  {currentThemeType === 'modern' && (
+                    <div className="absolute inset-0 bg-primary/20 rounded-md animate-pulse"></div>
+                  )}
+                  <span className="relative z-10">Modern</span>
                 </button>
                 <button
                   onClick={() => changeThemeType('glass')}
                   className={cn(
-                    "flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                    "flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 relative",
                     currentThemeType === 'glass'
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-primary text-primary-foreground shadow-lg border-2 border-primary/30 scale-105 font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/70 hover:scale-102"
                   )}
                 >
-                  Glass
+                  {currentThemeType === 'glass' && (
+                    <div className="absolute inset-0 bg-primary/20 rounded-md animate-pulse"></div>
+                  )}
+                  <span className="relative z-10">Glass</span>
                 </button>
               </div>
               
@@ -147,10 +155,10 @@ export function ThemeSelector() {
                     setIsOpen(false);
                   }}
                   className={cn(
-                    "text-left p-3 rounded-lg relative overflow-hidden border transition-all duration-200",
+                    "text-left p-3 rounded-lg relative overflow-hidden transition-all duration-200",
                     currentTheme === theme.key 
-                      ? "border-primary bg-accent" 
-                      : "border-border hover:border-primary/50 hover:bg-accent/50"
+                      ? "border-2 border-primary bg-primary/10 shadow-lg scale-105 ring-2 ring-primary/20" 
+                      : "border border-border hover:border-primary/50 hover:bg-accent/50 hover:scale-102"
                   )}
                 >
                   {/* Theme icon/graphic */}
@@ -159,11 +167,24 @@ export function ThemeSelector() {
                   </div>
                   
                   <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-lg">{theme.icon}</span>
-                      <div className="font-medium text-sm">{theme.name}</div>
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{theme.icon}</span>
+                        <div className={cn(
+                          "font-medium text-sm",
+                          currentTheme === theme.key ? "font-bold text-primary" : ""
+                        )}>{theme.name}</div>
+                      </div>
+                      {currentTheme === theme.key && (
+                        <div className="w-5 h-5 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+                          ✓
+                        </div>
+                      )}
                     </div>
-                    <div className="text-xs text-muted-foreground line-clamp-2">
+                    <div className={cn(
+                      "text-xs line-clamp-2",
+                      currentTheme === theme.key ? "text-primary/80" : "text-muted-foreground"
+                    )}>
                       {theme.description}
                     </div>
                   </div>
