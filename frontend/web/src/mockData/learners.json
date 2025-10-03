@@ -1,0 +1,272 @@
+[
+  {
+    "id": "learn001",
+    "firstName": "Aarav",
+    "lastName": "Mehta",
+    "email": "aarav.mehta@student.nextphoton.com",
+    "phoneNumber": "+91-9123456789",
+    "dateOfBirth": "2007-03-15",
+    "grade": "12",
+    "enrollmentDate": "2024-06-01",
+    "guardianIds": ["guard001"],
+    "batchIds": ["batch001", "batch003"],
+    "isActive": true,
+    "profilePicture": null,
+    "address": "123 MG Road, Bangalore, Karnataka - 560001",
+    "createdAt": "2024-06-01T10:00:00Z",
+    "updatedAt": "2025-09-20T14:30:00Z",
+    "name": "Aarav Mehta",
+    "username": "@aarav.mehta",
+    "phone": "+91-9123456789",
+    "profileImage": null,
+    "school": "Delhi Public School, Bangalore",
+    "board": "CBSE",
+    "academicLevel": "Class 12",
+    "targetExams": ["JEE Advanced", "JEE Main"],
+    "targetExamYear": "2025",
+    "status": "active",
+    "lastActive": "2025-10-02T16:45:00Z",
+    "assignedEducators": ["edu001", "edu002", "edu003"],
+    "guardians": [
+      {
+        "guardianId": "guard001",
+        "guardianName": "Rajesh Mehta",
+        "relation": "Father"
+      }
+    ],
+    "attendance": {
+      "overall": 92,
+      "lastMonth": 95
+    },
+    "performance": {
+      "averageScore": 85,
+      "lastTestScore": 88,
+      "trend": "improving"
+    },
+    "reviewedEducators": [
+      {
+        "educatorId": "edu001",
+        "educatorName": "Prof. Priya Sharma",
+        "exam": "Mathematics",
+        "rating": 5,
+        "comment": "Excellent teaching methodology. Concepts are crystal clear.",
+        "date": "2025-08-15"
+      }
+    ],
+    "learnerNotes": [
+      {
+        "author": "Admin",
+        "timestamp": "2025-09-10T10:00:00Z",
+        "note": "Strong performance in mock tests. Keep up the good work!",
+        "type": "academic"
+      }
+    ],
+    "remarkTags": ["high-performer", "regular-attendance"]
+  },
+  {
+    "id": "learn002",
+    "firstName": "Diya",
+    "lastName": "Reddy",
+    "email": "diya.reddy@student.nextphoton.com",
+    "phoneNumber": "+91-9123456790",
+    "dateOfBirth": "2008-07-22",
+    "grade": "11",
+    "enrollmentDate": "2024-07-15",
+    "guardianIds": ["guard002"],
+    "batchIds": ["batch002"],
+    "isActive": true,
+    "profilePicture": null,
+    "address": "45 Jubilee Hills, Hyderabad, Telangana - 500033",
+    "createdAt": "2024-07-15T11:30:00Z",
+    "updatedAt": "2025-09-25T09:15:00Z",
+    "name": "Diya Reddy",
+    "username": "@diya.reddy",
+    "phone": "+91-9123456790",
+    "profileImage": null,
+    "school": "Oakridge International School, Hyderabad",
+    "board": "CBSE",
+    "academicLevel": "Class 11",
+    "targetExams": ["NEET", "AIIMS"],
+    "targetExamYear": "2026",
+    "status": "active",
+    "lastActive": "2025-10-03T11:20:00Z",
+    "assignedEducators": ["edu003", "edu004"],
+    "guardians": [
+      {
+        "guardianId": "guard002",
+        "guardianName": "Lakshmi Reddy",
+        "relation": "Mother"
+      }
+    ],
+    "attendance": {
+      "overall": 96,
+      "lastMonth": 98
+    },
+    "performance": {
+      "averageScore": 91,
+      "lastTestScore": 94,
+      "trend": "improving"
+    },
+    "reviewedEducators": [],
+    "learnerNotes": [],
+    "remarkTags": ["consistent-performer", "excellent-attendance"]
+  },
+  {
+    "id": "learn003",
+    "firstName": "Arjun",
+    "lastName": "Singh",
+    "email": "arjun.singh@student.nextphoton.com",
+    "phoneNumber": "+91-9123456791",
+    "dateOfBirth": "2007-11-08",
+    "grade": "12",
+    "enrollmentDate": "2024-05-20",
+    "guardianIds": ["guard003"],
+    "batchIds": ["batch001"],
+    "isActive": true,
+    "profilePicture": null,
+    "address": "78 Connaught Place, New Delhi - 110001",
+    "createdAt": "2024-05-20T09:00:00Z",
+    "updatedAt": "2025-09-28T13:45:00Z",
+    "name": "Arjun Singh",
+    "username": "@arjun.singh",
+    "phone": "+91-9123456791",
+    "profileImage": null,
+    "school": "Modern School, Delhi",
+    "board": "CBSE",
+    "academicLevel": "Class 12",
+    "targetExams": ["JEE Main", "BITSAT"],
+    "targetExamYear": "2025",
+    "status": "active",
+    "lastActive": "2025-10-01T18:30:00Z",
+    "assignedEducators": ["edu001", "edu002", "edu005"],
+    "guardians": [
+      {
+        "guardianId": "guard003",
+        "guardianName": "Suresh Singh",
+        "relation": "Father"
+      }
+    ],
+    "attendance": {
+      "overall": 78,
+      "lastMonth": 82
+    },
+    "performance": {
+      "averageScore": 72,
+      "lastTestScore": 76,
+      "trend": "stable"
+    },
+    "reviewedEducators": [],
+    "learnerNotes": [
+      {
+        "author": "Educator",
+        "timestamp": "2025-09-15T14:00:00Z",
+        "note": "Needs to focus more on practice problems. Conceptual understanding is good.",
+        "type": "improvement"
+      }
+    ],
+    "remarkTags": ["needs-attention", "moderate-attendance"]
+  },
+  {
+    "id": "learn004",
+    "firstName": "Ananya",
+    "lastName": "Gupta",
+    "email": "ananya.gupta@student.nextphoton.com",
+    "phoneNumber": "+91-9123456792",
+    "dateOfBirth": "2008-01-30",
+    "grade": "11",
+    "enrollmentDate": "2024-08-01",
+    "guardianIds": ["guard004"],
+    "batchIds": ["batch002", "batch004"],
+    "isActive": true,
+    "profilePicture": null,
+    "address": "12 Park Street, Kolkata, West Bengal - 700016",
+    "createdAt": "2024-08-01T10:30:00Z",
+    "updatedAt": "2025-09-30T10:00:00Z",
+    "name": "Ananya Gupta",
+    "username": "@ananya.gupta",
+    "phone": "+91-9123456792",
+    "profileImage": null,
+    "school": "La Martiniere for Girls, Kolkata",
+    "board": "ICSE",
+    "academicLevel": "Class 11",
+    "targetExams": ["NEET"],
+    "targetExamYear": "2026",
+    "status": "active",
+    "lastActive": "2025-10-03T09:15:00Z",
+    "assignedEducators": ["edu004"],
+    "guardians": [
+      {
+        "guardianId": "guard004",
+        "guardianName": "Pradeep Gupta",
+        "relation": "Father"
+      }
+    ],
+    "attendance": {
+      "overall": 88,
+      "lastMonth": 90
+    },
+    "performance": {
+      "averageScore": 80,
+      "lastTestScore": 78,
+      "trend": "declining"
+    },
+    "reviewedEducators": [],
+    "learnerNotes": [],
+    "remarkTags": ["good-attendance", "monitor-performance"]
+  },
+  {
+    "id": "learn005",
+    "firstName": "Rohan",
+    "lastName": "Joshi",
+    "email": "rohan.joshi@student.nextphoton.com",
+    "phoneNumber": "+91-9123456793",
+    "dateOfBirth": "2007-05-19",
+    "grade": "12",
+    "enrollmentDate": "2024-06-10",
+    "guardianIds": ["guard005"],
+    "batchIds": ["batch001", "batch003"],
+    "isActive": false,
+    "profilePicture": null,
+    "address": "56 FC Road, Pune, Maharashtra - 411005",
+    "createdAt": "2024-06-10T12:00:00Z",
+    "updatedAt": "2025-08-20T15:30:00Z",
+    "name": "Rohan Joshi",
+    "username": "@rohan.joshi",
+    "phone": "+91-9123456793",
+    "profileImage": null,
+    "school": "Fergusson College, Pune",
+    "board": "State Board",
+    "academicLevel": "Class 12",
+    "targetExams": ["MHT-CET", "JEE Main"],
+    "targetExamYear": "2025",
+    "status": "inactive",
+    "lastActive": "2025-08-18T12:00:00Z",
+    "assignedEducators": ["edu001", "edu003"],
+    "guardians": [
+      {
+        "guardianId": "guard005",
+        "guardianName": "Neha Joshi",
+        "relation": "Mother"
+      }
+    ],
+    "attendance": {
+      "overall": 65,
+      "lastMonth": 50
+    },
+    "performance": {
+      "averageScore": 68,
+      "lastTestScore": 62,
+      "trend": "declining"
+    },
+    "reviewedEducators": [],
+    "learnerNotes": [
+      {
+        "author": "Admin",
+        "timestamp": "2025-08-15T10:00:00Z",
+        "note": "Student has been inactive for 2 weeks. Follow-up required with guardian.",
+        "type": "alert"
+      }
+    ],
+    "remarkTags": ["inactive", "poor-attendance", "needs-followup"]
+  }
+]
