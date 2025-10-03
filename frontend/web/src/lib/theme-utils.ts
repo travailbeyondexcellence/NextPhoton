@@ -1,5 +1,5 @@
-import glassThemes from '@/../../glass-themes.json';
-import modernThemes from '@/../../modern-themes.json';
+import glassThemes from '../../glass-themes.json';
+import modernThemes from '../../modern-themes.json';
 
 export type ThemeType = 'modern' | 'glass';
 
