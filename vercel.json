@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "cd frontend/web && bun run build",
   "devCommand": "cd frontend/web && bun run dev",
-  "installCommand": "bun install --production=false",
+  "installCommand": "bun install",
   "framework": "nextjs",
   "outputDirectory": "frontend/web/.next",
   "regions": ["iad1"],
