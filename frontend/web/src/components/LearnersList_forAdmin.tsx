@@ -336,7 +336,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                     </td>
                                     <td className="p-4">
                                         <div className="flex flex-wrap gap-1">
-                                            {learner.targetExams.map((exam, idx) => (
+                                            {learner.targetExams.map((exam: any, idx: number) => (
                                                 <span 
                                                     key={idx} 
                                                     className="text-xs px-2 py-1 bg-accent/20 text-accent rounded-full"
@@ -440,7 +440,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                                 <div>
                                                     <h4 className="font-medium mb-2">Assigned Educators</h4>
                                                     <div className="space-y-1">
-                                                        {learner.assignedEducators.map((edu, idx) => (
+                                                        {learner.assignedEducators.map((edu: any, idx: number) => (
                                                             <div key={idx} className="text-sm">
                                                                 <span className="font-medium">{edu.educatorName}</span>
                                                                 <span className="text-muted-foreground"> - {edu.subject}</span>
@@ -451,7 +451,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                                 <div>
                                                     <h4 className="font-medium mb-2">Guardians</h4>
                                                     <div className="space-y-1">
-                                                        {learner.guardians.map((guardian, idx) => (
+                                                        {learner.guardians.map((guardian: any, idx: number) => (
                                                             <div key={idx} className="text-sm">
                                                                 <span className="font-medium">{guardian.guardianName}</span>
                                                                 <span className="text-muted-foreground"> ({guardian.relation})</span>
@@ -464,7 +464,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                                                 <div className="mt-4">
                                                     <h4 className="font-medium mb-2">Tags</h4>
                                                     <div className="flex flex-wrap gap-2">
-                                                        {learner.remarkTags.map((tag, idx) => (
+                                                        {learner.remarkTags.map((tag: any, idx: number) => (
                                                             <span 
                                                                 key={idx} 
                                                                 className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full"
@@ -610,7 +610,7 @@ const LearnersList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewTy
                             </div>
                             {learner.remarkTags && learner.remarkTags.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-2">
-                                    {learner.remarkTags.map((tag, idx) => (
+                                    {learner.remarkTags.map((tag: any, idx: number) => (
                                         <span 
                                             key={idx} 
                                             className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full"

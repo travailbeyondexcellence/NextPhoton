@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signUp } from "better-auth/react"; // Assuming signUp exists and is imported like this
+// import { signUp } from "better-auth/react"; // Commented out for mock deployment
 import Link from "next/link";
 
 const GuardianSignupPage = () => {
@@ -15,23 +15,24 @@ const GuardianSignupPage = () => {
     e.preventDefault();
     setError(null);
 
-    try {
-      // Assuming signUp function exists and accepts email, password, and role
-      const result = await signUp({
-        email,
-        password,
-        role: "GUARDIAN", // Specify the role
-      });
+    // Mock deployment: Skip authentication, just redirect
+    router.push("/sign-in");
 
-      if (result?.error) {
-        setError(result.error);
-      } else {
-        // Successful signup, redirect to sign-in or a welcome page
-        router.push("/sign-in");
-      }
-    } catch (error: any) {
-      setError(error.message);
-    }
+    // Original implementation (commented out for mock deployment):
+    // try {
+    //   const result = await signUp({
+    //     email,
+    //     password,
+    //     role: "GUARDIAN",
+    //   });
+    //   if (result?.error) {
+    //     setError(result.error);
+    //   } else {
+    //     router.push("/sign-in");
+    //   }
+    // } catch (error: any) {
+    //   setError(error.message);
+    // }
   };
 
   return (

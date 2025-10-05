@@ -115,9 +115,8 @@ export function useAsyncAction<T = any>(
     setIsLoading(true);
 
     // Start global loading if enabled
-    let globalLoadingKey: string | undefined;
     if (useGlobalLoader) {
-      globalLoadingKey = startLoading(loadingKey, loadingMessage) as string;
+      startLoading(loadingKey, loadingMessage);
     }
 
     try {
@@ -172,8 +171,8 @@ export function useAsyncAction<T = any>(
       }
 
       // Stop global loading
-      if (useGlobalLoader && globalLoadingKey) {
-        stopLoading(globalLoadingKey);
+      if (useGlobalLoader) {
+        stopLoading(loadingKey);
       }
     }
   }, [

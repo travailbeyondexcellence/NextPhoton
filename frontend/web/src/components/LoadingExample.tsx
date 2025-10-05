@@ -18,7 +18,7 @@ export const LoadingExamples: React.FC = () => {
   // Example 1: Manual loading control
   const handleManualLoading = async () => {
     // Start loading with a custom message
-    const loadingKey = startLoading('manual-operation', 'Processing your request...');
+    startLoading('manual-operation', 'Processing your request...');
 
     try {
       // Simulate async operation
@@ -28,7 +28,7 @@ export const LoadingExamples: React.FC = () => {
       toast.error('Operation failed!');
     } finally {
       // Always stop loading in finally block
-      stopLoading(loadingKey);
+      stopLoading('manual-operation');
     }
   };
 
@@ -82,11 +82,8 @@ export const LoadingExamples: React.FC = () => {
   // Example 5: Multiple concurrent operations
   const handleMultipleOperations = async () => {
     // Start multiple loading operations
-    const loadingKeys = [
-      startLoading('op1', 'Loading data set 1...'),
-      startLoading('op2', 'Loading data set 2...'),
-      startLoading('op3', 'Loading data set 3...'),
-    ];
+    const loadingKeys = ['op1', 'op2', 'op3'];
+    loadingKeys.forEach(key => startLoading(key, `Loading data set ${key}...`));
 
     try {
       // Simulate multiple async operations

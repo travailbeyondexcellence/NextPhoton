@@ -20,11 +20,11 @@ export default function TestLoaderPage() {
   // Test 1: Direct loading control
   const testDirectLoading = () => {
     console.log('Test 1: Starting direct loading test');
-    const key = startLoading('test-direct', 'Testing direct loading for 3 seconds...');
+    startLoading('test-direct', 'Testing direct loading for 3 seconds...');
 
     setTimeout(() => {
       console.log('Test 1: Stopping direct loading');
-      stopLoading(key);
+      stopLoading('test-direct');
       setTestResult('Direct loading test completed!');
     }, 3000);
   };
@@ -61,46 +61,44 @@ export default function TestLoaderPage() {
   // Test 4: Simulate API call
   const testAPICall = async () => {
     console.log('Test 4: Starting API simulation');
-    const key = startLoading('api-call', 'Simulating API call...');
+    startLoading('api-call', 'Simulating API call...');
 
     try {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Simulate processing
-      const key2 = startLoading('api-process', 'Processing response...');
+      startLoading('api-process', 'Processing response...');
       await new Promise(resolve => setTimeout(resolve, 1000));
-      stopLoading(key2);
+      stopLoading('api-process');
 
       setTestResult('API call simulation completed!');
     } finally {
-      stopLoading(key);
+      stopLoading('api-call');
     }
   };
 
   // Test 5: Multiple concurrent operations
   const testConcurrent = async () => {
     console.log('Test 5: Starting concurrent operations');
-    const keys = [
-      startLoading('op1', 'Operation 1 running...'),
-      startLoading('op2', 'Operation 2 running...'),
-      startLoading('op3', 'Operation 3 running...'),
-    ];
+    startLoading('op1', 'Operation 1 running...');
+    startLoading('op2', 'Operation 2 running...');
+    startLoading('op3', 'Operation 3 running...');
 
     // Stop them one by one
     setTimeout(() => {
       console.log('Stopping operation 1');
-      stopLoading(keys[0]);
+      stopLoading('op1');
     }, 1000);
 
     setTimeout(() => {
       console.log('Stopping operation 2');
-      stopLoading(keys[1]);
+      stopLoading('op2');
     }, 2000);
 
     setTimeout(() => {
       console.log('Stopping operation 3');
-      stopLoading(keys[2]);
+      stopLoading('op3');
       setTestResult('All concurrent operations completed!');
     }, 3000);
   };

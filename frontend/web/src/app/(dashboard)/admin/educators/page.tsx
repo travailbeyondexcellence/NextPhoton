@@ -47,7 +47,7 @@ const Educators = () => {
         {/* View Toggle */}
         <div>
           {view === "list" ? (
-            <EducatorsList_forAdmin initialView="table" />
+            <EducatorsList_forAdmin />
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <EducatorsCardsView_forAdmin />

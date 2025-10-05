@@ -29,7 +29,12 @@
       "Bash(bun run:*)",
       "Read(//proc/sys/fs/inotify/**)",
       "Bash(sudo tee:*)",
-      "Read(//etc/**)"
+      "Read(//etc/**)",
+      "Bash(NODE_ENV=production NEXT_PUBLIC_USE_MOCK_DATA=true SKIP_ENV_VALIDATION=true bun run build)",
+      "Bash(export NODE_ENV=production NEXT_PUBLIC_USE_MOCK_DATA=true SKIP_ENV_VALIDATION=true)",
+      "Bash(export NODE_ENV=production)",
+      "Bash(export NEXT_PUBLIC_USE_MOCK_DATA=true)",
+      "Bash(export SKIP_ENV_VALIDATION=true)"
     ],
     "deny": [],
     "ask": []

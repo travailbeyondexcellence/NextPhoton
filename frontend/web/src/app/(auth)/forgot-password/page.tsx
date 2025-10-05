@@ -89,7 +89,7 @@ export default function ForgotPasswordPage() {
             {/* Success Message */}
             <h2 className="text-2xl font-semibold text-foreground mb-4">Check Your Email</h2>
             <p className="text-muted-foreground mb-6">
-              We've sent password reset instructions to <br />
+              We&apos;ve sent password reset instructions to <br />
               <strong className="text-foreground">{getValues("email")}</strong>
             </p>
 
@@ -156,7 +156,7 @@ export default function ForgotPasswordPage() {
           {/* Header */}
           <div className="text-center mb-6">
             <h2 className="text-2xl font-semibold text-foreground mb-2">Forgot Password?</h2>
-            <p className="text-muted-foreground">Enter your email address and we'll send you instructions to reset your password.</p>
+            <p className="text-muted-foreground">Enter your email address and we&apos;ll send you instructions to reset your password.</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

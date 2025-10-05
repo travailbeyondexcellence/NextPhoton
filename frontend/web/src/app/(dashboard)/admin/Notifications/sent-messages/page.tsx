@@ -203,7 +203,7 @@ export default function SentMessagesPage() {
                           key={idx}
                           className="text-xs px-2 py-1 rounded bg-white/10"
                         >
-                          {attachment}
+                          {attachment.name}
                         </span>
                       ))}
                     </div>

@@ -4,6 +4,9 @@
 // Make sure to run this script from the client directory: `npx tsx src/lib/test-prisma.ts` (after installing tsx)
 // Ensure you have the correct environment variables set in your .env file.
 
+// Mock deployment: This file is commented out for production build
+export {};
+
 
 // import { PrismaClient } from '@prisma/client';
 
@@ -15,41 +18,42 @@
 // const sharedDb = require('../../../shared/db');
 // const prisma = sharedDb.prisma;
 
-import path from 'path';
-import dotenv from 'dotenv';
-import { prisma } from '../../../../../shared/db'; // ✅ import default
-import { fileURLToPath } from 'url';
+// Mock deployment: Commented out for production build
+// import path from 'path';
+// import dotenv from 'dotenv';
+// import { prisma } from '../../../../../shared/db'; // ✅ import default
+// import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
-const dotenvPath = path.resolve(__dirname, '../../../.env');
+// const dotenvPath = path.resolve(__dirname, '../../../.env');
+
+// // console.log("📂 Current Working Directory:", process.cwd());
+// // require('dotenv').config({ path: '../../../.env' }); // load .env // this assumes you're running from inside client/
+
+// dotenv.config({ path: dotenvPath });
 
 // console.log("📂 Current Working Directory:", process.cwd());
-// require('dotenv').config({ path: '../../../.env' }); // load .env // this assumes you're running from inside client/
+// console.log("📄 Loading .env from:", dotenvPath);
+// console.log("🔍 Loaded DATABASE_URL:", process.env.DATABASE_URL);
 
-dotenv.config({ path: dotenvPath });
+// // npx ts-node src/lib/test-prisma.ts
 
-console.log("📂 Current Working Directory:", process.cwd());
-console.log("📄 Loading .env from:", dotenvPath);
-console.log("🔍 Loaded DATABASE_URL:", process.env.DATABASE_URL);
+// async function main() {
+//     const users = await prisma.user.findMany(); // ✅ model name in camelCase
 
-// npx ts-node src/lib/test-prisma.ts
+//     console.log("✅ Users fetched from Neon DB:");
+//     console.log(users);
+// }
 
-async function main() {
-    const users = await prisma.user.findMany(); // ✅ model name in camelCase
-
-    console.log("✅ Users fetched from Neon DB:");
-    console.log(users);
-}
-
-main()
-    .catch((e) => {
-        console.error("❌ Prisma Error:", e);
-    })
-    .finally(async () => {
-        await prisma.$disconnect();
-    });
+// main()
+//     .catch((e) => {
+//         console.error("❌ Prisma Error:", e);
+//     })
+//     .finally(async () => {
+//         await prisma.$disconnect();
+//     });
 
 
 

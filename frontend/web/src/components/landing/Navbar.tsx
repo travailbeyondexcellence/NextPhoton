@@ -139,7 +139,7 @@ export function Navbar() {
                       )}
                     >
                       <div className="bg-background backdrop-blur-xl rounded-xl p-5 border border-white/20 shadow-2xl">
-                        {section.isTwoColumn && section.columnTitles ? (
+                        {section.isTwoColumn && (section as any).columnTitles ? (
                           // Two-column layout for About Us
                           <div>
                             <h3 className="text-lg font-semibold mb-4">{section.name}</h3>
@@ -147,7 +147,7 @@ export function Navbar() {
                               {/* Company Column */}
                               <div>
                                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-                                  {section.columnTitles.company}
+                                  {(section as any).columnTitles.company}
                                 </h4>
                                 {section.items
                                   .filter((item: any) => item.category === "company")
@@ -178,7 +178,7 @@ export function Navbar() {
                               {/* Resources Column */}
                               <div>
                                 <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-1">
-                                  {section.columnTitles.resources}
+                                  {(section as any).columnTitles.resources}
                                 </h4>
                                 {section.items
                                   .filter((item: any) => item.category === "resources")

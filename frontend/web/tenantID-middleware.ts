@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 // import { extractSubdomain } from '@next-photon/shared/auth/getTenant';
 
-import { extractSubdomain } from '../shared/auth/getTenant';
+// Mock deployment: Provide mock extractSubdomain function
+// import { extractSubdomain } from '../shared/auth/getTenant';
+const extractSubdomain = (host: string): string | null => {
+    // Mock implementation - extract subdomain from host
+    const parts = host.split('.');
+    if (parts.length > 2) {
+        return parts[0];
+    }
+    return 'default';
+};
 
 export function middleware(req: NextRequest) {
     const headers = req.headers;
