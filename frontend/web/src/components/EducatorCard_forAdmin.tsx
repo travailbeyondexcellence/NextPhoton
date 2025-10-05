@@ -49,7 +49,7 @@ const getPriceTagColor = (tier: string) => {
   }
 };
 
-const EducatorCard_forAdmin = ({ educator = defaultEducator }: { educator?: Educator }) => {
+const EducatorCard_forAdmin = ({ educator }: { educator: Educator }) => {
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
 

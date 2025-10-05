@@ -456,7 +456,7 @@ const GuardiansList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewT
                                                             <Users className="w-4 h-4" /> Assigned Learners
                                                         </h4>
                                                         <div className="space-y-2">
-                                                            {assignedLearners.length > 0 ? assignedLearners.map((learner, idx) => (
+                                                            {assignedLearners.length > 0 ? assignedLearners.map((learner: any, idx: number) => (
                                                                 <div key={idx} className="text-sm bg-white/5 p-2 rounded">
                                                                     <p className="font-medium">{learner.learnerName || 'Unknown'}</p>
                                                                     <p className="text-xs text-muted-foreground">
@@ -493,7 +493,7 @@ const GuardiansList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewT
                                                     <div className="mt-4">
                                                         <h4 className="font-medium mb-2">Recent Notes</h4>
                                                         <div className="space-y-2">
-                                                            {notes.slice(0, 2).map((note, idx) => (
+                                                            {notes.slice(0, 2).map((note: any, idx: number) => (
                                                                 <div key={idx} className="text-sm bg-white/5 p-2 rounded">
                                                                     <p className="font-medium">{note.author} - {note.timestamp}</p>
                                                                     <p className="text-muted-foreground">{note.note}</p>
@@ -615,7 +615,7 @@ const GuardiansList_forAdmin = ({ initialView = 'table' }: { initialView?: ViewT
                                 <div className="mt-3">
                                     <h4 className="text-sm font-medium mb-2">Learners Under Guardian:</h4>
                                     <div className="flex flex-wrap gap-2">
-                                        {assignedLearners.length > 0 ? assignedLearners.map((learner, idx) => (
+                                        {assignedLearners.length > 0 ? assignedLearners.map((learner: any, idx: number) => (
                                             <div
                                                 key={idx}
                                                 className="bg-white/5 px-3 py-1 rounded-lg text-sm border border-white/10"

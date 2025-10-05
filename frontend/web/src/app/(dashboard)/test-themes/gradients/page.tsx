@@ -243,9 +243,8 @@ export default function GradientsTestPage() {
               </div>
               
               <div className="space-y-1">
-                <Label htmlFor="opacity">Opacity: {opacity}%</Label>
+                <Label>Opacity: {opacity}%</Label>
                 <Slider
-                  id="opacity"
                   value={[opacity]}
                   onValueChange={(value) => setOpacity(value[0])}
                   min={0}
@@ -286,12 +285,12 @@ export default function GradientsTestPage() {
         <CardContent>
           <div className="bg-muted/30 p-4 rounded-lg font-mono text-sm">
             <div className="mb-3">
-              <span className="text-muted-foreground">// Current gradient:</span>
+              <span className="text-muted-foreground">{'//'} Current gradient:</span>
               <br />
               <code>{generateGradientCSS(currentGradient)}</code>
             </div>
             <div>
-              <span className="text-muted-foreground">// Experimental gradient:</span>
+              <span className="text-muted-foreground">{'//'} Experimental gradient:</span>
               <br />
               <code className="text-primary">{generateGradientCSS(experimentalGradient, true)}</code>
             </div>

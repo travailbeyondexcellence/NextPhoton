@@ -152,7 +152,9 @@ export const apolloClient = new ApolloClient({
   link,
   cache,
   // Enable Apollo DevTools in development
-  connectToDevTools: process.env.NODE_ENV === 'development',
+  devtools: {
+    enabled: process.env.NODE_ENV === 'development',
+  },
   // Default options for queries and mutations
   defaultOptions: {
     watchQuery: {
@@ -199,7 +201,9 @@ export const apolloClient = new ApolloClient({
  * export const apolloClient = new ApolloClient({
  *   link: authLink.concat(httpLink),
  *   cache,
- *   connectToDevTools: process.env.NODE_ENV === 'development',
+ *   devtools: {
+ *     enabled: process.env.NODE_ENV === 'development',
+ *   },
  * });
  *
  * 3. Remove the typeDefs and resolvers imports and configuration

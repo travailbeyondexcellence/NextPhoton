@@ -54,6 +54,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Project Summary:
 NextPhoton is an "Uber for Educators" platform focused on **micromanagement and outside-classroom monitoring** (80-90% focus) rather than content delivery like competitors. Key roles: Learner, Guardian, Educator, EduCare Manager (ECM), Employee, Intern, Admin.
 
+## 🔴 MANDATORY CODING STANDARDS - READ BEFORE WRITING ANY CODE 🔴
+
+**CRITICAL**: Before writing or modifying ANY code, you MUST read:
+
+### **`CodingSOP.md`** - Coding Standard Operating Procedures
+**Location:** `/home/teamzenith/ZenCo/NextPhoton/CodingSOP.md`
+
+This document contains:
+- ✅ **Production-ready coding patterns** learned from 40+ build errors
+- ❌ **Common mistakes to avoid** with wrong vs correct examples
+- 📋 **TypeScript strict mode requirements** for Next.js 15
+- 🎯 **Build checklist** to verify code before committing
+- 🔍 **Error pattern reference** for quick debugging
+- 🤖 **AI assistant instructions** on code quality standards
+
+**WHY THIS IS CRITICAL:**
+- Development code MUST be production-ready from the start
+- Following these standards prevents 10x debugging effort during builds
+- Every rule is based on actual production build errors encountered
+- Violations WILL cause production build failures
+
+**WHEN TO READ:**
+1. ✅ At the start of EVERY coding session
+2. ✅ Before writing new features
+3. ✅ Before modifying existing code
+4. ✅ When encountering build errors (check Section 8)
+5. ✅ When reviewing code changes
+
+**HOW TO USE:**
+- Read relevant sections before coding
+- Reference during code review
+- Consult Section 8 for error patterns
+- Use Section 9 checklist before builds
+- Update when new patterns emerge
+
 ## Development Commands
 
 ### Package Manager: Bun

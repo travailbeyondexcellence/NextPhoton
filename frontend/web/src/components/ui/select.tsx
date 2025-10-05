@@ -5,7 +5,7 @@ import { ChevronDown, Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const Select = React.createContext<{
+const SelectContext = React.createContext<{
   value?: string
   onValueChange?: (value: string) => void
   open?: boolean
@@ -13,11 +13,30 @@ const Select = React.createContext<{
   disabled?: boolean
 }>({})
 
+interface SelectProps {
+  value?: string
+  onValueChange?: (value: string) => void
+  disabled?: boolean
+  children: React.ReactNode
+}
+
+const Select: React.FC<SelectProps> = ({ value, onValueChange, disabled, children }) => {
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <SelectContext.Provider value={{ value, onValueChange, open, onOpenChange: setOpen, disabled }}>
+      <div className="relative">
+        {children}
+      </div>
+    </SelectContext.Provider>
+  )
+}
+
 const SelectTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ComponentPropsWithoutRef<"button">
 >(({ className, children, ...props }, ref) => {
-  const context = React.useContext(Select)
+  const context = React.useContext(SelectContext)
   
   return (
     <button
@@ -42,7 +61,7 @@ const SelectValue = React.forwardRef<
     placeholder?: string
   }
 >(({ className, placeholder, ...props }, ref) => {
-  const context = React.useContext(Select)
+  const context = React.useContext(SelectContext)
   
   return (
     <span
@@ -79,7 +98,7 @@ const SelectItem = React.forwardRef<
     value: string
   }
 >(({ className, children, value, ...props }, ref) => {
-  const context = React.useContext(Select)
+  const context = React.useContext(SelectContext)
   
   return (
     <div
