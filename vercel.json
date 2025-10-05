@@ -1,14 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "buildCommand": "cd frontend/web && bun run build",
   "devCommand": "cd frontend/web && bun run dev",
-  "installCommand": "bun install",
+  "installCommand": "bun install --no-save",
   "framework": "nextjs",
   "outputDirectory": "frontend/web/.next",
   "regions": ["iad1"],
   "github": {
     "silent": true
   },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD",
   "env": {
     "SKIP_ENV_VALIDATION": "true",
     "NEXT_PUBLIC_USE_MOCK_DATA": "true"
@@ -17,7 +19,8 @@
     "env": {
       "SKIP_ENV_VALIDATION": "true",
       "NEXT_PUBLIC_USE_MOCK_DATA": "true",
-      "PRISMA_SKIP_POSTINSTALL_GENERATE": "true"
+      "PRISMA_SKIP_POSTINSTALL_GENERATE": "true",
+      "TURBO_FORCE": "true"
     }
   }
 }
