@@ -1,13 +1,13 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "bunx prisma generate --schema=shared/prisma/schema && cd frontend/web && bun run build",
   "github": {
     "silent": true
   },
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "true",
-      "NEXT_PUBLIC_USE_MOCK_DATA": "true",
-      "PRISMA_SKIP_POSTINSTALL_GENERATE": "true"
+      "NEXT_PUBLIC_USE_MOCK_DATA": "true"
     }
   }
 }
