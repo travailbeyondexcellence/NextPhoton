@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "ls -la shared/prisma/ && ls -la shared/prisma/schema/ && bunx prisma generate --schema=shared/prisma/schema && cd frontend/web && bun run build",
+  "buildCommand": "cd frontend/web && bun run build",
   "github": {
     "silent": true
   },
