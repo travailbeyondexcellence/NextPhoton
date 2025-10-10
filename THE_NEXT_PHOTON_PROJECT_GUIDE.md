@@ -22028,3 +22028,34778 @@ Next Photon Application
 
 *Next Up*: Part III - Backend Architecture (Coming Soon)
 
+**Status**: Part II Complete! 🎉
+
+*Next Up*: Part III - Backend Architecture (Chapters 19-28)
+
+---
+
+# Part III: Backend Architecture
+
+---
+
+# Chapter 19: Introduction to NestJS - Enterprise Node.js
+
+## Welcome to the Backend
+
+If you've been following along through Parts I and II, you've built a solid understanding of the frontend - the part of the application users see and interact with. You've learned about React components, state management, forms, routing, and styling. But there's a crucial piece missing: **where does the data come from? Where does it go? Who decides if a user is allowed to do something?**
+
+Welcome to the **backend** - the brain of the application.
+
+[Note: Chapter 19-20 content covering NestJS introduction and Dependency Injection were written in previous sessions. Chapters 21-22 on GraphQL and Apollo Server are also complete from earlier work.]
+
+---
+
+# Chapter 23: RESTful API Design
+
+## The Communication Protocol of the Web
+
+You've already learned about GraphQL in the previous chapters. But Next Photon uses **both** GraphQL and REST. Why? Because sometimes, simpler is better.
+
+Think of it this way:
+- **GraphQL**: Like ordering a custom meal - you specify exactly what ingredients you want
+- **REST**: Like ordering from a menu - standardized options that everyone understands
+
+For authentication (login, register, logout), REST is actually perfect. It's simpler, more familiar, and widely supported. Let's understand it from first principles.
+
+---
+
+## 23.1 What is REST?
+
+**REST** stands for **Representational State Transfer**. It's an architectural style for designing networked applications. But what does that actually mean?
+
+### The Core Metaphor: Resources as Nouns
+
+Imagine your application as a library:
+- **Books** are resources (users, sessions, educators, learners)
+- **Actions** are HTTP verbs (GET to read, POST to add, DELETE to remove)
+- **Addresses** are URLs (where to find each book)
+
+**REST Principle**: Use URLs to represent resources (things), and HTTP methods to represent actions.
+
+```
+❌ BAD (actions in URLs):
+POST /api/createUser
+POST /api/deleteUser
+GET /api/getUserById
+
+✅ GOOD (resources as nouns, actions as HTTP methods):
+POST /api/users           (create user)
+DELETE /api/users/:id     (delete user)
+GET /api/users/:id        (get user)
+```
+
+---
+
+## 23.2 The Five HTTP Methods You Need
+
+HTTP has several methods, but you'll use these five 99% of the time:
+
+### 1. **GET** - Retrieve Data
+**Purpose**: Read/retrieve a resource without modifying it
+
+```typescript
+// Get a single user
+GET /api/users/123
+
+// Get all educators
+GET /api/educators
+
+// Get educators with filters
+GET /api/educators?specialization=mathematics&experience=5
+```
+
+**Characteristics**:
+- ✅ **Safe**: Doesn't change server state
+- ✅ **Idempotent**: Same result every time (until data changes)
+- ✅ **Cacheable**: Browsers can cache responses
+- ❌ No request body (data in URL parameters only)
+
+---
+
+### 2. **POST** - Create New Resource
+**Purpose**: Create a new resource on the server
+
+```typescript
+// Create a new user
+POST /api/users
+Body: {
+  "name": "Priya Sharma",
+  "email": "priya@example.com",
+  "role": "learner"
+}
+
+// Login (create a session)
+POST /api/auth/login
+Body: {
+  "email": "priya@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+**Characteristics**:
+- ❌ **Not idempotent**: Calling twice creates two resources
+- ✅ **Has request body**: Send data in JSON format
+- ✅ **Returns**: Usually returns the created resource and 201 status
+
+---
+
+### 3. **PUT** - Replace Entire Resource
+**Purpose**: Replace the entire resource with new data
+
+```typescript
+// Replace user completely
+PUT /api/users/123
+Body: {
+  "name": "Priya Sharma",
+  "email": "priya.new@example.com",
+  "role": "learner",
+  "phoneNumber": "+91-9876543210"
+  // ALL fields required!
+}
+```
+
+**Characteristics**:
+- ✅ **Idempotent**: Calling multiple times = same result
+- ⚠️ **Replaces everything**: Missing fields get deleted/nulled
+- ✅ **Has request body**
+
+**When to use**: Rarely! Usually PATCH is better.
+
+---
+
+### 4. **PATCH** - Partial Update
+**Purpose**: Update only specific fields of a resource
+
+```typescript
+// Update only email
+PATCH /api/users/123
+Body: {
+  "email": "priya.new@example.com"
+  // Only fields you want to change
+}
+
+// Update educator profile
+PATCH /api/educators/456
+Body: {
+  "experience": 6,
+  "specializations": ["mathematics", "physics"]
+}
+```
+
+**Characteristics**:
+- ✅ **Partial updates**: Only send changed fields
+- ✅ **Idempotent**: Same result on multiple calls
+- ✅ **Has request body**
+
+**When to use**: Most updates! It's the safest option.
+
+---
+
+### 5. **DELETE** - Remove Resource
+**Purpose**: Delete a resource from the server
+
+```typescript
+// Delete a user
+DELETE /api/users/123
+
+// Delete a session
+DELETE /api/sessions/789
+```
+
+**Characteristics**:
+- ✅ **Idempotent**: Deleting twice has same effect as once (resource is gone)
+- ❌ No request body usually
+- ✅ **Returns**: Usually 204 No Content or 200 OK with confirmation message
+
+---
+
+## 23.3 HTTP Status Codes: The Response Language
+
+Every HTTP response includes a **status code** that tells you what happened. Think of them as grades on a test:
+
+### 2xx - Success (A+ grades)
+
+| Code | Meaning | When Used |
+|------|---------|-----------|
+| **200 OK** | Request succeeded | GET, PATCH, DELETE success |
+| **201 Created** | Resource created | POST success |
+| **204 No Content** | Success, no data to return | DELETE success |
+
+**Example**:
+```typescript
+// Successful login
+Response:
+Status: 200 OK
+Body: {
+  "access_token": "eyJhbGc...",
+  "user": { ... }
+}
+```
+
+---
+
+### 3xx - Redirection (Follow-up needed)
+
+| Code | Meaning | When Used |
+|------|---------|-----------|
+| **301 Moved Permanently** | Resource moved | URL changed forever |
+| **302 Found** | Temporary redirect | Temporary URL change |
+| **304 Not Modified** | Use cached version | Browser cache valid |
+
+**Example**:
+```typescript
+// Resource moved
+Response:
+Status: 301 Moved Permanently
+Location: /api/v2/users/123
+```
+
+---
+
+### 4xx - Client Errors (You messed up)
+
+| Code | Meaning | When Used |
+|------|---------|-----------|
+| **400 Bad Request** | Invalid data sent | Validation failed |
+| **401 Unauthorized** | Not authenticated | Missing/invalid token |
+| **403 Forbidden** | Not allowed | Don't have permission |
+| **404 Not Found** | Resource doesn't exist | Invalid ID/URL |
+| **409 Conflict** | Data conflict | Email already exists |
+| **422 Unprocessable Entity** | Validation error | Field requirements not met |
+
+**Example**:
+```typescript
+// Login with wrong password
+Response:
+Status: 401 Unauthorized
+Body: {
+  "statusCode": 401,
+  "message": "Invalid credentials",
+  "error": "Unauthorized"
+}
+```
+
+---
+
+### 5xx - Server Errors (We messed up)
+
+| Code | Meaning | When Used |
+|------|---------|-----------|
+| **500 Internal Server Error** | Server crashed | Unhandled exception |
+| **502 Bad Gateway** | Upstream server error | Database down |
+| **503 Service Unavailable** | Server overloaded | Maintenance mode |
+
+**Example**:
+```typescript
+// Database connection failed
+Response:
+Status: 500 Internal Server Error
+Body: {
+  "statusCode": 500,
+  "message": "Internal server error",
+  "error": "Failed to connect to database"
+}
+```
+
+---
+
+## 23.4 REST Principles in Detail
+
+### Principle 1: Resource-Based URLs
+
+URLs should represent **resources** (nouns), not actions (verbs).
+
+```typescript
+// ❌ WRONG: Verbs in URLs
+POST /api/createUser
+GET /api/getUserById/123
+POST /api/loginUser
+
+// ✅ CORRECT: Nouns in URLs, verbs in HTTP methods
+POST /api/users
+GET /api/users/123
+POST /api/auth/login
+```
+
+**Resource Naming Conventions**:
+- Use **plural nouns** for collections: `/users`, `/educators`, `/sessions`
+- Use **singular IDs** for specific items: `/users/123`, `/sessions/abc`
+- Use **lowercase** with hyphens: `/user-profiles`, `/session-bookings`
+- Avoid verbs except for actions that aren't CRUD: `/auth/login`, `/auth/logout`, `/emails/send`
+
+---
+
+### Principle 2: Stateless Communication
+
+Each request must contain **all information** needed to process it. The server doesn't remember previous requests.
+
+```typescript
+// ❌ WRONG: Server remembers session
+// Request 1: POST /api/login → Server stores "user is logged in"
+// Request 2: GET /api/profile → Server uses stored session
+
+// ✅ CORRECT: Every request includes auth token
+// Request 1: POST /api/login → Returns JWT token
+// Request 2: GET /api/profile
+//   Headers: { Authorization: "Bearer eyJhbGc..." }
+```
+
+**Why stateless?**
+- **Scalability**: Any server can handle any request
+- **Reliability**: No session state to lose
+- **Simplicity**: Each request is independent
+
+---
+
+### Principle 3: Uniform Interface
+
+All resources follow the same patterns:
+
+```typescript
+// Pattern: /resource/:id
+GET    /api/users/:id      // Get one user
+POST   /api/users          // Create user
+PATCH  /api/users/:id      // Update user
+DELETE /api/users/:id      // Delete user
+
+GET    /api/sessions/:id   // Get one session
+POST   /api/sessions       // Create session
+PATCH  /api/sessions/:id   // Update session
+DELETE /api/sessions/:id   // Delete session
+```
+
+**Consistency is key!** Users of your API know what to expect.
+
+---
+
+### Principle 4: Nested Resources
+
+Related resources can be nested in URLs:
+
+```typescript
+// Get all sessions for a specific educator
+GET /api/educators/123/sessions
+
+// Get a specific session for an educator
+GET /api/educators/123/sessions/456
+
+// Get all learners in a session
+GET /api/sessions/456/learners
+
+// Limit nesting to 2-3 levels max
+// ❌ TOO DEEP: /api/educators/123/sessions/456/learners/789/assignments/abc
+// ✅ BETTER: /api/assignments/abc
+```
+
+---
+
+## 23.5 Query Parameters for Filtering & Pagination
+
+Use query parameters (after `?`) for filtering, sorting, and pagination:
+
+### Filtering
+```typescript
+// Get educators teaching mathematics
+GET /api/educators?specialization=mathematics
+
+// Get learners in grade 12
+GET /api/learners?grade=12
+
+// Multiple filters
+GET /api/educators?specialization=mathematics&experience=5&priceTier=premium-1
+```
+
+### Sorting
+```typescript
+// Sort by name ascending
+GET /api/educators?sort=name
+
+// Sort by experience descending
+GET /api/educators?sort=-experience
+
+// Multiple sort fields
+GET /api/educators?sort=priceTier,-experience
+```
+
+### Pagination
+```typescript
+// Page 2, 20 items per page
+GET /api/educators?page=2&limit=20
+
+// Skip 40, take 20
+GET /api/educators?skip=40&take=20
+
+// Cursor-based (better for real-time data)
+GET /api/educators?cursor=eyJpZCI6MTIz&limit=20
+```
+
+---
+
+## 23.6 Request & Response Structure
+
+### Typical Request Structure
+
+```typescript
+POST /api/auth/register
+Headers:
+  Content-Type: application/json
+  Accept: application/json
+
+Body:
+{
+  "email": "priya@example.com",
+  "password": "SecurePass123!",
+  "name": "Priya Sharma",
+  "role": "learner"
+}
+```
+
+**Headers Explained**:
+- `Content-Type`: Format of data you're sending (usually `application/json`)
+- `Accept`: Format you want back (usually `application/json`)
+- `Authorization`: Auth token for protected routes (e.g., `Bearer <token>`)
+
+---
+
+### Typical Success Response
+
+```typescript
+Response:
+Status: 201 Created
+Headers:
+  Content-Type: application/json
+
+Body:
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "1696834567890_a1b2c3d4e",
+    "email": "priya@example.com",
+    "name": "Priya Sharma",
+    "roles": ["learner"],
+    "emailVerified": false
+  }
+}
+```
+
+---
+
+### Typical Error Response
+
+```typescript
+Response:
+Status: 400 Bad Request
+Headers:
+  Content-Type: application/json
+
+Body:
+{
+  "statusCode": 400,
+  "message": [
+    "Password must be at least 8 characters long",
+    "Password must contain uppercase, lowercase, number and special character"
+  ],
+  "error": "Bad Request"
+}
+```
+
+**Error Response Pattern** (Next Photon follows NestJS convention):
+- `statusCode`: HTTP status code (400, 401, 404, etc.)
+- `message`: Human-readable error description (string or array)
+- `error`: Error type/category
+
+---
+
+## 23.7 Real Next Photon REST Endpoints
+
+Let's trace real authentication endpoints from Next Photon's codebase.
+
+### Endpoint 1: POST /auth/register
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:39-42`
+
+```typescript
+@Post('register')
+@HttpCode(HttpStatus.CREATED)
+async register(@Body(ValidationPipe) registerDto: RegisterDto) {
+  return this.authService.register(registerDto);
+}
+```
+
+**What happens here**:
+1. `@Post('register')` - Maps to POST `/auth/register`
+2. `@HttpCode(HttpStatus.CREATED)` - Returns 201 status on success
+3. `@Body(ValidationPipe)` - Validates request body against `RegisterDto`
+4. `registerDto: RegisterDto` - TypeScript ensures correct data shape
+
+**RegisterDto Validation** (File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/dto/register.dto.ts:24-67`):
+
+```typescript
+export class RegisterDto {
+  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsNotEmpty({ message: 'Email is required' })
+  email: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+    {
+      message: 'Password must contain uppercase, lowercase, number and special character',
+    },
+  )
+  password: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  @MinLength(2, { message: 'Name must be at least 2 characters long' })
+  name: string;
+
+  @IsEnum(UserRole, { message: 'Invalid role specified' })
+  @IsNotEmpty({ message: 'Role is required' })
+  role: UserRole;
+}
+```
+
+**Request Example**:
+```bash
+curl -X POST http://localhost:963/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "priya@example.com",
+    "password": "SecurePass123!",
+    "name": "Priya Sharma",
+    "role": "learner"
+  }'
+```
+
+**Success Response** (201 Created):
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjk2ODM...",
+  "user": {
+    "id": "1696834567890_a1b2c3d4e",
+    "email": "priya@example.com",
+    "name": "Priya Sharma",
+    "roles": ["learner"],
+    "emailVerified": false
+  }
+}
+```
+
+**Error Response** (400 Bad Request - if validation fails):
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "Password must be at least 8 characters long"
+  ],
+  "error": "Bad Request"
+}
+```
+
+---
+
+### Endpoint 2: POST /auth/login
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:51-55`
+
+```typescript
+@Post('login')
+@UseGuards(LocalAuthGuard)
+@HttpCode(HttpStatus.OK)
+async login(@Body(ValidationPipe) loginDto: LoginDto) {
+  return this.authService.login(loginDto);
+}
+```
+
+**What happens**:
+1. `@UseGuards(LocalAuthGuard)` - Validates credentials via Passport Local Strategy
+2. `LocalAuthGuard` triggers before controller method runs
+3. If credentials valid → continues to controller
+4. If invalid → throws 401 Unauthorized
+
+**LoginDto** (File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/dto/login.dto.ts:11-26`):
+
+```typescript
+export class LoginDto {
+  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsNotEmpty({ message: 'Email is required' })
+  email: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+}
+```
+
+**Request Example**:
+```bash
+curl -X POST http://localhost:963/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "priya@example.com",
+    "password": "SecurePass123!"
+  }'
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "1696834567890_a1b2c3d4e",
+    "email": "priya@example.com",
+    "name": "Priya Sharma",
+    "roles": ["learner"],
+    "emailVerified": false
+  }
+}
+```
+
+**Error Response** (401 Unauthorized - wrong password):
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid credentials",
+  "error": "Unauthorized"
+}
+```
+
+---
+
+### Endpoint 3: GET /auth/profile (Protected Route)
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:79-82`
+
+```typescript
+@Get('profile')
+@UseGuards(JwtAuthGuard)
+async getProfile(@Request() req) {
+  return req.user;
+}
+```
+
+**What happens**:
+1. `@UseGuards(JwtAuthGuard)` - Requires valid JWT token
+2. `JwtAuthGuard` extracts token from `Authorization` header
+3. Validates token signature and expiration
+4. If valid → attaches user to `req.user`, continues
+5. If invalid/missing → throws 401 Unauthorized
+
+**Request Example**:
+```bash
+curl -X GET http://localhost:963/auth/profile \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "id": "1696834567890_a1b2c3d4e",
+  "email": "priya@example.com",
+  "name": "Priya Sharma",
+  "roles": ["learner"],
+  "emailVerified": false
+}
+```
+
+**Error Response** (401 Unauthorized - missing/invalid token):
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid token or user not found",
+  "error": "Unauthorized"
+}
+```
+
+---
+
+### Endpoint 4: POST /auth/logout (Protected Route)
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:65-69`
+
+```typescript
+@Post('logout')
+@UseGuards(JwtAuthGuard)
+@HttpCode(HttpStatus.OK)
+async logout(@Request() req) {
+  return this.authService.logout(req.user.id);
+}
+```
+
+**Request Example**:
+```bash
+curl -X POST http://localhost:963/auth/logout \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+```
+
+**Success Response** (200 OK):
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+---
+
+## 23.8 Frontend: Making REST API Calls
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/auth-service.ts:122-143`
+
+```typescript
+/**
+ * Register a new user
+ */
+async register(data: RegisterData): Promise<AuthResponse> {
+  try {
+    const response = await fetch(`${this.baseUrl}/auth/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Registration failed');
+    }
+
+    const authData = await response.json();
+    this.storeAuthData(authData);
+    return authData;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
+}
+```
+
+**Breaking down the fetch call**:
+
+1. **URL**: `${this.baseUrl}/auth/register`
+   - `this.baseUrl` = `http://localhost:963` (from env var)
+   - Full URL: `http://localhost:963/auth/register`
+
+2. **Method**: `POST` (creating a new user)
+
+3. **Headers**:
+   - `Content-Type: application/json` - Tells server we're sending JSON
+
+4. **Body**: `JSON.stringify(data)`
+   - Converts JavaScript object to JSON string
+   - Example: `{ email: "...", password: "..." }` → `'{"email":"...","password":"..."}'`
+
+5. **Error Handling**:
+   - `if (!response.ok)` - Checks for 4xx/5xx status codes
+   - Throws error with server's error message
+
+6. **Success Handling**:
+   - `await response.json()` - Parse JSON response
+   - `this.storeAuthData(authData)` - Save token to localStorage
+
+---
+
+## 23.9 REST vs GraphQL in Next Photon
+
+Next Photon uses **both** REST and GraphQL. Here's why:
+
+| Use Case | Technology | Reason |
+|----------|------------|--------|
+| **Authentication** | REST | Simple, standard, widely supported |
+| **User Registration** | REST | One-time operation, no complex queries |
+| **Data Fetching** | GraphQL | Flexible, prevents over-fetching |
+| **Complex Queries** | GraphQL | Can fetch nested data in one request |
+| **Public APIs** | REST | Easier for third-party integration |
+
+**Example**:
+- ✅ Login/Register → REST (simple, standard)
+- ✅ Get learner with sessions, guardian, tasks → GraphQL (complex, nested)
+- ✅ Upload file → REST (multipart/form-data, not JSON)
+- ✅ Real-time updates → GraphQL Subscriptions
+
+---
+
+## 23.10 API Versioning
+
+As your API evolves, you might need to change endpoints without breaking existing clients. Use versioning:
+
+### URL Versioning (Most Common)
+```typescript
+// Version in URL path
+GET /api/v1/users/123
+GET /api/v2/users/123
+
+// Different versions can coexist
+app.use('/api/v1', v1Router);
+app.use('/api/v2', v2Router);
+```
+
+### Header Versioning
+```typescript
+// Version in custom header
+GET /api/users/123
+Headers:
+  API-Version: 1
+
+GET /api/users/123
+Headers:
+  API-Version: 2
+```
+
+### Content Negotiation
+```typescript
+// Version in Accept header
+GET /api/users/123
+Headers:
+  Accept: application/vnd.nextphoton.v1+json
+
+GET /api/users/123
+Headers:
+  Accept: application/vnd.nextphoton.v2+json
+```
+
+**Next Photon doesn't use versioning yet** (it's v1 by default), but it's designed to support it when needed.
+
+---
+
+## 23.11 REST Best Practices
+
+✅ **Use Nouns for Resources**: `/users`, not `/getUsers`
+
+✅ **Use Plural Names**: `/users`, not `/user`
+
+✅ **Use HTTP Methods Correctly**:
+- GET for reading
+- POST for creating
+- PATCH for updating
+- DELETE for deleting
+
+✅ **Return Appropriate Status Codes**:
+- 200 OK, 201 Created, 204 No Content
+- 400 Bad Request, 401 Unauthorized, 404 Not Found
+- 500 Internal Server Error
+
+✅ **Provide Meaningful Error Messages**:
+```json
+{
+  "statusCode": 400,
+  "message": "Email already exists",
+  "error": "Bad Request",
+  "field": "email"
+}
+```
+
+✅ **Use Pagination for Large Lists**:
+```typescript
+GET /api/educators?page=2&limit=20
+
+Response:
+{
+  "data": [...],
+  "meta": {
+    "page": 2,
+    "limit": 20,
+    "total": 150,
+    "totalPages": 8
+  }
+}
+```
+
+✅ **Use Filtering and Sorting**:
+```typescript
+GET /api/educators?specialization=math&sort=-experience
+```
+
+✅ **Document Your API**: Use tools like Swagger/OpenAPI
+
+❌ **Avoid**:
+- Verbs in URLs (`/createUser`)
+- Inconsistent naming (`/users` vs `/get-educators`)
+- Exposing internal database structure
+- Returning sensitive data (passwords, secrets)
+
+---
+
+## 23.12 Key Takeaways from Chapter 23
+
+✅ **REST Principles**:
+- Resources as nouns in URLs
+- HTTP methods for actions (GET, POST, PATCH, DELETE)
+- Stateless communication
+- Uniform interface
+
+✅ **HTTP Methods**:
+- GET: Retrieve (safe, idempotent)
+- POST: Create (not idempotent)
+- PATCH: Partial update (idempotent)
+- PUT: Full replacement (rarely used)
+- DELETE: Remove (idempotent)
+
+✅ **Status Codes**:
+- 2xx: Success (200, 201, 204)
+- 3xx: Redirection (301, 302)
+- 4xx: Client error (400, 401, 403, 404)
+- 5xx: Server error (500, 503)
+
+✅ **URL Design**:
+- `/api/users` - Collection
+- `/api/users/:id` - Specific resource
+- `/api/educators?specialization=math` - Filtering
+- `/api/educators/123/sessions` - Nested resources
+
+✅ **Request/Response**:
+- Request: Method, URL, Headers, Body
+- Response: Status Code, Headers, Body
+- Error format: `{ statusCode, message, error }`
+
+✅ **Real Next Photon Examples**:
+- POST `/auth/register` - Creates user, returns JWT
+- POST `/auth/login` - Validates credentials, returns JWT
+- GET `/auth/profile` - Protected route, requires JWT
+- POST `/auth/logout` - Clears session
+
+✅ **REST vs GraphQL**:
+- REST: Simple, standard operations (auth, file upload)
+- GraphQL: Complex queries, nested data fetching
+- Use both where each excels!
+
+---
+
+*Up Next: Chapter 24 - Authentication with JWT & Passport.js (Deep dive into how login actually works)*
+
+---
+
+# Chapter 24: Authentication - JWT & Passport.js
+
+## The Security Challenge
+
+Imagine you're building a house. You have different rooms (pages) with different access levels:
+- **Living Room**: Anyone can enter (public pages)
+- **Bedroom**: Only family members (authenticated users)
+- **Office**: Only you (admin only)
+
+How do you control who enters which room? In web applications, this is **authentication** (verifying identity) and **authorization** (verifying permissions).
+
+Let's understand how Next Photon solves this problem using **JWT tokens** and **Passport.js**.
+
+---
+
+## 24.1 Authentication vs Authorization
+
+These terms are often confused. Let's clarify:
+
+### Authentication: "Who are you?"
+**Purpose**: Verify the user's identity
+
+**Examples**:
+- Login with email/password → "You are Priya Sharma"
+- Fingerprint scan → "You are the device owner"
+- Google OAuth → "You are john@gmail.com"
+
+**In Next Photon**:
+```typescript
+// User provides credentials
+POST /auth/login
+Body: { email: "priya@example.com", password: "SecurePass123!" }
+
+// Server verifies and responds
+Response: {
+  access_token: "...",
+  user: { id: "123", name: "Priya", roles: ["learner"] }
+}
+```
+
+---
+
+### Authorization: "What can you do?"
+**Purpose**: Verify if the user has permission for an action
+
+**Examples**:
+- Can this learner view educator profiles? → Yes
+- Can this learner delete other users? → No
+- Can this admin approve educators? → Yes
+
+**In Next Photon**:
+```typescript
+// Check user's role before allowing action
+if (user.roles.includes('admin')) {
+  // Allow educator approval
+} else {
+  // Deny with 403 Forbidden
+}
+```
+
+**Key Difference**:
+- **Authentication**: Logging in (proving who you are)
+- **Authorization**: Accessing protected resources (proving what you can do)
+
+---
+
+## 24.2 Why JWT? (JSON Web Tokens)
+
+Before JWT, websites used **session-based authentication**:
+
+### Old Way: Session-Based Auth (Problems)
+
+```
+1. User logs in
+2. Server creates session, stores in database
+3. Server sends session ID in cookie
+4. Every request: Server looks up session in database
+5. Logout: Delete session from database
+```
+
+**Problems**:
+- 🐌 **Slow**: Database lookup on every request
+- 💾 **Storage**: Server must store all sessions
+- 📈 **Scalability**: Hard to scale across multiple servers
+- 🌍 **Stateful**: Server must "remember" sessions
+
+---
+
+### New Way: JWT Token-Based Auth (Solutions)
+
+```
+1. User logs in
+2. Server creates JWT token (contains user info)
+3. Server sends JWT to client
+4. Client stores JWT (localStorage/cookie)
+5. Every request: Client sends JWT in header
+6. Server verifies JWT signature (no database lookup!)
+7. Logout: Client deletes JWT
+```
+
+**Benefits**:
+- ⚡ **Fast**: No database lookup (just verify signature)
+- 💪 **Stateless**: Server doesn't store anything
+- 📈 **Scalable**: Any server can verify any token
+- 🔒 **Secure**: Cryptographically signed, tamper-proof
+
+---
+
+## 24.3 JWT Structure: Three Parts
+
+A JWT token looks like this:
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+```
+
+It has **three parts** separated by dots (`.`):
+
+### Part 1: Header (Algorithm & Token Type)
+
+```json
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+```
+
+**Base64 encoded** → `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9`
+
+**Fields**:
+- `alg`: Algorithm used for signing (HS256, RS256, etc.)
+- `typ`: Token type (always "JWT")
+
+---
+
+### Part 2: Payload (User Data)
+
+```json
+{
+  "sub": "1696834567890_a1b2c3d4e",
+  "email": "priya@example.com",
+  "roles": ["learner"],
+  "iat": 1696834567,
+  "exp": 1697439367
+}
+```
+
+**Base64 encoded** → `eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ`
+
+**Fields**:
+- `sub` (subject): User ID
+- `email`: User's email
+- `roles`: Array of user's roles
+- `iat` (issued at): Token creation timestamp
+- `exp` (expiration): Token expiry timestamp
+
+**Important**: Payload is **NOT encrypted**, just encoded! Anyone can decode it. Don't put sensitive data like passwords here.
+
+---
+
+### Part 3: Signature (Verification)
+
+```
+HMACSHA256(
+  base64UrlEncode(header) + "." + base64UrlEncode(payload),
+  secret_key
+)
+```
+
+**Result** → `SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c`
+
+**Purpose**: Proves the token wasn't tampered with
+
+**How it works**:
+1. Server combines header + payload
+2. Hashes with secret key (only server knows this!)
+3. Creates signature
+4. When verifying: Re-calculate signature, compare with token's signature
+5. If match → Token is valid ✅
+6. If different → Token was tampered with ❌
+
+---
+
+## 24.4 JWT Token Lifecycle
+
+Let's trace a complete JWT flow in Next Photon:
+
+### Step 1: User Logs In
+
+**Frontend** (`/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/auth-service.ts:149-166`):
+```typescript
+async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  const response = await fetch(`${this.baseUrl}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),  // { email, password }
+  });
+
+  const authData = await response.json();
+  this.storeAuthData(authData);  // Save token to localStorage
+  return authData;
+}
+```
+
+**Backend Receives Request** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:51-55`):
+```typescript
+@Post('login')
+@UseGuards(LocalAuthGuard)  // 👈 This validates credentials!
+async login(@Body(ValidationPipe) loginDto: LoginDto) {
+  return this.authService.login(loginDto);
+}
+```
+
+---
+
+### Step 2: LocalAuthGuard Validates Credentials
+
+**What is a Guard?** A guard is middleware that runs **before** the controller method. It decides: "Should this request proceed?"
+
+**LocalAuthGuard** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/guards/local-auth.guard.ts:12`):
+```typescript
+@Injectable()
+export class LocalAuthGuard extends AuthGuard('local') {
+  // Triggers the 'local' strategy
+}
+```
+
+This triggers **LocalStrategy**:
+
+**LocalStrategy** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/strategies/local.strategy.ts:16-44`):
+```typescript
+@Injectable()
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+  constructor(private authService: AuthService) {
+    super({
+      usernameField: 'email',  // Use email instead of username
+      passwordField: 'password',
+    });
+  }
+
+  async validate(email: string, password: string): Promise<any> {
+    const user = await this.authService.validateUser(email, password);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return user;  // Attached to req.user
+  }
+}
+```
+
+**AuthService.validateUser** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts:35-79`):
+```typescript
+async validateUser(email: string, password: string): Promise<any> {
+  // 1. Find user by email
+  const user = await this.prisma.user.findUnique({
+    where: { email },
+    include: {
+      accounts: true,
+      userRoles: { include: { role: true } },
+    },
+  });
+
+  if (!user) return null;
+
+  // 2. Find email/password account
+  const localAccount = user.accounts.find(
+    account => account.providerId === 'email'
+  );
+
+  if (!localAccount || !localAccount.password) return null;
+
+  // 3. Verify password using bcrypt
+  const isPasswordValid = await bcrypt.compare(
+    password,
+    localAccount.password
+  );
+
+  if (!isPasswordValid) return null;
+
+  // 4. Return user without sensitive data
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    roles: user.userRoles.map(ur => ur.role.name),
+  };
+}
+```
+
+**What just happened**:
+1. Guard triggered `LocalStrategy`
+2. Strategy called `validateUser(email, password)`
+3. `validateUser`:
+   - Finds user in database
+   - Compares password hash with `bcrypt.compare()`
+   - Returns user object if valid
+4. Passport attaches user to `req.user`
+5. Controller method runs
+
+---
+
+### Step 3: Generate JWT Token
+
+**AuthService.login** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts:88-125`):
+```typescript
+async login(loginDto: LoginDto) {
+  // User already validated by LocalStrategy
+  const user = await this.validateUser(loginDto.email, loginDto.password);
+
+  if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  // Create JWT payload
+  const payload: JwtPayload = {
+    sub: user.id,
+    email: user.email,
+    roles: user.roles,
+  };
+
+  // Create session in database
+  await this.prisma.session.create({
+    data: {
+      userId: user.id,
+      token: this.generateId(),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    },
+  });
+
+  // Sign the JWT token
+  return {
+    access_token: this.jwtService.sign(payload),
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      roles: user.roles,
+    },
+  };
+}
+```
+
+**JWT Signing** (happens in `jwtService.sign(payload)`):
+```typescript
+// Configured in AuthModule
+JwtModule.registerAsync({
+  useFactory: (configService: ConfigService) => ({
+    secret: configService.get('JWT_SECRET') || 'your-secret-key',
+    signOptions: { expiresIn: '7d' },
+  }),
+})
+
+// Under the hood:
+const token = jwt.sign(
+  { sub: user.id, email: user.email, roles: user.roles },
+  'your-secret-key',
+  { expiresIn: '7d' }
+);
+```
+
+**Result**:
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxNjk2ODM0NTY3ODkwX2ExYjJjM2Q0ZSIsImVtYWlsIjoicHJpeWFAZXhhbXBsZS5jb20iLCJyb2xlcyI6WyJsZWFybmVyIl0sImlhdCI6MTY5NjgzNDU2NywiZXhwIjoxNjk3NDM5MzY3fQ.K5x3ZqJ9vYmP2wX8RtN7fH4sL1jQ6bC9dM0eG8iV5kU",
+  "user": {
+    "id": "1696834567890_a1b2c3d4e",
+    "email": "priya@example.com",
+    "name": "Priya Sharma",
+    "roles": ["learner"]
+  }
+}
+```
+
+---
+
+### Step 4: Frontend Stores Token
+
+**AuthService.storeAuthData** (`/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/auth-service.ts:59-67`):
+```typescript
+private storeAuthData(data: AuthResponse): void {
+  if (typeof window !== 'undefined') {
+    // Store in localStorage
+    localStorage.setItem(this.tokenKey, data.access_token);
+    localStorage.setItem(this.userKey, JSON.stringify(data.user));
+
+    // Also set cookies for middleware
+    document.cookie = `nextphoton_jwt_token=${data.access_token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+  }
+}
+```
+
+**Why both localStorage and cookies?**
+- **localStorage**: Easy to access in client-side JavaScript
+- **Cookies**: Can be read by Next.js middleware for server-side protection
+
+---
+
+### Step 5: Accessing Protected Routes
+
+User wants to view their profile: GET `/auth/profile`
+
+**Frontend Sends Request**:
+```typescript
+const token = localStorage.getItem('nextphoton_jwt_token');
+
+const response = await fetch(`${baseUrl}/auth/profile`, {
+  headers: {
+    'Authorization': `Bearer ${token}`,  // 👈 Include token!
+  },
+});
+```
+
+**Backend Receives Request** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:79-82`):
+```typescript
+@Get('profile')
+@UseGuards(JwtAuthGuard)  // 👈 This validates JWT!
+async getProfile(@Request() req) {
+  return req.user;  // User attached by JwtStrategy
+}
+```
+
+---
+
+### Step 6: JwtAuthGuard Validates Token
+
+**JwtAuthGuard** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/guards/jwt-auth.guard.ts:15-39`):
+```typescript
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  canActivate(context: ExecutionContext) {
+    return super.canActivate(context);  // Triggers JwtStrategy
+  }
+
+  handleRequest(err: any, user: any, info: any) {
+    if (err || !user) {
+      if (info?.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token has expired');
+      }
+      if (info?.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      }
+      throw err || new UnauthorizedException('Authentication required');
+    }
+    return user;
+  }
+}
+```
+
+This triggers **JwtStrategy**:
+
+**JwtStrategy** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/strategies/jwt.strategy.ts:18-53`):
+```typescript
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(
+    private authService: AuthService,
+    configService: ConfigService,
+  ) {
+    super({
+      // Extract JWT from Authorization header (Bearer <token>)
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+
+      // Don't ignore expiration - reject expired tokens
+      ignoreExpiration: false,
+
+      // Get secret from environment variable or use default
+      secretOrKey: configService.get('JWT_SECRET') || 'your-secret-key-change-in-production',
+    });
+  }
+
+  async validate(payload: JwtPayload): Promise<any> {
+    // Payload is already decoded and verified!
+    // We just need to confirm user still exists
+    const user = await this.authService.validateToken(payload);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;  // Attached to req.user
+  }
+}
+```
+
+**What happens**:
+1. **Extract Token**: From `Authorization: Bearer <token>` header
+2. **Verify Signature**:
+   ```typescript
+   // Pseudo-code
+   const [header, payload, signature] = token.split('.');
+   const calculatedSignature = HMACSHA256(header + '.' + payload, secret);
+   if (calculatedSignature !== signature) throw Error('Invalid token');
+   ```
+3. **Check Expiration**:
+   ```typescript
+   if (payload.exp < Date.now() / 1000) throw Error('Token expired');
+   ```
+4. **Validate User**: Ensure user still exists in database
+5. **Attach User**: Set `req.user = { id, email, roles }`
+6. **Continue**: Controller method runs
+
+---
+
+### Step 7: Return User Profile
+
+**Controller** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:79-82`):
+```typescript
+@Get('profile')
+@UseGuards(JwtAuthGuard)
+async getProfile(@Request() req) {
+  return req.user;  // Already attached by JwtStrategy!
+}
+```
+
+**Response**:
+```json
+{
+  "id": "1696834567890_a1b2c3d4e",
+  "email": "priya@example.com",
+  "name": "Priya Sharma",
+  "roles": ["learner"],
+  "emailVerified": false
+}
+```
+
+---
+
+## 24.5 Password Security with Bcrypt
+
+**Never store plain text passwords!** Next Photon uses **bcrypt** for password hashing.
+
+### What is Hashing?
+
+**Hashing**: One-way transformation (cannot reverse)
+- Input: `"SecurePass123!"`
+- Output: `$2a$10$N9qo8uLOickgx2ZMRZoMye.DfbQYXdGvJZg7XbF.jZgXLs.3kP9yC`
+
+**Key Properties**:
+- ✅ **One-way**: Can't get password from hash
+- ✅ **Deterministic**: Same input → same output
+- ✅ **Unique**: Different inputs → different outputs (even "password" vs "Password")
+- ✅ **Slow**: Intentionally slow to prevent brute-force attacks
+
+### Registration: Hash Password
+
+**AuthService.register** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts:154-156`):
+```typescript
+// Hash the password
+const saltRounds = 10;
+const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
+```
+
+**What happens**:
+1. **Generate Salt**: Random string added to password
+   ```
+   Salt: $2a$10$N9qo8uLOickgx2ZMRZoMye
+   ```
+2. **Combine**: `password + salt`
+3. **Hash**: Run through bcrypt algorithm 2^10 (1024) times
+4. **Result**:
+   ```
+   $2a$10$N9qo8uLOickgx2ZMRZoMye.DfbQYXdGvJZg7XbF.jZgXLs.3kP9yC
+   ```
+
+**Why Salt?**
+- Prevents rainbow table attacks
+- Same password → different hashes for different users
+- Example:
+  ```
+  User 1: "password" → $2a$10$ABC...123
+  User 2: "password" → $2a$10$XYZ...789  (different!)
+  ```
+
+**Why 10 Rounds?**
+- More rounds = slower (more secure, but slower performance)
+- 10 rounds = good balance (takes ~100ms to hash)
+- 12 rounds = 4x slower
+- 15 rounds = 32x slower
+
+---
+
+### Login: Verify Password
+
+**AuthService.validateUser** (`/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts:64`):
+```typescript
+// Verify password using bcrypt
+const isPasswordValid = await bcrypt.compare(password, localAccount.password);
+```
+
+**What happens**:
+1. **Extract Salt** from stored hash
+2. **Hash Input Password** with same salt
+3. **Compare Hashes**:
+   ```typescript
+   const storedHash = "$2a$10$N9qo8uLOickgx2ZMRZoMye.DfbQYXdGvJZg7XbF.jZgXLs.3kP9yC";
+   const inputPassword = "SecurePass123!";
+
+   // Extract salt from stored hash
+   const salt = "$2a$10$N9qo8uLOickgx2ZMRZoMye";
+
+   // Hash input with same salt
+   const inputHash = bcrypt.hashSync(inputPassword, salt);
+   // Result: "$2a$10$N9qo8uLOickgx2ZMRZoMye.DfbQYXdGvJZg7XbF.jZgXLs.3kP9yC"
+
+   // Compare
+   if (inputHash === storedHash) return true;  // ✅ Match!
+   ```
+
+**Security**: Even if attacker gets database, they can't reverse hashes to get passwords!
+
+---
+
+## 24.6 What is Passport.js?
+
+**Passport** is authentication middleware for Node.js. Think of it as a framework that handles the "how" of authentication, so you focus on the "what."
+
+### Without Passport (Manual)
+
+```typescript
+// You write all this yourself:
+@Post('login')
+async login(@Body() body, @Res() res) {
+  // 1. Extract credentials
+  const { email, password } = body;
+
+  // 2. Validate format
+  if (!email || !password) throw Error('Missing fields');
+
+  // 3. Find user
+  const user = await this.db.findUser(email);
+
+  // 4. Check password
+  const valid = await bcrypt.compare(password, user.password);
+
+  // 5. Generate token
+  const token = jwt.sign({ userId: user.id }, 'secret');
+
+  // 6. Return response
+  return { token, user };
+}
+```
+
+**Problems**:
+- 😫 Lots of boilerplate
+- 🐛 Easy to make security mistakes
+- 🔁 Repeat for every auth type (local, Google, Facebook)
+
+---
+
+### With Passport (Automated)
+
+```typescript
+// Passport handles extraction, validation, user lookup
+@Post('login')
+@UseGuards(LocalAuthGuard)  // 👈 This does steps 1-4!
+async login(@Request() req) {
+  // req.user already contains validated user
+  return this.authService.login(req.user);
+}
+```
+
+**Benefits**:
+- ✅ Less code, fewer bugs
+- ✅ Standardized patterns
+- ✅ Easy to swap strategies (local → Google OAuth)
+- ✅ Well-tested by community
+
+---
+
+## 24.7 Passport Strategies
+
+**Strategy**: A module that implements a specific authentication method.
+
+Next Photon uses two strategies:
+
+### 1. Local Strategy (Email/Password)
+
+**Purpose**: Validate email and password credentials
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/strategies/local.strategy.ts`
+
+```typescript
+@Injectable()
+export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
+  constructor(private authService: AuthService) {
+    super({
+      usernameField: 'email',     // Field name for username
+      passwordField: 'password',  // Field name for password
+    });
+  }
+
+  async validate(email: string, password: string): Promise<any> {
+    // Your custom validation logic
+    const user = await this.authService.validateUser(email, password);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    return user;  // Attached to req.user
+  }
+}
+```
+
+**Flow**:
+1. User sends: `{ email: "priya@example.com", password: "..." }`
+2. Passport extracts `email` and `password` fields
+3. Calls `validate(email, password)`
+4. If valid → returns user → attached to `req.user`
+5. If invalid → throws error → returns 401
+
+---
+
+### 2. JWT Strategy (Token-Based)
+
+**Purpose**: Validate JWT tokens from request headers
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/strategies/jwt.strategy.ts`
+
+```typescript
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+  constructor(
+    private authService: AuthService,
+    configService: ConfigService,
+  ) {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: configService.get('JWT_SECRET'),
+    });
+  }
+
+  async validate(payload: JwtPayload): Promise<any> {
+    // Payload already verified!
+    // Just confirm user exists
+    const user = await this.authService.validateToken(payload);
+    if (!user) throw new UnauthorizedException();
+    return user;  // Attached to req.user
+  }
+}
+```
+
+**Flow**:
+1. User sends: `Authorization: Bearer <token>`
+2. Passport extracts token from header
+3. Verifies signature and expiration
+4. Decodes payload
+5. Calls `validate(payload)`
+6. If valid → returns user → attached to `req.user`
+7. If invalid → throws error → returns 401
+
+---
+
+## 24.8 Token Storage Strategies
+
+Where should the frontend store JWT tokens?
+
+### Option 1: localStorage (Next Photon uses this)
+
+```typescript
+localStorage.setItem('nextphoton_jwt_token', token);
+```
+
+**Pros**:
+- ✅ Easy to access
+- ✅ Persists across browser sessions
+- ✅ Works with client-side routing
+
+**Cons**:
+- ⚠️ Vulnerable to XSS (Cross-Site Scripting) attacks
+- ⚠️ JavaScript can access it
+
+**Security**: Only store in localStorage if you trust your code and dependencies!
+
+---
+
+### Option 2: Cookies (httpOnly)
+
+```typescript
+// Server sets cookie
+res.cookie('jwt', token, {
+  httpOnly: true,     // JavaScript can't access
+  secure: true,       // HTTPS only
+  sameSite: 'strict', // CSRF protection
+});
+```
+
+**Pros**:
+- ✅ Immune to XSS (JavaScript can't access)
+- ✅ Automatic inclusion in requests
+- ✅ Can be httpOnly and secure
+
+**Cons**:
+- ⚠️ Vulnerable to CSRF (Cross-Site Request Forgery)
+- ⚠️ Needs CSRF tokens for protection
+- ⚠️ More complex setup
+
+---
+
+### Next Photon's Approach: Both!
+
+```typescript
+// Store in localStorage for client-side access
+localStorage.setItem('nextphoton_jwt_token', token);
+
+// Also set cookie for middleware
+document.cookie = `nextphoton_jwt_token=${token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+```
+
+**Why both?**
+- **localStorage**: Frontend can read for API calls
+- **Cookie**: Next.js middleware can read for server-side protection
+
+---
+
+## 24.9 Token Refresh Mechanism
+
+JWT tokens expire (Next Photon: 7 days). When expired, user must re-login. But that's annoying! Solution: **Token refresh**.
+
+**Endpoint**: POST `/auth/refresh`
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts:92-108`
+
+```typescript
+@Post('refresh')
+@UseGuards(JwtAuthGuard)  // Must have valid (or recently expired) token
+@HttpCode(HttpStatus.OK)
+async refreshToken(@Request() req) {
+  // User already validated by JwtAuthGuard
+  const payload = {
+    sub: req.user.id,
+    email: req.user.email,
+    roles: req.user.roles,
+  };
+
+  // Generate new token with fresh expiration
+  return {
+    access_token: this.jwtService.sign(payload),
+    user: req.user,
+  };
+}
+```
+
+**Flow**:
+1. User's token is about to expire (or just expired)
+2. Frontend sends: POST `/auth/refresh` with old token
+3. Backend validates old token (must be recently expired, not too old)
+4. Generates new token with fresh 7-day expiration
+5. Frontend replaces old token with new one
+
+**Advanced**: Use **refresh tokens** (separate long-lived tokens) for better security.
+
+---
+
+## 24.10 Security Best Practices
+
+### ✅ DO:
+1. **Use HTTPS**: Tokens sent over encrypted connection
+2. **Short expiration**: 15 minutes (access token), 7 days (refresh token)
+3. **Validate tokens**: Always verify signature and expiration
+4. **Hash passwords**: bcrypt with 10+ salt rounds
+5. **Sanitize inputs**: Prevent SQL injection, XSS
+6. **Rate limiting**: Prevent brute-force attacks
+7. **Logout**: Invalidate tokens on server (if using session table)
+
+### ❌ DON'T:
+1. **Store sensitive data in JWT**: Payload is readable!
+2. **Use weak secrets**: Generate strong, random JWT_SECRET
+3. **Ignore token expiration**: Always check `exp` claim
+4. **Log tokens**: Never log JWT tokens (security risk)
+5. **Share secrets**: Never commit JWT_SECRET to Git
+6. **Trust client**: Always validate on server
+
+---
+
+## 24.11 Key Takeaways from Chapter 24
+
+✅ **Authentication vs Authorization**:
+- Authentication: Who are you? (login)
+- Authorization: What can you do? (permissions)
+
+✅ **JWT (JSON Web Tokens)**:
+- Three parts: Header, Payload, Signature
+- Stateless, scalable, cryptographically secure
+- Contains user data, signed with secret key
+
+✅ **JWT Lifecycle**:
+1. Login → Server generates JWT
+2. Frontend stores JWT (localStorage/cookie)
+3. Protected request → Include JWT in header
+4. Server validates JWT → Allows access
+
+✅ **Password Security**:
+- Never store plain text
+- Use bcrypt for hashing
+- Salt prevents rainbow tables
+- 10 rounds = good balance
+
+✅ **Passport.js**:
+- Middleware for authentication
+- Strategies: Local (email/password), JWT (token)
+- Handles extraction, validation, user attachment
+
+✅ **Next Photon Implementation**:
+- **LocalStrategy**: Validates email/password on login
+- **JwtStrategy**: Validates tokens on protected routes
+- **Guards**: `LocalAuthGuard`, `JwtAuthGuard`
+- **Services**: `AuthService` contains business logic
+
+✅ **Complete Flow**:
+1. POST /auth/login → LocalStrategy → bcrypt.compare → JWT.sign
+2. Store token → localStorage + cookie
+3. GET /auth/profile → JwtStrategy → JWT.verify → req.user
+4. Controller accesses req.user
+
+✅ **Security**:
+- HTTPS only
+- Short expiration (7 days)
+- Token refresh mechanism
+- Never store sensitive data in JWT
+- Strong JWT_SECRET
+
+---
+
+*End of Chapters 23-24*
+
+**Summary**: These chapters covered REST API design principles and JWT authentication implementation in Next Photon. You learned HTTP methods, status codes, URL design, request/response patterns, and the complete authentication flow from login to protected route access using Passport.js and JWT tokens.
+
+**Next Up**: Chapter 25 - Authorization: ABAC System (Role-based permissions and access control)
+
+---
+
+## Chapter 25: Authorization - ABAC System
+
+### 25.1 Introduction: Authorization vs Authentication
+
+Let's clear up the confusion between two terms you hear all the time: **authentication** and **authorization**.
+
+**Think of it like entering a building**:
+- **Authentication**: Showing your ID at the entrance → "Who are you?"
+- **Authorization**: Security checking what floors you can access → "What can you do?"
+
+In Chapter 24, we learned **authentication** (JWT tokens prove who you are). Now we'll learn **authorization** (checking what you're allowed to do).
+
+**Example**:
+```
+Student logs in → Authentication ✅ (JWT proves they're StudentID#123)
+Student tries to delete another student → Authorization ❌ (Students can't delete users)
+Student views their own grades → Authorization ✅ (Students can view their data)
+```
+
+**Key Difference**:
+- **Authentication happens once**: When you log in and get a JWT token
+- **Authorization happens many times**: Every time you try to do something
+
+---
+
+### 25.2 What is Authorization?
+
+**Authorization** is the system that decides **what actions** a user can perform after they've proven who they are.
+
+**Real-World Analogy**:
+Imagine a school:
+- **Everyone** can enter (authentication)
+- **Students** can access classrooms and library
+- **Teachers** can access classrooms, library, and staff room
+- **Principal** can access everywhere, including admin office
+
+**In Web Applications**:
+Authorization controls:
+- Which pages you can visit
+- Which API endpoints you can call
+- What data you can read/write/delete
+- What features you can use
+
+**Example Scenarios**:
+```typescript
+// Student tries to access different resources
+GET /api/my-grades          → ✅ Allowed (own data)
+GET /api/all-students       → ❌ Denied (admin only)
+POST /api/submit-homework   → ✅ Allowed (student action)
+DELETE /api/users/123       → ❌ Denied (admin only)
+```
+
+---
+
+### 25.3 ABAC: Attribute-Based Access Control
+
+**ABAC** stands for **Attribute-Based Access Control**. It's a fancy name for a smart way to manage permissions.
+
+**Traditional Approach (Role-Only)**:
+```
+User → Role → Fixed Permissions
+Student → Can view grades, submit homework
+```
+
+**ABAC Approach (Flexible)**:
+```
+User → Roles + Attributes + Relationships → Dynamic Permissions
+Student → Can view OWN grades, submit homework to ASSIGNED teacher
+```
+
+**What are "Attributes"?**
+Attributes are properties that describe users, resources, and context:
+- **User attributes**: Role, department, experience level
+- **Resource attributes**: Owner, sensitivity, type
+- **Relationship attributes**: "Is this my student?", "Am I assigned to this class?"
+- **Context attributes**: Time, location, device
+
+**ABAC Example**:
+```typescript
+// Simple role check (not ABAC)
+if (user.role === 'teacher') {
+  allowAccess(); // All teachers can access
+}
+
+// ABAC check (more powerful)
+if (user.role === 'teacher' &&
+    resource.assignedTeacher === user.id &&
+    currentTime.isBetween('9am', '5pm')) {
+  allowAccess(); // Only assigned teacher, during work hours
+}
+```
+
+**Why ABAC is Powerful**:
+- **Flexible**: Permissions based on multiple factors, not just roles
+- **Secure**: Fine-grained control (e.g., "edit your own posts" not "edit all posts")
+- **Scalable**: Easy to add new rules without changing code
+
+---
+
+### 25.4 Next Photon's 7 Roles Review
+
+Next Photon has **7 distinct roles**, each with specific responsibilities and permissions. Let's review them:
+
+#### **1. Learner (Student)**
+**Purpose**: Students seeking personalized education
+
+**Types**:
+- `K12`: Kindergarten through 12th grade
+- `COLLEGE`: University students
+- `ADULT_LEARNER`: Adult education and skill development
+
+**Key Permissions**:
+- View own progress and grades
+- Submit homework and assignments
+- Attend scheduled sessions
+- Communicate with assigned educator and ECM
+- Access own learning materials
+
+#### **2. Guardian (Parent/Family)**
+**Purpose**: Family members who monitor learner progress
+
+**Key Permissions**:
+- View learner progress (for their children only)
+- Book sessions for learners
+- Make payments
+- Communicate with educators and ECMs
+- Approve session schedules
+- View financial transactions
+
+**Relationship Types**: Parent, legal guardian, elder sibling, grandparent, other
+
+#### **3. Educator (Teacher/Tutor)**
+**Purpose**: Independent tutors providing personalized education
+
+**Key Permissions**:
+- Conduct online/offline sessions
+- View assigned students' progress
+- Submit feedback to ECMs
+- Set own availability schedule
+- Upload qualifications
+- View own earnings
+
+**Restrictions**: Must follow platform curriculum strictly, cannot deviate
+
+#### **4. EduCare Manager (ECM)**
+**Primary Role**: Student success through micromanagement and monitoring
+
+**Key Permissions**:
+- Track student progress (assigned students)
+- Create custom tasks for students
+- Generate progress reports
+- Communicate with guardians
+- Assign educators to students
+- Monitor educator performance
+- Handle customer support issues
+
+**Note**: ECM is the **core operational role** in Next Photon (80-90% of platform focus)
+
+#### **5. Employee**
+**Purpose**: Platform staff handling various operations
+
+**Types**:
+- `HR_EXECUTIVE`: Recruitment, employee relations
+- `HR_MANAGER`: Strategic HR planning
+- `CONTENT_CREATOR`: Curriculum and content development
+- `PLATFORM_ADMIN`: System administration
+
+**Permissions**: Vary by employee type
+
+#### **6. Intern**
+**Purpose**: Learning-focused roles across departments
+
+**Types**:
+- `STUDENT_EDUCATOR_INTERN`: Aspiring teachers
+- `VIDEO_EDITOR_INTERN`: Video production
+- `CONTENT_CREATOR_INTERN`: Content development
+- `HR_INTERN`: HR support
+
+**Permissions**: Limited, supervised access with mentorship requirements
+
+#### **7. Admin**
+**Purpose**: Platform owners and system administrators
+
+**Key Permissions**:
+- Full system access
+- User management (create, update, delete)
+- Role and permission management
+- Educator approval and classification
+- Rate approval for educators
+- Platform configuration
+- Financial oversight
+- Business analytics
+
+**Note**: Highest-level access, unrestricted
+
+---
+
+### 25.5 Multi-Role Support
+
+In Next Photon, **users can have multiple roles simultaneously**. This is crucial for flexibility.
+
+**Why Multi-Role?**
+1. **Learner who becomes Educator**: A college student (learner) can also tutor K12 students (educator)
+2. **Employee with multiple responsibilities**: An HR manager might also be a content creator
+3. **Admin who tests features**: Platform admin might create a learner profile to test student features
+
+**Database Structure**:
+```prisma
+// File: /home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema.prisma
+
+model User {
+  id    String   @id
+  email String   @unique
+  name  String?
+  // ... other fields
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String   // Links to User
+  roleId    String   // Links to Role
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // A user can have many roles
+  // Each role can belong to many users
+}
+
+model Role {
+  id          String   @id
+  name        String   @unique // "learner", "educator", "admin", etc.
+  description String?
+  // ... other fields
+}
+```
+
+**How It Works**:
+```typescript
+// User with multiple roles
+{
+  userId: "user123",
+  roles: ["learner", "educator"], // Array of role names
+  permissions: {
+    // Combined permissions from both roles
+    viewOwnGrades: true,        // From learner role
+    conductSessions: true,       // From educator role
+    approveRates: false          // Neither role has this
+  }
+}
+```
+
+**Permission Merging Logic**:
+When a user has multiple roles, their permissions are **merged** using the **most permissive approach**:
+- If **any role** allows an action → User can perform it
+- All roles deny an action → User cannot perform it
+
+**Example**:
+```typescript
+// Role permissions
+Learner: { viewGrades: true, editCurriculum: false }
+Educator: { viewGrades: true, editCurriculum: true }
+
+// User with both roles
+User (Learner + Educator): {
+  viewGrades: true,        // Both allow → Allowed
+  editCurriculum: true     // Educator allows → Allowed (most permissive)
+}
+```
+
+---
+
+### 25.6 Permission Inheritance Model
+
+Next Photon uses a **two-tier permission system**:
+1. **Role-based defaults**: Every role has default permissions
+2. **Individual overrides**: Specific users can have custom permissions
+
+**Think of it like school uniforms**:
+- **Role defaults**: Everyone in 10th grade wears the blue uniform (default)
+- **Individual overrides**: Sarah gets permission to wear red shoes for medical reasons (override)
+
+#### **Tier 1: Role-Based Defaults**
+
+Every role has default permissions stored in the `RolePermissions` model:
+
+```json
+// File: /home/teamzenith/ZenCo/NextPhoton/Project_Docs/pd-roles-permissions.md
+
+// Example: Intern default permissions
+{
+  "viewReports": true,
+  "editContent": false,
+  "approveRates": false,
+  "manageUsers": false,
+  "accessAnalytics": false
+}
+
+// Example: Educator default permissions
+{
+  "viewReports": true,
+  "editContent": true,
+  "approveRates": false,
+  "manageUsers": false,
+  "accessAnalytics": false
+}
+```
+
+#### **Tier 2: Individual Overrides**
+
+Each user profile can have a `permissions` JSON field that **overrides** specific defaults:
+
+```json
+// Example: Intern user with special permissions
+{
+  "userId": "intern123",
+  "role": "intern",
+  "permissions": {
+    "editContent": true,           // Override: now allowed (was false)
+    "accessBasicAnalytics": true   // Addition: new permission
+  }
+}
+```
+
+#### **Permission Resolution Algorithm**
+
+Here's how the system determines final permissions:
+
+```
+Step 1: Load all roles for user
+  User roles: ["intern", "educator"]
+
+Step 2: Load default permissions for each role
+  Intern defaults: { viewReports: true, editContent: false }
+  Educator defaults: { viewReports: true, editContent: true, conductSessions: true }
+
+Step 3: Merge role permissions (most permissive)
+  Merged: {
+    viewReports: true,        // Both have it
+    editContent: true,         // Educator allows (most permissive)
+    conductSessions: true      // Only educator has it
+  }
+
+Step 4: Apply individual overrides
+  User overrides: { editContent: false }  // User personally restricted
+
+Step 5: Final permissions
+  Final: {
+    viewReports: true,
+    editContent: false,        // Override applied
+    conductSessions: true
+  }
+```
+
+**Pseudocode**:
+```typescript
+function resolvePermissions(user) {
+  // Step 1: Get user's roles
+  const roles = getUserRoles(user.id); // ["intern", "educator"]
+
+  // Step 2: Load default permissions for each role
+  let permissions = {};
+  for (const role of roles) {
+    const roleDefaults = getRoleDefaults(role);
+    // Step 3: Merge using OR logic (most permissive)
+    permissions = mergePermissions(permissions, roleDefaults);
+  }
+
+  // Step 4: Apply individual overrides
+  const userOverrides = getUserPermissions(user.id);
+  permissions = applyOverrides(permissions, userOverrides);
+
+  // Step 5: Return final permissions
+  return permissions;
+}
+
+function mergePermissions(perms1, perms2) {
+  const merged = { ...perms1 };
+  for (const key in perms2) {
+    // OR logic: if either is true, result is true
+    merged[key] = merged[key] || perms2[key];
+  }
+  return merged;
+}
+
+function applyOverrides(basePerms, overrides) {
+  // Overrides replace base permissions
+  return { ...basePerms, ...overrides };
+}
+```
+
+---
+
+### 25.7 Backend Implementation: RolesGuard
+
+Now let's dive into the actual code! In NestJS, we use **Guards** to protect routes based on roles.
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/guards/roles.guard.ts`
+
+```typescript
+/**
+ * Role-Based Access Control Guard
+ *
+ * Guard that checks if authenticated user has required roles
+ * Works in conjunction with @Roles decorator to protect routes
+ *
+ * Must be used after JwtAuthGuard to ensure user is authenticated
+ */
+
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY } from '../decorators/roles.decorator';
+
+@Injectable() // Makes this class injectable via dependency injection
+export class RolesGuard implements CanActivate { // Implements NestJS CanActivate interface
+  constructor(private reflector: Reflector) {} // Reflector reads decorator metadata
+
+  /**
+   * Check if user has required roles to access the route
+   */
+  canActivate(context: ExecutionContext): boolean {
+    // Step 1: Get required roles from decorator metadata
+    // This reads the @Roles(...) decorator from the controller method
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),  // Method-level decorator (specific endpoint)
+      context.getClass(),    // Class-level decorator (whole controller)
+    ]);
+
+    // Step 2: If no roles are required, allow access
+    // Routes without @Roles decorator are unprotected
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true; // No restrictions → Allow
+    }
+
+    // Step 3: Get user from request (set by JWT guard)
+    // JwtAuthGuard must run BEFORE RolesGuard to attach user to request
+    const request = context.switchToHttp().getRequest();
+    const user = request.user; // { id: "user123", email: "...", roles: ["learner"] }
+
+    // Step 4: Check if user exists and has roles
+    if (!user || !user.roles) {
+      throw new ForbiddenException('User does not have any assigned roles');
+    }
+
+    // Step 5: Check if user has at least one of the required roles
+    // Uses Array.some() to check if ANY required role exists in user.roles
+    const hasRole = requiredRoles.some((role) => user.roles.includes(role));
+    // Example: requiredRoles = ["admin", "educator"]
+    //          user.roles = ["educator", "learner"]
+    //          hasRole = true (educator matches)
+
+    // Step 6: Deny access if user doesn't have required role
+    if (!hasRole) {
+      throw new ForbiddenException(
+        `Access denied. Required roles: ${requiredRoles.join(', ')}. Your roles: ${user.roles.join(', ')}`
+      );
+      // Example error: "Access denied. Required roles: admin, educator. Your roles: learner"
+    }
+
+    // Step 7: Allow access
+    return true; // User has required role → Allow
+  }
+}
+```
+
+**Line-by-Line Breakdown**:
+
+**Line 10**: `import { Injectable, CanActivate, ExecutionContext, ForbiddenException }`
+- `Injectable`: Decorator that makes this class available for dependency injection
+- `CanActivate`: Interface that guards must implement (requires `canActivate` method)
+- `ExecutionContext`: Provides access to request/response and handler details
+- `ForbiddenException`: HTTP 403 error thrown when access is denied
+
+**Line 11**: `import { Reflector } from '@nestjs/core';`
+- `Reflector`: Utility to read metadata attached by decorators
+- Used to read the `@Roles(...)` decorator values
+
+**Line 14**: `@Injectable()`
+- Marks this class as a provider that can be injected
+- NestJS will create a single instance (singleton) and inject where needed
+
+**Line 15**: `export class RolesGuard implements CanActivate`
+- Implements `CanActivate` interface → Must have `canActivate()` method
+- Guards return `true` (allow) or `false` (deny), or throw exceptions
+
+**Line 16**: `constructor(private reflector: Reflector) {}`
+- Injects `Reflector` service via constructor
+- `private` automatically creates and assigns `this.reflector`
+
+**Line 21**: `canActivate(context: ExecutionContext): boolean`
+- Required method from `CanActivate` interface
+- `context`: Contains request, response, handler info
+- Returns `boolean`: `true` = allow access, `false` = deny access
+
+**Line 23-26**: `this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [...])`
+- Reads metadata attached by `@Roles()` decorator
+- `ROLES_KEY`: The metadata key ("roles")
+- `getAllAndOverride`: Checks both method and class level, method overrides class
+- Returns array of required role names: `["admin", "educator"]`
+
+**Line 29-31**: `if (!requiredRoles || requiredRoles.length === 0) { return true; }`
+- If no `@Roles()` decorator is present → No restrictions → Allow everyone
+- This makes roles **opt-in** (not required unless explicitly set)
+
+**Line 34**: `const request = context.switchToHttp().getRequest();`
+- Converts generic `ExecutionContext` to HTTP context
+- Gets the Express request object
+
+**Line 35**: `const user = request.user;`
+- Gets user object attached by `JwtAuthGuard`
+- Structure: `{ id: "user123", email: "user@example.com", roles: ["learner", "educator"] }`
+
+**Line 38-40**: `if (!user || !user.roles) { throw new ForbiddenException(...) }`
+- Validates that user exists and has roles array
+- Throws 403 error if validation fails
+
+**Line 43**: `const hasRole = requiredRoles.some((role) => user.roles.includes(role))`
+- `requiredRoles`: Array from decorator (e.g., `["admin", "educator"]`)
+- `user.roles`: User's actual roles (e.g., `["educator", "learner"]`)
+- `some()`: Returns true if **at least one** required role matches
+- Logic: User needs **ANY** of the required roles (OR logic, not AND)
+
+**Line 45-49**: `if (!hasRole) { throw new ForbiddenException(...) }`
+- If user doesn't have any required role → Deny access
+- Throws detailed error message showing what's required vs what user has
+
+**Line 51**: `return true;`
+- User has required role → Allow access to route
+
+**How It Works in Practice**:
+```typescript
+// Controller method with @Roles decorator
+@Roles('admin', 'educator') // Required roles
+@UseGuards(JwtAuthGuard, RolesGuard) // Guards applied in order
+@Get('dashboard')
+getDashboard(@Request() req) {
+  // This code only runs if:
+  // 1. JwtAuthGuard validates token (authentication)
+  // 2. RolesGuard checks user has 'admin' OR 'educator' role (authorization)
+  return { message: 'Dashboard data', user: req.user };
+}
+```
+
+---
+
+### 25.8 Backend Implementation: @Roles Decorator
+
+The `@Roles` decorator is used to **mark which roles can access a route**. Let's see how it works.
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/decorators/roles.decorator.ts`
+
+```typescript
+/**
+ * Roles Decorator
+ *
+ * Custom decorator to specify which roles can access a route
+ * Used in conjunction with RolesGuard for role-based access control
+ *
+ * Usage:
+ * @Roles('admin', 'educator')
+ * @UseGuards(JwtAuthGuard, RolesGuard)
+ * someMethod() { ... }
+ */
+
+import { SetMetadata } from '@nestjs/common';
+
+export const ROLES_KEY = 'roles'; // Metadata key for storing role names
+
+/**
+ * Decorator to set required roles for a route
+ *
+ * @param roles - Array of role names that are allowed to access the route
+ */
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+```
+
+**Line-by-Line Breakdown**:
+
+**Line 13**: `import { SetMetadata } from '@nestjs/common';`
+- `SetMetadata`: NestJS function to attach metadata to classes/methods
+- Metadata is key-value pairs stored with decorators
+
+**Line 15**: `export const ROLES_KEY = 'roles';`
+- Defines the metadata key name ("roles")
+- Used by both decorator (to set) and guard (to read)
+- Exporting ensures same key is used everywhere
+
+**Line 22**: `export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);`
+- Creates a custom decorator function
+- `...roles: string[]`: Rest parameter, accepts multiple arguments
+- `SetMetadata(ROLES_KEY, roles)`: Stores roles array under "roles" key
+- Returns a decorator function
+
+**How It Works**:
+
+1. **When you write**:
+```typescript
+@Roles('admin', 'educator')
+```
+
+2. **It becomes**:
+```typescript
+SetMetadata('roles', ['admin', 'educator'])
+```
+
+3. **Metadata is attached to the method**:
+```typescript
+{
+  methodName: 'getDashboard',
+  metadata: {
+    'roles': ['admin', 'educator'] // Stored here
+  }
+}
+```
+
+4. **RolesGuard reads it**:
+```typescript
+const requiredRoles = reflector.get('roles', handler);
+// Returns: ['admin', 'educator']
+```
+
+**Why Use a Custom Decorator?**
+
+Without decorator (verbose):
+```typescript
+@SetMetadata('roles', ['admin', 'educator']) // Repetitive, error-prone
+@Get('dashboard')
+getDashboard() { }
+```
+
+With decorator (clean):
+```typescript
+@Roles('admin', 'educator') // Clear, reusable
+@Get('dashboard')
+getDashboard() { }
+```
+
+**Advanced Usage**:
+
+```typescript
+// Multiple roles (OR logic: admin OR educator)
+@Roles('admin', 'educator')
+@Get('students')
+getStudents() { }
+
+// Single role
+@Roles('admin')
+@Delete('user/:id')
+deleteUser() { }
+
+// No roles (public route)
+@Get('announcements')
+getAnnouncements() { } // No @Roles decorator
+
+// Class-level roles (apply to all methods in controller)
+@Roles('admin')
+@Controller('admin')
+export class AdminController {
+  @Get('dashboard') // Inherits 'admin' role requirement
+  getDashboard() { }
+
+  @Roles('superadmin') // Overrides class-level, now requires 'superadmin'
+  @Delete('everything')
+  deleteEverything() { }
+}
+```
+
+---
+
+### 25.9 Using Guards in Controllers
+
+Now let's see how to use `@Roles` decorator and `RolesGuard` in actual controllers.
+
+**Example Controller**:
+
+```typescript
+import { Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { Roles } from './auth/decorators/roles.decorator';
+
+@Controller('users')
+export class UsersController {
+
+  // Public route - No authentication or authorization
+  @Get('public')
+  getPublicInfo() {
+    return { message: 'This is public information' };
+  }
+
+  // Authenticated route - Any logged-in user can access
+  @UseGuards(JwtAuthGuard) // Only authentication required
+  @Get('profile')
+  getProfile(@Request() req) {
+    // req.user contains authenticated user data from JWT
+    return { user: req.user };
+  }
+
+  // Role-protected route - Only admins can access
+  @Roles('admin') // Decorator specifies required roles
+  @UseGuards(JwtAuthGuard, RolesGuard) // Both guards applied in order
+  @Get('all')
+  getAllUsers() {
+    // This code only runs if:
+    // 1. User is authenticated (JwtAuthGuard passes)
+    // 2. User has 'admin' role (RolesGuard passes)
+    return { message: 'All users data (admin only)' };
+  }
+
+  // Multiple roles - Admin OR educator can access
+  @Roles('admin', 'educator') // OR logic
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('students')
+  getStudents() {
+    // Accessible by admins or educators
+    return { message: 'Student list' };
+  }
+
+  // Complex authorization - Role + ownership check
+  @Roles('learner', 'guardian')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('grades/:learnerId')
+  getGrades(@Request() req, @Param('learnerId') learnerId: string) {
+    // Step 1: RolesGuard checks user has 'learner' or 'guardian' role
+    // Step 2: Additional logic checks ownership
+
+    const user = req.user;
+
+    // If learner, can only view own grades
+    if (user.roles.includes('learner')) {
+      if (user.learnerId !== learnerId) {
+        throw new ForbiddenException('You can only view your own grades');
+      }
+    }
+
+    // If guardian, can only view their children's grades
+    if (user.roles.includes('guardian')) {
+      const isMyChild = await this.checkGuardianRelationship(user.id, learnerId);
+      if (!isMyChild) {
+        throw new ForbiddenException('You can only view your children\'s grades');
+      }
+    }
+
+    return { grades: 'Grades data', learnerId };
+  }
+}
+```
+
+**Guard Execution Order**:
+
+```
+1. @UseGuards(JwtAuthGuard, RolesGuard)
+   ↓
+2. JwtAuthGuard runs first
+   - Validates JWT token
+   - Extracts user data
+   - Attaches user to request.user
+   - If fails → 401 Unauthorized
+   ↓
+3. RolesGuard runs second
+   - Reads @Roles decorator
+   - Checks request.user.roles
+   - If fails → 403 Forbidden
+   ↓
+4. Controller method executes
+   - Additional business logic
+   - Return response
+```
+
+**Important Notes**:
+
+1. **Order matters**: `JwtAuthGuard` must run before `RolesGuard` because RolesGuard needs `request.user`
+
+2. **Guards are independent**: You can use `JwtAuthGuard` alone for routes that need authentication but no role check
+
+3. **Multiple guards in one array**: `@UseGuards(Guard1, Guard2)` runs them sequentially
+
+4. **Guards don't modify response**: They only allow/deny access, controller handles response
+
+---
+
+### 25.10 Frontend Route Access Control
+
+The backend enforces security, but the frontend needs to **optimize UI** based on user roles. Don't show buttons/pages users can't access!
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/routeAccessMap.ts`
+
+```typescript
+export const ITEM_PER_PAGE = 10 // Pagination constant
+
+// Type definition for route access map
+type RouteAccessMap = {
+  [key: string]: string[]; // Route pattern → Array of allowed roles
+};
+
+// Route access configuration
+export const routeAccessMap: RouteAccessMap = {
+  // Wildcard route - Admin can access everything
+  "/(.*)": ["admin"], // Regex: matches any route
+
+  // Admin routes - Admin only
+  "/admin(.*)": ["admin"], // All routes starting with /admin
+  "/admin/debug(.*)": ["admin"], // Debug routes
+
+  // Role-specific dashboards
+  "/learner(.*)": ["learner", "admin"], // Learner dashboard + admin override
+  "/educator(.*)": ["educator"], // Educator dashboard
+  "/guardian(.*)": ["guardian"], // Guardian dashboard
+
+  // User management routes
+  "/educators": ["admin", "educator"], // View educators list
+  "/learners": ["admin", "educator"], // View learners list
+  "/guardians": ["admin", "educator"], // View guardians list
+
+  // Admin-only configuration
+  "/subjects": ["admin"], // Manage subjects
+
+  // Shared routes - Multiple roles
+  "/classes": ["admin", "educator"], // Class management
+  "/exams": ["admin", "educator", "learner", "guardian"], // Everyone can view exams
+  "/assignments": ["admin", "educator", "learner", "guardian"], // Assignments
+  "/results": ["admin", "educator", "learner", "guardian"], // Results/grades
+  "/attendance": ["admin", "educator", "learner", "guardian"], // Attendance tracking
+  "/events": ["admin", "educator", "learner", "guardian"], // School events
+  "/announcements": ["admin", "educator", "learner", "guardian"], // Announcements
+
+  // Academic planning routes
+  "/academicplans/acadmindmaps": ["admin", "employee", "intern", "educator"], // Mind maps
+  "/academicplans(.*)": ["admin", "employee", "intern", "educator"] // All academic plans
+};
+```
+
+**How It's Used in Middleware**:
+
+```typescript
+// File: /home/teamzenith/ZenCo/NextPhoton/frontend/web/src/middleware.ts (example)
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { routeAccessMap } from '@/lib/routeAccessMap';
+
+export function middleware(request: NextRequest) {
+  // Step 1: Get current path
+  const path = request.nextUrl.pathname; // e.g., "/admin/dashboard"
+
+  // Step 2: Get user from session/cookie
+  const userRoles = getUserRoles(request); // e.g., ["educator", "learner"]
+
+  // Step 3: Check if route is protected
+  for (const [pattern, allowedRoles] of Object.entries(routeAccessMap)) {
+    // Convert pattern to regex (e.g., "/admin(.*)" → /^\/admin.*$/)
+    const regex = new RegExp(`^${pattern}$`);
+
+    // Check if current path matches pattern
+    if (regex.test(path)) {
+      // Step 4: Check if user has any allowed role
+      const hasAccess = allowedRoles.some(role => userRoles.includes(role));
+
+      if (!hasAccess) {
+        // Step 5: Redirect to access denied page
+        return NextResponse.redirect(new URL('/access-denied', request.url));
+      }
+
+      break; // Match found, stop checking
+    }
+  }
+
+  // Step 6: Allow access
+  return NextResponse.next();
+}
+
+// Configure which routes to run middleware on
+export const config = {
+  matcher: [
+    // Match all routes except static files and API routes
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+};
+```
+
+**Using in Components**:
+
+```tsx
+// File: Example component
+
+import { useAuth } from '@/contexts/auth-context';
+import { routeAccessMap } from '@/lib/routeAccessMap';
+
+function Navigation() {
+  const { user } = useAuth(); // Get current user
+  const userRoles = user?.roles || []; // ["learner", "guardian"]
+
+  // Helper function to check route access
+  const canAccess = (route: string) => {
+    const allowedRoles = routeAccessMap[route] || [];
+    return allowedRoles.some(role => userRoles.includes(role));
+  };
+
+  return (
+    <nav>
+      {/* Show link only if user can access */}
+      {canAccess('/admin(.*)') && (
+        <a href="/admin">Admin Dashboard</a>
+      )}
+
+      {canAccess('/learner(.*)') && (
+        <a href="/learner">My Learning</a>
+      )}
+
+      {canAccess('/guardian(.*)') && (
+        <a href="/guardian">My Children</a>
+      )}
+
+      {/* Always visible (public route) */}
+      <a href="/announcements">Announcements</a>
+    </nav>
+  );
+}
+```
+
+**Key Points**:
+
+1. **Frontend is for UX, not security**: Always enforce on backend
+2. **Regex patterns**: Use regex for flexible matching (e.g., `/admin(.*)` matches `/admin/users`, `/admin/settings`, etc.)
+3. **Most specific first**: Check specific routes before wildcards
+4. **Admin override**: Admin role often gets access to everything
+
+---
+
+### 25.11 Complete Authorization Flow
+
+Let's trace a complete request from frontend to backend with authorization:
+
+**Scenario**: Educator tries to view student list
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 1: User Action (Frontend)                              │
+├─────────────────────────────────────────────────────────────┤
+│  User clicks "View Students" button                          │
+│  Frontend checks: Can 'educator' role access '/students'?   │
+│  routeAccessMap['/learners'] = ['admin', 'educator']        │
+│  Result: ✅ Show button (educator is allowed)                │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 2: Frontend Makes Request                              │
+├─────────────────────────────────────────────────────────────┤
+│  GET /api/students                                           │
+│  Headers: {                                                  │
+│    Authorization: 'Bearer eyJhbGciOiJ...'  ← JWT token      │
+│  }                                                           │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 3: Request Hits Backend NestJS Server                  │
+├─────────────────────────────────────────────────────────────┤
+│  Route: GET /api/students                                    │
+│  Decorators on controller method:                            │
+│    @Roles('admin', 'educator')                               │
+│    @UseGuards(JwtAuthGuard, RolesGuard)                      │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 4: JwtAuthGuard Executes (Authentication)              │
+├─────────────────────────────────────────────────────────────┤
+│  1. Extract token from Authorization header                  │
+│  2. Verify token signature with JWT_SECRET                   │
+│  3. Decode token payload: {                                  │
+│       userId: "user123",                                     │
+│       email: "teacher@example.com",                          │
+│       roles: ["educator", "learner"]                         │
+│     }                                                        │
+│  4. Query database to get full user data                     │
+│  5. Attach user to request: request.user = userObject        │
+│  Result: ✅ Token valid, proceed                             │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 5: RolesGuard Executes (Authorization)                 │
+├─────────────────────────────────────────────────────────────┤
+│  1. Read @Roles decorator metadata                           │
+│     requiredRoles = ['admin', 'educator']                    │
+│                                                              │
+│  2. Get user from request (set by JwtAuthGuard)              │
+│     request.user.roles = ['educator', 'learner']             │
+│                                                              │
+│  3. Check if user has any required role                      │
+│     requiredRoles.some(r => user.roles.includes(r))          │
+│     Does ['educator', 'learner'] include 'admin'? No         │
+│     Does ['educator', 'learner'] include 'educator'? Yes ✅  │
+│                                                              │
+│  4. Result: User has 'educator' role → Allow access          │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 6: Controller Method Executes                          │
+├─────────────────────────────────────────────────────────────┤
+│  @Get('students')                                            │
+│  async getStudents(@Request() req) {                         │
+│    // Guards passed, execute business logic                  │
+│    const students = await this.studentsService.findAll();    │
+│    return { students };                                      │
+│  }                                                           │
+└─────────────────────────────────────────────────────────────┘
+                          ↓
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 7: Response Sent to Frontend                           │
+├─────────────────────────────────────────────────────────────┤
+│  HTTP 200 OK                                                 │
+│  Body: {                                                     │
+│    students: [                                               │
+│      { id: 1, name: "Alice", grade: 10 },                   │
+│      { id: 2, name: "Bob", grade: 11 }                      │
+│    ]                                                         │
+│  }                                                           │
+│  Frontend displays student list                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**What if Authorization Fails?**
+
+```
+Scenario: Learner tries to access /admin/dashboard
+
+STEP 1: Frontend Check
+  routeAccessMap['/admin(.*)'] = ['admin']
+  User roles: ['learner']
+  Result: ❌ Hide admin link (learner not allowed)
+
+STEP 2: User Manually Types URL (bypass frontend)
+  Browser: http://example.com/admin/dashboard
+
+STEP 3: Middleware Check (if implemented)
+  Path: /admin/dashboard
+  Pattern: /admin(.*)
+  Allowed: ['admin']
+  User roles: ['learner']
+  Result: ❌ Redirect to /access-denied
+
+STEP 4: Even if Middleware Bypassed (direct API call)
+  Learner calls: GET /api/admin/users
+
+STEP 5: JwtAuthGuard
+  ✅ Token valid, user authenticated
+
+STEP 6: RolesGuard
+  Required roles: ['admin']
+  User roles: ['learner']
+  Result: ❌ Throw ForbiddenException
+
+STEP 7: Response
+  HTTP 403 Forbidden
+  Body: {
+    statusCode: 403,
+    message: "Access denied. Required roles: admin. Your roles: learner"
+  }
+```
+
+**Key Takeaways**:
+1. **Multiple layers**: Frontend UX + Middleware + Backend guards
+2. **Backend is final authority**: Never trust frontend checks
+3. **Authentication before authorization**: Must know WHO before checking WHAT
+4. **Detailed error messages**: Help debugging (but sanitize in production)
+
+---
+
+### 25.12 Permission Resolution Algorithm (Deep Dive)
+
+Let's formalize the permission resolution algorithm with pseudocode and examples.
+
+**Algorithm**:
+
+```typescript
+/**
+ * Permission Resolution Algorithm
+ *
+ * Determines final permissions for a user with multiple roles
+ * and individual overrides
+ */
+
+function resolveUserPermissions(userId: string): Permissions {
+  // STEP 1: Fetch user and their roles
+  const user = getUserById(userId);
+  const userRoles = getUserRoles(userId); // ["educator", "intern"]
+
+  // STEP 2: Initialize empty permissions object
+  let mergedPermissions: Permissions = {};
+
+  // STEP 3: Load and merge default permissions for each role
+  for (const role of userRoles) {
+    const roleDefaults = getRoleDefaultPermissions(role);
+    mergedPermissions = mergePermissionsOR(mergedPermissions, roleDefaults);
+  }
+
+  // STEP 4: Load user-specific permission overrides
+  const userOverrides = getUserPermissionOverrides(userId);
+
+  // STEP 5: Apply overrides (overrides replace base permissions)
+  const finalPermissions = applyOverrides(mergedPermissions, userOverrides);
+
+  // STEP 6: Return final permissions
+  return finalPermissions;
+}
+
+/**
+ * Merge two permission objects using OR logic
+ * If either permission is true, result is true (most permissive)
+ */
+function mergePermissionsOR(perm1: Permissions, perm2: Permissions): Permissions {
+  const merged = { ...perm1 }; // Copy first permissions
+
+  for (const key in perm2) {
+    if (!(key in merged)) {
+      // New permission from perm2 → Add it
+      merged[key] = perm2[key];
+    } else {
+      // Both have this permission → Use OR logic
+      merged[key] = merged[key] || perm2[key]; // true if either is true
+    }
+  }
+
+  return merged;
+}
+
+/**
+ * Apply user-specific overrides to base permissions
+ * Overrides completely replace base values
+ */
+function applyOverrides(basePerms: Permissions, overrides: Permissions): Permissions {
+  return { ...basePerms, ...overrides }; // Spread overwrites matching keys
+}
+```
+
+**Example Walkthrough**:
+
+```typescript
+// Scenario: User with multiple roles and individual overrides
+
+// User: John (ID: user123)
+// Roles: ["educator", "intern"]
+
+// STEP 1: Fetch roles
+userRoles = ["educator", "intern"]
+
+// STEP 2: Initialize
+mergedPermissions = {}
+
+// STEP 3: Load role defaults and merge
+
+// Iteration 1: Educator role
+roleDefaults_educator = {
+  viewStudents: true,
+  editGrades: true,
+  deleteStudents: false,
+  viewReports: true
+}
+
+mergedPermissions = mergePermissionsOR({}, roleDefaults_educator)
+// Result: { viewStudents: true, editGrades: true, deleteStudents: false, viewReports: true }
+
+// Iteration 2: Intern role
+roleDefaults_intern = {
+  viewStudents: false,   // Conflicts with educator
+  editContent: true,
+  viewReports: false,    // Conflicts with educator
+  accessBasicAnalytics: true
+}
+
+mergedPermissions = mergePermissionsOR(mergedPermissions, roleDefaults_intern)
+// Merge logic:
+//   viewStudents: true || false = true   (educator wins)
+//   editGrades: true (no conflict)
+//   deleteStudents: false (no conflict)
+//   viewReports: true || false = true    (educator wins)
+//   editContent: true (new from intern)
+//   accessBasicAnalytics: true (new from intern)
+
+// Result after merge:
+mergedPermissions = {
+  viewStudents: true,          // From educator (OR logic)
+  editGrades: true,            // From educator
+  deleteStudents: false,       // From educator
+  viewReports: true,           // From educator (OR logic)
+  editContent: true,           // From intern
+  accessBasicAnalytics: true   // From intern
+}
+
+// STEP 4: Load user overrides
+userOverrides = {
+  editGrades: false,           // John personally restricted from editing grades
+  deleteStudents: true,         // John given special permission
+  approveRates: true           // New permission not in any role
+}
+
+// STEP 5: Apply overrides
+finalPermissions = applyOverrides(mergedPermissions, userOverrides)
+// Spread operator { ...merged, ...overrides } replaces matching keys
+
+// STEP 6: Final result
+finalPermissions = {
+  viewStudents: true,          // From merged (unchanged)
+  editGrades: false,           // OVERRIDE: Changed from true to false
+  deleteStudents: true,        // OVERRIDE: Changed from false to true
+  viewReports: true,           // From merged (unchanged)
+  editContent: true,           // From merged (unchanged)
+  accessBasicAnalytics: true,  // From merged (unchanged)
+  approveRates: true           // OVERRIDE: New permission added
+}
+```
+
+**Database Query Example**:
+
+```typescript
+// Real implementation with Prisma
+
+async function resolveUserPermissions(userId: string) {
+  // Get user with roles
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      userRoles: {
+        include: {
+          role: {
+            include: {
+              rolePermissions: true // Default permissions for each role
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Merge role permissions
+  let merged = {};
+  for (const userRole of user.userRoles) {
+    const rolePerms = userRole.role.rolePermissions.permissions; // JSON field
+    merged = { ...merged, ...rolePerms }; // Simple merge (OR logic via overwrite)
+
+    // For explicit OR logic on booleans:
+    for (const key in rolePerms) {
+      merged[key] = merged[key] || rolePerms[key];
+    }
+  }
+
+  // Get user profile for individual overrides
+  const profile = await prisma.learnerProfile.findUnique({
+    where: { userId: user.id },
+    select: { permissions: true } // JSON field
+  });
+
+  // Apply overrides
+  const final = { ...merged, ...(profile?.permissions || {}) };
+
+  return final;
+}
+```
+
+**Complexity Analysis**:
+- **Time**: O(R × P) where R = number of roles, P = average permissions per role
+- **Space**: O(P_total) where P_total = total unique permissions across all roles
+- **Caching**: Cache resolved permissions per user, invalidate on role/permission change
+
+---
+
+### 25.13 Security Best Practices for Authorization
+
+**1. Always Validate on Backend**
+```typescript
+// ❌ BAD: Only check on frontend
+function deleteUser(userId) {
+  // No backend validation!
+  return fetch(`/api/users/${userId}`, { method: 'DELETE' });
+}
+
+// ✅ GOOD: Backend enforces authorization
+@Roles('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Delete('users/:id')
+deleteUser(@Param('id') id: string) {
+  // Only admins reach here
+  return this.usersService.delete(id);
+}
+```
+
+**2. Use Principle of Least Privilege**
+```typescript
+// ❌ BAD: Give broad permissions
+permissions = {
+  manageUsers: true // Too broad! Create, read, update, delete all together
+}
+
+// ✅ GOOD: Granular permissions
+permissions = {
+  createUser: false,
+  readUser: true,
+  updateUser: false,
+  deleteUser: false,
+  readOwnProfile: true,
+  updateOwnProfile: true
+}
+```
+
+**3. Deny by Default**
+```typescript
+// ❌ BAD: Allow by default
+function checkPermission(user, action) {
+  if (deniedActions.includes(action)) return false;
+  return true; // Default allow
+}
+
+// ✅ GOOD: Deny by default
+function checkPermission(user, action) {
+  if (user.permissions[action] === true) return true;
+  return false; // Default deny
+}
+```
+
+**4. Validate Resource Ownership**
+```typescript
+// ❌ BAD: Role check only
+@Roles('learner')
+@Get('grades/:gradeId')
+async getGrade(@Param('gradeId') gradeId: string) {
+  // Any learner can access any grade!
+  return this.gradesService.findOne(gradeId);
+}
+
+// ✅ GOOD: Role + ownership check
+@Roles('learner')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Get('grades/:gradeId')
+async getGrade(
+  @Request() req,
+  @Param('gradeId') gradeId: string
+) {
+  const grade = await this.gradesService.findOne(gradeId);
+
+  // Check if this grade belongs to the requesting learner
+  if (grade.learnerId !== req.user.learnerId) {
+    throw new ForbiddenException('You can only access your own grades');
+  }
+
+  return grade;
+}
+```
+
+**5. Log Authorization Failures**
+```typescript
+@Injectable()
+export class RolesGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    const hasRole = requiredRoles.some(role => user.roles.includes(role));
+
+    if (!hasRole) {
+      // ✅ Log unauthorized access attempts
+      this.logger.warn({
+        message: 'Unauthorized access attempt',
+        userId: user.id,
+        requiredRoles,
+        userRoles: user.roles,
+        route: request.url,
+        ip: request.ip,
+        timestamp: new Date()
+      });
+
+      throw new ForbiddenException('Access denied');
+    }
+
+    return true;
+  }
+}
+```
+
+**6. Separate Authentication and Authorization**
+```typescript
+// ❌ BAD: Mixed concerns
+@UseGuards(AuthAndRoleGuard) // One guard does both
+@Get('admin/users')
+getUsers() { }
+
+// ✅ GOOD: Separate guards
+@UseGuards(JwtAuthGuard, RolesGuard) // Two distinct guards
+@Roles('admin')
+@Get('admin/users')
+getUsers() { }
+```
+
+**7. Use Time-Based Permissions (Context-Aware)**
+```typescript
+// ✅ GOOD: Check time context
+function canAccessResource(user, resource) {
+  // Check role
+  if (!user.roles.includes('educator')) return false;
+
+  // Check time window
+  const now = new Date();
+  if (now.getHours() < 8 || now.getHours() > 18) {
+    return false; // Only during work hours
+  }
+
+  // Check relationship
+  if (resource.assignedEducatorId !== user.id) return false;
+
+  return true;
+}
+```
+
+**8. Audit Sensitive Operations**
+```typescript
+@Roles('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Delete('users/:id')
+async deleteUser(@Request() req, @Param('id') id: string) {
+  const user = await this.usersService.findById(id);
+
+  // ✅ Audit log before deletion
+  await this.auditService.log({
+    action: 'DELETE_USER',
+    performedBy: req.user.id,
+    targetUser: id,
+    targetData: user,
+    timestamp: new Date(),
+    ip: req.ip
+  });
+
+  await this.usersService.delete(id);
+
+  return { success: true };
+}
+```
+
+---
+
+### 25.14 Key Takeaways from Chapter 25
+
+✅ **Authorization vs Authentication**:
+- Authentication: "Who are you?" (login, JWT tokens)
+- Authorization: "What can you do?" (permissions, roles)
+- Authentication happens once, authorization happens many times
+
+✅ **ABAC (Attribute-Based Access Control)**:
+- More flexible than simple role-based access control
+- Uses attributes: user properties, resource properties, relationships, context
+- Enables fine-grained permissions (e.g., "edit own posts" not "edit all posts")
+
+✅ **Next Photon's 7 Roles**:
+- **Learner**: Students (K12, College, Adult)
+- **Guardian**: Parents/family monitoring learners
+- **Educator**: Independent tutors following platform curriculum
+- **EduCare Manager (ECM)**: Core operational role, student success specialists
+- **Employee**: Platform staff (HR, Content, Admin)
+- **Intern**: Learning-focused roles
+- **Admin**: Platform owners, highest access level
+
+✅ **Multi-Role Support**:
+- Users can have multiple roles simultaneously (e.g., learner who is also educator)
+- Permissions merged using most permissive approach (OR logic)
+- Enables flexibility without security compromise
+
+✅ **Permission Inheritance Model**:
+- **Tier 1**: Role-based defaults (stored in RolePermissions)
+- **Tier 2**: Individual overrides (stored in user profiles)
+- Resolution: Base permissions → Merge roles (OR logic) → Apply overrides
+
+✅ **RolesGuard Implementation**:
+- NestJS guard implementing `CanActivate` interface
+- Uses `Reflector` to read `@Roles()` decorator metadata
+- Checks if `request.user.roles` includes any required role
+- Must run after `JwtAuthGuard` (needs authenticated user)
+- Throws `ForbiddenException` (403) if access denied
+
+✅ **@Roles Decorator**:
+- Custom decorator using `SetMetadata`
+- Attaches role requirements to controller methods
+- Clean syntax: `@Roles('admin', 'educator')`
+- Can be class-level (all methods) or method-level (specific endpoint)
+
+✅ **Using Guards in Controllers**:
+- `@UseGuards(JwtAuthGuard, RolesGuard)` applies guards sequentially
+- Order matters: Authentication before authorization
+- Combine with `@Roles()` decorator to specify requirements
+- Guards run before controller method executes
+
+✅ **Frontend Route Access Control**:
+- `routeAccessMap` defines which roles can access which routes
+- Used for UI optimization (hide/show buttons, links)
+- Regex patterns for flexible matching (e.g., `/admin(.*)`)
+- **Never rely on frontend for security** (backend is final authority)
+
+✅ **Authorization Flow**:
+1. User action (frontend)
+2. Frontend UX check (show/hide UI)
+3. Request sent with JWT token
+4. Backend: JwtAuthGuard authenticates
+5. Backend: RolesGuard authorizes
+6. Controller method executes
+7. Response sent to frontend
+
+✅ **Permission Resolution Algorithm**:
+1. Fetch user roles
+2. Load default permissions for each role
+3. Merge using OR logic (most permissive)
+4. Load individual overrides
+5. Apply overrides (replace base values)
+6. Return final permissions
+
+✅ **Security Best Practices**:
+- Always validate on backend (never trust frontend)
+- Use principle of least privilege (minimal permissions)
+- Deny by default (explicit allow required)
+- Validate resource ownership (not just role)
+- Log authorization failures for auditing
+- Separate authentication and authorization concerns
+- Use context-aware permissions (time, location)
+- Audit sensitive operations
+
+✅ **Key Implementation Files**:
+- `/backend/server_NestJS/src/auth/guards/roles.guard.ts` - Authorization guard
+- `/backend/server_NestJS/src/auth/decorators/roles.decorator.ts` - @Roles decorator
+- `/frontend/web/src/lib/routeAccessMap.ts` - Frontend route configuration
+- `/Project_Docs/pd-roles-permissions.md` - Role and permission documentation
+
+---
+
+*End of Chapter 25*
+
+**Summary**: This chapter covered authorization in Next Photon's ABAC system. You learned the difference between authentication and authorization, how ABAC works, Next Photon's 7 roles, multi-role support, permission inheritance, and the complete implementation of RolesGuard and @Roles decorator. The chapter included real code examples, authorization flow diagrams, permission resolution algorithms, and security best practices.
+
+**Next Up**: Chapter 26 - Database Operations with Prisma (Advanced queries, transactions, optimization)
+
+---
+
+## Chapter 26: Database Operations with Prisma
+
+### 26.1 Introduction: Beyond Basic CRUD
+
+In earlier chapters, we covered basic Prisma operations:
+- `findUnique()`: Get one record by unique field
+- `findMany()`: Get multiple records
+- `create()`: Insert new record
+- `update()`: Modify existing record
+- `delete()`: Remove record
+
+But real applications need **much more**:
+- Complex filtering (multiple conditions, nested logic)
+- Efficient data loading (joins, related data)
+- Pagination (handling thousands of records)
+- Transactions (multiple operations as one atomic unit)
+- Aggregations (counts, sums, averages)
+- Performance optimization (avoiding N+1 problems)
+
+This chapter dives into **advanced Prisma patterns** used in Next Photon's production codebase.
+
+---
+
+### 26.2 Review: Simple Queries
+
+Let's quickly review basic operations before diving deeper.
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/users/users.service.ts`
+
+**Find One User by ID**:
+```typescript
+async findById(id: string) {
+  const user = await this.prisma.user.findUnique({
+    where: { id }, // Find by unique field (id)
+    select: {      // Select specific fields (optional)
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+      emailVerified: true,
+    }
+  });
+
+  if (!user) {
+    return null; // Not found
+  }
+
+  return {
+    ...user,
+    isActive: true, // Add computed field
+  };
+}
+```
+
+**Create New User**:
+```typescript
+async create(input: CreateUserInput) {
+  // Generate unique ID
+  const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  const user = await this.prisma.user.create({
+    data: {
+      id: userId,
+      email: input.email,
+      name: input.name,
+      image: input.image,
+      emailVerified: false, // New users need to verify
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+      emailVerified: true,
+    }
+  });
+
+  return { ...user, isActive: true };
+}
+```
+
+**Update User**:
+```typescript
+async update(id: string, updates: Partial<CreateUserInput>) {
+  const user = await this.prisma.user.update({
+    where: { id }, // Which record to update
+    data: {        // What to update
+      ...updates,
+      updatedAt: new Date(), // Always update timestamp
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+      emailVerified: true,
+    }
+  });
+
+  return { ...user, isActive: true };
+}
+```
+
+**Delete User**:
+```typescript
+async delete(id: string): Promise<boolean> {
+  await this.prisma.user.delete({
+    where: { id }
+  });
+
+  return true;
+}
+```
+
+These are the **building blocks**. Now let's level up!
+
+---
+
+### 26.3 Complex Where Clauses
+
+Real applications need complex filtering: "Find all active educators who teach Math OR Physics, created in the last 30 days, sorted by rating."
+
+**Prisma Where Operators**:
+
+**1. Equality and Comparison**:
+```typescript
+// Exact match
+where: { status: 'ACTIVE' }
+
+// Not equal
+where: { status: { not: 'DELETED' } }
+
+// Greater than, less than
+where: {
+  age: { gt: 18 },      // Greater than 18
+  rating: { gte: 4.5 }, // Greater than or equal to 4.5
+  price: { lt: 100 },   // Less than 100
+  score: { lte: 90 }    // Less than or equal to 90
+}
+
+// In array
+where: { status: { in: ['ACTIVE', 'PENDING'] } }
+
+// Not in array
+where: { status: { notIn: ['DELETED', 'BANNED'] } }
+```
+
+**2. String Operations**:
+```typescript
+// Contains (case-sensitive)
+where: { name: { contains: 'John' } }
+
+// Case-insensitive search
+where: { email: { contains: 'gmail', mode: 'insensitive' } }
+
+// Starts with
+where: { name: { startsWith: 'Dr.' } }
+
+// Ends with
+where: { email: { endsWith: '@stanford.edu' } }
+```
+
+**3. Null Checks**:
+```typescript
+// Is null
+where: { deletedAt: null }
+
+// Is not null
+where: { emailVerified: { not: null } }
+```
+
+**4. Date Filtering**:
+```typescript
+// Created in last 30 days
+const thirtyDaysAgo = new Date();
+thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+where: {
+  createdAt: { gte: thirtyDaysAgo } // Greater than or equal to 30 days ago
+}
+
+// Between two dates
+where: {
+  createdAt: {
+    gte: new Date('2024-01-01'), // After Jan 1
+    lte: new Date('2024-12-31')  // Before Dec 31
+  }
+}
+```
+
+**5. Combining Conditions with AND**:
+```typescript
+// Multiple conditions (all must be true)
+where: {
+  status: 'ACTIVE',        // AND
+  role: 'educator',        // AND
+  emailVerified: true      // AND
+}
+
+// Explicit AND
+where: {
+  AND: [
+    { status: 'ACTIVE' },
+    { role: 'educator' },
+    { rating: { gte: 4.0 } }
+  ]
+}
+```
+
+**6. Combining Conditions with OR**:
+```typescript
+// At least one condition must be true
+where: {
+  OR: [
+    { role: 'admin' },           // OR
+    { role: 'educator' },        // OR
+    { permissions: { has: 'manage_users' } } // OR
+  ]
+}
+```
+
+**7. Negating Conditions with NOT**:
+```typescript
+// None of these conditions should be true
+where: {
+  NOT: [
+    { status: 'DELETED' },
+    { status: 'BANNED' }
+  ]
+}
+
+// Equivalent to:
+where: {
+  status: { notIn: ['DELETED', 'BANNED'] }
+}
+```
+
+**8. Nested Conditions (Complex Logic)**:
+```typescript
+// Find educators who are ACTIVE and (teach Math OR Physics) and rated >= 4.5
+where: {
+  role: 'educator',        // Must be educator
+  status: 'ACTIVE',        // Must be active
+  rating: { gte: 4.5 },    // Must have high rating
+  OR: [                    // AND (teach Math OR Physics)
+    { subjects: { has: 'Math' } },
+    { subjects: { has: 'Physics' } }
+  ]
+}
+```
+
+**9. Filtering by Related Data**:
+```typescript
+// Find users who have at least one active session
+where: {
+  sessions: {
+    some: {  // At least one session matches
+      expiresAt: { gt: new Date() } // Not expired
+    }
+  }
+}
+
+// Find educators with NO assigned students
+where: {
+  assignedStudents: {
+    none: {} // No students (empty relation)
+  }
+}
+
+// Find guardians with ALL their learners verified
+where: {
+  learners: {
+    every: {  // All learners match
+      emailVerified: true
+    }
+  }
+}
+```
+
+**Real Example from Next Photon**:
+```typescript
+// File: /home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/users/users.service.ts
+
+async findActiveEducators(filters: {
+  subjects?: string[];
+  minRating?: number;
+  maxRate?: number;
+}) {
+  return await this.prisma.educatorProfile.findMany({
+    where: {
+      // Must be active
+      status: 'ACTIVE',
+
+      // Must have verified email
+      user: {
+        emailVerified: true
+      },
+
+      // Filter by subjects if provided
+      ...(filters.subjects && {
+        OR: filters.subjects.map(subject => ({
+          subjects: { has: subject }
+        }))
+      }),
+
+      // Filter by rating if provided
+      ...(filters.minRating && {
+        rating: { gte: filters.minRating }
+      }),
+
+      // Filter by rate if provided
+      ...(filters.maxRate && {
+        hourlyRate: { lte: filters.maxRate }
+      }),
+
+      // Created in last 6 months (active educators)
+      createdAt: {
+        gte: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000) // 180 days
+      },
+
+      // NOT banned
+      NOT: {
+        status: 'BANNED'
+      }
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true
+        }
+      }
+    },
+    orderBy: {
+      rating: 'desc' // Highest rated first
+    }
+  });
+}
+```
+
+---
+
+### 26.4 Advanced Select & Include
+
+**Select vs Include**:
+- **Select**: Choose specific fields to return (excludes everything else)
+- **Include**: Add related data (includes base fields + relations)
+
+**You cannot use both on the same level!**
+
+**Using Select (Specific Fields Only)**:
+```typescript
+// Only return id, name, email (no other fields)
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  select: {
+    id: true,
+    name: true,
+    email: true
+    // createdAt, updatedAt, etc. are NOT included
+  }
+});
+
+// Result:
+{
+  id: "user123",
+  name: "John Doe",
+  email: "john@example.com"
+  // No other fields
+}
+```
+
+**Using Include (Add Related Data)**:
+```typescript
+// Return all user fields + related profiles
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  include: {
+    learnerProfile: true,   // Include learner profile if exists
+    educatorProfile: true,  // Include educator profile if exists
+    sessions: true          // Include all sessions
+  }
+});
+
+// Result:
+{
+  id: "user123",
+  email: "john@example.com",
+  name: "John Doe",
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-02T00:00:00Z",
+  // ... all other user fields ...
+  learnerProfile: { id: "learner123", grade: 10, ... },
+  educatorProfile: null, // User is not an educator
+  sessions: [
+    { id: "session1", expiresAt: "...", ... },
+    { id: "session2", expiresAt: "...", ... }
+  ]
+}
+```
+
+**Nested Select in Include**:
+```typescript
+// Include related data but select specific fields from relations
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  include: {
+    learnerProfile: {
+      select: {
+        id: true,
+        grade: true,
+        subjects: true
+        // Don't include createdAt, updatedAt, etc.
+      }
+    },
+    sessions: {
+      select: {
+        id: true,
+        expiresAt: true
+      },
+      where: {
+        expiresAt: { gt: new Date() } // Only active sessions
+      }
+    }
+  }
+});
+
+// Result:
+{
+  // ... all user fields ...
+  learnerProfile: { id: "learner123", grade: 10, subjects: ["Math"] },
+  sessions: [
+    { id: "session1", expiresAt: "2024-12-31T00:00:00Z" }
+  ]
+}
+```
+
+**Deep Nesting (Include Relations of Relations)**:
+```typescript
+// Get guardian with their learners and each learner's assigned educators
+const guardian = await prisma.guardianProfile.findUnique({
+  where: { id: guardianId },
+  include: {
+    user: {
+      select: {
+        id: true,
+        name: true,
+        email: true
+      }
+    },
+    learners: { // Guardian's learners
+      include: {
+        learnerProfile: { // Each learner's profile
+          include: {
+            user: true,
+            assignedEducators: { // Each learner's educators
+              include: {
+                educatorProfile: {
+                  include: {
+                    user: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+});
+
+// Result: Guardian → Learners → Educators (3 levels deep)
+```
+
+**Performance Implications**:
+
+```typescript
+// ❌ BAD: Fetch all fields (waste bandwidth)
+const users = await prisma.user.findMany(); // Gets ALL fields
+
+// ✅ GOOD: Select only needed fields
+const users = await prisma.user.findMany({
+  select: {
+    id: true,
+    name: true,
+    email: true
+  }
+});
+// Reduces data transfer by ~70%
+
+// ❌ BAD: Include all related data unnecessarily
+const users = await prisma.user.findMany({
+  include: {
+    sessions: true,      // Might be hundreds of sessions
+    learnerProfile: true,
+    educatorProfile: true,
+    // ... everything
+  }
+});
+
+// ✅ GOOD: Include only what you need
+const users = await prisma.user.findMany({
+  select: {
+    id: true,
+    name: true,
+    email: true
+  }
+  // No includes, just core data
+});
+```
+
+**Rule of Thumb**:
+- Use **select** when you need only a few fields
+- Use **include** when you need related data
+- Avoid deep nesting (>3 levels) - prefer multiple queries
+- Only include what you actually use in your response
+
+---
+
+### 26.5 Pagination Patterns
+
+Handling large datasets requires pagination. There are two main approaches:
+
+**1. Offset-Based Pagination (skip/take)**:
+
+```typescript
+// File: /home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/users/users.service.ts
+
+async findMany(pagination: PaginationInput = {}) {
+  // Extract pagination parameters with defaults
+  const {
+    limit = 10,           // How many records per page
+    offset = 0,           // How many records to skip
+    sortBy = 'createdAt', // Which field to sort by
+    sortOrder = 'desc'    // Sort direction (desc or asc)
+  } = pagination;
+
+  try {
+    // Run two queries in parallel
+    const [users, totalCount] = await Promise.all([
+      // Query 1: Get paginated users
+      this.prisma.user.findMany({
+        skip: offset,     // Skip first N records (page * limit)
+        take: limit,      // Take N records (page size)
+        orderBy: {
+          [sortBy]: sortOrder, // Dynamic sort field
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          image: true,
+          createdAt: true,
+          updatedAt: true,
+          emailVerified: true,
+        }
+      }),
+
+      // Query 2: Get total count (for pagination UI)
+      this.prisma.user.count()
+    ]);
+
+    // Add computed fields
+    const usersWithActive = users.map(user => ({
+      ...user,
+      isActive: true,
+    }));
+
+    // Return data + metadata
+    return {
+      users: usersWithActive,
+      totalCount,
+      page: Math.floor(offset / limit) + 1, // Current page number
+      pageSize: limit,
+      totalPages: Math.ceil(totalCount / limit)
+    };
+  } catch (error) {
+    console.error('Error finding users with pagination:', error);
+    throw error;
+  }
+}
+```
+
+**How Offset Pagination Works**:
+```typescript
+// Page 1: skip 0, take 10
+// Returns records 1-10
+await prisma.user.findMany({ skip: 0, take: 10 });
+
+// Page 2: skip 10, take 10
+// Returns records 11-20
+await prisma.user.findMany({ skip: 10, take: 10 });
+
+// Page 3: skip 20, take 10
+// Returns records 21-30
+await prisma.user.findMany({ skip: 20, take: 10 });
+
+// Formula: skip = (page - 1) * limit
+// Page 5, limit 10: skip = (5 - 1) * 10 = 40
+```
+
+**Pros of Offset Pagination**:
+- Simple to implement
+- Easy to jump to any page (e.g., page 5)
+- Works with any sort order
+
+**Cons of Offset Pagination**:
+- Slow for large offsets (skip 1,000,000 is slow)
+- Inconsistent results if data changes during pagination
+- Database scans through skipped rows
+
+**2. Cursor-Based Pagination**:
+
+```typescript
+// More efficient for large datasets
+async findManyWithCursor(
+  limit: number = 10,
+  cursor?: string // ID of last item from previous page
+) {
+  const users = await this.prisma.user.findMany({
+    take: limit,
+    skip: cursor ? 1 : 0, // Skip the cursor itself
+    cursor: cursor ? { id: cursor } : undefined,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      createdAt: true,
+    }
+  });
+
+  // Next cursor is the ID of the last item
+  const nextCursor = users.length > 0 ? users[users.length - 1].id : null;
+
+  return {
+    users,
+    nextCursor, // Use this for next request
+    hasMore: users.length === limit
+  };
+}
+```
+
+**How Cursor Pagination Works**:
+```typescript
+// Page 1: No cursor
+const page1 = await findManyWithCursor(10);
+// Returns: { users: [1-10], nextCursor: "user10id", hasMore: true }
+
+// Page 2: Use cursor from page 1
+const page2 = await findManyWithCursor(10, page1.nextCursor);
+// Returns: { users: [11-20], nextCursor: "user20id", hasMore: true }
+
+// Page 3: Use cursor from page 2
+const page3 = await findManyWithCursor(10, page2.nextCursor);
+// Returns: { users: [21-30], nextCursor: "user30id", hasMore: true }
+```
+
+**Pros of Cursor Pagination**:
+- Consistent performance regardless of page depth
+- Handles real-time data changes gracefully
+- No duplicate or missing items during pagination
+
+**Cons of Cursor Pagination**:
+- Can't jump to arbitrary page (only next/previous)
+- Requires unique, sequential cursor field (usually ID or timestamp)
+- More complex to implement
+
+**When to Use Each**:
+- **Offset**: Admin dashboards, reports (need page numbers)
+- **Cursor**: Infinite scroll, feeds, large datasets
+
+---
+
+### 26.6 Sorting and Ordering
+
+**Basic Sorting**:
+```typescript
+// Sort by single field
+const users = await prisma.user.findMany({
+  orderBy: {
+    createdAt: 'desc' // Newest first
+  }
+});
+
+// Sort ascending
+const users = await prisma.user.findMany({
+  orderBy: {
+    name: 'asc' // A to Z
+  }
+});
+```
+
+**Multiple Sort Fields**:
+```typescript
+// Sort by multiple fields (priority order)
+const educators = await prisma.educatorProfile.findMany({
+  orderBy: [
+    { rating: 'desc' },     // First: Sort by rating (highest first)
+    { hourlyRate: 'asc' },  // Then: Sort by rate (cheapest first)
+    { createdAt: 'desc' }   // Finally: Sort by join date (newest first)
+  ]
+});
+
+// Logic: If two educators have same rating, sort by rate.
+//        If same rating AND rate, sort by join date.
+```
+
+**Sorting by Related Fields**:
+```typescript
+// Sort users by their profile's rating
+const users = await prisma.user.findMany({
+  orderBy: {
+    educatorProfile: {
+      rating: 'desc' // Sort by educator profile rating
+    }
+  },
+  include: {
+    educatorProfile: true
+  }
+});
+```
+
+**Sorting by Aggregated Values**:
+```typescript
+// Sort educators by number of students (aggregation)
+const educators = await prisma.educatorProfile.findMany({
+  orderBy: {
+    assignedStudents: {
+      _count: 'desc' // Sort by count of assigned students
+    }
+  }
+});
+```
+
+**Null Values Handling**:
+```typescript
+// Nulls last (default varies by database)
+const users = await prisma.user.findMany({
+  orderBy: {
+    emailVerified: {
+      sort: 'desc',
+      nulls: 'last' // Put null values at end
+    }
+  }
+});
+```
+
+---
+
+### 26.7 Transactions in Prisma
+
+**Why Transactions?**
+
+Imagine creating a new learner:
+1. Create User record
+2. Create LearnerProfile record
+3. Create GuardianLearnerRelation record
+
+What if step 2 fails? Now you have a User with no profile (data inconsistency)!
+
+**Transactions** ensure all operations succeed together or all fail together (**ACID properties**).
+
+**ACID Properties**:
+- **Atomicity**: All or nothing (no partial completion)
+- **Consistency**: Database stays in valid state
+- **Isolation**: Concurrent transactions don't interfere
+- **Durability**: Committed changes are permanent
+
+**1. Sequential Transactions (Array Syntax)**:
+
+```typescript
+// All operations succeed together or all fail
+async createLearnerWithProfile(data: CreateLearnerInput) {
+  const result = await this.prisma.$transaction([
+    // Operation 1: Create user
+    this.prisma.user.create({
+      data: {
+        email: data.email,
+        name: data.name,
+      }
+    }),
+
+    // Operation 2: Create learner profile
+    this.prisma.learnerProfile.create({
+      data: {
+        userId: data.userId,
+        grade: data.grade,
+        subjects: data.subjects,
+      }
+    }),
+
+    // Operation 3: Link to guardian
+    this.prisma.guardianLearnerRelation.create({
+      data: {
+        guardianId: data.guardianId,
+        learnerId: data.learnerId,
+        relationship: 'parent',
+      }
+    })
+  ]);
+
+  // result is an array: [user, learnerProfile, relation]
+  const [user, learnerProfile, relation] = result;
+
+  return { user, learnerProfile, relation };
+}
+```
+
+**What Happens**:
+```
+Start Transaction
+  ↓
+Execute Operation 1 (create user)
+  → Success: Continue
+  → Failure: ROLLBACK entire transaction
+  ↓
+Execute Operation 2 (create learner profile)
+  → Success: Continue
+  → Failure: ROLLBACK entire transaction (undo operation 1)
+  ↓
+Execute Operation 3 (create relation)
+  → Success: COMMIT all changes
+  → Failure: ROLLBACK entire transaction (undo operations 1 & 2)
+  ↓
+End Transaction
+```
+
+**2. Interactive Transactions (Callback Syntax)**:
+
+Use when operations depend on previous results:
+
+```typescript
+async enrollLearnerInCourse(learnerId: string, courseId: string) {
+  return await this.prisma.$transaction(async (tx) => {
+    // Step 1: Check if course is full
+    const course = await tx.course.findUnique({
+      where: { id: courseId },
+      include: {
+        enrollments: true
+      }
+    });
+
+    if (!course) {
+      throw new Error('Course not found');
+    }
+
+    if (course.enrollments.length >= course.maxStudents) {
+      throw new Error('Course is full');
+    }
+
+    // Step 2: Check if learner is already enrolled
+    const existingEnrollment = await tx.enrollment.findFirst({
+      where: {
+        learnerId,
+        courseId
+      }
+    });
+
+    if (existingEnrollment) {
+      throw new Error('Already enrolled');
+    }
+
+    // Step 3: Create enrollment
+    const enrollment = await tx.enrollment.create({
+      data: {
+        learnerId,
+        courseId,
+        enrolledAt: new Date()
+      }
+    });
+
+    // Step 4: Update course count
+    await tx.course.update({
+      where: { id: courseId },
+      data: {
+        currentStudents: {
+          increment: 1 // Atomically increment count
+        }
+      }
+    });
+
+    // All operations succeed together or all rollback
+    return enrollment;
+  });
+}
+```
+
+**Key Differences**:
+
+| Sequential Transactions | Interactive Transactions |
+|------------------------|-------------------------|
+| Array of operations | Callback function |
+| Operations don't depend on each other | Operations use results from previous steps |
+| `$transaction([...])` | `$transaction(async (tx) => {...})` |
+| Simpler, faster | More flexible, complex logic |
+
+**Transaction Isolation Levels**:
+```typescript
+// Specify isolation level for advanced use cases
+await this.prisma.$transaction(
+  async (tx) => {
+    // Transaction operations
+  },
+  {
+    isolationLevel: 'ReadCommitted', // Default
+    // Other options: 'ReadUncommitted', 'RepeatableRead', 'Serializable'
+    maxWait: 5000,  // Max time to wait for transaction start (ms)
+    timeout: 10000, // Max transaction execution time (ms)
+  }
+);
+```
+
+**When to Use Transactions**:
+- Creating related records together (User + Profile)
+- Financial operations (debit one account, credit another)
+- Updating multiple tables that must stay consistent
+- Complex business logic with multiple database operations
+
+**When NOT to Use Transactions**:
+- Single operation (no need for transaction overhead)
+- Independent operations (no consistency requirement)
+- Long-running operations (locks database resources)
+
+---
+
+### 26.8 Aggregations and Grouping
+
+**Count Records**:
+```typescript
+// Count all users
+const totalUsers = await prisma.user.count();
+
+// Count with filter
+const activeEducators = await prisma.educatorProfile.count({
+  where: {
+    status: 'ACTIVE'
+  }
+});
+
+// Count with nested filter
+const verifiedUsers = await prisma.user.count({
+  where: {
+    emailVerified: true,
+    learnerProfile: {
+      isNot: null // Has a learner profile
+    }
+  }
+});
+```
+
+**Aggregate Functions (sum, avg, min, max)**:
+```typescript
+// Get statistics about educator rates
+const rateStats = await prisma.educatorProfile.aggregate({
+  _avg: {
+    hourlyRate: true // Average rate
+  },
+  _min: {
+    hourlyRate: true // Lowest rate
+  },
+  _max: {
+    hourlyRate: true // Highest rate
+  },
+  _sum: {
+    totalEarnings: true // Sum of all earnings
+  },
+  _count: {
+    id: true // Total count
+  },
+  where: {
+    status: 'ACTIVE' // Only active educators
+  }
+});
+
+// Result:
+{
+  _avg: { hourlyRate: 45.5 },
+  _min: { hourlyRate: 20 },
+  _max: { hourlyRate: 100 },
+  _sum: { totalEarnings: 125000 },
+  _count: { id: 245 }
+}
+```
+
+**Group By (SQL GROUP BY)**:
+```typescript
+// Count users by role
+const usersByRole = await prisma.user.groupBy({
+  by: ['role'], // Group by role field
+  _count: {
+    id: true // Count users in each group
+  }
+});
+
+// Result:
+[
+  { role: 'learner', _count: { id: 1500 } },
+  { role: 'educator', _count: { id: 300 } },
+  { role: 'guardian', _count: { id: 800 } },
+  { role: 'admin', _count: { id: 5 } }
+]
+```
+
+**Group By with Multiple Fields**:
+```typescript
+// Count enrollments by course and status
+const enrollmentStats = await prisma.enrollment.groupBy({
+  by: ['courseId', 'status'], // Group by two fields
+  _count: {
+    id: true
+  },
+  where: {
+    createdAt: {
+      gte: new Date('2024-01-01') // Only this year
+    }
+  },
+  orderBy: {
+    _count: {
+      id: 'desc' // Order by count
+    }
+  }
+});
+
+// Result:
+[
+  { courseId: 'math101', status: 'ACTIVE', _count: { id: 45 } },
+  { courseId: 'math101', status: 'COMPLETED', _count: { id: 30 } },
+  { courseId: 'physics101', status: 'ACTIVE', _count: { id: 38 } },
+  // ...
+]
+```
+
+**Group By with Having (Filter Groups)**:
+```typescript
+// Find courses with more than 10 enrollments
+const popularCourses = await prisma.enrollment.groupBy({
+  by: ['courseId'],
+  _count: {
+    id: true
+  },
+  having: {
+    id: {
+      _count: {
+        gt: 10 // Only groups with count > 10
+      }
+    }
+  }
+});
+```
+
+---
+
+### 26.9 Raw SQL Queries (When to Use)
+
+**When Prisma's Query API Isn't Enough**:
+- Complex SQL features (window functions, CTEs, full-text search)
+- Performance-critical queries (highly optimized SQL)
+- Legacy database with complex stored procedures
+- Database-specific features
+
+**$queryRaw (Returns Data)**:
+```typescript
+import { Prisma } from '@prisma/client';
+
+// Raw SQL query (for SELECT statements)
+const users = await this.prisma.$queryRaw<User[]>`
+  SELECT id, name, email
+  FROM "User"
+  WHERE "createdAt" > ${thirtyDaysAgo}
+  ORDER BY "createdAt" DESC
+  LIMIT 10
+`;
+
+// users is typed as User[]
+```
+
+**$executeRaw (Returns Count)**:
+```typescript
+// Raw SQL for UPDATE/DELETE/INSERT (doesn't return data)
+const updateCount = await this.prisma.$executeRaw`
+  UPDATE "User"
+  SET "emailVerified" = true
+  WHERE "email" LIKE '%@example.com'
+`;
+
+// updateCount is number of affected rows
+console.log(`Updated ${updateCount} users`);
+```
+
+**SQL Injection Prevention**:
+```typescript
+// ❌ DANGEROUS: String concatenation (SQL injection risk!)
+const email = userInput; // Could be: "'; DROP TABLE User; --"
+const users = await prisma.$queryRaw(
+  `SELECT * FROM "User" WHERE email = '${email}'`
+);
+// SQL injection vulnerability!
+
+// ✅ SAFE: Use template literals with variables
+const users = await prisma.$queryRaw<User[]>`
+  SELECT * FROM "User" WHERE email = ${email}
+`;
+// Prisma escapes variables automatically
+
+// ✅ SAFE: Use Prisma.sql helper for complex queries
+const email = userInput;
+const query = Prisma.sql`
+  SELECT * FROM "User"
+  WHERE email = ${email}
+  AND status = ${'ACTIVE'}
+`;
+const users = await prisma.$queryRaw<User[]>(query);
+```
+
+**Complex Example (Window Function)**:
+```typescript
+// Get top 3 students per class by grade
+const topStudents = await this.prisma.$queryRaw<any[]>`
+  SELECT *
+  FROM (
+    SELECT
+      id,
+      name,
+      class_id,
+      grade,
+      ROW_NUMBER() OVER (
+        PARTITION BY class_id
+        ORDER BY grade DESC
+      ) as rank
+    FROM "LearnerProfile"
+  ) ranked
+  WHERE rank <= 3
+`;
+```
+
+**When to Use Prisma Query API vs Raw SQL**:
+- **Use Prisma API**: 99% of queries (type-safe, maintainable, database-agnostic)
+- **Use Raw SQL**: Only when Prisma doesn't support the feature you need
+
+---
+
+### 26.10 Query Optimization
+
+**1. The N+1 Problem**:
+
+```typescript
+// ❌ BAD: N+1 queries (1 query + N queries in loop)
+const users = await prisma.user.findMany(); // 1 query
+
+for (const user of users) {
+  // N additional queries (one per user)!
+  const profile = await prisma.learnerProfile.findUnique({
+    where: { userId: user.id }
+  });
+  user.profile = profile;
+}
+// Total queries: 1 + 100 = 101 queries for 100 users!
+
+// ✅ GOOD: Single query with include
+const users = await prisma.user.findMany({
+  include: {
+    learnerProfile: true // JOIN in SQL, 1 query total
+  }
+});
+// Total queries: 1 query for 100 users!
+```
+
+**2. Select Only Needed Fields**:
+```typescript
+// ❌ BAD: Fetch all fields (large payload)
+const users = await prisma.user.findMany();
+// Gets id, email, name, image, createdAt, updatedAt, ...everything
+
+// ✅ GOOD: Select specific fields
+const users = await prisma.user.findMany({
+  select: {
+    id: true,
+    name: true,
+    email: true
+  }
+});
+// Much smaller payload, faster transfer
+```
+
+**3. Use Indexes**:
+```prisma
+// File: /home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema.prisma
+
+model User {
+  id    String @id
+  email String @unique // Automatic index for unique fields
+  name  String
+
+  // Add index for frequently queried fields
+  @@index([createdAt]) // Index on createdAt
+  @@index([status, role]) // Composite index
+}
+```
+
+**4. Pagination for Large Results**:
+```typescript
+// ❌ BAD: Fetch all records (crashes on large datasets)
+const allUsers = await prisma.user.findMany();
+// 1 million users = out of memory!
+
+// ✅ GOOD: Use pagination
+const users = await prisma.user.findMany({
+  take: 100,
+  skip: 0
+});
+```
+
+**5. Connection Pooling**:
+
+Prisma automatically manages connection pooling, but you can configure it:
+
+```
+// .env file
+DATABASE_URL="postgresql://user:password@localhost:5432/nextphoton?connection_limit=20&pool_timeout=20"
+```
+
+**6. Use Transactions Wisely**:
+```typescript
+// ❌ BAD: Long transaction (locks database)
+await prisma.$transaction(async (tx) => {
+  // ... 100 operations ...
+  await heavyComputation(); // Non-database work in transaction!
+});
+
+// ✅ GOOD: Short transaction (only database operations)
+const result = await heavyComputation(); // Do this outside transaction
+
+await prisma.$transaction(async (tx) => {
+  // Quick database operations only
+  await tx.user.create({ data: result });
+});
+```
+
+---
+
+### 26.11 Error Handling with Prisma
+
+**Prisma Error Codes**:
+
+```typescript
+import { Prisma } from '@prisma/client';
+
+async create(input: CreateUserInput) {
+  try {
+    const user = await this.prisma.user.create({
+      data: {
+        email: input.email,
+        name: input.name,
+      }
+    });
+    return user;
+  } catch (error) {
+    // Check if it's a Prisma error
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+
+      // P2002: Unique constraint violation
+      if (error.code === 'P2002') {
+        // error.meta.target contains the field(s) that caused the error
+        throw new BadRequestException(
+          `User with this ${error.meta?.target} already exists`
+        );
+      }
+
+      // P2025: Record not found
+      if (error.code === 'P2025') {
+        throw new NotFoundException('User not found');
+      }
+
+      // P2003: Foreign key constraint failed
+      if (error.code === 'P2003') {
+        throw new BadRequestException(
+          `Invalid reference: ${error.meta?.field_name}`
+        );
+      }
+    }
+
+    // Unknown error
+    console.error('Unexpected error:', error);
+    throw new InternalServerErrorException('Database operation failed');
+  }
+}
+```
+
+**Common Prisma Error Codes**:
+
+| Code | Description | Example |
+|------|-------------|---------|
+| P2000 | Value too long | String exceeds column length |
+| P2001 | Record not found | Where condition matches nothing |
+| P2002 | Unique constraint | Duplicate email/ID |
+| P2003 | Foreign key constraint | Reference to non-existent record |
+| P2025 | Not found in update/delete | Trying to update non-existent record |
+
+**Example from Next Photon**:
+
+```typescript
+// File: /home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/users/users.service.ts
+
+async create(input: CreateUserInput) {
+  try {
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    const user = await this.prisma.user.create({
+      data: {
+        id: userId,
+        email: input.email,
+        name: input.name,
+        image: input.image,
+        emailVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+      }
+    });
+
+    return { ...user, isActive: true };
+  } catch (error) {
+    console.error('Error creating user:', error);
+
+    // Prisma error code P2002 = unique constraint violation
+    if ((error as any).code === 'P2002') {
+      throw new BadRequestException('User with this email already exists');
+    }
+
+    throw error;
+  }
+}
+```
+
+---
+
+### 26.12 PrismaService Architecture in Next Photon
+
+Next Photon uses a **centralized Prisma client** to ensure consistency across the entire monorepo.
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/prisma/prisma.service.ts`
+
+```typescript
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { prisma } from '../../../../shared/db/index'; // Import centralized client
+
+/**
+ * Prisma Service for NestJS Server
+ *
+ * This service wraps the centralized Prisma client from the shared folder
+ * to ensure both client and server use the same database connection and schema.
+ * It delegates all operations to the shared prisma instance.
+ *
+ * Benefits:
+ * - Single source of truth for database connection
+ * - Consistent schema across client and server
+ * - Prevents multiple Prisma client instances
+ * - Proper connection pooling and management
+ * - Full access to all Prisma models and methods through delegation
+ */
+@Injectable() // NestJS dependency injection
+export class PrismaService implements OnModuleInit, OnModuleDestroy {
+  // Delegate all model operations to the shared prisma instance
+
+  // Auth models
+  get user() { return prisma.user; }             // Access User model
+  get session() { return prisma.session; }       // Access Session model
+  get account() { return prisma.account; }       // Access Account model
+  get verification() { return prisma.verification; } // Access Verification model
+
+  // Role & Permission models
+  get role() { return prisma.role; }
+  get permission() { return prisma.permission; }
+  get rolePermission() { return prisma.rolePermission; }
+  get userRole() { return prisma.userRole; }
+
+  // Profile models (7 roles in Next Photon)
+  get learnerProfile() { return prisma.learnerProfile; }
+  get guardianProfile() { return prisma.guardianProfile; }
+  get educatorProfile() { return prisma.educatorProfile; }
+  get eCMProfile() { return prisma.eCMProfile; }
+  get employeeProfile() { return prisma.employeeProfile; }
+  get internProfile() { return prisma.internProfile; }
+  get adminProfile() { return prisma.adminProfile; }
+
+  // Transaction support
+  get $transaction() { return prisma.$transaction.bind(prisma); }
+
+  // Raw query support
+  get $queryRaw() { return prisma.$queryRaw.bind(prisma); }
+  get $executeRaw() { return prisma.$executeRaw.bind(prisma); }
+
+  // Connection methods
+  get $connect() { return prisma.$connect.bind(prisma); }
+  get $disconnect() { return prisma.$disconnect.bind(prisma); }
+
+  // Lifecycle hook: Called when NestJS module initializes
+  async onModuleInit() {
+    // Connection is already managed by the shared client
+    await prisma.$connect();
+    console.log('✅ PrismaService connected to shared database client');
+  }
+
+  // Lifecycle hook: Called when NestJS module is destroyed
+  async onModuleDestroy() {
+    // Disconnect is managed by the shared client
+    await prisma.$disconnect();
+    console.log('🔌 PrismaService disconnected from shared database client');
+  }
+}
+```
+
+**How It Works**:
+
+1. **Centralized Client**:
+   - Prisma client defined in `shared/db/index.ts`
+   - Single client instance for entire monorepo
+
+2. **Delegation Pattern**:
+   - `PrismaService` doesn't create new client
+   - Uses getters to delegate to shared client
+   - `this.prisma.user` → `prisma.user` from shared
+
+3. **Model Access**:
+```typescript
+// In UsersService
+constructor(private prisma: PrismaService) {}
+
+async findById(id: string) {
+  // this.prisma.user delegates to shared prisma.user
+  return await this.prisma.user.findUnique({
+    where: { id }
+  });
+}
+```
+
+4. **Connection Management**:
+   - `onModuleInit`: Connect when app starts
+   - `onModuleDestroy`: Disconnect when app stops
+   - Ensures clean connections lifecycle
+
+**Benefits of Centralized Architecture**:
+- **Consistency**: Same schema everywhere (frontend, backend)
+- **Performance**: Single connection pool (not multiple clients)
+- **Maintainability**: Update schema in one place
+- **Type Safety**: TypeScript types generated once, used everywhere
+
+---
+
+### 26.13 Real-World Example: Complete User CRUD
+
+Let's walk through the complete `UsersService` from Next Photon:
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/users/users.service.ts`
+
+```typescript
+import {
+    Injectable,
+    BadRequestException,
+    NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserInput } from '../dto/inputs/create-user.input';
+import { PaginationInput } from '../dto/common/pagination.dto';
+
+/**
+ * Users Service
+ *
+ * This service handles all user-related business logic including
+ * CRUD operations, authentication, and user management across
+ * different user types in the NextPhoton platform.
+ *
+ * Features:
+ * - User creation and management
+ * - Multi-role user support
+ * - Pagination for user lists
+ * - Integration with Better-auth
+ */
+@Injectable()
+export class UsersService {
+    constructor(private prisma: PrismaService) { }
+
+    /**
+     * Find user by ID
+     *
+     * @param id - User ID to search for
+     * @returns User object or null if not found
+     */
+    async findById(id: string) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id }, // Unique constraint on id
+                select: {      // Select specific fields
+                    id: true,
+                    email: true,
+                    name: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    emailVerified: true,
+                }
+            });
+
+            if (!user) {
+                return null; // Not found, return null (caller handles)
+            }
+
+            // Add isActive field (not in Better-auth schema, but needed for GraphQL)
+            return {
+                ...user,
+                isActive: true, // Default to true since Better-auth doesn't have this field
+            };
+        } catch (error) {
+            console.error('Error finding user by ID:', error);
+            throw error; // Re-throw for upper layers to handle
+        }
+    }
+
+    /**
+     * Find users with pagination
+     *
+     * @param pagination - Pagination parameters
+     * @returns Object containing users array and total count
+     */
+    async findMany(pagination: PaginationInput = {}) {
+        // Destructure with defaults
+        const { limit = 10, offset = 0, sortBy = 'createdAt', sortOrder = 'desc' } = pagination;
+
+        try {
+            // Parallel queries for efficiency
+            const [users, totalCount] = await Promise.all([
+                // Query 1: Get paginated users
+                this.prisma.user.findMany({
+                    skip: offset,     // Offset-based pagination
+                    take: limit,      // Limit results
+                    orderBy: {
+                        [sortBy]: sortOrder, // Dynamic sort field
+                    },
+                    select: {
+                        id: true,
+                        email: true,
+                        name: true,
+                        image: true,
+                        createdAt: true,
+                        updatedAt: true,
+                        emailVerified: true,
+                    }
+                }),
+
+                // Query 2: Get total count for pagination metadata
+                this.prisma.user.count()
+            ]);
+
+            // Add isActive field to all users
+            const usersWithActive = users.map(user => ({
+                ...user,
+                isActive: true, // Default to true since Better-auth doesn't have this field
+            }));
+
+            return { users: usersWithActive, totalCount };
+        } catch (error) {
+            console.error('Error finding users with pagination:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Create a new user
+     *
+     * @param input - User creation data
+     * @returns Created user object
+     */
+    async create(input: CreateUserInput) {
+        try {
+            // Generate a unique ID for Better-auth compatibility
+            const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+            const user = await this.prisma.user.create({
+                data: {
+                    id: userId,
+                    email: input.email,
+                    name: input.name,
+                    image: input.image,
+                    emailVerified: false, // New users need to verify email
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    emailVerified: true,
+                }
+            });
+
+            // Add isActive field for GraphQL compatibility
+            return {
+                ...user,
+                isActive: true,
+            };
+        } catch (error) {
+            console.error('Error creating user:', error);
+
+            // Handle Prisma error P2002 (unique constraint violation)
+            if ((error as any).code === 'P2002') {
+                throw new BadRequestException('User with this email already exists');
+            }
+
+            throw error;
+        }
+    }
+
+    /**
+     * Update user information
+     *
+     * @param id - User ID to update
+     * @param updates - Partial user data to update
+     * @returns Updated user object
+     */
+    async update(id: string, updates: Partial<CreateUserInput>) {
+        try {
+            const user = await this.prisma.user.update({
+                where: { id }, // Which record to update
+                data: {
+                    ...updates,           // Spread partial updates
+                    updatedAt: new Date(), // Always update timestamp
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    image: true,
+                    createdAt: true,
+                    updatedAt: true,
+                    emailVerified: true,
+                }
+            });
+
+            // Add isActive field for GraphQL compatibility
+            return {
+                ...user,
+                isActive: true,
+            };
+        } catch (error) {
+            console.error('Error updating user:', error);
+
+            // Handle Prisma error P2025 (record not found)
+            if ((error as any).code === 'P2025') {
+                throw new NotFoundException('User not found');
+            }
+
+            throw error;
+        }
+    }
+
+    /**
+     * Delete user (soft delete by setting isActive to false)
+     *
+     * @param id - User ID to delete
+     * @returns Success boolean
+     */
+    async delete(id: string): Promise<boolean> {
+        try {
+            // TODO: Implement soft delete with isActive field
+            // For now, we'll use hard delete as placeholder
+            await this.prisma.user.delete({
+                where: { id }
+            });
+
+            return true;
+        } catch (error) {
+            console.error('Error deleting user:', error);
+
+            // Handle Prisma error P2025 (record not found)
+            if ((error as any).code === 'P2025') {
+                throw new NotFoundException('User not found');
+            }
+
+            throw error;
+        }
+    }
+}
+```
+
+**Key Patterns Used**:
+1. **Dependency Injection**: `constructor(private prisma: PrismaService)`
+2. **Error Handling**: Try-catch with Prisma error code checks
+3. **Type Safety**: TypeScript interfaces for inputs
+4. **Pagination**: Offset-based with parallel count query
+5. **Selective Fields**: Use `select` to return only needed data
+6. **Data Transformation**: Add computed fields (isActive)
+7. **Logging**: Console.error for debugging
+8. **Custom Exceptions**: BadRequestException, NotFoundException
+
+---
+
+### 26.14 Key Takeaways from Chapter 26
+
+✅ **Basic CRUD Operations**:
+- `findUnique()`: Get one record by unique field (id, email)
+- `findMany()`: Get multiple records with filtering
+- `create()`: Insert new record
+- `update()`: Modify existing record
+- `delete()`: Remove record
+
+✅ **Complex Where Clauses**:
+- **Comparison**: `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `not`
+- **String**: `contains`, `startsWith`, `endsWith`, `mode: 'insensitive'`
+- **Null checks**: `null`, `{ not: null }`
+- **Logical**: `AND`, `OR`, `NOT` for combining conditions
+- **Nested**: Filter by related data with `some`, `every`, `none`
+
+✅ **Advanced Select & Include**:
+- **Select**: Choose specific fields (excludes everything else)
+- **Include**: Add related data (includes base fields + relations)
+- **Cannot use both** on same level
+- **Nested select**: Select specific fields from relations
+- **Performance**: Only fetch what you need
+
+✅ **Pagination Patterns**:
+- **Offset-based**: `skip`/`take` (simple, jump to any page, slow for large offsets)
+- **Cursor-based**: `cursor`/`take` (efficient, consistent, only next/prev)
+- Always return total count for pagination UI
+- Use `Promise.all()` to run count and data queries in parallel
+
+✅ **Sorting and Ordering**:
+- Single field: `orderBy: { field: 'asc' | 'desc' }`
+- Multiple fields: `orderBy: [{ field1: 'desc' }, { field2: 'asc' }]`
+- Related fields: `orderBy: { relation: { field: 'desc' } }`
+- Aggregated values: `orderBy: { relation: { _count: 'desc' } }`
+
+✅ **Transactions (ACID)**:
+- **Why**: Ensure all operations succeed together or all fail
+- **Sequential**: `$transaction([op1, op2, op3])` for independent operations
+- **Interactive**: `$transaction(async (tx) => {...})` for dependent operations
+- Use `tx` instead of `prisma` inside transaction callback
+- Keep transactions short (only database operations)
+
+✅ **Aggregations and Grouping**:
+- **Count**: `count()` with optional where filter
+- **Aggregate**: `aggregate()` with `_avg`, `_min`, `_max`, `_sum`, `_count`
+- **Group By**: `groupBy()` to group records and aggregate per group
+- **Having**: Filter groups after aggregation
+
+✅ **Raw SQL Queries**:
+- **$queryRaw**: For SELECT (returns data)
+- **$executeRaw**: For UPDATE/DELETE/INSERT (returns count)
+- Use template literals to prevent SQL injection
+- Only use when Prisma API doesn't support needed feature
+- Prefer Prisma API for type safety and maintainability
+
+✅ **Query Optimization**:
+- **Avoid N+1**: Use `include` instead of loops with queries
+- **Select specific fields**: Reduce payload size
+- **Use indexes**: Add `@@index` for frequently queried fields
+- **Pagination**: Never fetch all records at once
+- **Connection pooling**: Configure in DATABASE_URL
+- **Short transactions**: Don't do non-DB work in transactions
+
+✅ **Error Handling**:
+- Catch `Prisma.PrismaClientKnownRequestError`
+- Check `error.code` for specific errors:
+  - **P2002**: Unique constraint (duplicate email)
+  - **P2025**: Record not found (update/delete failed)
+  - **P2003**: Foreign key constraint (invalid reference)
+- Throw user-friendly exceptions (BadRequestException, NotFoundException)
+- Always log errors for debugging
+
+✅ **PrismaService Architecture**:
+- Centralized client in `shared/db/index.ts`
+- Single source of truth for entire monorepo
+- Delegation pattern (getters forward to shared client)
+- Lifecycle hooks: `onModuleInit`, `onModuleDestroy`
+- Benefits: Consistency, performance, maintainability
+
+✅ **Real-World Patterns**:
+- **Dependency injection**: Inject PrismaService in constructors
+- **Error handling**: Try-catch with Prisma error code checks
+- **Type safety**: TypeScript interfaces for inputs/outputs
+- **Pagination**: Offset-based with parallel count query
+- **Selective fields**: Use `select` to optimize responses
+- **Data transformation**: Add computed fields as needed
+- **Logging**: Console.error for debugging
+- **Custom exceptions**: NestJS exceptions for HTTP status codes
+
+✅ **Key Implementation Files**:
+- `/backend/server_NestJS/src/prisma/prisma.service.ts` - Centralized Prisma service
+- `/backend/server_NestJS/src/users/users.service.ts` - Complete CRUD example
+- `/shared/prisma/schema.prisma` - Single source of truth for schema
+- `/shared/db/index.ts` - Centralized Prisma client
+
+✅ **Best Practices**:
+- Always use transactions for multi-step operations
+- Select only needed fields for performance
+- Use pagination for large datasets
+- Handle Prisma errors with specific error codes
+- Log all errors for debugging
+- Prefer Prisma API over raw SQL
+- Use TypeScript types for all inputs/outputs
+- Keep transactions short and focused
+
+---
+
+*End of Chapters 25-26*
+
+**Summary**: These chapters covered advanced authorization and database operations. Chapter 25 explained ABAC authorization, Next Photon's 7 roles, multi-role support, permission inheritance, RolesGuard implementation, and complete authorization flow with security best practices. Chapter 26 explored advanced Prisma operations including complex where clauses, pagination, transactions, aggregations, raw SQL, query optimization, error handling, and Next Photon's centralized Prisma architecture with real-world CRUD examples.
+
+**Next Up**: Chapter 27 - Error Handling and Validation (Input validation, custom exceptions, error boundaries)
+
+---
+
+## Chapter 27: Error Handling and Validation
+
+Welcome to Chapter 27! In this chapter, we'll learn how backend APIs handle errors and validate incoming data. This is critical for building secure, user-friendly applications.
+
+---
+
+### 27.1 Why Error Handling Matters
+
+Imagine you're building a login form. What could go wrong?
+
+1. **User types invalid email**: "notanemail" instead of "user@example.com"
+2. **User enters wrong password**: Credentials don't match database
+3. **Database connection fails**: Server can't reach database
+4. **User doesn't exist**: Trying to update a user that was deleted
+
+Without proper error handling:
+- Your app crashes
+- Users see confusing error messages
+- Security vulnerabilities exposed (like "User not found" vs "Wrong password")
+- Debugging becomes nightmare
+
+**With proper error handling**:
+- Clear, user-friendly error messages
+- Appropriate HTTP status codes (400, 401, 404, 500)
+- Security maintained (don't reveal sensitive info)
+- Easy debugging with server-side logs
+
+**Real-world analogy**: Think of error handling like a customer service representative at a restaurant. When something goes wrong (wrong order, missing ingredient), they:
+1. Acknowledge the problem
+2. Explain what happened (clearly but without kitchen secrets)
+3. Offer a solution
+4. Document the issue for management
+
+That's exactly what error handling does in your API!
+
+---
+
+### 27.2 Types of Errors in Backend APIs
+
+HTTP status codes tell the client what went wrong. Here are the most common:
+
+#### **400 Bad Request** - Client sent invalid data
+```typescript
+// Example: Missing required field
+POST /api/users
+Body: { "email": "test@example.com" }  // ❌ Missing 'name' field
+
+Response: 400 Bad Request
+{
+  "statusCode": 400,
+  "message": ["name is required"],
+  "error": "Bad Request"
+}
+```
+
+**When to use**: Validation errors, malformed JSON, invalid input
+
+---
+
+#### **401 Unauthorized** - Authentication failed
+```typescript
+// Example: Invalid credentials
+POST /api/auth/login
+Body: { "email": "user@example.com", "password": "wrongpassword" }
+
+Response: 401 Unauthorized
+{
+  "statusCode": 401,
+  "message": "Invalid credentials",
+  "error": "Unauthorized"
+}
+```
+
+**When to use**: Wrong password, expired token, missing authentication
+
+---
+
+#### **403 Forbidden** - User authenticated but not authorized
+```typescript
+// Example: Learner trying to access admin route
+GET /api/admin/users
+Headers: { Authorization: "Bearer <valid-learner-token>" }
+
+Response: 403 Forbidden
+{
+  "statusCode": 403,
+  "message": "You do not have permission to access this resource",
+  "error": "Forbidden"
+}
+```
+
+**When to use**: User doesn't have required role/permission
+
+**401 vs 403**:
+- **401**: "I don't know who you are" (not logged in or invalid credentials)
+- **403**: "I know who you are, but you can't do this" (insufficient permissions)
+
+---
+
+#### **404 Not Found** - Resource doesn't exist
+```typescript
+// Example: User ID doesn't exist
+GET /api/users/999999
+
+Response: 404 Not Found
+{
+  "statusCode": 404,
+  "message": "User not found",
+  "error": "Not Found"
+}
+```
+
+**When to use**: Resource doesn't exist in database
+
+---
+
+#### **500 Internal Server Error** - Server-side failure
+```typescript
+// Example: Database connection lost
+GET /api/users
+
+Response: 500 Internal Server Error
+{
+  "statusCode": 500,
+  "message": "Internal server error",
+  "error": "Internal Server Error"
+}
+```
+
+**When to use**: Unexpected errors, database crashes, third-party service failures
+
+**Important**: Never expose sensitive details in 500 errors (like database schema, stack traces). Log those server-side for debugging.
+
+---
+
+### 27.3 DTOs (Data Transfer Objects) - What and Why
+
+**DTO** = A TypeScript class that defines the structure of data being transferred between client and server.
+
+**Why do we need DTOs?**
+
+1. **Type Safety**: Ensure incoming data has correct types
+2. **Validation**: Check data meets requirements (email format, password strength)
+3. **Separation of Concerns**: API input structure separate from database models
+4. **Documentation**: Self-documenting API (you can see what fields are required)
+
+**Without DTOs**:
+```typescript
+async login(body: any) {  // ❌ 'any' - no type safety!
+  const { email, password } = body;
+  // What if body is undefined?
+  // What if email is not a string?
+  // What if password is missing?
+}
+```
+
+**With DTOs**:
+```typescript
+async login(loginDto: LoginDto) {  // ✅ Typed and validated!
+  // loginDto.email is guaranteed to be:
+  // - A string
+  // - In valid email format
+  // - Not empty
+  const { email, password } = loginDto;
+}
+```
+
+**Analogy**: DTOs are like customs forms at an airport. They specify:
+- What fields are required (passport number, name, date of birth)
+- What format they should be in (date format, valid country code)
+- What's optional (middle name, phone number)
+
+The customs officer (validation pipeline) checks the form before letting you through!
+
+---
+
+### 27.4 class-validator Package
+
+NestJS uses the `class-validator` package to validate DTOs using **decorators**.
+
+**What are decorators?** Special annotations (starting with `@`) that add metadata and behavior to classes and properties.
+
+**Common Validators**:
+
+| Decorator | What it validates | Example |
+|-----------|-------------------|---------|
+| `@IsEmail()` | Valid email format | `user@example.com` ✅, `notanemail` ❌ |
+| `@IsNotEmpty()` | Field is not empty | `""` ❌, `"value"` ✅ |
+| `@IsString()` | Value is a string | `"text"` ✅, `123` ❌ |
+| `@MinLength(n)` | String length >= n | `@MinLength(8)` → `"password"` ✅ (8 chars) |
+| `@MaxLength(n)` | String length <= n | `@MaxLength(50)` → `"short"` ✅ |
+| `@Matches(regex)` | Matches regex pattern | `@Matches(/^[A-Z]/)` → must start with uppercase |
+| `@IsEnum(enum)` | Value is in enum | `@IsEnum(UserRole)` → must be valid role |
+| `@Min(n)` | Number >= n | `@Min(1)` → `5` ✅, `0` ❌ |
+| `@Max(n)` | Number <= n | `@Max(100)` → `50` ✅, `200` ❌ |
+| `@IsOptional()` | Field is optional | Can be `undefined` |
+| `@IsPositive()` | Number > 0 | `5` ✅, `-1` ❌, `0` ❌ |
+
+**Custom error messages**:
+```typescript
+@IsEmail({}, { message: 'Please provide a valid email address' })
+//          ↑ Validator options
+//                    ↑ Custom error message
+```
+
+---
+
+### 27.5 Real Next Photon DTO: LoginDto
+
+Let's examine the actual login DTO from Next Photon.
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/dto/login.dto.ts`
+
+```typescript
+/**
+ * Data Transfer Object for User Login
+ *
+ * Validates login credentials:
+ * - Email format
+ * - Password presence
+ */
+
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+// ↑ Import validation decorators from class-validator package
+
+export class LoginDto {
+  /**
+   * User's email address
+   * Must be a valid email format
+   */
+  @IsEmail({}, { message: 'Please provide a valid email address' })
+  // ↑ Validates email format (must contain @, valid domain, etc.)
+  // ↑ If validation fails, user sees: "Please provide a valid email address"
+
+  @IsNotEmpty({ message: 'Email is required' })
+  // ↑ Ensures field is not empty string, null, or undefined
+  // ↑ If validation fails, user sees: "Email is required"
+
+  email: string;
+  // ↑ TypeScript type annotation (compile-time check)
+
+  /**
+   * User's password
+   * No specific validation as we're checking against stored hash
+   */
+  @IsString()
+  // ↑ Validates that password is a string (not number, object, etc.)
+
+  @IsNotEmpty({ message: 'Password is required' })
+  // ↑ Ensures password field is not empty
+
+  password: string;
+  // ↑ Plain text password (will be compared to hashed version in database)
+}
+```
+
+**How this works**:
+
+1. **Client sends request**:
+```json
+POST /api/auth/login
+{
+  "email": "user@example.com",
+  "password": "mypassword"
+}
+```
+
+2. **NestJS validation pipeline runs** (before controller method):
+   - Check `email` is a string ✅
+   - Check `email` is not empty ✅
+   - Check `email` is valid email format ✅
+   - Check `password` is a string ✅
+   - Check `password` is not empty ✅
+
+3. **If validation passes**: Controller method receives fully validated `LoginDto` object
+
+4. **If validation fails**: NestJS automatically returns 400 Bad Request with error messages
+
+**Example validation failure**:
+```json
+// Client sends invalid data
+POST /api/auth/login
+{
+  "email": "notanemail",
+  "password": ""
+}
+
+// Response: 400 Bad Request
+{
+  "statusCode": 400,
+  "message": [
+    "Please provide a valid email address",
+    "Password is required"
+  ],
+  "error": "Bad Request"
+}
+```
+
+---
+
+### 27.6 Real Next Photon DTO: RegisterDto
+
+Registration requires more complex validation. Let's see how Next Photon handles it.
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/dto/register.dto.ts`
+
+```typescript
+/**
+ * Data Transfer Object for User Registration
+ *
+ * Validates registration data including:
+ * - Email format and uniqueness
+ * - Password strength requirements
+ * - Name requirements
+ * - Valid role selection
+ */
+
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsEnum, Matches } from 'class-validator';
+// ↑ Import all needed validators
+
+// Define allowed roles for registration
+export enum UserRole {
+  LEARNER = 'learner',
+  GUARDIAN = 'guardian',
+  EDUCATOR = 'educator',
+  ECM = 'ecm',
+  EMPLOYEE = 'employee',
+  INTERN = 'intern',
+  ADMIN = 'admin',
+}
+// ↑ TypeScript enum - limits role to these exact values
+// ↑ LEARNER is the enum key, 'learner' is the actual string value
+
+export class RegisterDto {
+  /**
+   * User's email address
+   * Must be a valid email format
+   */
+  @IsEmail({}, { message: 'Please provide a valid email address' })
+  // ↑ Same validation as LoginDto
+
+  @IsNotEmpty({ message: 'Email is required' })
+  email: string;
+
+  /**
+   * User's password
+   * Minimum 8 characters, must contain at least:
+   * - One uppercase letter
+   * - One lowercase letter
+   * - One number
+   * - One special character
+   */
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  // ↑ Ensures password is at least 8 characters
+  // ↑ "Pass" would fail, "Password123!" would pass
+
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+    // ↑ Regular expression (regex) for complex password rules
+    // ↑ Let's break down this regex:
+    //   (?=.*[a-z])     → Must contain at least one lowercase letter (a-z)
+    //   (?=.*[A-Z])     → Must contain at least one uppercase letter (A-Z)
+    //   (?=.*\d)        → Must contain at least one digit (0-9)
+    //   (?=.*[@$!%*?&]) → Must contain at least one special character
+    //   [A-Za-z\d@$!%*?&] → Allowed characters (letters, numbers, special chars)
+    {
+      message: 'Password must contain uppercase, lowercase, number and special character',
+    },
+  )
+  password: string;
+
+  /**
+   * User's full name
+   * Minimum 2 characters
+   */
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+
+  @MinLength(2, { message: 'Name must be at least 2 characters long' })
+  // ↑ Prevents single-character names like "A"
+
+  name: string;
+
+  /**
+   * User's role in the system
+   * Must be one of the predefined roles
+   */
+  @IsEnum(UserRole, { message: 'Invalid role specified' })
+  // ↑ Validates that role is one of the UserRole enum values
+  // ↑ 'learner' ✅, 'guardian' ✅, 'hacker' ❌
+
+  @IsNotEmpty({ message: 'Role is required' })
+  role: UserRole;
+  // ↑ Type is UserRole enum (not just any string)
+}
+```
+
+**Password validation examples**:
+
+| Password | Valid? | Why? |
+|----------|--------|------|
+| `password` | ❌ | No uppercase, no number, no special char |
+| `Password` | ❌ | No number, no special char |
+| `Password1` | ❌ | No special char |
+| `Password1!` | ✅ | Has uppercase, lowercase, number, special char |
+| `Pass1!` | ❌ | Less than 8 characters |
+| `PASSWORD1!` | ❌ | No lowercase |
+
+**Role validation examples**:
+
+| Role | Valid? | Why? |
+|------|--------|------|
+| `'learner'` | ✅ | Valid enum value |
+| `'admin'` | ✅ | Valid enum value |
+| `'superuser'` | ❌ | Not in UserRole enum |
+| `''` | ❌ | Empty (fails @IsNotEmpty) |
+
+---
+
+### 27.7 Real Next Photon DTO: PaginationInput
+
+This DTO handles pagination parameters for GraphQL queries.
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/dto/common/pagination.dto.ts`
+
+```typescript
+import { InputType, ObjectType, Field, Int } from '@nestjs/graphql';
+// ↑ GraphQL decorators for defining input/output types
+
+import { IsOptional, IsPositive, Min, Max } from 'class-validator';
+// ↑ Validation decorators
+
+/**
+ * Pagination Input for GraphQL Queries
+ *
+ * This input type provides standardized pagination parameters
+ * for GraphQL queries that return lists of data.
+ *
+ * Features:
+ * - Cursor-based pagination support
+ * - Limit validation to prevent performance issues
+ * - Optional sorting parameters
+ */
+@InputType()
+// ↑ GraphQL decorator marking this as an input type
+// ↑ (can be used in GraphQL query arguments)
+
+export class PaginationInput {
+  @Field(() => Int, { nullable: true, defaultValue: 10, description: 'Number of items to return (max 100)' })
+  // ↑ GraphQL field definition:
+  //   - Type: Int (GraphQL integer)
+  //   - nullable: true (field is optional)
+  //   - defaultValue: 10 (if not provided, use 10)
+  //   - description: Shows up in GraphQL schema documentation
+
+  @IsOptional()
+  // ↑ Validation: This field is optional (can be undefined)
+
+  @IsPositive()
+  // ↑ Validation: If provided, must be a positive number (> 0)
+
+  @Min(1)
+  // ↑ Validation: Minimum value is 1 (can't request 0 items)
+
+  @Max(100)
+  // ↑ Validation: Maximum value is 100 (prevents requesting 10,000 items)
+  // ↑ This is a performance safeguard!
+
+  limit?: number = 10;
+  // ↑ TypeScript: Optional field with default value of 10
+
+  @Field(() => Int, { nullable: true, defaultValue: 0, description: 'Number of items to skip' })
+  @IsOptional()
+  @Min(0)
+  // ↑ Offset can be 0 (start from beginning) or greater
+
+  offset?: number = 0;
+
+  @Field({ nullable: true, description: 'Cursor for pagination (base64 encoded)' })
+  @IsOptional()
+  cursor?: string;
+  // ↑ Alternative to offset-based pagination
+  // ↑ More efficient for large datasets
+
+  @Field({ nullable: true, description: 'Sort field name' })
+  @IsOptional()
+  sortBy?: string;
+  // ↑ Which field to sort by (e.g., 'createdAt', 'name')
+
+  @Field({ nullable: true, defaultValue: 'asc', description: 'Sort direction (asc or desc)' })
+  @IsOptional()
+  sortOrder?: 'asc' | 'desc' = 'asc';
+  // ↑ TypeScript union type: can only be 'asc' or 'desc'
+}
+```
+
+**How validation prevents abuse**:
+
+```typescript
+// ❌ User tries to fetch 10,000 items (DoS attack)
+{
+  limit: 10000  // Validation fails: Max is 100
+}
+
+// ❌ User tries negative limit
+{
+  limit: -5  // Validation fails: Must be positive
+}
+
+// ❌ User tries negative offset
+{
+  offset: -10  // Validation fails: Min is 0
+}
+
+// ✅ Valid request
+{
+  limit: 20,
+  offset: 0,
+  sortBy: 'createdAt',
+  sortOrder: 'desc'
+}
+```
+
+**Why limit max to 100?**
+
+Imagine a user requests 1,000,000 records:
+1. Database fetches 1 million rows (slow!)
+2. Converts to JSON (memory intensive!)
+3. Sends over network (bandwidth intensive!)
+4. Client tries to render (browser crashes!)
+
+**Solution**: Paginate! Users fetch data in chunks (10-100 items at a time), keeping everything fast and responsive.
+
+---
+
+### 27.8 ValidationPipe in NestJS
+
+DTOs are just classes with decorators. How does NestJS actually validate them?
+
+**Answer**: The `ValidationPipe`!
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/main.ts` (typical setup)
+
+```typescript
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Enable validation globally for all routes
+  app.useGlobalPipes(new ValidationPipe({
+    // ↑ Creates a new ValidationPipe instance
+
+    whitelist: true,
+    // ↑ Strip properties that don't have decorators in DTO
+    // ↑ If client sends { email: "test@test.com", hacker: "malicious" }
+    // ↑ and DTO only has 'email', 'hacker' field is removed
+
+    forbidNonWhitelisted: true,
+    // ↑ Throw error if unknown properties are sent
+    // ↑ More strict than whitelist (rejects request instead of stripping)
+
+    transform: true,
+    // ↑ Automatically transform payloads to DTO instances
+    // ↑ Converts plain JSON to TypeScript class instances
+    // ↑ Enables type coercion (e.g., "5" → 5 for numbers)
+
+    transformOptions: {
+      enableImplicitConversion: true,
+      // ↑ Automatically convert types based on TypeScript annotations
+      // ↑ Example: If DTO has 'age: number', string "25" becomes number 25
+    },
+  }));
+
+  await app.listen(3001);
+}
+bootstrap();
+```
+
+**How it works**:
+
+```
+Client Request → ValidationPipe → Controller
+     ↓
+{ "email": "test@test.com", "password": "pass" }
+     ↓
+ValidationPipe checks LoginDto validators
+     ↓
+All pass? → Controller receives LoginDto instance
+Any fail? → Return 400 Bad Request with error messages
+```
+
+**Configuration options explained**:
+
+1. **whitelist: true** - Security feature
+   ```typescript
+   // Client sends
+   { "email": "test@test.com", "isAdmin": true }
+
+   // DTO only has 'email' field
+   // With whitelist: true, 'isAdmin' is silently removed
+   // Controller receives: { "email": "test@test.com" }
+   ```
+
+2. **forbidNonWhitelisted: true** - Even more secure
+   ```typescript
+   // Client sends
+   { "email": "test@test.com", "isAdmin": true }
+
+   // Response: 400 Bad Request
+   // "property isAdmin should not exist"
+   ```
+
+3. **transform: true** - Type conversion
+   ```typescript
+   // Client sends (all strings from JSON)
+   { "limit": "10", "offset": "0" }
+
+   // DTO expects numbers
+   class PaginationDto {
+     limit: number;
+     offset: number;
+   }
+
+   // With transform: true
+   // Controller receives: { limit: 10, offset: 0 } (numbers)
+   ```
+
+---
+
+### 27.9 Built-in HTTP Exceptions in NestJS
+
+NestJS provides built-in exception classes for common HTTP errors.
+
+**All exceptions extend `HttpException`**:
+
+```typescript
+import {
+  BadRequestException,      // 400
+  UnauthorizedException,    // 401
+  ForbiddenException,       // 403
+  NotFoundException,        // 404
+  ConflictException,        // 409
+  InternalServerErrorException, // 500
+} from '@nestjs/common';
+```
+
+**When to use each**:
+
+#### **BadRequestException (400)** - Validation errors, invalid input
+```typescript
+async createUser(input: CreateUserInput) {
+  if (!input.email.includes('@')) {
+    throw new BadRequestException('Invalid email format');
+    // ↑ Returns: { statusCode: 400, message: "Invalid email format", error: "Bad Request" }
+  }
+}
+```
+
+#### **UnauthorizedException (401)** - Authentication failed
+```typescript
+async login(loginDto: LoginDto) {
+  const user = await this.validateUser(loginDto.email, loginDto.password);
+
+  if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
+    // ↑ Don't say "Wrong password" or "User not found" (security!)
+    // ↑ Generic message prevents username enumeration attacks
+  }
+}
+```
+
+#### **ForbiddenException (403)** - Insufficient permissions
+```typescript
+async deleteUser(userId: string, currentUser: User) {
+  if (currentUser.role !== 'admin') {
+    throw new ForbiddenException('Only admins can delete users');
+    // ↑ User is authenticated but doesn't have required role
+  }
+}
+```
+
+#### **NotFoundException (404)** - Resource not found
+```typescript
+async findById(id: string) {
+  const user = await this.prisma.user.findUnique({ where: { id } });
+
+  if (!user) {
+    throw new NotFoundException('User not found');
+    // ↑ Clear message indicating resource doesn't exist
+  }
+
+  return user;
+}
+```
+
+#### **ConflictException (409)** - Duplicate resource
+```typescript
+async register(registerDto: RegisterDto) {
+  const existingUser = await this.prisma.user.findUnique({
+    where: { email: registerDto.email }
+  });
+
+  if (existingUser) {
+    throw new ConflictException('User with this email already exists');
+    // ↑ Email must be unique, conflict with existing user
+  }
+}
+```
+
+#### **InternalServerErrorException (500)** - Unexpected errors
+```typescript
+async getUsers() {
+  try {
+    return await this.prisma.user.findMany();
+  } catch (error) {
+    console.error('Database error:', error);
+    // ↑ Log full error server-side for debugging
+
+    throw new InternalServerErrorException('Failed to fetch users');
+    // ↑ Generic message to client (don't expose database details!)
+  }
+}
+```
+
+**Custom error messages**:
+```typescript
+throw new BadRequestException('Custom error message');
+// Simple string message
+
+throw new BadRequestException({
+  statusCode: 400,
+  message: 'Multiple errors occurred',
+  errors: ['Email is invalid', 'Password too short'],
+});
+// ↑ Structured error response with multiple messages
+```
+
+---
+
+### 27.10 Exception Filters (Advanced)
+
+**What are Exception Filters?** Classes that catch exceptions and format error responses.
+
+**Why use them?**
+- Consistent error response format across entire API
+- Custom logging
+- Transform error messages
+- Handle unexpected errors gracefully
+
+**Basic concept**:
+
+```typescript
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+import { Response } from 'express';
+
+@Catch(HttpException)
+// ↑ This filter catches all HttpException instances
+// ↑ (BadRequestException, UnauthorizedException, etc. all extend HttpException)
+
+export class HttpExceptionFilter implements ExceptionFilter {
+  catch(exception: HttpException, host: ArgumentsHost) {
+    // ↑ Called whenever an HttpException is thrown
+
+    const ctx = host.switchToHttp();
+    // ↑ Get HTTP context (request and response objects)
+
+    const response = ctx.getResponse<Response>();
+    // ↑ Get Express response object
+
+    const status = exception.getStatus();
+    // ↑ Get HTTP status code (400, 401, 404, etc.)
+
+    const exceptionResponse = exception.getResponse();
+    // ↑ Get the exception's response (message, error details)
+
+    // Custom error response format
+    const errorResponse = {
+      statusCode: status,
+      timestamp: new Date().toISOString(),
+      // ↑ When the error occurred (helpful for debugging)
+
+      message: exceptionResponse['message'] || exception.message,
+      // ↑ Error message to show user
+
+      error: exceptionResponse['error'] || 'Error',
+      // ↑ Error type (Bad Request, Unauthorized, etc.)
+    };
+
+    // Log error server-side
+    console.error('Exception thrown:', {
+      ...errorResponse,
+      stack: exception.stack,
+      // ↑ Stack trace for debugging (never send to client!)
+    });
+
+    // Send formatted error to client
+    response.status(status).json(errorResponse);
+  }
+}
+```
+
+**How to use globally**:
+
+```typescript
+// main.ts
+import { HttpExceptionFilter } from './filters/http-exception.filter';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.useGlobalFilters(new HttpExceptionFilter());
+  // ↑ Apply filter to all routes in application
+
+  await app.listen(3001);
+}
+```
+
+**Now all errors have consistent format**:
+```json
+{
+  "statusCode": 404,
+  "timestamp": "2025-10-06T10:30:00.000Z",
+  "message": "User not found",
+  "error": "Not Found"
+}
+```
+
+---
+
+### 27.11 Error Handling Best Practices
+
+**1. Consistent Error Format**
+   - Use same structure for all errors
+   - Include: statusCode, message, error type
+   - Optionally: timestamp, path, trace ID
+
+**2. Never Expose Sensitive Data**
+   ```typescript
+   // ❌ BAD: Exposes database schema
+   catch (error) {
+     throw new InternalServerErrorException(error.message);
+     // Client sees: "Column 'password_hash' does not exist"
+   }
+
+   // ✅ GOOD: Generic message
+   catch (error) {
+     console.error('Database error:', error);  // Log full error
+     throw new InternalServerErrorException('An error occurred');
+   }
+   ```
+
+**3. Log Errors Server-Side**
+   ```typescript
+   catch (error) {
+     console.error('Error details:', {
+       message: error.message,
+       stack: error.stack,
+       timestamp: new Date().toISOString(),
+       userId: currentUser?.id,  // Context for debugging
+     });
+
+     throw new InternalServerErrorException('An error occurred');
+   }
+   ```
+
+**4. User-Friendly Error Messages**
+   ```typescript
+   // ❌ BAD: Technical jargon
+   throw new BadRequestException('Unique constraint violation on field email');
+
+   // ✅ GOOD: Clear, actionable
+   throw new BadRequestException('An account with this email already exists');
+   ```
+
+**5. Use Appropriate Status Codes**
+   - **400**: Client's fault (bad input)
+   - **401**: Need to login
+   - **403**: Logged in but can't access this
+   - **404**: Resource doesn't exist
+   - **500**: Server's fault (not client's)
+
+**6. Validate Early**
+   - Use DTOs and ValidationPipe
+   - Validate at API boundary (before business logic)
+   - Fail fast (don't waste resources on invalid data)
+
+**7. Handle Prisma Errors Specifically** (we'll see examples next!)
+
+---
+
+### 27.12 Real Error Handling: UsersService
+
+Let's examine how Next Photon's UsersService handles errors.
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/users/users.service.ts`
+
+**Example 1: Creating a User (Lines 148-186)**
+
+```typescript
+async create(input: CreateUserInput) {
+  try {
+    // Generate a unique ID for Better-auth compatibility
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    const user = await this.prisma.user.create({
+      data: {
+        id: userId,
+        email: input.email,
+        name: input.name,
+        image: input.image,
+        emailVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+      }
+    });
+
+    return {
+      ...user,
+      isActive: true,
+    };
+  } catch (error) {
+    // ↑ Catch any errors from Prisma
+
+    console.error('Error creating user:', error);
+    // ↑ Log full error server-side (includes stack trace, error code, etc.)
+
+    if ((error as any).code === 'P2002') {
+      // ↑ Prisma error code P2002 = Unique constraint violation
+      // ↑ Means: Trying to create user with email that already exists
+
+      throw new BadRequestException('User with this email already exists');
+      // ↑ Convert Prisma error to user-friendly message
+      // ↑ Returns: { statusCode: 400, message: "User with this email already exists" }
+    }
+
+    throw error;
+    // ↑ If it's not P2002, re-throw the error
+    // ↑ Will be caught by exception filter and returned as 500 Internal Server Error
+  }
+}
+```
+
+**What happens**:
+
+1. **Success case**: User created, return user object
+2. **Duplicate email (P2002)**: Throw BadRequestException (400)
+3. **Other errors**: Re-throw, becomes 500 error
+
+**Prisma Error Code P2002**:
+```typescript
+// User tries to register with existing email
+{ email: "existing@example.com", name: "John Doe" }
+
+// Prisma throws:
+{
+  code: 'P2002',
+  meta: { target: ['email'] },
+  message: 'Unique constraint failed on the fields: (`email`)'
+}
+
+// We catch and convert to:
+{
+  statusCode: 400,
+  message: 'User with this email already exists'
+}
+```
+
+---
+
+**Example 2: Updating a User (Lines 195-226)**
+
+```typescript
+async update(id: string, updates: Partial<CreateUserInput>) {
+  try {
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: {
+        ...updates,
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+        emailVerified: true,
+      }
+    });
+
+    return {
+      ...user,
+      isActive: true,
+    };
+  } catch (error) {
+    console.error('Error updating user:', error);
+
+    if ((error as any).code === 'P2025') {
+      // ↑ Prisma error code P2025 = Record not found
+      // ↑ Means: Trying to update user that doesn't exist
+
+      throw new NotFoundException('User not found');
+      // ↑ Returns: { statusCode: 404, message: "User not found" }
+    }
+
+    throw error;
+  }
+}
+```
+
+**Prisma Error Code P2025**:
+```typescript
+// Trying to update user that was deleted
+await update('deleted-user-id', { name: 'New Name' })
+
+// Prisma throws:
+{
+  code: 'P2025',
+  meta: { cause: 'Record to update not found.' }
+}
+
+// We catch and convert to:
+{
+  statusCode: 404,
+  message: 'User not found'
+}
+```
+
+---
+
+**Example 3: Deleting a User (Lines 234-250)**
+
+```typescript
+async delete(id: string): Promise<boolean> {
+  try {
+    await this.prisma.user.delete({
+      where: { id }
+    });
+
+    return true;
+    // ↑ Successfully deleted
+
+  } catch (error) {
+    console.error('Error deleting user:', error);
+
+    if ((error as any).code === 'P2025') {
+      // ↑ Same P2025 error - trying to delete user that doesn't exist
+
+      throw new NotFoundException('User not found');
+    }
+
+    throw error;
+  }
+}
+```
+
+**Common Prisma Error Codes**:
+
+| Code | Meaning | Example | How to Handle |
+|------|---------|---------|---------------|
+| `P2002` | Unique constraint failed | Duplicate email | BadRequestException |
+| `P2025` | Record not found | Update/delete non-existent user | NotFoundException |
+| `P2003` | Foreign key constraint | Deleting user with active sessions | BadRequestException |
+| `P2001` | Record does not exist | Related record missing | BadRequestException |
+
+**Error handling pattern**:
+```typescript
+try {
+  // Attempt database operation
+} catch (error) {
+  console.error('Context for debugging:', error);  // Log everything
+
+  if (error.code === 'P2002') {
+    throw new BadRequestException('User-friendly message');
+  }
+
+  if (error.code === 'P2025') {
+    throw new NotFoundException('User-friendly message');
+  }
+
+  throw error;  // Unknown error → becomes 500
+}
+```
+
+---
+
+### 27.13 Real Error Handling: AuthService
+
+Let's examine authentication error handling.
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts`
+
+**Example 1: Login with Invalid Credentials (Lines 88-126)**
+
+```typescript
+async login(loginDto: LoginDto) {
+  const user = await this.validateUser(loginDto.email, loginDto.password);
+  // ↑ Returns user if valid, null if invalid
+
+  if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
+    // ↑ Generic error message (security best practice!)
+    // ↑ Don't say "Wrong password" or "User doesn't exist"
+    // ↑ Prevents username enumeration attacks
+  }
+
+  // Generate JWT token...
+  const payload: JwtPayload = {
+    sub: user.id,
+    email: user.email,
+    roles: user.roles,
+  };
+
+  return {
+    access_token: this.jwtService.sign(payload),
+    user: { /* ... */ },
+  };
+}
+```
+
+**Why "Invalid credentials" instead of specific errors?**
+
+```typescript
+// ❌ SECURITY VULNERABILITY: Username Enumeration
+if (!user) {
+  throw new UnauthorizedException('User does not exist');
+  // Attacker learns: This email is not registered
+}
+
+if (!isPasswordValid) {
+  throw new UnauthorizedException('Wrong password');
+  // Attacker learns: This email IS registered!
+}
+
+// ✅ SECURE: Generic Error
+if (!user || !isPasswordValid) {
+  throw new UnauthorizedException('Invalid credentials');
+  // Attacker learns: Nothing useful!
+}
+```
+
+**Username Enumeration Attack**:
+1. Attacker tries: `hacker@evil.com` → "User does not exist"
+2. Attacker tries: `admin@company.com` → "Wrong password"
+3. Attacker now knows `admin@company.com` exists!
+4. Attacker launches targeted attack on that account
+
+---
+
+**Example 2: Registration with Existing Email (Lines 134-240)**
+
+```typescript
+async register(registerDto: RegisterDto) {
+  try {
+    // Check if user already exists
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email: registerDto.email },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+      // ↑ 409 Conflict: Resource already exists
+      // ↑ Clear message helps user understand they should login instead
+    }
+
+    // Validate role exists
+    const role = await this.prisma.role.findUnique({
+      where: { name: registerDto.role },
+    });
+
+    if (!role) {
+      throw new BadRequestException(`Role ${registerDto.role} does not exist`);
+      // ↑ 400 Bad Request: Invalid role provided
+      // ↑ This shouldn't happen if frontend uses role enum correctly
+    }
+
+    // Hash password, create user, etc...
+
+  } catch (error) {
+    if (error instanceof ConflictException || error instanceof BadRequestException) {
+      // ↑ If we already threw a custom exception, re-throw it
+      throw error;
+    }
+
+    console.error('Registration error:', error);
+    // ↑ Log unexpected errors
+
+    throw new BadRequestException('Failed to register user');
+    // ↑ Generic error for any unexpected issues
+  }
+}
+```
+
+**Error flow**:
+```
+1. Duplicate email → ConflictException (409)
+2. Invalid role → BadRequestException (400)
+3. Database error → BadRequestException (400, generic message)
+```
+
+---
+
+**Example 3: Token Validation (Lines 268-296)**
+
+```typescript
+async validateToken(payload: JwtPayload) {
+  try {
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.sub },
+      include: {
+        userRoles: {
+          include: {
+            role: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+      // ↑ Token contained valid user ID, but user was deleted
+      // ↑ 401: Need to re-authenticate
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      roles: user.userRoles.map(ur => ur.role.name),
+      emailVerified: user.emailVerified,
+    };
+  } catch (error) {
+    console.error('Token validation error:', error);
+
+    throw new UnauthorizedException('Invalid token');
+    // ↑ Generic error for any token validation failure
+    // ↑ Could be: expired token, malformed token, user deleted, etc.
+  }
+}
+```
+
+**When is this called?**
+- Every request to protected routes
+- JwtStrategy calls `validateToken` to verify token
+- If throws UnauthorizedException → Client gets 401 → Must re-login
+
+---
+
+### 27.14 Try-Catch Patterns
+
+**When to catch errors**:
+
+1. **Convert errors to user-friendly messages**
+   ```typescript
+   try {
+     await this.prisma.user.create({ data });
+   } catch (error) {
+     if (error.code === 'P2002') {
+       throw new BadRequestException('Email already exists');
+     }
+     throw error;
+   }
+   ```
+
+2. **Add context for logging**
+   ```typescript
+   try {
+     return await this.prisma.user.findMany();
+   } catch (error) {
+     console.error('Failed to fetch users:', error);
+     throw new InternalServerErrorException('Failed to fetch users');
+   }
+   ```
+
+3. **Clean up resources**
+   ```typescript
+   const connection = await openConnection();
+   try {
+     await doWork(connection);
+   } catch (error) {
+     console.error('Work failed:', error);
+     throw error;
+   } finally {
+     await connection.close();  // Always runs, even if error
+   }
+   ```
+
+**When to let errors bubble up**:
+
+1. **Errors are already user-friendly**
+   ```typescript
+   // Method throws NotFoundException
+   async getUser(id: string) {
+     const user = await this.usersService.findById(id);
+     if (!user) {
+       throw new NotFoundException('User not found');
+     }
+     return user;
+   }
+
+   // Controller doesn't need try-catch
+   @Get(':id')
+   async getUserById(@Param('id') id: string) {
+     return this.usersService.getUser(id);  // Exception filter handles error
+   }
+   ```
+
+2. **No additional context to add**
+   ```typescript
+   // No need for try-catch
+   async createUser(input: CreateUserInput) {
+     return this.prisma.user.create({ data: input });
+   }
+   ```
+
+**Async error handling**:
+
+```typescript
+// ✅ CORRECT: await inside try
+async getData() {
+  try {
+    const data = await this.prisma.user.findMany();
+    return data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+// ❌ WRONG: Promise not awaited
+async getData() {
+  try {
+    return this.prisma.user.findMany();  // Returns Promise, not data!
+  } catch (error) {
+    // This never runs! Promise rejection not caught
+  }
+}
+```
+
+---
+
+### 27.15 Key Takeaways from Chapter 27
+
+✅ **Why Error Handling Matters**:
+- User experience: Clear, actionable error messages
+- Security: Don't expose sensitive information
+- Debugging: Server-side logs with full context
+- Reliability: Graceful degradation instead of crashes
+
+✅ **HTTP Status Codes**:
+- **400 Bad Request**: Client sent invalid data (validation errors)
+- **401 Unauthorized**: Authentication failed (wrong credentials, no token)
+- **403 Forbidden**: Authenticated but not authorized (insufficient permissions)
+- **404 Not Found**: Resource doesn't exist
+- **500 Internal Server Error**: Unexpected server-side failure
+
+✅ **DTOs (Data Transfer Objects)**:
+- TypeScript classes defining API input structure
+- Decorated with class-validator decorators
+- Provide type safety and validation
+- Separate from database models
+
+✅ **Common Validators**:
+- `@IsEmail()`: Valid email format
+- `@IsNotEmpty()`: Field not empty
+- `@IsString()`: Value is string
+- `@MinLength(n)`: Minimum string length
+- `@Matches(regex)`: Matches pattern
+- `@IsEnum(enum)`: Value in enum
+- `@Min(n)`, `@Max(n)`: Number range
+- `@IsOptional()`: Field optional
+
+✅ **ValidationPipe Configuration**:
+- `whitelist: true`: Strip unknown properties
+- `forbidNonWhitelisted: true`: Reject unknown properties
+- `transform: true`: Convert to DTO instances
+- Applied globally in `main.ts`
+
+✅ **NestJS HTTP Exceptions**:
+- `BadRequestException(message)`: 400
+- `UnauthorizedException(message)`: 401
+- `ForbiddenException(message)`: 403
+- `NotFoundException(message)`: 404
+- `ConflictException(message)`: 409
+- `InternalServerErrorException(message)`: 500
+
+✅ **Exception Filters**:
+- Catch exceptions and format responses
+- Provide consistent error structure
+- Log errors server-side
+- Applied globally with `app.useGlobalFilters()`
+
+✅ **Error Handling Best Practices**:
+- Consistent error format (statusCode, message, error)
+- Never expose sensitive data (database schema, stack traces)
+- Log errors server-side with full context
+- User-friendly messages (actionable, clear)
+- Use appropriate HTTP status codes
+- Validate early at API boundary
+
+✅ **Prisma Error Codes**:
+- **P2002**: Unique constraint violation → BadRequestException
+- **P2025**: Record not found → NotFoundException
+- **P2003**: Foreign key constraint → BadRequestException
+- Always log full Prisma error server-side
+
+✅ **Security Patterns**:
+- Generic authentication errors ("Invalid credentials")
+- Prevents username enumeration attacks
+- Don't reveal if email exists or password is wrong
+- Log actual errors server-side for debugging
+
+✅ **Try-Catch Patterns**:
+- Catch to convert errors to user-friendly messages
+- Catch to add logging context
+- Use `finally` for resource cleanup
+- Let errors bubble if already handled
+- Always `await` promises in try blocks
+
+✅ **Real Next Photon Examples**:
+- LoginDto: Email and password validation
+- RegisterDto: Complex password rules, role enum validation
+- PaginationInput: Min/max limits to prevent abuse
+- UsersService: Prisma error handling (P2002, P2025)
+- AuthService: Security-focused error messages
+
+✅ **Validation Flow**:
+```
+Client Request → ValidationPipe → DTO Validation → Controller
+                      ↓
+                  Valid? → Controller receives typed DTO
+                  Invalid? → 400 Bad Request with error messages
+```
+
+✅ **Key Implementation Files**:
+- `/backend/server_NestJS/src/auth/dto/login.dto.ts`
+- `/backend/server_NestJS/src/auth/dto/register.dto.ts`
+- `/backend/server_NestJS/src/dto/common/pagination.dto.ts`
+- `/backend/server_NestJS/src/users/users.service.ts`
+- `/backend/server_NestJS/src/auth/auth.service.ts`
+
+---
+
+## Chapter 28: Testing Backend Services
+
+Welcome to Chapter 28! Testing is how we make sure our code works correctly and continues to work as we make changes. Let's learn how to write tests for NestJS backend services.
+
+---
+
+### 28.1 Why Testing Matters
+
+**Scenario**: You've built a beautiful authentication system. It works perfectly! Then:
+1. You add a new feature
+2. Accidentally break login
+3. Push to production
+4. Users can't log in
+5. Panic!
+
+**With tests**:
+1. You add a new feature
+2. Run tests
+3. Login test fails
+4. Fix the bug before pushing
+5. Crisis averted!
+
+**Benefits of testing**:
+
+1. **Prevent Regressions**
+   - Regression = Breaking existing functionality while adding new features
+   - Tests catch these breaks automatically
+   - Example: Adding forgot password breaks login → Test fails
+
+2. **Documentation Through Tests**
+   - Tests show how code should be used
+   - Better than comments (tests prove it works)
+   - New developers learn from tests
+
+3. **Confidence in Refactoring**
+   - Refactoring = Improving code structure without changing behavior
+   - Tests prove behavior didn't change
+   - Refactor fearlessly!
+
+4. **Catch Bugs Early**
+   - Fix bugs in minutes (during development)
+   - Not hours (during QA)
+   - Not days (after production deployment)
+
+5. **Faster Development** (after initial setup)
+   - Manual testing: Click through UI for every change
+   - Automated testing: Run all tests in seconds
+   - Example: 100 test cases run in 5 seconds vs 30 minutes manual testing
+
+**Real-world analogy**: Tests are like quality control in a car factory. Every car is tested before leaving the factory. Imagine if they didn't test brakes until after delivery!
+
+---
+
+### 28.2 Types of Tests (Test Pyramid)
+
+The "Test Pyramid" shows how many tests of each type you should write:
+
+```
+        /\
+       /  \      E2E Tests (10%)
+      /____\     Slow, test entire user flows
+     /      \    Example: "User can sign up, login, create post, logout"
+    /        \
+   /__________\  Integration Tests (20%)
+  /            \ Test multiple components together
+ /              \ Example: "AuthService + PrismaService create user"
+/________________\
+                  Unit Tests (70%)
+                  Fast, test individual functions
+                  Example: "validateEmail returns true for valid email"
+```
+
+**Why pyramid shape?**
+- More unit tests = Fast feedback, easy to debug
+- Fewer E2E tests = Slow, hard to debug, but test real scenarios
+- Balance gives best coverage with reasonable speed
+
+---
+
+#### **Unit Tests (70%)** - Test individual functions/methods in isolation
+
+**What**: Test single function or method
+**Speed**: Very fast (milliseconds)
+**Example**: Testing `validateEmail()` function
+
+```typescript
+describe('validateEmail', () => {
+  it('should return true for valid email', () => {
+    expect(validateEmail('user@example.com')).toBe(true);
+  });
+
+  it('should return false for invalid email', () => {
+    expect(validateEmail('notanemail')).toBe(false);
+  });
+});
+```
+
+**When to write**:
+- Pure functions (input → output, no side effects)
+- Business logic
+- Utility functions
+- Validators
+
+---
+
+#### **Integration Tests (20%)** - Test multiple components working together
+
+**What**: Test how components interact
+**Speed**: Medium (seconds)
+**Example**: Testing `AuthService` with `PrismaService`
+
+```typescript
+describe('AuthService', () => {
+  it('should create user in database', async () => {
+    const user = await authService.register({
+      email: 'test@example.com',
+      password: 'Password123!',
+      name: 'Test User',
+      role: 'learner',
+    });
+
+    expect(user.email).toBe('test@example.com');
+
+    // Verify user actually exists in database
+    const dbUser = await prisma.user.findUnique({
+      where: { email: 'test@example.com' }
+    });
+    expect(dbUser).toBeDefined();
+  });
+});
+```
+
+**When to write**:
+- Services interacting with database
+- Services calling other services
+- API endpoints (controller + service)
+
+---
+
+#### **E2E Tests (End-to-End, 10%)** - Test entire user flows
+
+**What**: Test complete user journey through system
+**Speed**: Slow (seconds to minutes)
+**Example**: Testing entire registration flow
+
+```typescript
+describe('User Registration Flow (e2e)', () => {
+  it('should allow user to register, login, and access protected route', async () => {
+    // 1. Register
+    const registerResponse = await request(app.getHttpServer())
+      .post('/api/auth/register')
+      .send({
+        email: 'e2e@example.com',
+        password: 'Password123!',
+        name: 'E2E User',
+        role: 'learner',
+      })
+      .expect(201);
+
+    const { access_token } = registerResponse.body;
+
+    // 2. Use token to access protected route
+    const profileResponse = await request(app.getHttpServer())
+      .get('/api/users/me')
+      .set('Authorization', `Bearer ${access_token}`)
+      .expect(200);
+
+    expect(profileResponse.body.email).toBe('e2e@example.com');
+  });
+});
+```
+
+**When to write**:
+- Critical user paths (signup, login, checkout)
+- Complex workflows
+- Integration between frontend and backend
+
+---
+
+### 28.3 Jest Testing Framework
+
+**Jest** is the testing framework used by NestJS. It comes pre-installed!
+
+**Key features**:
+- Fast and parallel test execution
+- Built-in assertions (`expect()`)
+- Mocking support
+- Code coverage reports
+- Watch mode (re-runs tests on file changes)
+
+**Test file naming convention**:
+```
+my-service.service.ts        ← Source file
+my-service.service.spec.ts   ← Test file (same name + .spec.ts)
+```
+
+**Jest commands** (in `package.json`):
+```json
+{
+  "scripts": {
+    "test": "jest",                    // Run all tests once
+    "test:watch": "jest --watch",      // Re-run tests on file changes
+    "test:cov": "jest --coverage",     // Run tests + generate coverage report
+    "test:e2e": "jest --config ./test/jest-e2e.json"  // Run E2E tests
+  }
+}
+```
+
+---
+
+### 28.4 Basic Jest Syntax
+
+#### **describe() blocks** - Group related tests (test suites)
+
+```typescript
+describe('UsersService', () => {
+  // ↑ Name of the thing being tested
+
+  describe('findById', () => {
+    // ↑ Nested describe for specific method
+
+    // Tests for findById go here...
+  });
+
+  describe('create', () => {
+    // Tests for create go here...
+  });
+});
+```
+
+**Why group tests?**
+- Organize by class/method
+- Share setup code (`beforeEach`)
+- Better error messages ("UsersService > findById > should return user")
+
+---
+
+#### **it() or test()** - Individual test cases
+
+```typescript
+it('should return user by ID', async () => {
+  // ↑ Description of what this test verifies
+  // ↑ Use "should" to make it clear
+
+  // Test code here...
+});
+
+// 'test()' is alias for 'it()' (same thing)
+test('should return user by ID', async () => {
+  // Same as above
+});
+```
+
+**Naming convention**: Start with "should"
+- ✅ `it('should return user by ID', ...)`
+- ✅ `it('should throw error if user not found', ...)`
+- ❌ `it('returns user', ...)` - Less clear
+
+---
+
+#### **expect() assertions** - Verify expectations
+
+```typescript
+it('should return user by ID', async () => {
+  const user = await service.findById('user-1');
+
+  expect(user).toBeDefined();
+  // ↑ Verify user is not undefined or null
+
+  expect(user.id).toBe('user-1');
+  // ↑ Verify exact value match
+
+  expect(user.email).toContain('@');
+  // ↑ Verify string contains substring
+
+  expect(user.roles).toHaveLength(1);
+  // ↑ Verify array length
+});
+```
+
+**Common matchers**:
+
+| Matcher | What it checks | Example |
+|---------|----------------|---------|
+| `toBe(value)` | Exact match (===) | `expect(5).toBe(5)` |
+| `toEqual(object)` | Deep equality | `expect({a:1}).toEqual({a:1})` |
+| `toBeDefined()` | Not undefined | `expect(user).toBeDefined()` |
+| `toBeNull()` | Is null | `expect(result).toBeNull()` |
+| `toBeTruthy()` | Truthy value | `expect(1).toBeTruthy()` |
+| `toBeFalsy()` | Falsy value | `expect(0).toBeFalsy()` |
+| `toContain(item)` | Array/string contains | `expect([1,2,3]).toContain(2)` |
+| `toHaveLength(n)` | Array/string length | `expect([1,2]).toHaveLength(2)` |
+| `toThrow()` | Function throws | `expect(() => fn()).toThrow()` |
+| `toHaveBeenCalled()` | Mock was called | `expect(mockFn).toHaveBeenCalled()` |
+
+**toBe vs toEqual**:
+```typescript
+// toBe: Reference equality (same object in memory)
+const obj1 = { a: 1 };
+const obj2 = { a: 1 };
+expect(obj1).toBe(obj1);    // ✅ Same reference
+expect(obj1).toBe(obj2);    // ❌ Different references
+
+// toEqual: Deep equality (same values)
+expect(obj1).toEqual(obj2);  // ✅ Same values
+```
+
+---
+
+#### **beforeEach(), afterEach() hooks** - Setup and cleanup
+
+```typescript
+describe('UsersService', () => {
+  let service: UsersService;
+  let prisma: PrismaService;
+
+  beforeEach(async () => {
+    // ↑ Runs BEFORE each test in this describe block
+
+    // Create fresh instances for each test
+    const module = await Test.createTestingModule({
+      providers: [UsersService, PrismaService],
+    }).compile();
+
+    service = module.get<UsersService>(UsersService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  afterEach(async () => {
+    // ↑ Runs AFTER each test
+
+    // Clean up database
+    await prisma.user.deleteMany({});
+  });
+
+  it('should create user', async () => {
+    // service is fresh from beforeEach
+  });
+
+  it('should find user', async () => {
+    // service is fresh again (not affected by previous test)
+  });
+});
+```
+
+**Other hooks**:
+- `beforeAll()`: Runs once before all tests
+- `afterAll()`: Runs once after all tests
+
+**When to use each**:
+- `beforeEach`: Create fresh instances (most common)
+- `afterEach`: Clean up test data
+- `beforeAll`: Connect to database once
+- `afterAll`: Close database connection
+
+---
+
+### 28.5 NestJS Testing Utilities
+
+NestJS provides the `@nestjs/testing` package for testing NestJS applications.
+
+#### **Test.createTestingModule()** - Create test module
+
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+import { UsersService } from './users.service';
+import { PrismaService } from '../prisma/prisma.service';
+
+describe('UsersService', () => {
+  let service: UsersService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      // ↑ Creates a testing module (similar to @Module decorator)
+
+      providers: [
+        UsersService,
+        // ↑ Service we want to test
+
+        PrismaService,
+        // ↑ Dependency of UsersService
+      ],
+    }).compile();
+    // ↑ compile() builds the module
+
+    service = module.get<UsersService>(UsersService);
+    // ↑ Get instance from dependency injection container
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+});
+```
+
+---
+
+#### **Mocking Dependencies** - Replace real dependencies with test doubles
+
+**Why mock?**
+- Isolate code being tested
+- Don't want to hit real database in unit tests
+- Control return values for testing edge cases
+- Make tests faster
+
+**Example: Mock PrismaService**
+
+```typescript
+describe('UsersService', () => {
+  let service: UsersService;
+  let prisma: PrismaService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UsersService,
+        {
+          provide: PrismaService,
+          // ↑ When someone asks for PrismaService...
+
+          useValue: {
+            // ↑ ...give them this mock object instead
+
+            user: {
+              findUnique: jest.fn(),
+              // ↑ Mock function (we can control return value)
+
+              create: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
+            },
+          },
+        },
+      ],
+    }).compile();
+
+    service = module.get<UsersService>(UsersService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  it('should return user by ID', async () => {
+    // Set up mock to return test data
+    const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' };
+    jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+    // ↑ When findUnique is called, return mockUser
+
+    // Call the method
+    const result = await service.findById('1');
+
+    // Verify result
+    expect(result.email).toBe('test@example.com');
+
+    // Verify mock was called correctly
+    expect(prisma.user.findUnique).toHaveBeenCalledWith({
+      where: { id: '1' }
+    });
+  });
+});
+```
+
+**jest.fn()** - Create mock function
+```typescript
+const mockFn = jest.fn();
+// Empty mock (does nothing)
+
+const mockFn = jest.fn().mockReturnValue(42);
+// Mock that returns 42
+
+const mockFn = jest.fn().mockResolvedValue({ id: '1' });
+// Mock that returns Promise resolving to { id: '1' }
+
+const mockFn = jest.fn().mockRejectedValue(new Error('Failed'));
+// Mock that returns Promise rejecting with error
+```
+
+---
+
+### 28.6 Real Example: AppController Test Walkthrough
+
+Let's examine a real test from Next Photon.
+
+#### **File**: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/app.controller.spec.ts`
+
+```typescript
+import { Test, TestingModule } from '@nestjs/testing';
+// ↑ NestJS testing utilities
+
+import { AppController } from './app.controller';
+// ↑ The controller we're testing
+
+import { AppService } from './app.service';
+// ↑ Dependency of AppController
+
+describe('AppController', () => {
+  // ↑ Test suite for AppController
+
+  let appController: AppController;
+  // ↑ Variable to hold controller instance
+
+  beforeEach(async () => {
+    // ↑ Runs before each test (creates fresh instances)
+
+    const app: TestingModule = await Test.createTestingModule({
+      // ↑ Create testing module
+
+      controllers: [AppController],
+      // ↑ Include AppController (thing being tested)
+
+      providers: [AppService],
+      // ↑ Include AppService (dependency of AppController)
+    }).compile();
+    // ↑ Build the module
+
+    appController = app.get<AppController>(AppController);
+    // ↑ Get AppController instance from DI container
+    // ↑ TypeScript generic <AppController> for type safety
+  });
+
+  describe('root', () => {
+    // ↑ Nested describe for specific functionality (root route)
+
+    it('should return "Hello World!"', () => {
+      // ↑ Test description (what we're verifying)
+
+      expect(appController.getHello()).toBe('Hello World!');
+      // ↑ Call the method and verify return value
+      // ↑ toBe checks exact match
+    });
+  });
+});
+```
+
+**What this tests**:
+
+1. AppController can be created (dependency injection works)
+2. `getHello()` method returns correct string
+
+**Flow**:
+```
+beforeEach → Create module → Get controller → Run test → Verify result
+```
+
+**AppController code** (what's being tested):
+```typescript
+@Controller()
+export class AppController {
+  constructor(private readonly appService: AppService) {}
+
+  @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+}
+```
+
+**AppService code** (dependency):
+```typescript
+@Injectable()
+export class AppService {
+  getHello(): string {
+    return 'Hello World!';
+  }
+}
+```
+
+---
+
+### 28.7 Unit Testing a Service (Example Pattern)
+
+Let's write tests for `UsersService.findById()`.
+
+**Service code** (from `/backend/server_NestJS/src/users/users.service.ts`):
+```typescript
+async findById(id: string) {
+  try {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: { id: true, email: true, name: true, /* ... */ }
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return { ...user, isActive: true };
+  } catch (error) {
+    console.error('Error finding user by ID:', error);
+    throw error;
+  }
+}
+```
+
+**Test code**:
+```typescript
+describe('UsersService', () => {
+  let service: UsersService;
+  let prisma: PrismaService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        UsersService,
+        {
+          provide: PrismaService,
+          useValue: {
+            user: {
+              findUnique: jest.fn(),
+            },
+          },
+        },
+      ],
+    }).compile();
+
+    service = module.get<UsersService>(UsersService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  describe('findById', () => {
+    it('should return user when found', async () => {
+      // Arrange: Set up test data
+      const mockUser = {
+        id: 'user-1',
+        email: 'test@example.com',
+        name: 'Test User',
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        emailVerified: false,
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+      // ↑ Mock Prisma to return mockUser
+
+      // Act: Call the method
+      const result = await service.findById('user-1');
+
+      // Assert: Verify results
+      expect(result).toBeDefined();
+      expect(result.id).toBe('user-1');
+      expect(result.email).toBe('test@example.com');
+      expect(result.isActive).toBe(true);
+      // ↑ Verify isActive was added
+
+      // Assert: Verify Prisma was called correctly
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        select: expect.any(Object),
+      });
+      // ↑ toHaveBeenCalledWith verifies arguments
+    });
+
+    it('should return null when user not found', async () => {
+      // Arrange: Mock Prisma to return null
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+
+      // Act
+      const result = await service.findById('nonexistent-id');
+
+      // Assert
+      expect(result).toBeNull();
+    });
+
+    it('should throw error on database failure', async () => {
+      // Arrange: Mock Prisma to throw error
+      jest.spyOn(prisma.user, 'findUnique').mockRejectedValue(
+        new Error('Database connection failed')
+      );
+
+      // Act & Assert: Verify error is thrown
+      await expect(service.findById('user-1')).rejects.toThrow('Database connection failed');
+    });
+  });
+});
+```
+
+**AAA Pattern** (Arrange, Act, Assert):
+1. **Arrange**: Set up test data and mocks
+2. **Act**: Call the method being tested
+3. **Assert**: Verify results and mock calls
+
+---
+
+### 28.8 Testing with Mocks
+
+**Mock** = Fake object that simulates real dependency.
+
+**Why mock?**
+- Isolate code being tested (only test one thing at a time)
+- Control return values (test edge cases)
+- Verify interactions (was method called with correct arguments?)
+- Faster tests (no real database, network calls, etc.)
+
+#### **Creating mocks with jest.fn()**
+
+```typescript
+// 1. Simple mock function
+const mockFn = jest.fn();
+mockFn('hello');
+expect(mockFn).toHaveBeenCalledWith('hello');
+
+// 2. Mock with return value
+const mockGetUser = jest.fn().mockReturnValue({ id: '1', name: 'Test' });
+const user = mockGetUser();
+expect(user.name).toBe('Test');
+
+// 3. Mock with resolved Promise (async)
+const mockFindUser = jest.fn().mockResolvedValue({ id: '1', name: 'Test' });
+const user = await mockFindUser();
+expect(user.name).toBe('Test');
+
+// 4. Mock with rejected Promise (error)
+const mockFailure = jest.fn().mockRejectedValue(new Error('Failed'));
+await expect(mockFailure()).rejects.toThrow('Failed');
+```
+
+---
+
+#### **Verifying mock calls with expect()**
+
+```typescript
+const mockFn = jest.fn();
+
+// Call the mock
+mockFn('arg1', 'arg2');
+mockFn('arg3');
+
+// Verify it was called
+expect(mockFn).toHaveBeenCalled();
+// ↑ Called at least once
+
+expect(mockFn).toHaveBeenCalledTimes(2);
+// ↑ Called exactly 2 times
+
+expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2');
+// ↑ Called with these exact arguments (first call)
+
+expect(mockFn).toHaveBeenLastCalledWith('arg3');
+// ↑ Last call had this argument
+
+expect(mockFn).toHaveBeenNthCalledWith(1, 'arg1', 'arg2');
+// ↑ First call (nth = 1) had these arguments
+```
+
+---
+
+#### **Spying on real methods**
+
+```typescript
+// Spy on existing method
+const user = { getName: () => 'Real Name' };
+const spy = jest.spyOn(user, 'getName');
+
+user.getName();
+
+expect(spy).toHaveBeenCalled();
+// ↑ Verifies method was called
+
+// Override return value
+spy.mockReturnValue('Mock Name');
+expect(user.getName()).toBe('Mock Name');
+
+// Restore original implementation
+spy.mockRestore();
+expect(user.getName()).toBe('Real Name');
+```
+
+---
+
+### 28.9 Testing Async Code
+
+Most backend code is async (database queries, API calls). How do we test it?
+
+#### **Using async/await in tests**
+
+```typescript
+it('should create user', async () => {
+  // ↑ Mark test function as async
+
+  const user = await service.create({
+    // ↑ Await the async operation
+    email: 'test@example.com',
+    name: 'Test User',
+  });
+
+  expect(user.email).toBe('test@example.com');
+});
+```
+
+**Without async/await** (older style):
+```typescript
+it('should create user', (done) => {
+  // ↑ Use 'done' callback
+
+  service.create({
+    email: 'test@example.com',
+    name: 'Test User',
+  }).then(user => {
+    expect(user.email).toBe('test@example.com');
+    done();  // Signal test is complete
+  });
+});
+```
+
+**Modern approach**: Always use async/await (cleaner, easier to read).
+
+---
+
+#### **Testing promises that resolve**
+
+```typescript
+it('should resolve with user', async () => {
+  const promise = service.findById('user-1');
+
+  await expect(promise).resolves.toEqual({
+    id: 'user-1',
+    email: 'test@example.com',
+    // ...
+  });
+  // ↑ .resolves checks Promise resolves successfully
+});
+```
+
+---
+
+#### **Testing promises that reject**
+
+```typescript
+it('should reject with error', async () => {
+  jest.spyOn(prisma.user, 'create').mockRejectedValue(
+    new BadRequestException('Email already exists')
+  );
+
+  const promise = service.create({
+    email: 'existing@example.com',
+    name: 'Test',
+  });
+
+  await expect(promise).rejects.toThrow('Email already exists');
+  // ↑ .rejects checks Promise rejects with error
+
+  await expect(promise).rejects.toThrow(BadRequestException);
+  // ↑ Can also check error type
+});
+```
+
+---
+
+### 28.10 Integration Testing
+
+**Integration tests** verify multiple components work together.
+
+**Example: Testing UsersService with real PrismaService**
+
+```typescript
+describe('UsersService Integration', () => {
+  let service: UsersService;
+  let prisma: PrismaService;
+
+  beforeAll(async () => {
+    // ↑ beforeAll: Set up once for all tests
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [UsersService, PrismaService],
+      // ↑ Real PrismaService (not mocked)
+    }).compile();
+
+    service = module.get<UsersService>(UsersService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  afterAll(async () => {
+    // Clean up: Close database connection
+    await prisma.$disconnect();
+  });
+
+  afterEach(async () => {
+    // Clean up: Delete test data after each test
+    await prisma.user.deleteMany({
+      where: { email: { contains: 'test-' } }
+    });
+    // ↑ Only delete test users (prefixed with 'test-')
+  });
+
+  it('should create user in database', async () => {
+    // Create user (hits real database)
+    const user = await service.create({
+      email: 'test-integration@example.com',
+      name: 'Integration Test User',
+    });
+
+    expect(user.id).toBeDefined();
+
+    // Verify user exists in database
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    expect(dbUser).toBeDefined();
+    expect(dbUser.email).toBe('test-integration@example.com');
+  });
+
+  it('should update user in database', async () => {
+    // Create user
+    const user = await service.create({
+      email: 'test-update@example.com',
+      name: 'Original Name',
+    });
+
+    // Update user
+    const updated = await service.update(user.id, {
+      name: 'Updated Name',
+    });
+
+    expect(updated.name).toBe('Updated Name');
+
+    // Verify in database
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    expect(dbUser.name).toBe('Updated Name');
+  });
+});
+```
+
+**Test database setup** (best practice):
+
+```typescript
+// Use separate test database (don't test on production!)
+// DATABASE_URL_TEST=postgresql://user:pass@localhost:5432/nextphoton_test
+
+beforeAll(async () => {
+  // Run migrations on test database
+  await prisma.$executeRaw`SET search_path TO test_schema`;
+});
+```
+
+---
+
+### 28.11 Code Coverage
+
+**Code coverage** = Percentage of code executed by tests.
+
+**Metrics**:
+- **Lines**: % of lines executed
+- **Branches**: % of if/else branches taken
+- **Functions**: % of functions called
+- **Statements**: % of statements executed
+
+**Generate coverage report**:
+```bash
+npm run test:cov
+```
+
+**Example output**:
+```
+----------------------|---------|----------|---------|---------|
+File                  | % Stmts | % Branch | % Funcs | % Lines |
+----------------------|---------|----------|---------|---------|
+All files             |   85.5  |   78.3   |   92.1  |   86.2  |
+ users.service.ts     |   92.3  |   85.7   |   100   |   93.1  |
+ auth.service.ts      |   78.9  |   71.4   |   84.6  |   80.2  |
+----------------------|---------|----------|---------|---------|
+```
+
+**Reading the report**:
+- **Green** (80%+): Good coverage
+- **Yellow** (50-80%): Needs more tests
+- **Red** (<50%): Poorly tested
+
+**Coverage goals**:
+- **80%+ overall**: Good
+- **100%**: Ideal but often impractical
+- **Critical code**: Aim for 100% (auth, payments, data validation)
+- **Less critical**: 70%+ acceptable
+
+**What coverage does NOT tell you**:
+- Coverage ≠ Quality
+- Can have 100% coverage with bad tests
+- Example:
+  ```typescript
+  it('should create user', async () => {
+    await service.create({ email: 'test@test.com', name: 'Test' });
+    // ↑ Code runs (100% coverage) but no assertions! (bad test)
+  });
+  ```
+
+**Good test**:
+```typescript
+it('should create user', async () => {
+  const user = await service.create({ email: 'test@test.com', name: 'Test' });
+  expect(user).toBeDefined();
+  expect(user.email).toBe('test@test.com');
+  // ↑ Code runs AND results verified (good test)
+});
+```
+
+---
+
+### 28.12 Testing Best Practices
+
+#### **1. AAA Pattern (Arrange, Act, Assert)**
+
+```typescript
+it('should return user by ID', async () => {
+  // ARRANGE: Set up test data
+  const mockUser = { id: '1', email: 'test@example.com' };
+  jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+
+  // ACT: Call the method
+  const result = await service.findById('1');
+
+  // ASSERT: Verify results
+  expect(result.email).toBe('test@example.com');
+});
+```
+
+**Why?** Makes tests easy to read and understand.
+
+---
+
+#### **2. Test One Thing Per Test**
+
+```typescript
+// ❌ BAD: Tests multiple things
+it('should create, update, and delete user', async () => {
+  const user = await service.create({ ... });
+  const updated = await service.update(user.id, { ... });
+  await service.delete(user.id);
+  // Hard to debug which part failed!
+});
+
+// ✅ GOOD: Separate tests
+it('should create user', async () => {
+  const user = await service.create({ ... });
+  expect(user).toBeDefined();
+});
+
+it('should update user', async () => {
+  const updated = await service.update('1', { ... });
+  expect(updated.name).toBe('Updated');
+});
+
+it('should delete user', async () => {
+  const result = await service.delete('1');
+  expect(result).toBe(true);
+});
+```
+
+**Why?** When test fails, you know exactly what's broken.
+
+---
+
+#### **3. Clear Test Names (use "should...")**
+
+```typescript
+// ❌ BAD: Unclear
+it('findById', async () => { ... });
+it('test user creation', async () => { ... });
+
+// ✅ GOOD: Clear expectations
+it('should return user when ID exists', async () => { ... });
+it('should return null when ID does not exist', async () => { ... });
+it('should throw error when database fails', async () => { ... });
+```
+
+**Why?** Test names document expected behavior.
+
+---
+
+#### **4. Independent Tests (no order dependency)**
+
+```typescript
+// ❌ BAD: Tests depend on each other
+it('should create user', async () => {
+  user = await service.create({ ... });  // Sets global variable
+});
+
+it('should update user', async () => {
+  await service.update(user.id, { ... });  // Uses global variable
+  // Fails if first test didn't run!
+});
+
+// ✅ GOOD: Each test is independent
+it('should create user', async () => {
+  const user = await service.create({ ... });
+  expect(user).toBeDefined();
+});
+
+it('should update user', async () => {
+  // Create user in this test
+  const user = await service.create({ ... });
+  const updated = await service.update(user.id, { ... });
+  expect(updated.name).toBe('Updated');
+});
+```
+
+**Why?** Tests can run in any order, parallel execution possible.
+
+---
+
+#### **5. Use Factories/Fixtures for Test Data**
+
+```typescript
+// test/factories/user.factory.ts
+export const createMockUser = (overrides = {}) => ({
+  id: 'user-1',
+  email: 'test@example.com',
+  name: 'Test User',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  emailVerified: false,
+  ...overrides,  // Allow customization
+});
+
+// In tests
+it('should return user', async () => {
+  const mockUser = createMockUser({ email: 'custom@example.com' });
+  jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+  // ...
+});
+```
+
+**Why?** Reduces duplication, consistent test data, easy to customize.
+
+---
+
+### 28.13 Example Test Suite for AuthService
+
+Let's write a complete test suite for `AuthService.login()`.
+
+```typescript
+describe('AuthService', () => {
+  let service: AuthService;
+  let prisma: PrismaService;
+  let jwtService: JwtService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AuthService,
+        {
+          provide: PrismaService,
+          useValue: {
+            user: {
+              findUnique: jest.fn(),
+            },
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn().mockReturnValue('mock-jwt-token'),
+          },
+        },
+      ],
+    }).compile();
+
+    service = module.get<AuthService>(AuthService);
+    prisma = module.get<PrismaService>(PrismaService);
+    jwtService = module.get<JwtService>(JwtService);
+  });
+
+  describe('login', () => {
+    // SUCCESS CASE
+    it('should return access token for valid credentials', async () => {
+      // Arrange
+      const loginDto = {
+        email: 'user@example.com',
+        password: 'Password123!',
+      };
+
+      const mockUser = {
+        id: 'user-1',
+        email: 'user@example.com',
+        name: 'Test User',
+        emailVerified: true,
+        accounts: [{
+          providerId: 'email',
+          password: await bcrypt.hash('Password123!', 10),
+        }],
+        userRoles: [{
+          role: { name: 'learner' },
+        }],
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+
+      // Act
+      const result = await service.login(loginDto);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result.access_token).toBe('mock-jwt-token');
+      expect(result.user.email).toBe('user@example.com');
+      expect(result.user.roles).toContain('learner');
+    });
+
+    // ERROR CASE: User not found
+    it('should throw UnauthorizedException if user does not exist', async () => {
+      // Arrange
+      const loginDto = {
+        email: 'nonexistent@example.com',
+        password: 'Password123!',
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.login(loginDto)).rejects.toThrow('Invalid credentials');
+    });
+
+    // ERROR CASE: Wrong password
+    it('should throw UnauthorizedException if password is incorrect', async () => {
+      // Arrange
+      const loginDto = {
+        email: 'user@example.com',
+        password: 'WrongPassword123!',
+      };
+
+      const mockUser = {
+        id: 'user-1',
+        email: 'user@example.com',
+        accounts: [{
+          providerId: 'email',
+          password: await bcrypt.hash('CorrectPassword123!', 10),
+        }],
+        userRoles: [{
+          role: { name: 'learner' },
+        }],
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+
+      // Act & Assert
+      await expect(service.login(loginDto)).rejects.toThrow('Invalid credentials');
+    });
+
+    // EDGE CASE: User has no email account
+    it('should throw UnauthorizedException if user has no email account', async () => {
+      // Arrange
+      const loginDto = {
+        email: 'user@example.com',
+        password: 'Password123!',
+      };
+
+      const mockUser = {
+        id: 'user-1',
+        email: 'user@example.com',
+        accounts: [{
+          providerId: 'google',  // OAuth account, no password
+        }],
+        userRoles: [{
+          role: { name: 'learner' },
+        }],
+      };
+
+      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(mockUser);
+
+      // Act & Assert
+      await expect(service.login(loginDto)).rejects.toThrow('Invalid credentials');
+    });
+  });
+});
+```
+
+**Test coverage**:
+- ✅ Success case (valid credentials)
+- ✅ Error case (user not found)
+- ✅ Error case (wrong password)
+- ✅ Edge case (OAuth user trying email login)
+
+---
+
+### 28.14 Key Takeaways from Chapter 28
+
+✅ **Why Testing Matters**:
+- Prevent regressions (breaking existing features)
+- Documentation through tests (show how code works)
+- Confidence in refactoring (tests prove behavior unchanged)
+- Catch bugs early (minutes vs hours/days)
+- Faster development (automated vs manual testing)
+
+✅ **Test Pyramid**:
+- **70% Unit Tests**: Fast, test individual functions
+- **20% Integration Tests**: Test components together
+- **10% E2E Tests**: Test complete user flows
+- More unit tests = faster feedback, easier debugging
+
+✅ **Jest Framework**:
+- Pre-installed with NestJS
+- Fast parallel test execution
+- Built-in assertions and mocking
+- Code coverage reports
+- Test files: `*.spec.ts` (same name as source file)
+
+✅ **Basic Jest Syntax**:
+- `describe()`: Group related tests (test suites)
+- `it()` or `test()`: Individual test cases
+- `expect()`: Verify expectations (assertions)
+- `beforeEach()`, `afterEach()`: Setup and cleanup
+- `beforeAll()`, `afterAll()`: One-time setup/cleanup
+
+✅ **Common Matchers**:
+- `toBe(value)`: Exact match (===)
+- `toEqual(object)`: Deep equality
+- `toBeDefined()`: Not undefined
+- `toBeNull()`: Is null
+- `toContain(item)`: Array/string contains
+- `toHaveLength(n)`: Array/string length
+- `toThrow()`: Function throws error
+- `toHaveBeenCalled()`: Mock was called
+
+✅ **NestJS Testing Utilities**:
+- `Test.createTestingModule()`: Create test module
+- `module.get<Service>(Service)`: Get instance from DI container
+- Mock dependencies with `{ provide: X, useValue: mock }`
+- Isolate code being tested
+
+✅ **Mocking with Jest**:
+- `jest.fn()`: Create mock function
+- `mockReturnValue(value)`: Return value
+- `mockResolvedValue(value)`: Async return (Promise)
+- `mockRejectedValue(error)`: Async error
+- `jest.spyOn(obj, 'method')`: Spy on existing method
+- `toHaveBeenCalledWith(args)`: Verify mock arguments
+
+✅ **Testing Async Code**:
+- Mark test function as `async`
+- Use `await` for async operations
+- `expect(promise).resolves`: Test successful Promise
+- `expect(promise).rejects`: Test rejected Promise
+- Modern approach: Always use async/await
+
+✅ **Integration Testing**:
+- Test multiple components together
+- Use real dependencies (e.g., PrismaService)
+- Use separate test database
+- Clean up test data after each test
+- `beforeAll()`, `afterAll()` for database setup/teardown
+
+✅ **Code Coverage**:
+- Percentage of code executed by tests
+- Metrics: Lines, Branches, Functions, Statements
+- Command: `npm run test:cov`
+- Goals: 80%+ overall, 100% for critical code
+- Coverage ≠ Quality (need good assertions!)
+
+✅ **Testing Best Practices**:
+- **AAA Pattern**: Arrange, Act, Assert
+- **One thing per test**: Easy to debug failures
+- **Clear test names**: Use "should..." format
+- **Independent tests**: No order dependency
+- **Factories/fixtures**: Consistent test data
+- **Test success and error cases**: Both paths matter
+- **Test edge cases**: Unusual but valid scenarios
+
+✅ **Test Organization**:
+```typescript
+describe('ServiceName', () => {
+  // Setup
+  beforeEach(() => { /* ... */ });
+
+  describe('methodName', () => {
+    it('should handle success case', () => { /* ... */ });
+    it('should handle error case', () => { /* ... */ });
+    it('should handle edge case', () => { /* ... */ });
+  });
+});
+```
+
+✅ **Real Next Photon Example**:
+- AppController test: Basic controller testing
+- Mock PrismaService: Isolate service logic
+- Test AuthService.login(): Success, errors, edge cases
+- Use factories for consistent test data
+
+✅ **Testing Checklist**:
+- ✅ Success cases (happy path)
+- ✅ Error cases (validation failures, not found, etc.)
+- ✅ Edge cases (empty arrays, null values, boundary conditions)
+- ✅ Mock external dependencies (database, APIs)
+- ✅ Verify mock calls (correct arguments)
+- ✅ Clean up test data (afterEach)
+- ✅ Independent tests (can run in any order)
+
+✅ **Key Implementation File**:
+- `/backend/server_NestJS/src/app.controller.spec.ts` - Example test
+
+---
+
+*End of Chapters 27-28*
+
+**Summary**: These chapters covered error handling, validation, and testing in NestJS. Chapter 27 explained HTTP status codes (400, 401, 403, 404, 500), DTOs with class-validator decorators, ValidationPipe configuration, built-in HTTP exceptions, exception filters, error handling best practices, and real error handling examples from Next Photon's UsersService and AuthService with Prisma error code handling. Chapter 28 explored testing fundamentals, the test pyramid (unit/integration/E2E), Jest framework basics, NestJS testing utilities, mocking strategies, async testing, integration testing, code coverage, testing best practices (AAA pattern, independence, clear naming), and complete test suite examples for Next Photon services.
+
+---
+
+**End of Part III: Backend Architecture**
+
+---
+
+## Part III Summary: Backend Architecture (Chapters 19-28)
+
+Over the past 10 chapters, we've built a complete understanding of Next Photon's NestJS backend architecture. Here's what we've mastered:
+
+### **Chapter 19: Introduction to NestJS**
+- Module-based architecture with dependency injection
+- Decorators: @Module, @Controller, @Injectable, @Get, @Post
+- MVC pattern in NestJS (Models, Views, Controllers)
+- Project structure and file organization
+- How NestJS compares to Express.js
+
+### **Chapter 20: Controllers and Routing**
+- HTTP methods: GET, POST, PUT, PATCH, DELETE
+- Route parameters, query parameters, request body
+- Route decorators: @Param, @Query, @Body
+- Nested routes and route organization
+- Real Next Photon controller examples (UsersController)
+
+### **Chapter 21: Services and Dependency Injection**
+- Services as business logic layer
+- @Injectable decorator and providers
+- Constructor injection pattern
+- Dependency Injection container
+- Singleton vs per-request providers
+- Real Next Photon service examples (UsersService)
+
+### **Chapter 22: Introduction to GraphQL**
+- GraphQL vs REST comparison
+- Queries, mutations, subscriptions
+- Schema definition language (SDL)
+- Type system: scalars, objects, inputs, enums
+- GraphQL benefits: Single endpoint, client-specified queries, strong typing
+
+### **Chapter 23: GraphQL in NestJS**
+- Code-first vs schema-first approaches
+- Decorators: @ObjectType, @Field, @InputType, @Query, @Mutation
+- Resolvers and resolver classes
+- GraphQL module configuration
+- GraphQL Playground for testing
+- Real Next Photon GraphQL examples (UsersResolver)
+
+### **Chapter 24: Authentication with JWT**
+- Authentication vs Authorization
+- JWT structure: Header, Payload, Signature
+- Passport.js integration with NestJS
+- JWT Strategy and Guards (@UseGuards)
+- Login/register flow with token generation
+- Protected routes with @UseGuards(JwtAuthGuard)
+- Real Next Photon auth implementation (AuthService, JwtStrategy)
+
+### **Chapter 25: Authorization and ABAC**
+- Attribute-Based Access Control (ABAC)
+- Next Photon's 7 roles: Learner, Guardian, Educator, ECM, Employee, Intern, Admin
+- Multi-role support (users can have multiple roles)
+- Permission inheritance (Admin inherits all permissions)
+- RolesGuard implementation with @SetMetadata
+- Custom decorators (@Roles, @Public)
+- Complete authorization flow
+- Security best practices
+
+### **Chapter 26: Advanced Prisma Operations**
+- Complex where clauses: Comparison, string filters, logical operators
+- Select vs Include for fetching data
+- Pagination: Offset-based vs cursor-based
+- Sorting with orderBy
+- Transactions for ACID operations (sequential and interactive)
+- Aggregations: count, avg, min, max, sum, groupBy
+- Raw SQL queries: $queryRaw, $executeRaw
+- Query optimization techniques
+- Prisma error handling (P2002, P2025, P2003)
+- Real Next Photon CRUD examples (UsersService with complete error handling)
+
+### **Chapter 27: Error Handling and Validation**
+- HTTP status codes: 400, 401, 403, 404, 500
+- DTOs (Data Transfer Objects) with class-validator
+- Validation decorators: @IsEmail, @IsNotEmpty, @MinLength, @Matches, @IsEnum
+- ValidationPipe configuration (whitelist, transform)
+- NestJS HTTP exceptions: BadRequestException, UnauthorizedException, NotFoundException, etc.
+- Exception filters for consistent error responses
+- Error handling best practices (security, user-friendly messages)
+- Prisma error handling patterns
+- Real Next Photon DTOs (LoginDto, RegisterDto, PaginationInput)
+
+### **Chapter 28: Testing Backend Services**
+- Test pyramid: Unit (70%), Integration (20%), E2E (10%)
+- Jest testing framework basics
+- Test syntax: describe, it, expect, beforeEach, afterEach
+- NestJS testing utilities: Test.createTestingModule()
+- Mocking with jest.fn(), mockResolvedValue, mockRejectedValue
+- Testing async code with async/await
+- Integration testing with real database
+- Code coverage reports and goals
+- Testing best practices: AAA pattern, independence, clear naming
+- Real test examples (AppController, AuthService)
+
+---
+
+### **Key Architectural Patterns Learned**:
+
+1. **Dependency Injection**: Services injected via constructors
+2. **Layered Architecture**: Controllers → Services → Prisma → Database
+3. **Error Handling**: Try-catch → Transform to HTTP exceptions → Consistent responses
+4. **Validation**: ValidationPipe → DTOs with decorators → Business logic
+5. **Authentication**: Login → Generate JWT → Store in client → Attach to requests → Verify with guards
+6. **Authorization**: JWT payload → Extract roles → Check against route requirements → Allow/deny
+7. **Testing**: Arrange (setup) → Act (call method) → Assert (verify results)
+
+---
+
+### **Real Next Photon Files Explored**:
+
+**Controllers**:
+- `/backend/server_NestJS/src/users/users.controller.ts`
+
+**Services**:
+- `/backend/server_NestJS/src/users/users.service.ts`
+- `/backend/server_NestJS/src/auth/auth.service.ts`
+- `/backend/server_NestJS/src/prisma/prisma.service.ts`
+
+**Resolvers** (GraphQL):
+- `/backend/server_NestJS/src/users/users.resolver.ts`
+
+**DTOs**:
+- `/backend/server_NestJS/src/auth/dto/login.dto.ts`
+- `/backend/server_NestJS/src/auth/dto/register.dto.ts`
+- `/backend/server_NestJS/src/dto/common/pagination.dto.ts`
+
+**Guards & Strategies**:
+- `/backend/server_NestJS/src/auth/strategies/jwt.strategy.ts`
+- `/backend/server_NestJS/src/auth/guards/jwt-auth.guard.ts`
+- `/backend/server_NestJS/src/auth/guards/roles.guard.ts`
+
+**Tests**:
+- `/backend/server_NestJS/src/app.controller.spec.ts`
+
+**Configuration**:
+- `/backend/server_NestJS/src/main.ts`
+
+---
+
+### **Skills Acquired**:
+
+By completing Part III, you can now:
+
+✅ Understand NestJS module-based architecture
+✅ Create RESTful API endpoints with controllers
+✅ Implement business logic in services with dependency injection
+✅ Build GraphQL APIs with queries and mutations
+✅ Implement JWT authentication from scratch
+✅ Create role-based authorization systems (ABAC)
+✅ Perform complex database operations with Prisma
+✅ Handle errors gracefully with proper HTTP status codes
+✅ Validate API inputs with DTOs and class-validator
+✅ Write comprehensive tests (unit, integration, E2E)
+✅ Understand complete backend architecture from request to database
+✅ Read and understand real production-ready backend code
+
+---
+
+### **What's Next?**
+
+Part III gave you the complete backend foundation. Now you're ready to explore specific features and how frontend and backend work together!
+
+**Next Up**: Part IV - Feature Deep-Dives (Chapters 29-42)
+
+Part IV will explore:
+- User profile management (learner, educator, guardian profiles)
+- Session scheduling and management
+- Assignment creation and tracking
+- Attendance system
+- Payment processing
+- Notification system
+- Real-time features with WebSockets
+- File upload and management
+- Search and filtering
+- Analytics and reporting
+- Frontend-backend integration patterns
+- Deployment and DevOps
+
+Each chapter will show complete feature implementation from database schema → backend API → frontend UI → testing → deployment.
+
+Stay tuned for Part IV!
+
+---
+
+## **PART IV: FEATURE DEEP-DIVES**
+
+Welcome to Part IV!
+
+In Parts I-III, you learned the fundamentals:
+- **Part I**: Frontend architecture (Next.js, React components, state management)
+- **Part II**: Database design (Prisma, PostgreSQL, schema modeling)
+- **Part III**: Backend architecture (NestJS, REST APIs, GraphQL, JWT authentication)
+
+Now it's time to see how all these pieces work together!
+
+Part IV takes a **feature-first approach**. Instead of learning isolated technologies, you'll follow complete user journeys from UI click → frontend handler → API call → backend controller → database query → response back to UI.
+
+Each chapter will:
+1. Start with a real user action ("User clicks Login button")
+2. Follow the request through every layer of the stack
+3. Show actual code from our NextPhoton codebase
+4. Explain security considerations and error handling
+5. End with key takeaways
+
+**What you'll learn:**
+- How authentication flows work end-to-end
+- How forms submit data and handle validation
+- How frontend and backend communicate
+- How data flows through the entire stack
+- How to debug issues at each layer
+- Real production patterns and best practices
+
+Let's start with the most fundamental feature of any application: **User Authentication**.
+
+---
+
+# **Chapter 29: User Authentication Flow End-to-End**
+
+## **29.1 Introduction: What Happens When You Click "Login"?**
+
+You've probably clicked "Login" buttons thousands of times. But what actually happens?
+
+Let's trace the complete journey of a login request through NextPhoton's architecture:
+
+```
+User enters email/password and clicks "Login"
+         ↓
+Frontend: Sign-in page validates input
+         ↓
+Frontend: AuthContext.login() is called
+         ↓
+Frontend: authService.login() sends HTTP request
+         ↓
+Network: HTTP POST to http://localhost:963/auth/login
+         ↓
+Backend: NestJS receives request at AuthController
+         ↓
+Backend: Validates LoginDto (email format, password presence)
+         ↓
+Backend: AuthService.login() verifies credentials
+         ↓
+Backend: PrismaService queries database for user
+         ↓
+Database: PostgreSQL returns user record
+         ↓
+Backend: bcrypt compares password hash
+         ↓
+Backend: JwtService generates JWT token
+         ↓
+Backend: Returns { access_token, user } as JSON
+         ↓
+Network: HTTP 200 OK with response body
+         ↓
+Frontend: authService stores token in localStorage
+         ↓
+Frontend: AuthContext updates user state
+         ↓
+Frontend: Router redirects to role-specific dashboard
+         ↓
+User sees their dashboard!
+```
+
+That's **15 steps** for a single login! Let's understand each layer.
+
+---
+
+## **29.2 The Complete Authentication Stack**
+
+NextPhoton's authentication system has **7 layers**:
+
+### **Layer 1: User Interface (React Components)**
+- File: `/frontend/web/src/app/(auth)/sign-in/page.tsx`
+- Renders the login form
+- Collects email and password from user
+- Shows error messages
+
+### **Layer 2: State Management (React Context)**
+- File: `/frontend/web/src/contexts/AuthContext.tsx`
+- Manages global authentication state
+- Provides `login()`, `logout()`, `register()` functions
+- Stores current user data
+
+### **Layer 3: API Client (Frontend Service)**
+- File: `/frontend/web/src/lib/auth-service.ts`
+- Makes HTTP requests to backend
+- Manages JWT token storage
+- Handles token refresh
+
+### **Layer 4: HTTP Transport (Network)**
+- Browser sends HTTP POST request
+- Includes JSON body with credentials
+- Receives HTTP response with token
+
+### **Layer 5: API Endpoint (NestJS Controller)**
+- File: `/backend/server_NestJS/src/auth/auth.controller.ts`
+- Receives HTTP request
+- Validates request data
+- Returns HTTP response
+
+### **Layer 6: Business Logic (NestJS Service)**
+- File: `/backend/server_NestJS/src/auth/auth.service.ts`
+- Verifies credentials
+- Generates JWT tokens
+- Handles password hashing
+
+### **Layer 7: Data Persistence (Database)**
+- File: `shared/prisma/schema.prisma` (schema definition)
+- PostgreSQL stores user records
+- Prisma ORM queries database
+
+**Think of it like a restaurant:**
+- **UI** = Menu (shows options)
+- **Context** = Waiter (takes order, manages state)
+- **Service** = Kitchen manager (coordinates)
+- **HTTP** = Food runner (transports)
+- **Controller** = Chef (receives order)
+- **Business Logic** = Recipe (how to make food)
+- **Database** = Pantry (stores ingredients)
+
+---
+
+## **29.3 Step-by-Step Login Flow**
+
+Let's trace a real login attempt:
+
+**User Action**: `user@example.com` enters email and password `SecurePass123!`, clicks "Login"
+
+### **Step 1: Form Submission**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/app/(auth)/sign-in/page.tsx`
+
+```tsx
+// User clicks the Login button
+const handleLogin = async () => {
+  setError('');
+  // ↑ Clear any previous error messages
+
+  try {
+    await login({ email, password });
+    // ↑ Call login function from AuthContext
+    // This is line 32 - the critical point where we hand off to AuthContext
+
+    // Redirect handled by AuthContext
+    // (AuthContext will redirect based on user's role)
+  } catch (err: any) {
+    setError(err.message || 'Failed to sign in. Please check your credentials.');
+    // ↑ If login fails, show error message to user
+  }
+};
+```
+
+**What happens here:**
+1. `setError('')` - Clear any old error messages
+2. `await login({ email, password })` - Call the `login` function from `AuthContext`
+3. If successful: AuthContext handles redirect (we don't do anything)
+4. If error: Catch it and show error message to user
+
+**Key point**: The page component is **dumb** - it just collects input and shows errors. The real logic is in AuthContext.
+
+---
+
+### **Step 2: AuthContext.login() Executes**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/contexts/AuthContext.tsx`
+
+```tsx
+const login = useCallback(async (credentials: LoginCredentials) => {
+  // ↑ credentials = { email: 'user@example.com', password: 'SecurePass123!' }
+
+  return withLoading(async () => {
+    // ↑ withLoading shows a global loading spinner
+
+    try {
+      const response = await authService.login(credentials);
+      // ↑ Call authService to make HTTP request to backend
+      // response = { access_token: 'eyJhbGc...', user: { id, email, name, roles } }
+
+      setUser(response.user);
+      // ↑ Update React state with user data
+      // This triggers re-render of all components using useAuth()
+
+      // Redirect based on role
+      const primaryRole = response.user.roles[0];
+      // ↑ Get user's first role (e.g., 'learner', 'educator', 'admin')
+
+      const roleRedirectMap: Record<string, string> = {
+        admin: '/admin',
+        educator: '/educator',
+        learner: '/learner',
+        guardian: '/guardian',
+        ecm: '/ecm',
+        employee: '/employee',
+        intern: '/intern',
+      };
+      // ↑ Map of role → dashboard URL
+
+      const redirectPath = roleRedirectMap[primaryRole] || '/dashboard';
+      // ↑ Get dashboard URL for user's role, default to /dashboard if role not found
+
+      router.push(redirectPath);
+      // ↑ Redirect user to their dashboard
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+      // ↑ Re-throw error so the sign-in page can catch it and show error message
+    }
+  }, 'auth-login', 'Signing in...');
+  // ↑ withLoading arguments: (task, loadingId, loadingMessage)
+}, [router, withLoading]);
+```
+
+**What happens here:**
+1. Wrap everything in `withLoading` to show loading spinner
+2. Call `authService.login(credentials)` to make HTTP request
+3. Store user data in React state with `setUser(response.user)`
+4. Determine where to redirect based on user's role
+5. Redirect to role-specific dashboard
+6. If error occurs, throw it back to sign-in page
+
+**Key point**: AuthContext **coordinates** between authService (HTTP) and the UI (state + navigation).
+
+---
+
+### **Step 3: authService.login() Makes HTTP Request**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/auth-service.ts`
+
+```tsx
+async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  // ↑ credentials = { email: 'user@example.com', password: 'SecurePass123!' }
+
+  try {
+    const response = await fetch(`${this.baseUrl}/auth/login`, {
+      // ↑ this.baseUrl = 'http://localhost:963' (from environment variable)
+      // Full URL: http://localhost:963/auth/login
+
+      method: 'POST',
+      // ↑ HTTP POST method (we're sending data)
+
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // ↑ Tell server we're sending JSON data
+
+      body: JSON.stringify(credentials),
+      // ↑ Convert { email, password } to JSON string
+      // Body becomes: '{"email":"user@example.com","password":"SecurePass123!"}'
+    });
+
+    if (!response.ok) {
+      // ↑ If HTTP status is not 200-299 (e.g., 400, 401, 500)
+      const error = await response.json();
+      throw new Error(error.message || 'Login failed');
+      // ↑ Extract error message from response and throw it
+    }
+
+    const authData = await response.json();
+    // ↑ Parse JSON response
+    // authData = { access_token: 'eyJhbGc...', user: { id, email, name, roles } }
+
+    this.storeAuthData(authData);
+    // ↑ Save token and user data to localStorage and cookies
+
+    return authData;
+    // ↑ Return to AuthContext
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+}
+```
+
+**What happens here:**
+1. Make HTTP POST request to `http://localhost:963/auth/login`
+2. Send email and password in JSON body
+3. If response is not OK (status 400/401/500), throw error
+4. Parse JSON response to get `{ access_token, user }`
+5. Store token and user data in localStorage
+6. Return auth data to AuthContext
+
+**Key point**: This is the **network boundary** - everything before was frontend, everything after is backend.
+
+---
+
+### **Step 4-7: Backend Processing**
+
+(We covered these extensively in Chapters 21-24, so we'll summarize)
+
+**Step 4**: NestJS AuthController receives request
+```typescript
+@Post('login')
+async login(@Body() loginDto: LoginDto) {
+  return this.authService.login(loginDto);
+}
+```
+
+**Step 5**: Validates LoginDto
+```typescript
+export class LoginDto {
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
+```
+
+**Step 6**: AuthService verifies credentials
+```typescript
+async login(loginDto: LoginDto) {
+  // Find user by email
+  const user = await this.prisma.user.findUnique({
+    where: { email: loginDto.email }
+  });
+
+  // Verify password
+  const isValid = await bcrypt.compare(loginDto.password, user.password);
+
+  // Generate JWT token
+  const token = this.jwtService.sign({ sub: user.id, email: user.email });
+
+  return { access_token: token, user };
+}
+```
+
+**Step 7**: Database query executes
+```sql
+SELECT * FROM users WHERE email = 'user@example.com';
+```
+
+---
+
+### **Step 8-10: Response Flows Back**
+
+**Step 8**: Backend returns JSON
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "cm123abc",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "roles": ["learner"],
+    "emailVerified": true
+  }
+}
+```
+
+**Step 9**: authService stores token
+```typescript
+private storeAuthData(data: AuthResponse): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(this.tokenKey, data.access_token);
+    // ↑ Store token in localStorage: 'nextphoton_jwt_token' = 'eyJhbGc...'
+
+    localStorage.setItem(this.userKey, JSON.stringify(data.user));
+    // ↑ Store user data in localStorage: 'nextphoton_user' = '{"id":"cm123abc",...}'
+
+    // Also set cookies for middleware
+    document.cookie = `nextphoton_jwt_token=${data.access_token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+    // ↑ Set cookie with 7-day expiration
+  }
+}
+```
+
+**Why both localStorage AND cookies?**
+- **localStorage**: Easy to access from JavaScript (frontend components)
+- **Cookies**: Automatically sent with HTTP requests (middleware can check auth)
+
+**Step 10**: AuthContext redirects
+```typescript
+const primaryRole = response.user.roles[0]; // 'learner'
+const redirectPath = roleRedirectMap[primaryRole]; // '/learner'
+router.push(redirectPath); // Navigate to /learner dashboard
+```
+
+---
+
+## **29.4 Frontend: Sign-In Page Component**
+
+Let's look at the complete sign-in page:
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/app/(auth)/sign-in/page.tsx`
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthProviderWithLoading';
+import { AsyncButton } from '@/components/LoadingButton';
+
+export default function SignInPage() {
+  // Local state for form inputs
+  const [email, setEmail] = useState('');
+  // ↑ Controlled input: email value stored in React state
+
+  const [password, setPassword] = useState('');
+  // ↑ Controlled input: password value stored in React state
+
+  const [error, setError] = useState('');
+  // ↑ Error message to show user if login fails
+
+  // Get login function from AuthContext
+  const { login } = useAuth();
+  // ↑ useAuth() hook gives us access to login(), logout(), user, etc.
+
+  const handleLogin = async () => {
+    setError(''); // Clear previous errors
+
+    try {
+      await login({ email, password });
+      // ↑ AuthContext handles redirect
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in.');
+      // ↑ Show error to user
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="glass-card p-8 rounded-3xl">
+        <h2>Welcome, Glad to see you!</h2>
+
+        {error && (
+          <div className="bg-destructive/10 text-destructive px-4 py-3">
+            {error}
+          </div>
+        )}
+        {/* ↑ Only show error div if error exists */}
+
+        {/* Email Field */}
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+        />
+        {/* ↑ Controlled input: value from state, onChange updates state */}
+
+        {/* Password Field */}
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter your password"
+        />
+
+        {/* Login Button */}
+        <AsyncButton
+          onClick={handleLogin}
+          loadingMessage="Signing in..."
+        >
+          Login
+        </AsyncButton>
+        {/* ↑ AsyncButton shows loading spinner while handleLogin executes */}
+      </div>
+    </div>
+  );
+}
+```
+
+**Key patterns in this component:**
+
+1. **Controlled Inputs**: Form values stored in React state
+```tsx
+const [email, setEmail] = useState('');
+<input value={email} onChange={(e) => setEmail(e.target.value)} />
+```
+
+2. **Error Handling**: Catch errors from login and show to user
+```tsx
+try {
+  await login({ email, password });
+} catch (err: any) {
+  setError(err.message);
+}
+```
+
+3. **Conditional Rendering**: Only show error div if error exists
+```tsx
+{error && <div>{error}</div>}
+```
+
+4. **Async Button**: Shows loading state while async function executes
+```tsx
+<AsyncButton onClick={handleLogin} loadingMessage="Signing in...">
+  Login
+</AsyncButton>
+```
+
+---
+
+## **29.5 Frontend: AuthContext Provider**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/contexts/AuthContext.tsx`
+
+The AuthContext is the **central hub** for all authentication operations.
+
+```tsx
+interface AuthContextType {
+  user: User | null;              // Current logged-in user (or null)
+  isLoading: boolean;             // Is auth state being initialized?
+  isAuthenticated: boolean;       // Is user logged in?
+  login: (credentials) => Promise<void>;     // Login function
+  register: (data) => Promise<void>;         // Register function
+  logout: () => Promise<void>;               // Logout function
+  refreshUser: () => Promise<void>;          // Re-fetch user from server
+  hasRole: (role: string) => boolean;        // Check if user has role
+  hasAnyRole: (roles: string[]) => boolean;  // Check if user has any role
+}
+```
+
+**Core responsibilities:**
+
+### **1. Maintain Global Authentication State**
+
+```tsx
+const [user, setUser] = useState<User | null>(null);
+// ↑ The current user (null if not logged in)
+
+const [isLoading, setIsLoading] = useState(true);
+// ↑ Is the auth state being initialized?
+```
+
+This state is **shared across the entire app** via React Context:
+```tsx
+<AuthContext.Provider value={{ user, isLoading, login, logout, ... }}>
+  {children}
+</AuthContext.Provider>
+```
+
+Any component can access it:
+```tsx
+const { user, login, logout } = useAuth();
+```
+
+---
+
+### **2. Initialize Auth State on App Load**
+
+```tsx
+useEffect(() => {
+  const initAuth = async () => {
+    try {
+      // Check if user is authenticated
+      if (authService.isAuthenticated()) {
+        // ↑ Check if JWT token exists in localStorage
+
+        // Get user from localStorage (fast, immediate)
+        const storedUser = authService.getUser();
+        if (storedUser) {
+          setUser(storedUser);
+          // ↑ Set user immediately (user sees logged-in state)
+        }
+
+        // Fetch fresh profile from server (slow, but accurate)
+        try {
+          const profile = await authService.getProfile();
+          setUser(profile);
+          // ↑ Update with latest data from server
+        } catch (error) {
+          // If profile fetch fails, token might be expired
+          await authService.logout();
+          setUser(null);
+        }
+      }
+    } finally {
+      setIsLoading(false);
+      // ↑ Done initializing (hide splash screen)
+    }
+  };
+
+  initAuth();
+}, []);
+// ↑ Run once on component mount (empty dependency array)
+```
+
+**Why this pattern?**
+1. **Fast initial render**: Show user from localStorage immediately
+2. **Accurate data**: Fetch from server to get latest changes
+3. **Handle expired tokens**: If server fetch fails, logout user
+
+---
+
+### **3. Provide login() Function**
+
+```tsx
+const login = useCallback(async (credentials: LoginCredentials) => {
+  return withLoading(async () => {
+    // ↑ Show global loading spinner
+
+    const response = await authService.login(credentials);
+    // ↑ Make HTTP request to backend
+
+    setUser(response.user);
+    // ↑ Update global state
+
+    // Redirect based on role
+    const primaryRole = response.user.roles[0];
+    const roleRedirectMap: Record<string, string> = {
+      admin: '/admin',
+      educator: '/educator',
+      learner: '/learner',
+      guardian: '/guardian',
+      ecm: '/ecm',
+      employee: '/employee',
+      intern: '/intern',
+    };
+
+    const redirectPath = roleRedirectMap[primaryRole] || '/dashboard';
+    router.push(redirectPath);
+  }, 'auth-login', 'Signing in...');
+}, [router, withLoading]);
+```
+
+**Why useCallback?**
+- Prevents function from being recreated on every render
+- Important when passing function as prop or dependency
+
+**Role-based redirect**:
+- Learners go to `/learner` dashboard
+- Educators go to `/educator` dashboard
+- Admins go to `/admin` panel
+- Each role sees different UI
+
+---
+
+### **4. Auto-Refresh JWT Token**
+
+```tsx
+useEffect(() => {
+  if (!user) return;
+  // ↑ Only run if user is logged in
+
+  // Refresh token every 6 hours
+  const refreshInterval = setInterval(async () => {
+    try {
+      await authService.refreshToken();
+      // ↑ Get new JWT token from backend
+    } catch (error) {
+      // If refresh fails, logout user
+      await logout();
+    }
+  }, 6 * 60 * 60 * 1000); // 6 hours in milliseconds
+
+  return () => clearInterval(refreshInterval);
+  // ↑ Clean up interval when component unmounts or user changes
+}, [user]);
+```
+
+**Why refresh tokens?**
+- JWT tokens expire after 7 days (for security)
+- Refresh every 6 hours to keep user logged in
+- If refresh fails (token invalid), logout user
+
+---
+
+### **5. Provide Role-Checking Utilities**
+
+```tsx
+const hasRole = useCallback((role: string): boolean => {
+  return user ? user.roles.includes(role) : false;
+}, [user]);
+
+const hasAnyRole = useCallback((roles: string[]): boolean => {
+  if (!user) return false;
+  return roles.some(role => user.roles.includes(role));
+}, [user]);
+```
+
+**Usage in components:**
+```tsx
+const { hasRole, hasAnyRole } = useAuth();
+
+// Check single role
+if (hasRole('admin')) {
+  // Show admin-only UI
+}
+
+// Check multiple roles
+if (hasAnyRole(['educator', 'ecm'])) {
+  // Show UI for educators or ECMs
+}
+```
+
+---
+
+## **29.6 Frontend: authService**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/auth-service.ts`
+
+The authService is a **singleton class** that handles all HTTP communication with the backend.
+
+**Why a class instead of functions?**
+- Encapsulates state (`baseUrl`, `tokenKey`)
+- Provides methods that share private data
+- Singleton pattern ensures one instance across app
+
+```tsx
+class AuthService {
+  private baseUrl: string;
+  private tokenKey = 'nextphoton_jwt_token';
+  private userKey = 'nextphoton_user';
+
+  constructor() {
+    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:963';
+    // ↑ Get API URL from environment variable
+  }
+```
+
+---
+
+### **Key Methods:**
+
+#### **1. login() - Authenticate User**
+
+```tsx
+async login(credentials: LoginCredentials): Promise<AuthResponse> {
+  const response = await fetch(`${this.baseUrl}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Login failed');
+  }
+
+  const authData = await response.json();
+  this.storeAuthData(authData); // Save to localStorage
+  return authData;
+}
+```
+
+---
+
+#### **2. storeAuthData() - Save Token and User**
+
+```tsx
+private storeAuthData(data: AuthResponse): void {
+  if (typeof window !== 'undefined') {
+    // Save to localStorage
+    localStorage.setItem(this.tokenKey, data.access_token);
+    localStorage.setItem(this.userKey, JSON.stringify(data.user));
+
+    // Save to cookies (for middleware)
+    document.cookie = `nextphoton_jwt_token=${data.access_token}; path=/; max-age=${7 * 24 * 60 * 60}`;
+    document.cookie = `nextphoton_user=${JSON.stringify(data.user)}; path=/; max-age=${7 * 24 * 60 * 60}`;
+  }
+}
+```
+
+**Why check `typeof window !== 'undefined'`?**
+- Next.js does **Server-Side Rendering (SSR)**
+- Server doesn't have `window` object
+- This check prevents crashes during SSR
+
+**Why set cookies AND localStorage?**
+- **localStorage**: Easy to access from JavaScript
+- **Cookies**: Automatically sent with requests, middleware can read them
+
+---
+
+#### **3. getToken() - Retrieve Stored Token**
+
+```tsx
+getToken(): string | null {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(this.tokenKey);
+  }
+  return null;
+}
+```
+
+**Usage:**
+```tsx
+const token = authService.getToken();
+if (token) {
+  // User is logged in
+} else {
+  // User is not logged in
+}
+```
+
+---
+
+#### **4. getProfile() - Fetch Fresh User Data**
+
+```tsx
+async getProfile(): Promise<User> {
+  const token = this.getToken();
+  if (!token) {
+    throw new Error('Not authenticated');
+  }
+
+  const response = await fetch(`${this.baseUrl}/auth/profile`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      // ↑ Include JWT token in Authorization header
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      this.clearAuthData(); // Token expired
+      throw new Error('Session expired. Please login again.');
+    }
+    throw new Error('Failed to fetch profile');
+  }
+
+  const user = await response.json();
+  localStorage.setItem(this.userKey, JSON.stringify(user)); // Update cache
+  return user;
+}
+```
+
+**Why fetch profile?**
+- User data might change (e.g., email updated)
+- Token only contains user ID, not full profile
+- Ensures UI shows latest data
+
+---
+
+#### **5. logout() - Clear Auth Data**
+
+```tsx
+async logout(): Promise<void> {
+  try {
+    const token = this.getToken();
+    if (token) {
+      // Notify backend (optional, for analytics)
+      await fetch(`${this.baseUrl}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+    }
+  } finally {
+    // Always clear local data (even if server request fails)
+    this.clearAuthData();
+  }
+}
+
+private clearAuthData(): void {
+  localStorage.removeItem(this.tokenKey);
+  localStorage.removeItem(this.userKey);
+  document.cookie = 'nextphoton_jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = 'nextphoton_user=; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+}
+```
+
+**Why `try/finally`?**
+- If server request fails, still clear local data
+- User should be logged out locally even if server is down
+
+---
+
+## **29.7 Backend Authentication Flow**
+
+(Covered in Chapters 21-24, brief summary here)
+
+### **AuthController** - HTTP Endpoint
+
+```typescript
+@Controller('auth')
+export class AuthController {
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    // ↑ @Body() decorator extracts JSON from request body
+    // Validates loginDto against LoginDto class
+
+    return this.authService.login(loginDto);
+  }
+}
+```
+
+---
+
+### **LoginDto** - Validation
+
+```typescript
+export class LoginDto {
+  @IsEmail({}, { message: 'Invalid email format' })
+  @IsNotEmpty({ message: 'Email is required' })
+  email: string;
+
+  @IsString()
+  @IsNotEmpty({ message: 'Password is required' })
+  password: string;
+}
+```
+
+**Automatic validation:**
+- If email is not valid format → Returns 400 error
+- If password is missing → Returns 400 error
+- Only valid requests reach AuthService
+
+---
+
+### **AuthService** - Business Logic
+
+```typescript
+async login(loginDto: LoginDto): Promise<AuthResponse> {
+  // 1. Find user by email
+  const user = await this.prisma.user.findUnique({
+    where: { email: loginDto.email },
+    include: { roles: true }, // Include user's roles
+  });
+
+  if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  // 2. Verify password
+  const isPasswordValid = await bcrypt.compare(
+    loginDto.password,
+    user.password,
+  );
+
+  if (!isPasswordValid) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  // 3. Generate JWT token
+  const payload = { sub: user.id, email: user.email };
+  const access_token = this.jwtService.sign(payload);
+
+  // 4. Return token and user data
+  return {
+    access_token,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      roles: user.roles.map(r => r.name),
+      emailVerified: user.emailVerified,
+    },
+  };
+}
+```
+
+---
+
+## **29.8 Complete Request/Response Cycle**
+
+Let's see the **full HTTP cycle** with actual data:
+
+### **Frontend Request:**
+
+```http
+POST http://localhost:963/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+### **Backend Validation:**
+
+1. NestJS validates `LoginDto`:
+   - ✅ Email format valid
+   - ✅ Password present
+
+2. AuthService verifies:
+   - ✅ User exists in database
+   - ✅ Password matches hash
+
+### **Backend Response (Success):**
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbTEyM2FiYyIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTcwMDAwMDAwMCwiZXhwIjoxNzAwNjA0ODAwfQ.xYz...",
+  "user": {
+    "id": "cm123abc",
+    "email": "john@example.com",
+    "name": "John Doe",
+    "roles": ["learner"],
+    "emailVerified": true
+  }
+}
+```
+
+### **Backend Response (Error - Wrong Password):**
+
+```http
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "statusCode": 401,
+  "message": "Invalid credentials",
+  "error": "Unauthorized"
+}
+```
+
+### **Backend Response (Error - Invalid Email Format):**
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "statusCode": 400,
+  "message": ["Invalid email format"],
+  "error": "Bad Request"
+}
+```
+
+---
+
+## **29.9 Security Considerations**
+
+### **1. Password Storage**
+
+**❌ NEVER store plaintext passwords:**
+```typescript
+// WRONG - NEVER DO THIS
+user.password = loginDto.password;
+```
+
+**✅ Always hash passwords:**
+```typescript
+// CORRECT
+const hashedPassword = await bcrypt.hash(password, 10);
+user.password = hashedPassword;
+```
+
+**How bcrypt works:**
+```
+Input: "SecurePass123!"
+↓
+bcrypt.hash(password, saltRounds=10)
+↓
+Output: "$2b$10$rFzC9Z.../pT7k5MqX..."
+```
+
+**Verification:**
+```typescript
+const isValid = await bcrypt.compare(
+  'SecurePass123!',                    // User input
+  '$2b$10$rFzC9Z.../pT7k5MqX...'      // Stored hash
+);
+// isValid = true
+```
+
+---
+
+### **2. JWT Token Security**
+
+**Token structure:**
+```
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9  ← Header (algorithm, type)
+.
+eyJzdWIiOiJjbTEyM2FiYyIsImVtYWls...    ← Payload (user data)
+.
+xYzAbC123...                           ← Signature (verifies authenticity)
+```
+
+**Decoded payload:**
+```json
+{
+  "sub": "cm123abc",          // User ID
+  "email": "john@example.com", // Email
+  "iat": 1700000000,          // Issued at (timestamp)
+  "exp": 1700604800           // Expires at (timestamp)
+}
+```
+
+**Security features:**
+- **Signature**: Prevents tampering (backend can detect if modified)
+- **Expiration**: Token only valid for 7 days
+- **Stateless**: No session storage needed (token contains all data)
+
+**Why JWT is secure:**
+1. Signed with secret key (only backend knows secret)
+2. If someone modifies payload, signature becomes invalid
+3. Backend can verify authenticity by checking signature
+
+---
+
+### **3. HTTPS in Production**
+
+**❌ In development:**
+```
+http://localhost:963/auth/login  ← Unencrypted
+```
+
+**✅ In production:**
+```
+https://api.nextphoton.com/auth/login  ← Encrypted with TLS
+```
+
+**Why HTTPS matters:**
+- Passwords sent over HTTP can be intercepted
+- HTTPS encrypts all data in transit
+- Required for production applications
+
+---
+
+### **4. Error Messages**
+
+**❌ Verbose errors (security risk):**
+```json
+{
+  "message": "User john@example.com not found in database"
+}
+```
+☝️ Attacker learns email doesn't exist (can enumerate users)
+
+**✅ Generic errors:**
+```json
+{
+  "message": "Invalid credentials"
+}
+```
+☝️ Same error for wrong email OR wrong password (attacker can't enumerate)
+
+---
+
+### **5. Rate Limiting**
+
+**Problem**: Attacker tries 1000 passwords per second
+**Solution**: Limit login attempts
+
+```typescript
+// Example: Allow 5 login attempts per minute per IP
+@ThrottlerGuard({ ttl: 60, limit: 5 })
+@Post('login')
+async login(@Body() loginDto: LoginDto) {
+  // ...
+}
+```
+
+---
+
+## **29.10 Error Scenarios**
+
+Let's trace what happens when things go wrong:
+
+### **Scenario 1: Wrong Password**
+
+```
+User enters: email=john@example.com, password=WrongPass123
+         ↓
+Frontend: Sends to backend
+         ↓
+Backend: User found in database ✅
+Backend: bcrypt.compare('WrongPass123', hash) = false ❌
+Backend: throw new UnauthorizedException('Invalid credentials')
+         ↓
+Frontend: fetch() throws error
+         ↓
+AuthContext: catch (error) → throw error
+         ↓
+Sign-in page: setError('Invalid credentials')
+         ↓
+User sees: Red error message "Invalid credentials"
+```
+
+---
+
+### **Scenario 2: Email Not Found**
+
+```
+User enters: email=nonexistent@example.com, password=AnyPass123
+         ↓
+Frontend: Sends to backend
+         ↓
+Backend: User not found in database ❌
+Backend: throw new UnauthorizedException('Invalid credentials')
+         ↓
+(Same as wrong password - prevents email enumeration)
+```
+
+---
+
+### **Scenario 3: Invalid Email Format**
+
+```
+User enters: email=not-an-email, password=SecurePass123
+         ↓
+Frontend: Sends to backend
+         ↓
+Backend: LoginDto validation fails ❌
+Backend: Returns 400 Bad Request with validation errors
+         ↓
+Frontend: Shows error: "Invalid email format"
+```
+
+---
+
+### **Scenario 4: Network Error**
+
+```
+User clicks Login
+         ↓
+Frontend: fetch('http://localhost:963/auth/login')
+         ↓
+Network: Connection refused (backend not running)
+         ↓
+Frontend: fetch() throws "Failed to fetch"
+         ↓
+Sign-in page: setError('Failed to sign in. Please check your connection.')
+```
+
+---
+
+### **Scenario 5: Expired Token**
+
+```
+User logged in 8 days ago (token expired after 7 days)
+User refreshes page
+         ↓
+AuthContext: initAuth() runs
+AuthContext: Calls authService.getProfile()
+         ↓
+Backend: Verifies JWT token → Expired! ❌
+Backend: Returns 401 Unauthorized
+         ↓
+AuthContext: Catches error, calls authService.logout()
+         ↓
+User redirected to /sign-in
+```
+
+---
+
+## **29.11 Key Takeaways from Chapter 29**
+
+### **1. Authentication Involves 7 Layers:**
+- UI (React components)
+- State management (Context)
+- API client (authService)
+- Network (HTTP)
+- API endpoint (Controller)
+- Business logic (Service)
+- Database (Prisma + PostgreSQL)
+
+### **2. Frontend Separation of Concerns:**
+- **Page component**: Renders UI, handles user input
+- **AuthContext**: Manages global state, coordinates operations
+- **authService**: Makes HTTP requests, stores tokens
+
+### **3. Data Flow:**
+```
+UI → Context → Service → HTTP → Controller → Service → Database
+                                                          ↓
+UI ← Context ← Service ← HTTP ← Controller ← Service ← Database
+```
+
+### **4. Security Principles:**
+- Never store plaintext passwords (use bcrypt)
+- Use JWT tokens for stateless authentication
+- Generic error messages (prevent enumeration)
+- HTTPS in production (encrypt in transit)
+- Rate limiting (prevent brute force)
+
+### **5. Error Handling:**
+- Catch errors at every layer
+- Provide user-friendly messages
+- Log detailed errors for debugging
+- Handle network failures gracefully
+
+### **6. Token Management:**
+- Store in localStorage (easy access)
+- Also store in cookies (middleware access)
+- Auto-refresh before expiration
+- Clear on logout
+
+### **7. Role-Based Redirects:**
+- Each role has a specific dashboard
+- Redirect determined after login
+- Prevents unauthorized access
+
+---
+
+**Next up**: Chapter 30 will explore the **registration flow**, which is similar to login but involves creating new database records and handling more complex validation.
+
+---
+
+# **Chapter 30: User Registration: From Form to Database**
+
+## **30.1 Introduction: Registration vs Login**
+
+Login and registration seem similar - both are forms with email and password. But registration is **more complex**:
+
+**Login:**
+1. Find existing user
+2. Verify password
+3. Return token
+
+**Registration:**
+1. Validate input (email format, password strength, name length)
+2. Check if email already exists
+3. Hash password
+4. Create User record in database
+5. Create role-specific Profile record
+6. Generate JWT token
+7. Return token and user data
+
+**Key differences:**
+
+| Aspect | Login | Registration |
+|--------|-------|--------------|
+| **Database operations** | 1 read (find user) | 3 writes (create user, role, profile) |
+| **Validation** | Basic (email, password present) | Complex (format, strength, uniqueness) |
+| **Password** | Compare hash | Hash password |
+| **Failure modes** | Wrong credentials | Email exists, weak password, validation errors |
+
+Let's trace the complete registration flow!
+
+---
+
+## **30.2 Frontend: Learner Signup Page**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/app/(auth)/signup/learner/page.tsx`
+
+Currently, this page is **simplified for mock deployment**. Here's the real implementation:
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
+
+const LearnerSignupPage = () => {
+  const router = useRouter();
+  const { register } = useAuth();
+  // ↑ Get register function from AuthContext
+
+  // Form state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // ↑ Prevent default form submission (would reload page)
+
+    setError(null);
+    // ↑ Clear previous errors
+
+    try {
+      await register({
+        email,
+        password,
+        name,
+        role: 'learner',
+        // ↑ Hardcoded role (this is the learner signup page)
+      });
+      // ↑ AuthContext handles redirect after successful registration
+    } catch (error: any) {
+      setError(error.message);
+      // ↑ Show error to user
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
+        <h2 className="text-2xl font-bold mb-6 text-center">
+          Learner Sign Up
+        </h2>
+
+        {error && (
+          <p className="text-red-500 text-center mb-4">{error}</p>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          {/* Name Field */}
+          <div className="mb-4">
+            <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+              Full Name:
+            </label>
+            <input
+              type="text"
+              id="name"
+              className="w-full py-2 px-3 border rounded"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Email Field */}
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+              Email:
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full py-2 px-3 border rounded"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Password Field */}
+          <div className="mb-6">
+            <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+              Password:
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="w-full py-2 px-3 border rounded"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Must be 8+ characters with uppercase, lowercase, number, and special character
+            </p>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <p className="text-center text-gray-500 text-xs mt-4">
+          Already have an account?{" "}
+          <Link href="/sign-in" className="text-blue-500 hover:text-blue-800">
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default LearnerSignupPage;
+```
+
+**Key differences from login page:**
+
+1. **Three fields** instead of two:
+   - Name (new)
+   - Email
+   - Password
+
+2. **Hardcoded role**:
+```tsx
+await register({
+  email,
+  password,
+  name,
+  role: 'learner', // ← This page is specifically for learners
+});
+```
+
+3. **Password requirements hint**:
+```tsx
+<p className="text-xs text-gray-500">
+  Must be 8+ characters with uppercase, lowercase, number, and special character
+</p>
+```
+
+---
+
+## **30.3 AuthContext: register() Function**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/contexts/AuthContext.tsx` (lines 134-158)
+
+```tsx
+const register = useCallback(async (data: RegisterData) => {
+  // ↑ data = { email, password, name, role: 'learner' }
+
+  return withLoading(async () => {
+    // ↑ Show global loading spinner
+
+    try {
+      const response = await authService.register(data);
+      // ↑ Make HTTP POST to /auth/register
+      // response = { access_token: 'eyJ...', user: { id, email, name, roles } }
+
+      setUser(response.user);
+      // ↑ Update global auth state with new user
+
+      // Redirect to role-specific dashboard
+      const roleRedirectMap: Record<string, string> = {
+        admin: '/admin',
+        educator: '/educator',
+        learner: '/learner',
+        guardian: '/guardian',
+        ecm: '/ecm',
+        employee: '/employee',
+        intern: '/intern',
+      };
+
+      const redirectPath = roleRedirectMap[data.role] || '/dashboard';
+      // ↑ For learner, this is '/learner'
+
+      router.push(redirectPath);
+      // ↑ Navigate to learner dashboard
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+      // ↑ Re-throw so signup page can show error
+    }
+  }, 'auth-register', 'Creating your account...');
+  // ↑ Loading message shown to user
+}, [router, withLoading]);
+```
+
+**Almost identical to login()!**
+
+The only difference:
+- Calls `authService.register()` instead of `authService.login()`
+- Message says "Creating your account..." instead of "Signing in..."
+
+**Why so similar?**
+- Both return the same data structure: `{ access_token, user }`
+- Both store token and update state
+- Both redirect to role-specific dashboard
+
+---
+
+## **30.4 authService: register() Method**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/auth-service.ts` (lines 122-144)
+
+```tsx
+async register(data: RegisterData): Promise<AuthResponse> {
+  // ↑ data = { email, password, name, role: 'learner' }
+
+  try {
+    const response = await fetch(`${this.baseUrl}/auth/register`, {
+      // ↑ POST to http://localhost:963/auth/register
+
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      // ↑ Send all registration data as JSON
+      // '{"email":"john@example.com","password":"SecurePass123!","name":"John Doe","role":"learner"}'
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Registration failed');
+      // ↑ If server returns 400/409/500, throw error
+    }
+
+    const authData = await response.json();
+    // ↑ authData = { access_token: 'eyJ...', user: {...} }
+
+    this.storeAuthData(authData);
+    // ↑ Save token and user to localStorage and cookies
+
+    return authData;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
+}
+```
+
+**Identical to login() except:**
+- URL: `/auth/register` instead of `/auth/login`
+- Body includes `name` and `role` (login only sends email and password)
+
+---
+
+## **30.5 Backend: RegisterDto Validation**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/dto/register.dto.ts`
+
+This is where **complex validation** happens!
+
+```typescript
+import { IsEmail, IsNotEmpty, IsString, MinLength, IsEnum, Matches } from 'class-validator';
+
+// Define allowed roles
+export enum UserRole {
+  LEARNER = 'learner',
+  GUARDIAN = 'guardian',
+  EDUCATOR = 'educator',
+  ECM = 'ecm',
+  EMPLOYEE = 'employee',
+  INTERN = 'intern',
+  ADMIN = 'admin',
+}
+
+export class RegisterDto {
+  /**
+   * Email validation
+   */
+  @IsEmail({}, { message: 'Please provide a valid email address' })
+  // ↑ Checks format: must contain @ and domain
+  // Valid: john@example.com
+  // Invalid: john@, @example.com, john.com
+
+  @IsNotEmpty({ message: 'Email is required' })
+  // ↑ Cannot be empty string or null
+
+  email: string;
+
+  /**
+   * Password validation
+   */
+  @IsString()
+  // ↑ Must be a string (not number, array, etc.)
+
+  @IsNotEmpty({ message: 'Password is required' })
+
+  @MinLength(8, { message: 'Password must be at least 8 characters long' })
+  // ↑ 'abc123' → ❌ Too short
+  // 'abcd1234' → ✅ (if other requirements met)
+
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+    {
+      message: 'Password must contain uppercase, lowercase, number and special character',
+    },
+  )
+  // ↑ Regular expression breakdown:
+  // (?=.*[a-z])     → Must have at least one lowercase letter
+  // (?=.*[A-Z])     → Must have at least one uppercase letter
+  // (?=.*\d)        → Must have at least one digit
+  // (?=.*[@$!%*?&]) → Must have at least one special character
+  // [A-Za-z\d@$!%*?&] → Only these characters allowed
+
+  password: string;
+
+  /**
+   * Name validation
+   */
+  @IsString()
+  @IsNotEmpty({ message: 'Name is required' })
+  @MinLength(2, { message: 'Name must be at least 2 characters long' })
+  // ↑ 'J' → ❌ Too short
+  // 'Jo' → ✅
+
+  name: string;
+
+  /**
+   * Role validation
+   */
+  @IsEnum(UserRole, { message: 'Invalid role specified' })
+  // ↑ Must be one of the UserRole enum values
+  // 'learner' → ✅
+  // 'educator' → ✅
+  // 'student' → ❌ Not in enum
+
+  @IsNotEmpty({ message: 'Role is required' })
+
+  role: UserRole;
+}
+```
+
+**How validation works:**
+
+1. **Request arrives:**
+```json
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "name": "John Doe",
+  "role": "learner"
+}
+```
+
+2. **class-validator checks each field:**
+
+```typescript
+// Email check
+@IsEmail() → 'john@example.com' → ✅ Valid format
+@IsNotEmpty() → 'john@example.com' → ✅ Not empty
+
+// Password check
+@IsString() → 'SecurePass123!' → ✅ Is string
+@IsNotEmpty() → 'SecurePass123!' → ✅ Not empty
+@MinLength(8) → 'SecurePass123!' (15 chars) → ✅ Long enough
+@Matches(regex) → 'SecurePass123!' → ✅
+  Has lowercase (e, c, u, r, e, a, s)
+  Has uppercase (S, P)
+  Has digit (1, 2, 3)
+  Has special (!)
+
+// Name check
+@IsString() → 'John Doe' → ✅
+@IsNotEmpty() → 'John Doe' → ✅
+@MinLength(2) → 'John Doe' (8 chars) → ✅
+
+// Role check
+@IsEnum(UserRole) → 'learner' → ✅ In enum
+@IsNotEmpty() → 'learner' → ✅
+```
+
+3. **If ALL checks pass** → Continue to AuthService
+4. **If ANY check fails** → Return 400 error with validation messages
+
+---
+
+**Example validation failures:**
+
+**Bad email:**
+```json
+{
+  "email": "not-an-email",
+  "password": "SecurePass123!",
+  "name": "John",
+  "role": "learner"
+}
+```
+
+Response:
+```json
+{
+  "statusCode": 400,
+  "message": ["Please provide a valid email address"],
+  "error": "Bad Request"
+}
+```
+
+---
+
+**Weak password:**
+```json
+{
+  "email": "john@example.com",
+  "password": "weak",
+  "name": "John",
+  "role": "learner"
+}
+```
+
+Response:
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "Password must be at least 8 characters long",
+    "Password must contain uppercase, lowercase, number and special character"
+  ],
+  "error": "Bad Request"
+}
+```
+
+---
+
+**Invalid role:**
+```json
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "name": "John",
+  "role": "student"
+}
+```
+
+Response:
+```json
+{
+  "statusCode": 400,
+  "message": ["Invalid role specified"],
+  "error": "Bad Request"
+}
+```
+
+---
+
+## **30.6 Backend: Register Endpoint**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.controller.ts`
+
+```typescript
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @Post('register')
+  async register(@Body() registerDto: RegisterDto) {
+    // ↑ @Body() extracts JSON from request
+    // Validates against RegisterDto class
+    // If validation fails, returns 400 automatically
+
+    return this.authService.register(registerDto);
+    // ↑ Delegate to AuthService for business logic
+  }
+}
+```
+
+---
+
+File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts`
+
+```typescript
+async register(registerDto: RegisterDto): Promise<AuthResponse> {
+  const { email, password, name, role } = registerDto;
+
+  // 1. Check if email already exists
+  const existingUser = await this.prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    throw new ConflictException('Email already registered');
+    // ↑ Returns HTTP 409 Conflict
+  }
+
+  // 2. Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+  // ↑ 'SecurePass123!' → '$2b$10$rFzC9Z.../pT7k5MqX...'
+  // 10 = salt rounds (higher = more secure but slower)
+
+  // 3. Create user with transaction (all-or-nothing)
+  const user = await this.prisma.$transaction(async (prisma) => {
+    // Create User record
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+        emailVerified: false, // Email verification pending
+      },
+    });
+
+    // Create Role record
+    await prisma.role.create({
+      data: {
+        name: role,
+        userId: newUser.id,
+      },
+    });
+
+    // Create role-specific Profile
+    if (role === 'learner') {
+      await prisma.learnerProfile.create({
+        data: {
+          userId: newUser.id,
+          // Default values
+        },
+      });
+    } else if (role === 'educator') {
+      await prisma.educatorProfile.create({
+        data: {
+          userId: newUser.id,
+        },
+      });
+    }
+    // ... other role profiles
+
+    return newUser;
+  });
+
+  // 4. Generate JWT token
+  const payload = { sub: user.id, email: user.email };
+  const access_token = this.jwtService.sign(payload);
+
+  // 5. Return response
+  return {
+    access_token,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      roles: [role],
+      emailVerified: user.emailVerified,
+    },
+  };
+}
+```
+
+**Key concepts:**
+
+### **1. Email Uniqueness Check**
+
+```typescript
+const existingUser = await this.prisma.user.findUnique({
+  where: { email },
+});
+
+if (existingUser) {
+  throw new ConflictException('Email already registered');
+}
+```
+
+**Why check?**
+- Email is unique constraint in database
+- If we don't check, database will throw error
+- Better to give user-friendly message
+
+---
+
+### **2. Password Hashing**
+
+```typescript
+const hashedPassword = await bcrypt.hash(password, 10);
+```
+
+**How bcrypt works:**
+
+```
+Input: 'SecurePass123!'
+
+1. Generate random salt
+   Salt: '$2b$10$rFzC9Z...'
+
+2. Combine password + salt
+   Combined: 'SecurePass123!$2b$10$rFzC9Z...'
+
+3. Hash with bcrypt algorithm (10 rounds)
+   Hash: '$2b$10$rFzC9Z.../pT7k5MqX...'
+
+4. Hash includes salt (for verification later)
+```
+
+**Why salt?**
+- Same password produces different hash each time
+- Prevents rainbow table attacks
+- 10 rounds = good balance of security and speed
+
+---
+
+### **3. Database Transaction**
+
+```typescript
+await this.prisma.$transaction(async (prisma) => {
+  // Multiple database operations
+  const user = await prisma.user.create(...);
+  await prisma.role.create(...);
+  await prisma.learnerProfile.create(...);
+  return user;
+});
+```
+
+**Why transaction?**
+- **Atomicity**: All operations succeed or all fail
+- Prevents partial data (user created but no role)
+
+**Example without transaction:**
+```typescript
+// Create user
+const user = await prisma.user.create(...); // ✅ Succeeds
+
+// Create role
+await prisma.role.create(...); // ❌ Fails (database error)
+
+// Result: User exists without role → DATA CORRUPTION!
+```
+
+**With transaction:**
+```typescript
+await prisma.$transaction(async (prisma) => {
+  const user = await prisma.user.create(...); // Temporary
+  await prisma.role.create(...); // Fails
+  // ROLLBACK: User creation is undone
+});
+
+// Result: No user, no role → DATA CONSISTENT ✅
+```
+
+---
+
+## **30.7 Database: User Creation with Profile**
+
+Let's see what gets created in PostgreSQL:
+
+### **1. User Table**
+
+```sql
+INSERT INTO "User" (id, email, password, name, "emailVerified", "createdAt", "updatedAt")
+VALUES (
+  'cm123abc',                                  -- Generated UUID
+  'john@example.com',                          -- From form
+  '$2b$10$rFzC9Z.../pT7k5MqX...',            -- Hashed password
+  'John Doe',                                  -- From form
+  false,                                       -- Email not verified yet
+  '2025-10-06T10:30:00Z',                     -- Current timestamp
+  '2025-10-06T10:30:00Z'                      -- Current timestamp
+);
+```
+
+### **2. Role Table**
+
+```sql
+INSERT INTO "Role" (id, name, "userId", "createdAt")
+VALUES (
+  'role_abc123',    -- Generated UUID
+  'learner',        -- From form
+  'cm123abc',       -- Links to User.id
+  '2025-10-06T10:30:00Z'
+);
+```
+
+### **3. LearnerProfile Table**
+
+```sql
+INSERT INTO "LearnerProfile" (id, "userId", bio, "dateOfBirth", "phoneNumber", "createdAt", "updatedAt")
+VALUES (
+  'profile_xyz',       -- Generated UUID
+  'cm123abc',          -- Links to User.id
+  NULL,                -- Default (can be filled later)
+  NULL,                -- Default
+  NULL,                -- Default
+  '2025-10-06T10:30:00Z',
+  '2025-10-06T10:30:00Z'
+);
+```
+
+**Relationships:**
+```
+User (id: cm123abc)
+  ↓
+  ├─ Role (userId: cm123abc, name: learner)
+  └─ LearnerProfile (userId: cm123abc)
+```
+
+**Querying the user:**
+```typescript
+const user = await prisma.user.findUnique({
+  where: { id: 'cm123abc' },
+  include: {
+    roles: true,          // Include Role records
+    learnerProfile: true, // Include LearnerProfile
+  },
+});
+
+// Result:
+{
+  id: 'cm123abc',
+  email: 'john@example.com',
+  name: 'John Doe',
+  roles: [
+    { id: 'role_abc123', name: 'learner', userId: 'cm123abc' }
+  ],
+  learnerProfile: {
+    id: 'profile_xyz',
+    userId: 'cm123abc',
+    bio: null,
+    dateOfBirth: null,
+  }
+}
+```
+
+---
+
+## **30.8 Complete Registration Flow (12 Steps)**
+
+Let's trace the **entire journey**:
+
+**User Action:** John Doe enters name, email, password, clicks "Sign Up" on learner signup page
+
+### **Step 1: Form Submission**
+```tsx
+// signup/learner/page.tsx
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  await register({ email, password, name, role: 'learner' });
+};
+```
+
+### **Step 2: AuthContext.register()**
+```tsx
+// AuthContext.tsx
+const register = async (data) => {
+  const response = await authService.register(data);
+  setUser(response.user);
+  router.push('/learner');
+};
+```
+
+### **Step 3: authService.register()**
+```tsx
+// auth-service.ts
+async register(data) {
+  const response = await fetch('http://localhost:963/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+  return response.json();
+}
+```
+
+### **Step 4: HTTP Request**
+```http
+POST http://localhost:963/auth/register
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "name": "John Doe",
+  "role": "learner"
+}
+```
+
+### **Step 5: AuthController Receives Request**
+```typescript
+// auth.controller.ts
+@Post('register')
+async register(@Body() registerDto: RegisterDto) {
+  // Validates RegisterDto
+}
+```
+
+### **Step 6: RegisterDto Validation**
+```
+✅ Email: 'john@example.com' → Valid format
+✅ Password: 'SecurePass123!' → 8+ chars, has uppercase, lowercase, digit, special
+✅ Name: 'John Doe' → 2+ chars
+✅ Role: 'learner' → In enum
+```
+
+### **Step 7: AuthService.register()**
+```typescript
+// auth.service.ts
+async register(registerDto) {
+  // Check email uniqueness
+  const exists = await prisma.user.findUnique({ where: { email } });
+  if (exists) throw new ConflictException('Email already registered');
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // Create user + role + profile
+  // Generate JWT
+  // Return response
+}
+```
+
+### **Step 8: Database Uniqueness Check**
+```sql
+SELECT * FROM "User" WHERE email = 'john@example.com';
+-- Result: No rows (email not taken) ✅
+```
+
+### **Step 9: Password Hashing**
+```typescript
+bcrypt.hash('SecurePass123!', 10)
+// → '$2b$10$rFzC9Z.../pT7k5MqX...'
+```
+
+### **Step 10: Database Transaction**
+```sql
+BEGIN TRANSACTION;
+
+INSERT INTO "User" (id, email, password, name, "emailVerified")
+VALUES ('cm123abc', 'john@example.com', '$2b$10$...', 'John Doe', false);
+
+INSERT INTO "Role" (id, name, "userId")
+VALUES ('role_abc', 'learner', 'cm123abc');
+
+INSERT INTO "LearnerProfile" (id, "userId")
+VALUES ('profile_xyz', 'cm123abc');
+
+COMMIT;
+```
+
+### **Step 11: JWT Generation**
+```typescript
+jwtService.sign({ sub: 'cm123abc', email: 'john@example.com' })
+// → 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+```
+
+### **Step 12: Response Flow Back**
+```
+Backend → HTTP 201 Created
+       ↓
+authService → storeAuthData() (save token to localStorage)
+       ↓
+AuthContext → setUser() (update React state)
+       ↓
+AuthContext → router.push('/learner') (navigate to dashboard)
+       ↓
+User sees learner dashboard!
+```
+
+---
+
+## **30.9 Error Handling**
+
+### **Error 1: Email Already Exists**
+
+**User tries to register with existing email**
+
+```
+Step 1-7: Same as successful flow
+       ↓
+Step 8: Database query finds existing user
+       ↓
+Step 9: AuthService throws ConflictException
+       ↓
+Backend: Returns HTTP 409 Conflict
+{
+  "statusCode": 409,
+  "message": "Email already registered",
+  "error": "Conflict"
+}
+       ↓
+authService: Throws error
+       ↓
+AuthContext: Catches error, re-throws
+       ↓
+Signup page: setError('Email already registered')
+       ↓
+User sees: Red error message
+```
+
+---
+
+### **Error 2: Weak Password**
+
+**User enters password: 'weak'**
+
+```
+Step 1-4: Same as successful flow
+       ↓
+Step 5: RegisterDto validation
+       ↓
+@MinLength(8): 'weak' (4 chars) → ❌ FAIL
+@Matches(regex): 'weak' → ❌ FAIL (no uppercase, no digit, no special)
+       ↓
+Backend: Returns HTTP 400 Bad Request
+{
+  "statusCode": 400,
+  "message": [
+    "Password must be at least 8 characters long",
+    "Password must contain uppercase, lowercase, number and special character"
+  ]
+}
+       ↓
+(Same error flow as above)
+```
+
+---
+
+### **Error 3: Invalid Email Format**
+
+**User enters email: 'not-an-email'**
+
+```
+Step 1-4: Same
+       ↓
+Step 5: RegisterDto validation
+       ↓
+@IsEmail(): 'not-an-email' → ❌ FAIL (no @ symbol)
+       ↓
+Backend: HTTP 400 Bad Request
+{
+  "message": ["Please provide a valid email address"]
+}
+```
+
+---
+
+### **Error 4: Database Connection Failed**
+
+**Database is down**
+
+```
+Step 1-7: Same
+       ↓
+Step 8: prisma.user.findUnique() throws error
+       ↓
+AuthService: Exception bubbles up
+       ↓
+NestJS Exception Filter: Catches error
+       ↓
+Backend: HTTP 500 Internal Server Error
+{
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+       ↓
+Frontend: Shows generic error message
+```
+
+**Why generic message?**
+- Don't expose internal errors to users
+- Log detailed error on server for debugging
+- Show user-friendly message
+
+---
+
+### **Error 5: Transaction Rollback**
+
+**User created, but role creation fails**
+
+```
+Step 10: Database transaction begins
+       ↓
+INSERT INTO "User" → ✅ Success (temporary)
+       ↓
+INSERT INTO "Role" → ❌ Fails (constraint violation)
+       ↓
+Prisma: ROLLBACK transaction
+       ↓
+Result: No user created, no role created
+       ↓
+Backend: Throws error
+       ↓
+Frontend: Shows error message
+```
+
+**Without transaction:**
+- User would exist without role
+- Application would crash when accessing user.roles
+- Data corruption!
+
+**With transaction:**
+- All-or-nothing guarantee
+- Data stays consistent ✅
+
+---
+
+## **30.10 Key Takeaways from Chapter 30**
+
+### **1. Registration is More Complex Than Login:**
+- **Login**: 1 database read (find user)
+- **Registration**: 3 database writes (user + role + profile)
+- **Validation**: More extensive (format, strength, uniqueness)
+
+### **2. Backend Validation is Critical:**
+```typescript
+@IsEmail()           // Email format
+@MinLength(8)        // Password length
+@Matches(/regex/)    // Password complexity
+@IsEnum(UserRole)    // Valid role
+```
+
+**Frontend validation is UX, backend validation is security!**
+
+### **3. Password Security:**
+```typescript
+// ❌ NEVER
+user.password = plaintext;
+
+// ✅ ALWAYS
+user.password = await bcrypt.hash(plaintext, 10);
+```
+
+**Hashing is irreversible:**
+- Hash → Original: ❌ Impossible
+- Original → Hash: ✅ Possible (for verification)
+
+### **4. Database Transactions Ensure Data Integrity:**
+```typescript
+await prisma.$transaction(async (prisma) => {
+  await prisma.user.create(...);
+  await prisma.role.create(...);
+  await prisma.learnerProfile.create(...);
+});
+```
+
+**All operations succeed together or fail together**
+
+### **5. Error Messages Matter:**
+
+**❌ Verbose (security risk):**
+```
+"User with email john@example.com already exists in database table User"
+```
+
+**✅ Concise (secure):**
+```
+"Email already registered"
+```
+
+### **6. Frontend/Backend Data Flow:**
+```
+Form → Context → Service → HTTP → Controller → DTO Validation → Service → Database
+                                                                              ↓
+UI  ← Context ← Service ← HTTP ← Controller ← Service ← JWT Generation ← Database
+```
+
+### **7. Multiple Validation Layers:**
+1. **Frontend**: UX (immediate feedback)
+2. **DTO**: Format validation
+3. **Service**: Business logic (email uniqueness)
+4. **Database**: Constraints (unique email, foreign keys)
+
+**Never trust frontend validation alone!**
+
+### **8. Role-Specific Profiles:**
+- Learner → LearnerProfile (learning goals, progress)
+- Educator → EducatorProfile (bio, subjects, pricing)
+- Guardian → GuardianProfile (relationship to learners)
+
+**Created during registration, populated later**
+
+### **9. JWT Token Flow:**
+```
+Backend generates token → Frontend stores in localStorage & cookies
+                       ↓
+Future requests include token in Authorization header
+                       ↓
+Backend verifies token → Identifies user
+```
+
+### **10. Error Handling Strategy:**
+- **Validation errors (400)**: Show specific messages
+- **Conflict errors (409)**: Show "email already registered"
+- **Server errors (500)**: Show generic message, log details
+
+---
+
+## **What's Next?**
+
+We've completed **user authentication** (login + registration). You now understand:
+- How data flows through all 7 layers
+- How validation works at each layer
+- How security is enforced (hashing, JWT, transactions)
+- How errors are handled gracefully
+
+**Next Up: Chapter 31 - Multi-Role System Architecture**
+
+Chapter 31 will explore:
+- How NextPhoton handles 7 different user roles
+- Role-based access control (RBAC vs ABAC)
+- Protecting routes based on roles
+- Dynamic UI based on user role
+- Role switching for users with multiple roles
+
+You'll see how the same authentication system powers completely different experiences for learners, educators, guardians, and admins!
+
+---
+## Chapter 31: Multi-Role System Architecture
+
+### **31.1 Introduction: Why Multi-Role?**
+
+Let's start with a real-world scenario that happens every day in education:
+
+**Meet Priya:**
+- She's a **Mathematics Educator** on NextPhoton, teaching JEE preparation
+- She's also a **Guardian** - monitoring her teenage daughter who's a learner on the platform
+
+**The Challenge:**
+Priya needs **two different interfaces** from the same platform:
+1. **As an Educator**: Dashboard to manage sessions, view learner progress, upload materials
+2. **As a Guardian**: Dashboard to monitor her daughter's attendance, homework completion, test scores
+
+Traditional systems would make her create **two separate accounts** with two different logins. NextPhoton does something smarter: **One user, multiple roles**.
+
+---
+
+### **31.2 Database Design: The Foundation**
+
+The multi-role architecture starts at the database level. Let's understand how it's structured:
+
+#### **31.2.1 The User Table (Central Hub)**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/auth.prisma` (lines 4-30)
+
+```prisma
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  // Authentication relations
+  sessions      Session[]
+  accounts      Account[]
+
+  // Relations to NextPhoton user profiles
+  learnerProfile   LearnerProfile?   @relation("UserLearner")
+  guardianProfile  GuardianProfile?  @relation("UserGuardian")
+  educatorProfile  EducatorProfile?  @relation("UserEducator")
+  ecmProfile      ECMProfile?       @relation("UserECM")
+  employeeProfile  EmployeeProfile?  @relation("UserEmployee")
+  internProfile    InternProfile?    @relation("UserIntern")
+  adminProfile     AdminProfile?     @relation("UserAdmin")
+
+  // Multi-role support
+  userRoles        UserRole[]
+  userPermissions  UserPermission[]
+}
+```
+
+**Key observations:**
+
+1. **Single identity**: One `User` record per person (identified by unique email)
+2. **Optional profiles**: Each profile type is **optional** (notice the `?`)
+3. **One-to-one relationships**: Each profile can exist **at most once** per user
+4. **Many-to-many roles**: `userRoles` array allows multiple role assignments
+
+**Think of it like a passport:**
+- User table = Your passport (basic identity)
+- Profiles = Visa stamps (role-specific permissions and data)
+- UserRole table = Entry/exit records (role assignments with metadata)
+
+---
+
+#### **31.2.2 The UserRole Junction Table**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/roles-permissions.prisma` (lines 59-80)
+
+```prisma
+model UserRole {
+  id       String @id @default(cuid())
+  userId   String
+  roleId   String
+
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  // Multi-tenant support
+  organizationId String?
+
+  // Role-specific metadata
+  metadata Json? // Role-specific data like department, specialization, etc.
+
+  isActive   Boolean  @default(true)
+  assignedAt DateTime @default(now())
+  expiresAt  DateTime?
+  assignedBy String?  // userId of who assigned this role
+
+  @@unique([userId, roleId, organizationId])
+}
+```
+
+**This table answers critical questions:**
+
+| Question | Field | Example |
+|----------|-------|---------|
+| Who has the role? | `userId` | `user_123` |
+| What role do they have? | `roleId` | `role_educator` |
+| When was it assigned? | `assignedAt` | `2025-01-15T10:30:00Z` |
+| Is it still active? | `isActive` | `true` |
+| Does it expire? | `expiresAt` | `2026-01-15T10:30:00Z` (optional) |
+| Who assigned it? | `assignedBy` | `user_admin_456` |
+| Which organization? | `organizationId` | `org_nextphoton` |
+
+**Why the unique constraint?**
+```prisma
+@@unique([userId, roleId, organizationId])
+```
+
+This prevents:
+- Same user getting same role twice in same organization
+- Data duplication
+- Conflicting role assignments
+
+**But allows:**
+- Same user having same role in **different organizations** (multi-tenancy)
+- Same user having **different roles** in same organization
+
+---
+
+#### **31.2.3 The Role Table**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/roles-permissions.prisma` (lines 4-22)
+
+```prisma
+model Role {
+  id          String @id @default(cuid())
+  name        String @unique // learner, guardian, educator, ecm, employee, intern, admin
+  displayName String
+  description String?
+  isActive    Boolean @default(true)
+  isDefault   Boolean @default(false)
+
+  // Default permissions for this role
+  rolePermissions RolePermission[]
+
+  // Users with this role
+  userRoles UserRole[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+**The 7 core roles in NextPhoton:**
+
+| Role Name | Display Name | Default? | Purpose |
+|-----------|--------------|----------|---------|
+| `learner` | Learner | Yes | Students using the platform |
+| `guardian` | Guardian | No | Parents/guardians monitoring learners |
+| `educator` | Educator | No | Teachers conducting sessions |
+| `ecm` | EduCare Manager | No | Learning coaches monitoring progress |
+| `employee` | Employee | No | Internal staff members |
+| `intern` | Intern | No | Temporary/training staff |
+| `admin` | Administrator | No | Platform administrators |
+
+**Why separate `name` and `displayName`?**
+
+```typescript
+name: 'educator'        // Used in code, never changes
+displayName: 'Educator' // Shown to users, can be updated
+```
+
+**Benefits:**
+- Code references `role.name` (stable identifier)
+- UI shows `role.displayName` (can be translated, refined)
+- Database queries use `name` (consistent, predictable)
+
+---
+
+### **31.3 The 7 Profiles Detailed**
+
+Each role has a **dedicated profile table** with role-specific fields. Let's explore each:
+
+---
+
+#### **31.3.1 LearnerProfile**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 4-67)
+
+```prisma
+model LearnerProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserLearner", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName       String
+  lastName        String
+  dateOfBirth     DateTime
+  phoneNumber     String?
+  emergencyContact String?
+
+  // Educational Information
+  currentGrade    String?
+  school          String?
+  board           String? // CBSE, ICSE, State Board, etc.
+  subjects        String[] // Array of subjects
+
+  // Learning Preferences
+  learningStyle   String? // visual, auditory, kinesthetic, etc.
+  preferredLanguage String @default("English")
+
+  // Goals and Aspirations
+  academicGoals   String?
+  careerAspirations String?
+  targetExams     String[] // JEE, NEET, etc.
+
+  // Guardian Information
+  guardianId      String?
+  guardian        GuardianProfile? @relation("LearnerGuardian", fields: [guardianId], references: [id])
+
+  // ECM Assignment
+  assignedECMId   String?
+  assignedECM     ECMProfile? @relation("ECMLearners", fields: [assignedECMId], references: [id])
+
+  // Sessions and Progress (relations to other tables)
+  learningSessions LearningSession[]
+  progressRecords  ProgressRecord[]
+  assignments      Assignment[]
+  attendanceRecords AttendanceRecord[]
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Key features:**
+
+1. **Learning customization:**
+   - `learningStyle`: "visual", "auditory", "kinesthetic" → Personalized content delivery
+   - `targetExams`: ["JEE", "NEET"] → Focused curriculum planning
+
+2. **Hierarchical relationships:**
+   ```
+   LearnerProfile → Guardian (one-to-one)
+   LearnerProfile → ECM (one-to-one)
+   LearnerProfile → Sessions (one-to-many)
+   ```
+
+3. **Educational metadata:**
+   - `currentGrade`, `school`, `board` → Context for curriculum
+   - `subjects[]` → Array of enrolled subjects
+
+**Real-world example:**
+
+```typescript
+const learnerProfile = {
+  firstName: "Rahul",
+  lastName: "Sharma",
+  currentGrade: "12th",
+  board: "CBSE",
+  subjects: ["Physics", "Chemistry", "Mathematics"],
+  targetExams: ["JEE Advanced", "JEE Mains"],
+  learningStyle: "visual",
+  assignedECMId: "ecm_priya_123", // Assigned to Priya (ECM)
+  guardianId: "guardian_parent_456" // Parent monitoring
+}
+```
+
+---
+
+#### **31.3.2 GuardianProfile**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 69-101)
+
+```prisma
+model GuardianProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserGuardian", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  relationship  String // parent, grandparent, sibling, etc.
+  phoneNumber   String
+  address       String?
+
+  // Professional Information
+  occupation    String?
+  organization  String?
+
+  // Contact Preferences
+  preferredContactMethod String @default("email") // email, phone, sms, app
+  notificationSettings   Json?
+
+  // Associated Learners (one-to-many)
+  learners      LearnerProfile[] @relation("LearnerGuardian")
+
+  // Payment Information
+  paymentMethods PaymentMethod[]
+  invoices       Invoice[]
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Key features:**
+
+1. **One-to-many with learners:**
+   ```prisma
+   learners      LearnerProfile[] @relation("LearnerGuardian")
+   ```
+   - One guardian can monitor **multiple learners**
+   - Each learner has **at most one guardian** on the platform
+
+2. **Relationship tracking:**
+   - `relationship`: "parent", "grandparent", "uncle", "sibling"
+   - Important for emergency contacts and authorization
+
+3. **Financial responsibility:**
+   - `paymentMethods[]`: Credit cards, UPI, bank accounts
+   - `invoices[]`: Billing history
+
+**Real-world example:**
+
+```typescript
+const guardianProfile = {
+  firstName: "Anita",
+  lastName: "Sharma",
+  relationship: "mother",
+  phoneNumber: "+91-9876543210",
+  preferredContactMethod: "app",
+  learners: [
+    { id: "learner_rahul_123", firstName: "Rahul" },
+    { id: "learner_priya_456", firstName: "Priya" }
+  ],
+  paymentMethods: [
+    { type: "upi", identifier: "anita@paytm" }
+  ]
+}
+```
+
+**Notification settings example:**
+```json
+{
+  "attendanceAlerts": true,
+  "homeworkReminders": true,
+  "sessionRecordings": false,
+  "progressReports": "weekly"
+}
+```
+
+---
+
+#### **31.3.3 EducatorProfile**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 103-149)
+
+```prisma
+model EducatorProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserEducator", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  address       String?
+  dateOfBirth   DateTime?
+
+  // Professional Information
+  qualifications String[] // Array of qualifications
+  specializations String[] // Subjects/areas of expertise
+  experience     Int?     // Years of experience
+
+  // Verification Information
+  verificationStatus String @default("pending") // pending, verified, rejected
+  documentsUploaded  String[] // URLs to uploaded documents
+  backgroundCheck    String @default("pending") // pending, completed, failed
+
+  // Teaching Information
+  teachingStyle      String?
+  languages          String[] // Languages they can teach in
+  availableTimings   Json?    // Availability schedule
+  hourlyRate         Decimal? // Proposed hourly rate
+  rateStatus         String @default("pending") // pending, approved, rejected
+
+  // Platform Information
+  averageRating      Decimal? @default(0)
+  totalRatings       Int      @default(0)
+  totalSessionsHours Decimal? @default(0)
+
+  // Sessions and Records
+  learningSessions   LearningSession[]
+  sessionFeedbacks   SessionFeedback[]
+  rateProposals      RateProposal[]
+  sessionBookings    SessionBooking[]
+
+  isActive    Boolean  @default(true)
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Key features:**
+
+1. **Multi-stage verification:**
+   ```
+   Registration → Document Upload → Background Check → Admin Approval → Active
+        ↓              ↓                   ↓                ↓            ↓
+    pending    documentsUploaded     backgroundCheck   verificationStatus  isActive=true
+   ```
+
+2. **Marketplace features:**
+   - `hourlyRate` + `rateStatus`: Educator proposes, admin approves/rejects
+   - `averageRating`: Calculated from learner feedback
+   - `totalSessionsHours`: Platform experience metric
+
+3. **Availability management:**
+   ```json
+   {
+     "monday": ["09:00-12:00", "14:00-17:00"],
+     "tuesday": ["10:00-13:00"],
+     "saturday": ["09:00-18:00"],
+     "sunday": []
+   }
+   ```
+
+**Real-world example:**
+
+```typescript
+const educatorProfile = {
+  firstName: "Dr. Rajesh",
+  lastName: "Kumar",
+  qualifications: ["Ph.D. Physics", "M.Sc. Mathematics"],
+  specializations: ["JEE Physics", "NEET Physics", "11th/12th Board"],
+  experience: 15,
+  verificationStatus: "verified",
+  hourlyRate: 1500.00,
+  rateStatus: "approved",
+  languages: ["English", "Hindi", "Tamil"],
+  averageRating: 4.8,
+  totalRatings: 234,
+  totalSessionsHours: 1245.50,
+  isAvailable: true
+}
+```
+
+---
+
+#### **31.3.4 ECMProfile (EduCare Manager)**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 151-188)
+
+```prisma
+model ECMProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserECM", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  employeeId    String? @unique
+
+  // Professional Information
+  department    String?
+  specialization String[] // Age groups, subjects, etc.
+  experience     Int?     // Years of experience in education
+
+  // Workload Management
+  maxLearners    Int      @default(50) // Maximum learners they can manage
+  currentLoad    Int      @default(0)  // Current number of assigned learners
+
+  // Performance Metrics
+  interventionSuccess Decimal? @default(0) // Success rate of interventions
+  avgResponseTime     Int?     @default(0) // Average response time in minutes
+
+  // Assigned Learners (one-to-many)
+  assignedLearners   LearnerProfile[] @relation("ECMLearners")
+  interventions      Intervention[]
+  progressReports    ProgressReport[]
+
+  // Sessions managed
+  managedSessions    LearningSession[] @relation("ECMSessions")
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Key features:**
+
+1. **Workload balancing:**
+   ```typescript
+   if (ecmProfile.currentLoad < ecmProfile.maxLearners) {
+     // Can assign more learners
+     assignLearnerToECM(learnerId, ecmId);
+   } else {
+     // ECM at capacity, assign to next available ECM
+     findNextAvailableECM();
+   }
+   ```
+
+2. **Performance tracking:**
+   - `interventionSuccess`: % of interventions that improved learner performance
+   - `avgResponseTime`: How quickly ECM responds to alerts/issues
+
+3. **Specialization-based assignment:**
+   ```typescript
+   ecmProfile.specialization = ["10th-12th", "JEE/NEET", "Slow learners"]
+   // Auto-assign learners matching these criteria
+   ```
+
+**Real-world example:**
+
+```typescript
+const ecmProfile = {
+  firstName: "Priya",
+  lastName: "Menon",
+  employeeId: "ECM-2024-045",
+  specialization: ["JEE Physics", "Struggling students"],
+  maxLearners: 50,
+  currentLoad: 32,
+  assignedLearners: [
+    { id: "learner_001", name: "Rahul" },
+    { id: "learner_002", name: "Sneha" },
+    // ... 30 more
+  ],
+  interventionSuccess: 78.5, // 78.5% success rate
+  avgResponseTime: 45 // 45 minutes average
+}
+```
+
+---
+
+#### **31.3.5 EmployeeProfile**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 190-215)
+
+```prisma
+model EmployeeProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserEmployee", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  employeeId    String? @unique
+
+  // Employment Information
+  department    String
+  position      String
+  joiningDate   DateTime
+
+  // Contact Information
+  emergencyContact String?
+  address          String?
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Purpose:** Internal staff (HR, Finance, Operations, Tech Support)
+
+**Example:**
+```typescript
+const employeeProfile = {
+  firstName: "Amit",
+  lastName: "Verma",
+  employeeId: "EMP-2024-123",
+  department: "Customer Support",
+  position: "Senior Support Executive",
+  joiningDate: "2024-01-15"
+}
+```
+
+---
+
+#### **31.3.6 InternProfile**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 217-248)
+
+```prisma
+model InternProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserIntern", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  dateOfBirth   DateTime?
+
+  // Internship Information
+  department    String
+  internshipType String // paid, unpaid, academic
+  startDate     DateTime
+  endDate       DateTime
+  stipend       Decimal?
+
+  // Educational Background
+  institution   String?
+  course        String?
+  year          String?
+
+  // Mentor Information
+  mentorId      String?
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Purpose:** Temporary staff, usually college students
+
+**Example:**
+```typescript
+const internProfile = {
+  firstName: "Sneha",
+  lastName: "Reddy",
+  department: "Content Development",
+  internshipType: "paid",
+  startDate: "2025-06-01",
+  endDate: "2025-08-31",
+  stipend: 15000.00,
+  institution: "IIT Madras",
+  course: "B.Tech Computer Science",
+  year: "3rd Year"
+}
+```
+
+---
+
+#### **31.3.7 AdminProfile**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/user-profiles.prisma` (lines 250-269)
+
+```prisma
+model AdminProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation("UserAdmin", fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+
+  // Admin Information
+  adminLevel    String @default("platform") // platform, organization, department
+  permissions   Json?  // Additional admin permissions
+
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
+
+**Admin levels:**
+- `platform`: Super admin (all access)
+- `organization`: Organization-specific admin
+- `department`: Department-specific admin
+
+**Example:**
+```typescript
+const adminProfile = {
+  firstName: "Sundar",
+  lastName: "Iyer",
+  phoneNumber: "+91-9123456789",
+  adminLevel: "platform",
+  permissions: {
+    "canManageRoles": true,
+    "canApproveEducators": true,
+    "canAccessFinancials": true,
+    "canModifyPricing": true
+  }
+}
+```
+
+---
+
+### **31.4 Relationships Explained**
+
+The multi-role system creates a **web of relationships**. Let's visualize:
+
+#### **31.4.1 User ↔ UserRole (One-to-Many)**
+
+```
+User (Priya)
+    │
+    ├── UserRole #1
+    │   ├── roleId: "role_educator"
+    │   ├── assignedAt: "2025-01-01"
+    │   └── isActive: true
+    │
+    └── UserRole #2
+        ├── roleId: "role_guardian"
+        ├── assignedAt: "2025-02-15"
+        └── isActive: true
+```
+
+**In code:**
+```typescript
+const priya = await prisma.user.findUnique({
+  where: { email: 'priya@example.com' },
+  include: {
+    userRoles: {
+      include: {
+        role: true // Include role details
+      }
+    }
+  }
+});
+
+// Result:
+priya.userRoles = [
+  {
+    id: "ur_001",
+    role: { name: "educator", displayName: "Educator" },
+    assignedAt: "2025-01-01"
+  },
+  {
+    id: "ur_002",
+    role: { name: "guardian", displayName: "Guardian" },
+    assignedAt: "2025-02-15"
+  }
+]
+```
+
+---
+
+#### **31.4.2 User ↔ Profile (One-to-One per Role)**
+
+```
+User (Priya)
+    │
+    ├── EducatorProfile
+    │   ├── qualifications: ["M.Sc. Math"]
+    │   ├── hourlyRate: 1200
+    │   └── averageRating: 4.7
+    │
+    └── GuardianProfile
+        ├── relationship: "mother"
+        └── learners: [daughter_profile]
+```
+
+**In code:**
+```typescript
+const priya = await prisma.user.findUnique({
+  where: { email: 'priya@example.com' },
+  include: {
+    educatorProfile: true,
+    guardianProfile: {
+      include: {
+        learners: true // Include associated learners
+      }
+    }
+  }
+});
+
+// Result:
+priya.educatorProfile = {
+  firstName: "Priya",
+  qualifications: ["M.Sc. Mathematics"],
+  hourlyRate: 1200.00,
+  averageRating: 4.7
+}
+
+priya.guardianProfile = {
+  firstName: "Priya",
+  relationship: "mother",
+  learners: [
+    { id: "learner_001", firstName: "Ananya", currentGrade: "11th" }
+  ]
+}
+```
+
+---
+
+#### **31.4.3 Guardian ↔ Learners (One-to-Many)**
+
+```
+GuardianProfile (Anita Sharma)
+    │
+    ├── LearnerProfile #1 (Rahul)
+    │   ├── currentGrade: "12th"
+    │   └── targetExams: ["JEE"]
+    │
+    └── LearnerProfile #2 (Priya)
+        ├── currentGrade: "10th"
+        └── targetExams: ["NEET"]
+```
+
+**In code:**
+```typescript
+const guardian = await prisma.guardianProfile.findUnique({
+  where: { userId: 'user_anita_123' },
+  include: {
+    learners: {
+      include: {
+        assignedECM: true // Also get their ECM
+      }
+    }
+  }
+});
+
+// Result:
+guardian.learners = [
+  {
+    firstName: "Rahul",
+    currentGrade: "12th",
+    targetExams: ["JEE Advanced"],
+    assignedECM: { firstName: "Priya", lastName: "Menon" }
+  },
+  {
+    firstName: "Priya",
+    currentGrade: "10th",
+    targetExams: ["NEET"],
+    assignedECM: { firstName: "Amit", lastName: "Kumar" }
+  }
+]
+```
+
+---
+
+### **31.5 Role Assignment Flow (During Registration)**
+
+Let's trace what happens when a user registers:
+
+#### **Step 1: User Registration (Frontend)**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/app/(auth)/sign-up/page.tsx`
+
+```typescript
+const handleSubmit = async (data: SignUpFormData) => {
+  try {
+    await register({
+      email: data.email,
+      password: data.password,
+      name: data.name,
+      role: data.role // "educator" selected
+    });
+  } catch (error) {
+    // Handle error
+  }
+};
+```
+
+#### **Step 2: Backend Processes Registration**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/auth.service.ts`
+
+```typescript
+async register(registerDto: RegisterDto) {
+  // 1. Create User
+  const user = await this.prisma.user.create({
+    data: {
+      email: registerDto.email,
+      name: registerDto.name,
+      emailVerified: false,
+      // ... other fields
+    }
+  });
+
+  // 2. Find the Role
+  const role = await this.prisma.role.findUnique({
+    where: { name: registerDto.role } // "educator"
+  });
+
+  // 3. Create UserRole assignment
+  await this.prisma.userRole.create({
+    data: {
+      userId: user.id,
+      roleId: role.id,
+      assignedAt: new Date(),
+      isActive: true
+    }
+  });
+
+  // 4. Create role-specific profile
+  if (registerDto.role === 'educator') {
+    await this.prisma.educatorProfile.create({
+      data: {
+        userId: user.id,
+        firstName: user.name.split(' ')[0],
+        lastName: user.name.split(' ')[1] || '',
+        phoneNumber: '',
+        verificationStatus: 'pending',
+        // ... other defaults
+      }
+    });
+  }
+
+  // 5. Generate JWT token
+  const token = this.jwtService.sign({
+    sub: user.id,
+    email: user.email,
+    roles: [registerDto.role]
+  });
+
+  return { user, token };
+}
+```
+
+**The flow:**
+```
+User submits form
+    ↓
+Create User record
+    ↓
+Find Role record (by name: "educator")
+    ↓
+Create UserRole (links user to role)
+    ↓
+Create EducatorProfile (role-specific data)
+    ↓
+Generate JWT token (includes roles array)
+    ↓
+Return user + token to frontend
+```
+
+---
+
+### **31.6 Profile Comparison Table**
+
+| Feature | Learner | Guardian | Educator | ECM | Employee | Intern | Admin |
+|---------|---------|----------|----------|-----|----------|--------|-------|
+| **Primary Purpose** | Learn | Monitor learners | Teach | Manage learners | Internal ops | Temporary staff | Platform mgmt |
+| **Verification Required** | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Payment Role** | Receives service | Pays invoices | Receives payment | Salaried | Salaried | Stipend | Salaried |
+| **Can Have Multiple?** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Key Relationships** | Guardian, ECM | Learners (1→many) | Sessions, Bookings | Learners (1→many) | Department | Mentor | All entities |
+| **Unique Fields** | targetExams[], learningStyle | relationship, paymentMethods[] | qualifications[], hourlyRate | maxLearners, interventions[] | employeeId, department | internshipType, stipend | adminLevel, permissions |
+| **Performance Metrics** | Progress scores | N/A | avgRating, totalHours | interventionSuccess, avgResponseTime | N/A | N/A | N/A |
+| **Multi-Role Common?** | Rare | Common (parent is also educator) | Common (educator is also guardian) | Rare | No | No | No |
+
+---
+
+### **31.7 Querying Multi-Role Users (Prisma Include)**
+
+#### **31.7.1 Get User with All Roles and Profiles**
+
+```typescript
+const user = await prisma.user.findUnique({
+  where: { email: 'priya@example.com' },
+  include: {
+    // Include role assignments
+    userRoles: {
+      include: {
+        role: true
+      }
+    },
+    // Include all possible profiles (null if not present)
+    learnerProfile: true,
+    guardianProfile: {
+      include: {
+        learners: true // Guardian's learners
+      }
+    },
+    educatorProfile: true,
+    ecmProfile: {
+      include: {
+        assignedLearners: true // ECM's learners
+      }
+    },
+    employeeProfile: true,
+    internProfile: true,
+    adminProfile: true
+  }
+});
+
+// Result for Priya (Educator + Guardian):
+{
+  id: "user_priya_123",
+  email: "priya@example.com",
+  name: "Priya Menon",
+  userRoles: [
+    { role: { name: "educator", displayName: "Educator" } },
+    { role: { name: "guardian", displayName: "Guardian" } }
+  ],
+  learnerProfile: null,
+  guardianProfile: {
+    relationship: "mother",
+    learners: [
+      { firstName: "Ananya", currentGrade: "11th" }
+    ]
+  },
+  educatorProfile: {
+    qualifications: ["M.Sc. Mathematics"],
+    hourlyRate: 1200.00,
+    averageRating: 4.7
+  },
+  ecmProfile: null,
+  employeeProfile: null,
+  internProfile: null,
+  adminProfile: null
+}
+```
+
+---
+
+#### **31.7.2 Filter Users by Role**
+
+```typescript
+// Find all educators
+const educators = await prisma.user.findMany({
+  where: {
+    userRoles: {
+      some: {
+        role: {
+          name: 'educator'
+        },
+        isActive: true
+      }
+    }
+  },
+  include: {
+    educatorProfile: true
+  }
+});
+
+// Find users with multiple roles
+const multiRoleUsers = await prisma.user.findMany({
+  where: {
+    userRoles: {
+      // Must have at least 2 active roles
+      some: {
+        isActive: true
+      }
+    }
+  },
+  include: {
+    userRoles: {
+      where: { isActive: true },
+      include: { role: true }
+    }
+  }
+});
+```
+
+---
+
+### **31.8 Frontend: hasRole() and hasAnyRole()**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/contexts/AuthContext.tsx` (lines 192-204)
+
+```typescript
+/**
+ * Check if user has specific role
+ */
+const hasRole = useCallback((role: string): boolean => {
+  return user ? user.roles.includes(role) : false;
+}, [user]);
+
+/**
+ * Check if user has any of the specified roles
+ */
+const hasAnyRole = useCallback((roles: string[]): boolean => {
+  if (!user) return false;
+  return roles.some(role => user.roles.includes(role));
+}, [user]);
+```
+
+**Usage in components:**
+
+```typescript
+// Example 1: Conditional rendering
+function DashboardHeader() {
+  const { user, hasRole } = useAuth();
+
+  return (
+    <div>
+      <h1>Welcome, {user?.name}</h1>
+
+      {hasRole('educator') && (
+        <button>View My Sessions</button>
+      )}
+
+      {hasRole('guardian') && (
+        <button>Monitor Learners</button>
+      )}
+    </div>
+  );
+}
+
+// Example 2: Multi-role check
+function AdminPanel() {
+  const { hasAnyRole } = useAuth();
+
+  if (!hasAnyRole(['admin', 'employee'])) {
+    return <div>Access Denied</div>;
+  }
+
+  return <AdminDashboard />;
+}
+
+// Example 3: Exact role check
+function ECMTools() {
+  const { hasRole } = useAuth();
+
+  if (!hasRole('ecm')) {
+    return <Redirect to="/unauthorized" />;
+  }
+
+  return <ECMDashboard />;
+}
+```
+
+---
+
+### **31.9 Backend: @Roles Decorator and RolesGuard**
+
+File: `/home/teamzenith/ZenCo/NextPhoton/backend/server_NestJS/src/auth/guards/roles.guard.ts`
+
+```typescript
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    // 1. Get required roles from decorator metadata
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    // 2. If no roles required, allow access
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
+    }
+
+    // 3. Get user from request (set by JWT guard)
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    // 4. Check if user has required roles
+    if (!user || !user.roles) {
+      throw new ForbiddenException('User does not have any assigned roles');
+    }
+
+    // 5. Check if user has at least one required role
+    const hasRole = requiredRoles.some((role) => user.roles.includes(role));
+
+    if (!hasRole) {
+      throw new ForbiddenException(
+        `Access denied. Required roles: ${requiredRoles.join(', ')}`
+      );
+    }
+
+    return true;
+  }
+}
+```
+
+**Usage in controllers:**
+
+```typescript
+// Example 1: Single role required
+@Controller('educator')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class EducatorController {
+
+  @Get('sessions')
+  @Roles('educator') // Only educators can access
+  async getMySessions(@Request() req) {
+    return this.educatorService.getSessions(req.user.id);
+  }
+}
+
+// Example 2: Multiple roles allowed (OR logic)
+@Controller('dashboard')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class DashboardController {
+
+  @Get('analytics')
+  @Roles('admin', 'ecm', 'employee') // Any of these roles can access
+  async getAnalytics() {
+    return this.analyticsService.getOverview();
+  }
+}
+
+// Example 3: No role restriction (any authenticated user)
+@Controller('profile')
+@UseGuards(JwtAuthGuard) // Only JwtAuthGuard, no RolesGuard
+export class ProfileController {
+
+  @Get('me')
+  async getMyProfile(@Request() req) {
+    // Any authenticated user can access their own profile
+    return this.userService.findById(req.user.id);
+  }
+}
+```
+
+**The decorator:**
+```typescript
+// auth/decorators/roles.decorator.ts
+export const ROLES_KEY = 'roles';
+export const Roles = (...roles: string[]) => SetMetadata(ROLES_KEY, roles);
+```
+
+---
+
+### **31.10 Real Example: Educator-Guardian User (Priya)**
+
+Let's trace Priya's complete journey:
+
+#### **Registration:**
+```typescript
+// Priya registers as educator first
+POST /auth/register
+{
+  "email": "priya@example.com",
+  "password": "SecurePass123!",
+  "name": "Priya Menon",
+  "role": "educator"
+}
+
+// Database after registration:
+User { id: "user_priya", email: "priya@example.com" }
+UserRole { userId: "user_priya", roleId: "role_educator" }
+EducatorProfile { userId: "user_priya", verificationStatus: "pending" }
+```
+
+#### **Adding Guardian Role Later:**
+```typescript
+// Admin adds guardian role to Priya's account
+POST /admin/users/user_priya/roles
+{
+  "roleId": "role_guardian"
+}
+
+// Database after role addition:
+UserRole { userId: "user_priya", roleId: "role_educator" }
+UserRole { userId: "user_priya", roleId: "role_guardian" } // New
+GuardianProfile { userId: "user_priya", relationship: "mother" } // New
+```
+
+#### **Login Response:**
+```typescript
+// When Priya logs in:
+POST /auth/login
+{
+  "email": "priya@example.com",
+  "password": "SecurePass123!"
+}
+
+// Response:
+{
+  "user": {
+    "id": "user_priya",
+    "email": "priya@example.com",
+    "name": "Priya Menon",
+    "roles": ["educator", "guardian"] // Both roles!
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+// JWT payload:
+{
+  "sub": "user_priya",
+  "email": "priya@example.com",
+  "roles": ["educator", "guardian"],
+  "iat": 1736150400,
+  "exp": 1736755200
+}
+```
+
+#### **Accessing Different Dashboards:**
+```typescript
+// Priya accesses educator dashboard
+GET /educator/dashboard
+Headers: { Authorization: "Bearer <token>" }
+
+// RolesGuard checks:
+requiredRoles = ["educator"]
+user.roles = ["educator", "guardian"]
+hasRole = ["educator", "guardian"].some(r => ["educator"].includes(r))
+        = true ✅ ACCESS GRANTED
+
+// Priya accesses guardian dashboard
+GET /guardian/dashboard
+Headers: { Authorization: "Bearer <token>" }
+
+// RolesGuard checks:
+requiredRoles = ["guardian"]
+user.roles = ["educator", "guardian"]
+hasRole = ["educator", "guardian"].some(r => ["guardian"].includes(r))
+        = true ✅ ACCESS GRANTED
+```
+
+#### **UI Adapts to Multiple Roles:**
+```typescript
+function Navigation() {
+  const { user, hasRole } = useAuth();
+
+  return (
+    <nav>
+      <Link href="/profile">Profile</Link>
+
+      {hasRole('educator') && (
+        <>
+          <Link href="/educator/sessions">My Sessions</Link>
+          <Link href="/educator/bookings">Bookings</Link>
+          <Link href="/educator/earnings">Earnings</Link>
+        </>
+      )}
+
+      {hasRole('guardian') && (
+        <>
+          <Link href="/guardian/learners">My Children</Link>
+          <Link href="/guardian/progress">Progress Reports</Link>
+          <Link href="/guardian/payments">Payments</Link>
+        </>
+      )}
+    </nav>
+  );
+}
+```
+
+---
+
+### **31.11 Role Switching UI (Concept)**
+
+For users with multiple roles, NextPhoton provides a role switcher:
+
+```typescript
+function RoleSwitcher() {
+  const { user } = useAuth();
+  const [activeRole, setActiveRole] = useState(user?.roles[0]);
+
+  return (
+    <div className="role-switcher">
+      <label>Active Role:</label>
+      <select
+        value={activeRole}
+        onChange={(e) => setActiveRole(e.target.value)}
+      >
+        {user?.roles.map(role => (
+          <option key={role} value={role}>
+            {role.charAt(0).toUpperCase() + role.slice(1)}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function DashboardContent() {
+  const { user } = useAuth();
+  const activeRole = useRoleStore(state => state.activeRole);
+
+  // Show dashboard based on active role
+  switch(activeRole) {
+    case 'educator':
+      return <EducatorDashboard />;
+    case 'guardian':
+      return <GuardianDashboard />;
+    case 'ecm':
+      return <ECMDashboard />;
+    default:
+      return <DefaultDashboard />;
+  }
+}
+```
+
+**State management (Zustand):**
+```typescript
+// statestore/roleStore.ts
+export const useRoleStore = create((set) => ({
+  activeRole: null,
+  setActiveRole: (role) => set({ activeRole: role }),
+}));
+```
+
+**Benefits:**
+- Single login, multiple contexts
+- Seamless switching without re-authentication
+- UI adapts to selected role
+- All permissions still enforced (can't fake roles)
+
+---
+
+### **31.12 Security: Always Verify on Backend**
+
+**❌ WRONG (Frontend-only check):**
+```typescript
+// Frontend
+function deleteUser(userId: string) {
+  if (hasRole('admin')) {
+    // Client thinks they're admin, makes request
+    fetch(`/api/users/${userId}`, { method: 'DELETE' });
+  }
+}
+
+// Backend (INSECURE!)
+@Delete(':id')
+async deleteUser(@Param('id') id: string) {
+  // No role check! Anyone can delete if they bypass frontend
+  return this.userService.delete(id);
+}
+```
+
+**✅ CORRECT (Backend verification):**
+```typescript
+// Frontend
+function deleteUser(userId: string) {
+  if (hasRole('admin')) {
+    // Frontend check for UX only
+    fetch(`/api/users/${userId}`, { method: 'DELETE' });
+  }
+}
+
+// Backend (SECURE!)
+@Delete(':id')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin') // Backend enforces role
+async deleteUser(@Param('id') id: string) {
+  // Even if attacker modifies frontend, backend rejects
+  return this.userService.delete(id);
+}
+```
+
+**Why this matters:**
+1. **Frontend is untrusted**: Anyone can modify JavaScript in browser
+2. **JWT can't be faked**: Requires server's secret key to generate valid token
+3. **Guards run on every request**: Backend always verifies roles from JWT
+4. **Defense in depth**: Multiple layers (JWT validation + role check)
+
+---
+
+### **31.13 Adding Roles Post-Registration**
+
+Users can gain additional roles over time:
+
+```typescript
+// Scenario: Learner becomes educator after graduation
+
+// Initial state (2020):
+User: "Rahul Sharma"
+Roles: ["learner"]
+Profiles: LearnerProfile
+
+// Rahul completes graduation, applies to be educator (2024):
+POST /educator/application
+{
+  "qualifications": ["B.Tech Computer Science"],
+  "subjects": ["Computer Science", "Mathematics"]
+}
+
+// Admin approves application:
+POST /admin/approve-educator/user_rahul
+{
+  "approve": true
+}
+
+// Backend creates new role:
+await prisma.userRole.create({
+  data: {
+    userId: "user_rahul",
+    roleId: "role_educator",
+    assignedBy: "admin_user_id",
+    assignedAt: new Date()
+  }
+});
+
+await prisma.educatorProfile.create({
+  data: {
+    userId: "user_rahul",
+    firstName: "Rahul",
+    lastName: "Sharma",
+    qualifications: ["B.Tech Computer Science"],
+    specializations: ["Computer Science", "Mathematics"],
+    verificationStatus: "verified"
+  }
+});
+
+// Final state:
+User: "Rahul Sharma"
+Roles: ["learner", "educator"] // Now has both!
+Profiles: LearnerProfile, EducatorProfile
+```
+
+**JWT handling:**
+```typescript
+// After role addition, user must re-login or refresh token
+// Old token:
+{ sub: "user_rahul", roles: ["learner"] }
+
+// New token (after refresh):
+{ sub: "user_rahul", roles: ["learner", "educator"] }
+```
+
+---
+
+### **31.14 Key Takeaways**
+
+#### **1. Multi-Role Architecture Enables Flexibility**
+- One user account, multiple professional identities
+- Real-world scenario: Teacher monitoring their own child
+- Database design: User → UserRole → Role → Profile
+
+#### **2. One-to-One vs One-to-Many**
+- User ↔ Profile: **One-to-one** (each role has max one profile)
+- User ↔ UserRole: **One-to-many** (user can have multiple roles)
+- Guardian ↔ Learners: **One-to-many** (guardian monitors multiple learners)
+
+#### **3. Seven Distinct Profiles**
+| Profile | Key Feature |
+|---------|-------------|
+| Learner | Learning journey tracking |
+| Guardian | Learner monitoring, payments |
+| Educator | Teaching credentials, sessions |
+| ECM | Workload management, interventions |
+| Employee | Internal operations |
+| Intern | Temporary, stipend-based |
+| Admin | Platform management |
+
+#### **4. Frontend Role Checks (UX)**
+```typescript
+hasRole('educator')           // Single role
+hasAnyRole(['admin', 'ecm'])  // Any of these roles
+```
+
+#### **5. Backend Role Enforcement (Security)**
+```typescript
+@Roles('admin')                    // Decorator
+@UseGuards(JwtAuthGuard, RolesGuard) // Guards
+```
+
+#### **6. Role Assignment Flow**
+```
+Registration → Create User → Assign Role → Create Profile → Generate JWT
+```
+
+#### **7. Querying Multi-Role Users**
+```typescript
+include: {
+  userRoles: { include: { role: true } },
+  educatorProfile: true,
+  guardianProfile: { include: { learners: true } }
+}
+```
+
+#### **8. Security Principles**
+- ✅ Always verify roles on backend
+- ✅ Frontend checks are for UX only
+- ✅ JWT contains roles (can't be faked without secret key)
+- ❌ Never trust client-side role information for authorization
+
+#### **9. Dynamic Role Addition**
+- Users can gain roles over time
+- Requires admin approval
+- New profile created automatically
+- JWT must be refreshed to include new role
+
+#### **10. Real-World Complexity**
+NextPhoton's multi-role system handles:
+- Educator teaching during day, monitoring child at night
+- ECM managing learners while also being internal employee
+- Admin with platform-wide access vs organization-specific admin
+- Learner graduating to become educator (role evolution)
+
+---
+
+## **What's Next?**
+
+You've now mastered the **multi-role architecture** - one of NextPhoton's most complex features. You understand:
+- How 7 different user types coexist in one system
+- Database relationships between User, Role, and Profiles
+- Frontend and backend role checking mechanisms
+- Security implications of role-based access control
+
+**Next Up: Chapter 32 - Learner Dashboard Component Breakdown**
+
+Chapter 32 will explore:
+- Component architecture of the Learner Dashboard
+- How data flows from database to UI
+- Real-time updates and notifications
+- Progress tracking visualizations
+- Session scheduling interface
+- Assignment submission workflow
+
+We'll dissect a complete feature from database query to rendered UI, showing how all the concepts from previous chapters come together in a real user interface!
+
+---
+
+# Chapter 32: Learner Dashboard Component Breakdown
+
+## **Overview**
+
+The **Learner Dashboard** is the information hub where learners view upcoming sessions, assignments, progress metrics, and announcements. Unlike content delivery platforms, NextPhoton focuses on **micromanagement** - tracking what happens *outside* the classroom through daily monitoring widgets.
+
+This chapter dissects the Learner Dashboard architecture, from Next.js route groups to component patterns, state management, and security.
+
+---
+
+## **1. Dashboard Concept: Information Hub**
+
+### Purpose
+- **Central view** of learner's educational journey
+- **Real-time updates** on sessions, tasks, and progress
+- **Quick actions** (join session, submit homework, message educator)
+- **Status monitoring** (attendance, performance, upcoming deadlines)
+
+### Key Principle: Micromanagement Focus
+NextPhoton differentiates itself by **monitoring outside-classroom activities**:
+- Daily task completion tracking
+- Session attendance verification
+- Homework submission status
+- Guardian progress reports
+- Educator feedback loops
+
+**Not a content platform** - focus is on *accountability* and *progress tracking*, not delivering lessons.
+
+---
+
+## **2. Next.js Route Groups: `(dashboard)` Folder**
+
+### File Structure
+```
+/app
+├── (dashboard)/              # Route group - doesn't affect URL
+│   ├── layout.tsx           # Shared layout for all dashboards
+│   ├── loading.tsx          # Loading skeleton for all routes
+│   ├── learner/
+│   │   └── page.tsx         # /learner route
+│   ├── guardian/
+│   │   └── page.tsx         # /guardian route
+│   ├── educator/
+│   │   └── page.tsx         # /educator route
+│   ├── admin/
+│   │   └── page.tsx         # /admin route
+│   └── settings/
+│       └── page.tsx         # /settings route
+```
+
+### Route Group Benefits
+- **Shared layout** without affecting URLs
+- **Parentheses syntax** `(dashboard)` removes folder from path
+- **Common loading states** via `loading.tsx`
+- **Middleware protection** applied to entire group
+- **Consistent UI structure** (sidebar, header, footer)
+
+**Result**: All dashboard routes share layout but maintain clean URLs (`/learner`, not `/dashboard/learner`)
+
+---
+
+## **3. Current Learner Page Code**
+
+**File**: `/frontend/web/src/app/(dashboard)/learner/page.tsx`
+
+```tsx
+import prisma from "../../../lib/prisma";
+
+const StudentPage = async () => {
+  // Auth and database queries commented out for mock deployment
+  // const { userId } = auth();
+  // const classItem = await prisma.class.findMany({
+  //   where: { students: { some: { id: userId! } } },
+  // });
+
+  return (
+    <div className="p-4 flex gap-4 flex-col xl:flex-row">
+      {/* Empty - widgets will be added here */}
+    </div>
+  );
+};
+
+export default StudentPage;
+```
+
+### Current State
+- **Server Component** (async function, Prisma access)
+- **Empty container** awaiting widget implementation
+- **Responsive layout** (`flex-col` mobile, `flex-row` desktop)
+- **Auth commented out** for Vercel demo deployment
+
+---
+
+## **4. Layout Structure**
+
+**File**: `/frontend/web/src/app/(dashboard)/layout.tsx`
+
+### Components Breakdown
+
+```tsx
+<SidebarProvider>                      {/* Zustand context provider */}
+  <div className="flex w-screen h-screen">
+    <aside className="sidebar">        {/* Collapsible sidebar */}
+      <DashboardSidebar />
+    </aside>
+
+    <div className="main-content">
+      <DashboardNavbar />              {/* Top navigation bar */}
+
+      <main className="flex-1">        {/* Page content area */}
+        {children}                     {/* Learner page renders here */}
+      </main>
+    </div>
+
+    <SecondarySidebarDrawer />         {/* Notifications/quick actions */}
+  </div>
+</SidebarProvider>
+```
+
+### Layout Features
+- **Client Component** (`"use client"` directive)
+- **SidebarProvider**: Zustand state management for sidebar toggle
+- **DashboardSidebar**: Role-based navigation menu
+- **DashboardNavbar**: User profile, notifications, search
+- **SecondarySidebarDrawer**: Slide-out panel for quick actions
+- **Glassmorphism effects**: Theme-based backdrop blur and gradients
+- **Hydration protection**: `mounted` state prevents SSR/CSR mismatch
+
+---
+
+## **5. Planned Features: Six Dashboard Widgets**
+
+The Learner Dashboard will contain these widgets:
+
+1. **Upcoming Sessions Widget**
+   - Next 3 scheduled sessions
+   - Educator name, subject, time
+   - "Join Now" button (for live sessions)
+
+2. **Task Assignments Widget**
+   - Homework due this week
+   - Status: Pending, Submitted, Graded
+   - Quick submit button
+
+3. **Progress Metrics Widget**
+   - Attendance percentage
+   - Tasks completion rate
+   - Performance trend graph
+
+4. **Recent Announcements Widget**
+   - Latest 5 announcements
+   - From educators or admin
+   - Mark as read functionality
+
+5. **Today's Study Plan Widget**
+   - Daily tasks assigned by ECM
+   - Checkboxes for completion
+   - Time allocation estimates
+
+6. **Quick Actions Panel**
+   - Message educator
+   - View full schedule
+   - Access resources
+   - Submit feedback
+
+**Design Goal**: Information density without overwhelming - mobile-first, collapsible sections.
+
+---
+
+## **6. Container vs Presentational Pattern**
+
+### Architecture Principle
+Separate **data fetching** (Container) from **UI rendering** (Presentational).
+
+### Container Component (Server Component)
+```tsx
+// learner/page.tsx
+import { UpcomingSessionsWidget } from '@/components/learner/UpcomingSessionsWidget';
+
+export default async function LearnerPage() {
+  // Data fetching in Server Component
+  const sessions = await prisma.session.findMany({
+    where: {
+      learners: { some: { id: learnerId } },
+      startTime: { gte: new Date() }
+    },
+    take: 3,
+    orderBy: { startTime: 'asc' }
+  });
+
+  // Pass data to Presentational Component
+  return (
+    <div className="dashboard-grid">
+      <UpcomingSessionsWidget sessions={sessions} />
+    </div>
+  );
+}
+```
+
+### Presentational Component (Client Component)
+```tsx
+// components/learner/UpcomingSessionsWidget.tsx
+"use client";
+
+export function UpcomingSessionsWidget({ sessions }: Props) {
+  // Only UI logic - no data fetching
+  return (
+    <Card>
+      <CardHeader>Upcoming Sessions</CardHeader>
+      <CardContent>
+        {sessions.map(session => (
+          <SessionCard key={session.id} session={session} />
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Benefits
+- **Server Components**: Fast data fetching, no client JS
+- **Client Components**: Interactive UI, event handlers
+- **Clear separation**: Easy to test and maintain
+- **Optimized bundles**: Only interactive parts go to client
+
+---
+
+## **7. Upcoming Sessions Widget: Pseudocode**
+
+### Container (Server Component)
+```tsx
+// app/(dashboard)/learner/page.tsx
+async function LearnerPage() {
+  const userId = await getUserId();
+
+  // Fetch upcoming sessions with relations
+  const sessions = await prisma.session.findMany({
+    where: {
+      learners: { some: { id: userId } },
+      startTime: { gte: new Date() }
+    },
+    include: {
+      educator: { select: { name: true, avatar: true } },
+      subject: { select: { name: true } }
+    },
+    take: 3,
+    orderBy: { startTime: 'asc' }
+  });
+
+  return <UpcomingSessionsWidget sessions={sessions} />;
+}
+```
+
+### Presentational (Client Component)
+```tsx
+// components/learner/UpcomingSessionsWidget.tsx
+"use client";
+
+export function UpcomingSessionsWidget({ sessions }) {
+  const joinSession = (sessionId: string) => {
+    // Navigate to video call
+    router.push(`/session/${sessionId}`);
+  };
+
+  return (
+    <Card className="widget">
+      <CardHeader>
+        <h2>Upcoming Sessions</h2>
+      </CardHeader>
+      <CardContent>
+        {sessions.length === 0 ? (
+          <EmptyState message="No upcoming sessions" />
+        ) : (
+          <ul className="space-y-3">
+            {sessions.map(session => (
+              <li key={session.id} className="session-item">
+                <Avatar src={session.educator.avatar} />
+                <div>
+                  <h3>{session.subject.name}</h3>
+                  <p>{session.educator.name}</p>
+                  <time>{formatDate(session.startTime)}</time>
+                </div>
+                {isLive(session.startTime) && (
+                  <Button onClick={() => joinSession(session.id)}>
+                    Join Now
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## **8. Task Assignments Widget: Pseudocode**
+
+### Container (Server Component)
+```tsx
+// app/(dashboard)/learner/page.tsx
+async function LearnerPage() {
+  const userId = await getUserId();
+
+  // Fetch pending and recent tasks
+  const tasks = await prisma.task.findMany({
+    where: {
+      learners: { some: { id: userId } },
+      OR: [
+        { status: 'PENDING' },
+        { status: 'SUBMITTED', updatedAt: { gte: weekAgo() } }
+      ]
+    },
+    include: {
+      subject: true,
+      educator: { select: { name: true } }
+    },
+    orderBy: { dueDate: 'asc' }
+  });
+
+  return <TaskAssignmentsWidget tasks={tasks} />;
+}
+```
+
+### Presentational (Client Component)
+```tsx
+// components/learner/TaskAssignmentsWidget.tsx
+"use client";
+
+export function TaskAssignmentsWidget({ tasks }) {
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const submitTask = async (taskId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    await fetch(`/api/tasks/${taskId}/submit`, {
+      method: 'POST',
+      body: formData
+    });
+
+    // Refresh or update local state
+    router.refresh();
+  };
+
+  return (
+    <Card className="widget">
+      <CardHeader>Task Assignments</CardHeader>
+      <CardContent>
+        {tasks.map(task => (
+          <div key={task.id} className="task-card">
+            <Badge variant={task.status === 'PENDING' ? 'warning' : 'success'}>
+              {task.status}
+            </Badge>
+            <h3>{task.title}</h3>
+            <p>{task.subject.name} - {task.educator.name}</p>
+            <time>Due: {formatDate(task.dueDate)}</time>
+
+            {task.status === 'PENDING' && (
+              <Button onClick={() => setSelectedTask(task)}>
+                Submit
+              </Button>
+            )}
+          </div>
+        ))}
+      </CardContent>
+
+      {selectedTask && (
+        <SubmitTaskModal
+          task={selectedTask}
+          onSubmit={submitTask}
+          onClose={() => setSelectedTask(null)}
+        />
+      )}
+    </Card>
+  );
+}
+```
+
+---
+
+## **9. Server vs Client Components**
+
+### When to Use Server Components
+- **Data fetching**: Prisma queries, API calls
+- **Environment secrets**: Access `process.env` safely
+- **Heavy computations**: Run on server, send only result
+- **Static content**: No interactivity needed
+
+**Example**: Dashboard page fetching sessions and tasks
+
+### When to Use Client Components
+- **Interactivity**: Click handlers, form inputs
+- **Browser APIs**: localStorage, window, navigator
+- **React hooks**: useState, useEffect, useContext
+- **Real-time updates**: WebSocket connections
+
+**Example**: Task submission modal, session join button
+
+### Next.js 15 Rules
+1. **All components are Server Components by default**
+2. **Add `"use client"` directive** for Client Components
+3. **Can't import Client into Server** (but opposite works)
+4. **Props must be serializable** (no functions across boundary)
+
+### Optimal Pattern
+```tsx
+// Server Component (default)
+async function Page() {
+  const data = await fetchData();  // Server-side fetch
+  return <ClientWidget data={data} />;  // Pass to Client
+}
+
+// Client Component
+"use client";
+function ClientWidget({ data }) {
+  const [state, setState] = useState(data);
+  // Interactive logic here
+}
+```
+
+---
+
+## **10. Middleware Protection**
+
+**File**: `/frontend/web/src/middleware.ts` (lines 67-166)
+
+### Role-Based Route Access
+```tsx
+const roleBasedRoutes: Record<string, string[]> = {
+  '/admin': ['admin'],
+  '/educator': ['educator', 'admin'],
+  '/learner': ['learner', 'guardian', 'admin'],
+  '/guardian': ['guardian', 'admin'],
+  '/ecm': ['ecm', 'admin'],
+  '/employee': ['employee', 'admin'],
+  '/intern': ['intern', 'admin'],
+};
+```
+
+### Middleware Logic Flow
+1. **Check public routes**: Allow unauthenticated access
+2. **Extract JWT token**: From `nextphoton_jwt_token` cookie
+3. **Parse user roles**: From `nextphoton_user` cookie
+4. **Redirect unauthenticated**: To `/sign-in` with return URL
+5. **Check role permissions**: Match user roles against route requirements
+6. **Deny access**: Redirect to `/unauthorized` if role mismatch
+7. **Allow access**: Call `NextResponse.next()` if authorized
+
+### Example: Learner Route Protection
+```tsx
+// Middleware checks for /learner route
+if (pathname.startsWith('/learner')) {
+  // Must have 'learner', 'guardian', or 'admin' role
+  const hasRequiredRole = userRoles.some(role =>
+    ['learner', 'guardian', 'admin'].includes(role)
+  );
+
+  if (!hasRequiredRole) {
+    return NextResponse.redirect('/unauthorized');
+  }
+}
+```
+
+### Security Features
+- **JWT validation**: Token presence checked (backend validates signature)
+- **Role hierarchy**: Admin can access all routes
+- **Redirect preservation**: Return to original URL after sign-in
+- **Cookie-based auth**: HttpOnly cookies prevent XSS attacks
+
+---
+
+## **11. Loading Skeletons**
+
+**File**: `/frontend/web/src/app/(dashboard)/loading.tsx`
+
+```tsx
+import { CenteredPageLoader } from '@/components/MinimalisticLoader';
+
+export default function Loading() {
+  return <CenteredPageLoader variant="orbit" message="Loading dashboard..." />;
+}
+```
+
+### Loading States Strategy
+- **Route-level loading**: `loading.tsx` shows during page transitions
+- **Component-level loading**: Individual widgets can have skeletons
+- **Progressive rendering**: Show layout first, load widgets incrementally
+- **User feedback**: Animated loader with descriptive message
+
+### Widget Skeleton Example
+```tsx
+function UpcomingSessionsSkeleton() {
+  return (
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-40" />  {/* Title */}
+      </CardHeader>
+      <CardContent>
+        {[1, 2, 3].map(i => (
+          <div key={i} className="flex gap-3 mb-3">
+            <Skeleton className="h-12 w-12 rounded-full" />  {/* Avatar */}
+            <div className="flex-1">
+              <Skeleton className="h-4 w-32 mb-2" />  {/* Name */}
+              <Skeleton className="h-3 w-48" />  {/* Time */}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## **12. Responsive Design**
+
+### Mobile-First Approach
+```tsx
+<div className="p-4 flex gap-4 flex-col xl:flex-row">
+  {/* Stacks vertically on mobile, horizontal on desktop */}
+</div>
+```
+
+### Breakpoints (Tailwind CSS)
+- **Default**: Mobile (< 640px) - single column
+- **sm**: Tablet (640px+) - single column
+- **md**: Tablet (768px+) - single column
+- **lg**: Desktop (1024px+) - single column
+- **xl**: Large Desktop (1280px+) - two columns
+- **2xl**: Extra Large (1536px+) - three columns
+
+### Dashboard Grid Pattern
+```tsx
+<div className="dashboard-grid">
+  {/* Grid adjusts based on screen size */}
+  <style jsx>{`
+    .dashboard-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;  /* Mobile: 1 column */
+    }
+
+    @media (min-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 2fr 1fr;  /* Desktop: 2 columns */
+      }
+    }
+
+    @media (min-width: 1536px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr 1fr;  /* XL: 3 columns */
+      }
+    }
+  `}</style>
+</div>
+```
+
+### Widget Responsiveness
+- **Collapsible sections**: Accordions on mobile
+- **Scrollable lists**: Horizontal scroll for session cards on mobile
+- **Touch targets**: Minimum 44px for buttons
+- **Sidebar collapse**: Auto-hide on mobile, visible on desktop
+
+---
+
+## **13. Zustand State Management**
+
+**File**: `/frontend/web/src/statestore/store.ts`
+
+### Store Structure
+```tsx
+import { create } from 'zustand';
+
+// Sidebar toggle state
+export const useSidebarStore = create<SidebarState>((set) => ({
+  isOpen: false,
+  toggle: () => set((state) => ({ isOpen: !state.isOpen })),
+  setOpen: (open) => set({ isOpen: open }),
+}));
+
+// User authentication state
+export const useUserStore = create<UserState>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+}));
+
+// App-wide state (notifications, drawers)
+export const useStore = create<AppState>((set) => ({
+  isSecondarySidebarOpen: false,
+  secondarySidebarContent: null,
+  openSecondarySidebar: (content) => set({
+    isSecondarySidebarOpen: true,
+    secondarySidebarContent: content
+  }),
+  closeSecondarySidebar: () => set({
+    isSecondarySidebarOpen: false,
+    secondarySidebarContent: null
+  }),
+}));
+```
+
+### Usage in Components
+```tsx
+// In DashboardSidebar.tsx
+"use client";
+import { useSidebarStore } from '@/statestore/store';
+
+export function DashboardSidebar() {
+  const { isOpen, toggle } = useSidebarStore();
+
+  return (
+    <aside className={isOpen ? 'sidebar-open' : 'sidebar-closed'}>
+      <button onClick={toggle}>Toggle</button>
+    </aside>
+  );
+}
+```
+
+### Why Zustand?
+- **Minimal boilerplate**: No providers or reducers
+- **TypeScript support**: Full type inference
+- **No context hell**: Direct store access
+- **DevTools integration**: Debug state changes
+- **Small bundle size**: ~1KB gzipped
+
+### State Management Strategy
+- **Global UI state**: Sidebar, modals, drawers → Zustand
+- **User auth state**: Current user, roles → Zustand + cookies
+- **Server data**: Sessions, tasks, progress → Server Components
+- **Form state**: React Hook Form (no global state needed)
+
+---
+
+## **14. Key Takeaways**
+
+### Architecture Principles
+1. **Route groups** organize dashboard routes without affecting URLs
+2. **Shared layout** provides consistent sidebar/header across roles
+3. **Container/Presentational pattern** separates data from UI
+4. **Server Components** for data fetching (Prisma queries)
+5. **Client Components** for interactivity (buttons, forms)
+
+### Dashboard Design
+- **Six widget types** for micromanagement focus
+- **Mobile-first responsive** grid layout
+- **Loading skeletons** for perceived performance
+- **Glassmorphism styling** with theme support
+
+### Security & State
+- **Middleware protection** enforces role-based access
+- **JWT cookies** for authentication
+- **Zustand stores** for global UI state
+- **No client-side secrets** (all in Server Components)
+
+### Implementation Status
+- **Layout complete**: Sidebar, navbar, drawer functional
+- **Page skeleton**: Empty container ready for widgets
+- **Auth system**: Middleware protection active
+- **State management**: Zustand stores configured
+
+**Next Step**: Implement individual widgets (Upcoming Sessions, Task Assignments) following Container/Presentational pattern.
+
+---
+
+## **What's Next?**
+
+You've now mastered the **Learner Dashboard architecture** - the central hub for learner interactions. You understand:
+- How Next.js route groups organize dashboard routes
+- The Container/Presentational component pattern
+- Server vs Client Component boundaries
+- Middleware-based route protection
+- Responsive design and state management with Zustand
+
+---
+
+## Chapter 33: Guardian Portal - Progress Monitoring
+
+### 33.1 Guardian Role Overview
+
+**Purpose**: Guardians monitor learners' academic progress, book sessions, make payments, and communicate with ECMs.
+
+**Key Responsibilities**:
+- Monitor one or more learners (children, wards)
+- View progress reports and session history
+- Book sessions with educators
+- Make payments for sessions
+- Communicate with assigned ECM
+
+**Guardian vs Learner**:
+- Guardians oversee, learners learn
+- Guardians pay, learners participate
+- Guardians can access multiple learner profiles
+- Guardians don't attend sessions (unless observing)
+
+---
+
+### 33.2 Guardian-Learner Relationship
+
+**One-to-Many Model**:
+```prisma
+// shared/prisma/schema/user-profiles.prisma
+model GuardianProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+
+  firstName     String
+  lastName      String
+  relationship  String // parent, grandparent, sibling, etc.
+  phoneNumber   String
+
+  // One guardian, many learners
+  learners      LearnerProfile[] @relation("LearnerGuardian")
+
+  // Payment information
+  paymentMethods PaymentMethod[]
+  invoices       Invoice[]
+}
+
+model LearnerProfile {
+  id         String @id @default(cuid())
+  guardianId String?
+  guardian   GuardianProfile? @relation("LearnerGuardian", fields: [guardianId], references: [id])
+
+  // Learner's sessions, progress, etc.
+  learningSessions  LearningSession[]
+  progressReports   ProgressReport[]
+  sessionBookings   SessionBooking[]
+}
+```
+
+**Relationship Types**:
+- `parent` - Natural parent
+- `grandparent` - Grandparent
+- `sibling` - Older sibling
+- `legal_guardian` - Court-appointed guardian
+- `other` - Other authorized adult
+
+---
+
+### 33.3 Guardian Dashboard Features
+
+**Dashboard Layout**:
+```tsx
+// frontend/web/src/app/(dashboard)/guardian/page.tsx
+export default function GuardianDashboard() {
+  return (
+    <div className="p-4 flex flex-col gap-4">
+      {/* Learner selection (if multiple children) */}
+      <LearnerSelector />
+
+      {/* Progress overview cards */}
+      <ProgressOverviewCards />
+
+      {/* Recent session history */}
+      <RecentSessionsWidget />
+
+      {/* Upcoming sessions */}
+      <UpcomingSessionsWidget />
+
+      {/* Payment history */}
+      <PaymentHistoryWidget />
+
+      {/* ECM contact card */}
+      <ECMContactCard />
+    </div>
+  );
+}
+```
+
+---
+
+### 33.4 Learner Selection Dropdown
+
+**Multi-Learner Scenario**:
+```tsx
+"use client";
+import { useState } from 'react';
+import { Select } from '@/components/ui/select';
+
+function LearnerSelector({ learners }) {
+  const [selectedLearner, setSelectedLearner] = useState(learners[0].id);
+
+  return (
+    <Select value={selectedLearner} onValueChange={setSelectedLearner}>
+      {learners.map(learner => (
+        <option key={learner.id} value={learner.id}>
+          {learner.firstName} {learner.lastName} - Grade {learner.currentGrade}
+        </option>
+      ))}
+    </Select>
+  );
+}
+```
+
+**Data Fetching**:
+```tsx
+// Server Component
+async function GuardianDashboardContainer() {
+  const guardianProfile = await prisma.guardianProfile.findUnique({
+    where: { userId: currentUserId },
+    include: {
+      learners: {
+        select: { id: true, firstName: true, lastName: true, currentGrade: true }
+      }
+    }
+  });
+
+  return <GuardianDashboard learners={guardianProfile.learners} />;
+}
+```
+
+---
+
+### 33.5 Progress Overview Cards
+
+**Display Key Metrics**:
+```tsx
+function ProgressOverviewCards({ learnerId }) {
+  // Server Component - fetch data
+  const stats = await prisma.learnerProfile.findUnique({
+    where: { id: learnerId },
+    select: {
+      _count: {
+        select: {
+          learningSessions: { where: { status: 'completed' } },
+          assignments: { where: { status: 'submitted' } }
+        }
+      },
+      progressReports: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+        select: { attendanceRate: true, homeworkCompletion: true }
+      }
+    }
+  });
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <StatCard title="Sessions Completed" value={stats._count.learningSessions} />
+      <StatCard title="Attendance Rate" value={`${stats.progressReports[0]?.attendanceRate}%`} />
+      <StatCard title="Homework Completion" value={`${stats.progressReports[0]?.homeworkCompletion}%`} />
+      <StatCard title="Assignments Submitted" value={stats._count.assignments} />
+    </div>
+  );
+}
+```
+
+---
+
+### 33.6 Recent Session History
+
+**Session List Widget**:
+```tsx
+async function RecentSessionsWidget({ learnerId }) {
+  const sessions = await prisma.learningSession.findMany({
+    where: {
+      learnerId,
+      status: 'completed'
+    },
+    orderBy: { scheduledStart: 'desc' },
+    take: 5,
+    include: {
+      educator: { select: { firstName: true, lastName: true } },
+      feedbacks: {
+        where: { providedBy: 'educator' },
+        select: { overallRating: true, comments: true }
+      }
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Sessions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {sessions.map(session => (
+          <div key={session.id} className="flex justify-between items-center mb-3">
+            <div>
+              <p className="font-medium">{session.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {session.educator.firstName} {session.educator.lastName}
+              </p>
+              <p className="text-xs">{new Date(session.scheduledStart).toLocaleDateString()}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm">Rating: {session.feedbacks[0]?.overallRating}/5</p>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 33.7 Upcoming Sessions
+
+**Upcoming Sessions Display**:
+```tsx
+async function UpcomingSessionsWidget({ learnerId }) {
+  const upcoming = await prisma.learningSession.findMany({
+    where: {
+      learnerId,
+      status: 'scheduled',
+      scheduledStart: { gte: new Date() }
+    },
+    orderBy: { scheduledStart: 'asc' },
+    take: 3,
+    include: {
+      educator: { select: { firstName: true, lastName: true } }
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Upcoming Sessions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {upcoming.length === 0 ? (
+          <p className="text-muted-foreground">No upcoming sessions</p>
+        ) : (
+          upcoming.map(session => (
+            <div key={session.id} className="border-l-4 border-primary pl-3 mb-3">
+              <p className="font-medium">{session.title}</p>
+              <p className="text-sm">Educator: {session.educator.firstName} {session.educator.lastName}</p>
+              <p className="text-xs">{new Date(session.scheduledStart).toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Duration: {session.duration} min</p>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 33.8 Progress Report Viewing
+
+**ProgressReport Model**:
+```prisma
+// shared/prisma/schema/monitoring-progress.prisma
+model ProgressReport {
+  id              String @id @default(cuid())
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  reportType      String // weekly, monthly, quarterly
+  title           String
+  periodStart     DateTime
+  periodEnd       DateTime
+
+  // Academic summary (JSON with subject-wise data)
+  academicSummary Json
+  overallGrade    String?
+  improvements    String[]
+  concerns        String[]
+
+  // Behavioral metrics
+  attendanceRate  Decimal?
+  participationLevel Decimal?
+  behavioralNotes String?
+
+  // Session performance
+  sessionsAttended Int?
+  totalSessions    Int?
+  homeworkCompletion Decimal?
+
+  // Recommendations
+  academicRecommendations String[]
+  parentRecommendations   String[]
+
+  // Generated by ECM
+  generatedBy     String
+  ecm             ECMProfile @relation(fields: [generatedBy], references: [id])
+
+  sharedWithGuardian Boolean @default(false)
+  sharedAt        DateTime?
+}
+```
+
+**Report Viewer Component**:
+```tsx
+async function ProgressReportList({ learnerId }) {
+  const reports = await prisma.progressReport.findMany({
+    where: {
+      learnerId,
+      sharedWithGuardian: true
+    },
+    orderBy: { periodEnd: 'desc' },
+    include: {
+      ecm: { select: { firstName: true, lastName: true } }
+    }
+  });
+
+  return (
+    <div>
+      {reports.map(report => (
+        <Card key={report.id}>
+          <CardHeader>
+            <CardTitle>{report.title}</CardTitle>
+            <p className="text-sm">
+              {new Date(report.periodStart).toLocaleDateString()} -
+              {new Date(report.periodEnd).toLocaleDateString()}
+            </p>
+          </CardHeader>
+          <CardContent>
+            <p>Attendance: {report.attendanceRate}%</p>
+            <p>Homework Completion: {report.homeworkCompletion}%</p>
+            <p>Sessions: {report.sessionsAttended}/{report.totalSessions}</p>
+
+            <div className="mt-3">
+              <h4 className="font-medium">Improvements:</h4>
+              <ul>
+                {report.improvements.map((item, i) => (
+                  <li key={i}>✓ {item}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-3">
+              <h4 className="font-medium">Recommendations for Parents:</h4>
+              <ul>
+                {report.parentRecommendations.map((item, i) => (
+                  <li key={i}>• {item}</li>
+                ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+### 33.9 Payment Integration
+
+**Payment Models**:
+```prisma
+// shared/prisma/schema/financial-system.prisma
+model PaymentMethod {
+  id          String @id @default(cuid())
+  guardianId  String
+  guardian    GuardianProfile @relation(fields: [guardianId], references: [id])
+
+  type        String // card, upi, bank_transfer
+  provider    String // razorpay, stripe
+  displayName String // "Visa ****1234"
+  isDefault   Boolean @default(false)
+
+  transactions Transaction[]
+}
+
+model Invoice {
+  id            String @id @default(cuid())
+  invoiceNumber String @unique
+  guardianId    String
+  guardian      GuardianProfile @relation(fields: [guardianId], references: [id])
+
+  type          String // session_fees, subscription
+  status        String // draft, sent, paid, overdue
+
+  subtotal      Decimal
+  taxAmount     Decimal
+  totalAmount   Decimal
+
+  issueDate     DateTime
+  dueDate       DateTime
+  paidDate      DateTime?
+
+  items         InvoiceItem[]
+  transactions  Transaction[]
+}
+```
+
+**Payment History Widget**:
+```tsx
+async function PaymentHistoryWidget({ guardianId }) {
+  const invoices = await prisma.invoice.findMany({
+    where: { guardianId },
+    orderBy: { issueDate: 'desc' },
+    take: 10,
+    include: {
+      items: true
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Payment History</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoices.map(invoice => (
+              <tr key={invoice.id}>
+                <td>{invoice.invoiceNumber}</td>
+                <td>{new Date(invoice.issueDate).toLocaleDateString()}</td>
+                <td>₹{invoice.totalAmount}</td>
+                <td>
+                  <span className={`badge ${invoice.status === 'paid' ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                    {invoice.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 33.10 Session Booking Flow
+
+**SessionBooking Model**:
+```prisma
+// shared/prisma/schema/session-management.prisma
+model SessionBooking {
+  id             String @id @default(cuid())
+  learnerId      String
+  educatorId     String
+  requestedBy    String // Guardian ID
+
+  learner        LearnerProfile @relation(fields: [learnerId], references: [id])
+  educator       EducatorProfile @relation(fields: [educatorId], references: [id])
+
+  preferredDates DateTime[]
+  preferredTimes String[] // "morning", "afternoon", "evening"
+  subject        String
+  topics         String[]
+  duration       Int @default(60)
+
+  status         String @default("pending") // pending, approved, rejected
+  educatorResponse String @default("pending")
+  ecmResponse    String @default("pending")
+
+  proposedRate   Decimal?
+  agreedRate     Decimal?
+}
+```
+
+**Booking Form Component**:
+```tsx
+"use client";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const bookingSchema = z.object({
+  educatorId: z.string().cuid(),
+  learnerId: z.string().cuid(),
+  subject: z.string().min(1),
+  topics: z.array(z.string()),
+  preferredDates: z.array(z.date()),
+  duration: z.number().min(30).max(180),
+  requirements: z.string().optional()
+});
+
+function SessionBookingForm({ learners, educators }) {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(bookingSchema)
+  });
+
+  const onSubmit = async (data) => {
+    const response = await fetch('/api/bookings', {
+      method: 'POST',
+      body: JSON.stringify({ ...data, requestedBy: guardianId })
+    });
+
+    if (response.ok) {
+      toast.success('Booking request sent!');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <select {...register('learnerId')}>
+        {learners.map(l => (
+          <option key={l.id} value={l.id}>{l.firstName}</option>
+        ))}
+      </select>
+
+      <select {...register('educatorId')}>
+        {educators.map(e => (
+          <option key={e.id} value={e.id}>{e.firstName} {e.lastName}</option>
+        ))}
+      </select>
+
+      <input {...register('subject')} placeholder="Subject" />
+
+      <button type="submit">Book Session</button>
+    </form>
+  );
+}
+```
+
+---
+
+### 33.11 ECM Communication
+
+**ECM Contact Card**:
+```tsx
+async function ECMContactCard({ learnerId }) {
+  const learner = await prisma.learnerProfile.findUnique({
+    where: { id: learnerId },
+    include: {
+      assignedECM: {
+        select: {
+          firstName: true,
+          lastName: true,
+          phoneNumber: true,
+          user: { select: { email: true } }
+        }
+      }
+    }
+  });
+
+  const ecm = learner.assignedECM;
+
+  if (!ecm) return <p>No ECM assigned yet</p>;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Your EduCare Manager</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-4">
+          <Avatar>
+            <AvatarFallback>{ecm.firstName[0]}{ecm.lastName[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="font-medium">{ecm.firstName} {ecm.lastName}</p>
+            <p className="text-sm text-muted-foreground">{ecm.user.email}</p>
+            <p className="text-sm">{ecm.phoneNumber}</p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          <Button variant="outline" size="sm">
+            <Mail className="mr-2 h-4 w-4" />
+            Send Message
+          </Button>
+          <Button variant="outline" size="sm">
+            <Phone className="mr-2 h-4 w-4" />
+            Call
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 33.12 Real-Time Notifications
+
+**Notification Types for Guardians**:
+- Learner marked absent from session
+- New progress report available
+- Session booking approved/rejected
+- Payment due reminder
+- Low performance alert from ECM
+- Homework overdue alert
+
+**Notification Component**:
+```tsx
+async function GuardianNotifications({ guardianId }) {
+  // Fetch recent alerts for all learners
+  const notifications = await prisma.alert.findMany({
+    where: {
+      learnerId: {
+        in: await prisma.learnerProfile.findMany({
+          where: { guardianId },
+          select: { id: true }
+        }).then(learners => learners.map(l => l.id))
+      },
+      status: 'active'
+    },
+    orderBy: { createdAt: 'desc' },
+    take: 5
+  });
+
+  return (
+    <div>
+      {notifications.map(notif => (
+        <div key={notif.id} className={`alert alert-${notif.severity}`}>
+          <h4>{notif.title}</h4>
+          <p>{notif.message}</p>
+          <span className="text-xs">{new Date(notif.createdAt).toLocaleString()}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+### 33.13 Key Takeaways - Chapter 33
+
+✅ **Guardian Role**: Monitors learners, books sessions, makes payments, communicates with ECM
+
+✅ **One-to-Many Relationship**: One guardian can monitor multiple learners via `GuardianProfile.learners[]`
+
+✅ **Dashboard Widgets**:
+- Learner selector dropdown (multi-child support)
+- Progress overview cards (attendance, homework, sessions)
+- Recent/upcoming session lists
+- Payment history table
+- ECM contact card
+
+✅ **Progress Reports**: ECM-generated reports with academic summary, attendance, recommendations
+
+✅ **Payment Models**:
+- `PaymentMethod` - Stored payment methods (card, UPI)
+- `Invoice` - Session fees, subscriptions
+- `Transaction` - Payment processing records
+
+✅ **Session Booking**:
+- `SessionBooking` model with approval workflow
+- Guardian requests → Educator approves → ECM approves → Session created
+
+✅ **Communication**: Direct messaging with assigned ECM, view contact info
+
+✅ **Real-Time Alerts**: Absence notifications, performance alerts, payment reminders
+
+✅ **Data Security**: Guardians only see data for their assigned learners
+
+**Next Chapter**: Educator Interface - Session Management
+
+---
+
+## Chapter 34: Educator Interface - Session Management
+
+### 34.1 Educator Role Overview
+
+**Purpose**: Educators conduct learning sessions, provide feedback, set availability, and earn income.
+
+**Key Responsibilities**:
+- Conduct one-on-one or group sessions
+- Provide session feedback and homework
+- Set hourly rates and availability
+- Track earnings
+- Maintain learner roster
+
+**Educator vs ECM**:
+- Educators teach content, ECMs monitor progress
+- Educators propose rates, ECMs don't (salaried)
+- Educators have performance ratings
+- Educators are contractors, ECMs are employees
+
+---
+
+### 34.2 Educator Onboarding Workflow
+
+**Verification Status Flow**:
+```
+WAITLIST → UNDER_REVIEW → APPROVED → ACTIVE
+           ↓
+        REJECTED
+```
+
+**EducatorProfile Verification Fields**:
+```prisma
+// shared/prisma/schema/user-profiles.prisma
+model EducatorProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+
+  // Professional information
+  qualifications String[] // ["B.Ed", "M.Sc Mathematics"]
+  specializations String[] // ["Mathematics", "Physics"]
+  experience     Int?      // Years of experience
+
+  // Verification workflow
+  verificationStatus String @default("pending") // pending, verified, rejected
+  documentsUploaded  String[] // URLs to uploaded documents
+  backgroundCheck    String @default("pending") // pending, completed, failed
+
+  // Rate management
+  hourlyRate         Decimal?
+  rateStatus         String @default("pending") // pending, approved, rejected
+
+  // Performance metrics
+  averageRating      Decimal? @default(0)
+  totalRatings       Int      @default(0)
+  totalSessionsHours Decimal? @default(0)
+
+  // Active status
+  isActive     Boolean @default(true)
+  isAvailable  Boolean @default(true)
+}
+```
+
+**Onboarding Steps**:
+1. **Registration**: Educator signs up, fills profile
+2. **Document Upload**: Upload qualifications, ID, certificates
+3. **Admin Review**: Admin verifies documents
+4. **Background Check**: Third-party verification (if required)
+5. **Approval**: Status changed to `verified`, educator can now book sessions
+6. **Rate Proposal**: Educator proposes hourly rate for admin approval
+
+---
+
+### 34.3 Educator Dashboard Features
+
+**Dashboard Layout**:
+```tsx
+// frontend/web/src/app/(dashboard)/educator/page.tsx
+export default async function EducatorDashboard() {
+  return (
+    <div className="p-4 flex flex-col gap-4">
+      {/* Today's sessions */}
+      <TodaysSessionsWidget />
+
+      {/* Availability calendar */}
+      <AvailabilityCalendar />
+
+      {/* Session feedback form */}
+      <PendingFeedbackWidget />
+
+      {/* Earnings summary */}
+      <EarningsSummaryWidget />
+
+      {/* Learner roster */}
+      <LearnerRosterWidget />
+    </div>
+  );
+}
+```
+
+---
+
+### 34.4 Today's Sessions Widget
+
+**Display Today's Schedule**:
+```tsx
+async function TodaysSessionsWidget({ educatorId }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const sessions = await prisma.learningSession.findMany({
+    where: {
+      educatorId,
+      scheduledStart: {
+        gte: today,
+        lt: tomorrow
+      }
+    },
+    orderBy: { scheduledStart: 'asc' },
+    include: {
+      learner: { select: { firstName: true, lastName: true } }
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Today's Sessions</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {sessions.length === 0 ? (
+          <p className="text-muted-foreground">No sessions scheduled today</p>
+        ) : (
+          sessions.map(session => (
+            <div key={session.id} className="flex justify-between items-center border-b py-3">
+              <div>
+                <p className="font-medium">{session.title}</p>
+                <p className="text-sm">Student: {session.learner.firstName} {session.learner.lastName}</p>
+                <p className="text-xs">{new Date(session.scheduledStart).toLocaleTimeString()}</p>
+              </div>
+              <div className="flex gap-2">
+                <Badge variant={session.status === 'completed' ? 'success' : 'default'}>
+                  {session.status}
+                </Badge>
+                {session.status === 'scheduled' && (
+                  <Button size="sm" variant="outline">Start Session</Button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 34.5 Availability Calendar
+
+**Availability Management**:
+```tsx
+"use client";
+import { Calendar } from '@/components/ui/calendar';
+import { useState } from 'react';
+
+function AvailabilityCalendar({ educatorId }) {
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [timeSlots, setTimeSlots] = useState({
+    morning: false,
+    afternoon: false,
+    evening: false
+  });
+
+  const saveAvailability = async () => {
+    await fetch('/api/educator/availability', {
+      method: 'POST',
+      body: JSON.stringify({
+        educatorId,
+        availableDates: selectedDates,
+        timeSlots
+      })
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Set Availability</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Calendar
+          mode="multiple"
+          selected={selectedDates}
+          onSelect={setSelectedDates}
+        />
+
+        <div className="mt-4">
+          <h4 className="font-medium mb-2">Time Slots</h4>
+          <div className="flex gap-2">
+            <Checkbox
+              checked={timeSlots.morning}
+              onCheckedChange={(val) => setTimeSlots(prev => ({ ...prev, morning: val }))}
+            >
+              Morning (6am-12pm)
+            </Checkbox>
+            <Checkbox
+              checked={timeSlots.afternoon}
+              onCheckedChange={(val) => setTimeSlots(prev => ({ ...prev, afternoon: val }))}
+            >
+              Afternoon (12pm-6pm)
+            </Checkbox>
+            <Checkbox
+              checked={timeSlots.evening}
+              onCheckedChange={(val) => setTimeSlots(prev => ({ ...prev, evening: val }))}
+            >
+              Evening (6pm-10pm)
+            </Checkbox>
+          </div>
+        </div>
+
+        <Button onClick={saveAvailability} className="mt-4">Save Availability</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 34.6 Session Lifecycle
+
+**LearningSession Status Flow**:
+```
+SCHEDULED → IN_PROGRESS → COMPLETED
+    ↓
+CANCELLED / NO_SHOW
+```
+
+**LearningSession Model**:
+```prisma
+// shared/prisma/schema/session-management.prisma
+model LearningSession {
+  id          String @id @default(cuid())
+  learnerId   String
+  educatorId  String
+  ecmId       String? // ECM who approved
+
+  learner     LearnerProfile @relation(fields: [learnerId], references: [id])
+  educator    EducatorProfile @relation(fields: [educatorId], references: [id])
+
+  title       String
+  subject     String
+  topics      String[]
+
+  scheduledStart DateTime
+  scheduledEnd   DateTime
+  actualStart    DateTime? // When educator clicked "Start"
+  actualEnd      DateTime? // When educator clicked "End"
+
+  status         String @default("scheduled") // scheduled, in-progress, completed, cancelled, no-show
+
+  // Session outcomes
+  objectives     String[]
+  actualTopics   String[] // Topics covered
+  homework       String?
+  nextSessionPlan String?
+
+  // Financial
+  cost           Decimal?
+  paymentStatus  String @default("pending")
+
+  feedbacks      SessionFeedback[]
+}
+```
+
+**Session Control Component**:
+```tsx
+"use client";
+
+function SessionControls({ sessionId, status }) {
+  const startSession = async () => {
+    await fetch(`/api/sessions/${sessionId}/start`, { method: 'POST' });
+  };
+
+  const endSession = async () => {
+    await fetch(`/api/sessions/${sessionId}/end`, { method: 'POST' });
+  };
+
+  return (
+    <div>
+      {status === 'scheduled' && (
+        <Button onClick={startSession}>Start Session</Button>
+      )}
+
+      {status === 'in-progress' && (
+        <Button onClick={endSession} variant="destructive">End Session</Button>
+      )}
+
+      {status === 'completed' && (
+        <Badge variant="success">Completed</Badge>
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### 34.7 Session Feedback Form
+
+**SessionFeedback Model**:
+```prisma
+// shared/prisma/schema/session-management.prisma
+model SessionFeedback {
+  id            String @id @default(cuid())
+  sessionId     String
+  session       LearningSession @relation(fields: [sessionId], references: [id])
+
+  providedBy    String // "educator", "learner", "guardian"
+  providerId    String
+
+  educatorId    String?
+  educator      EducatorProfile? @relation(fields: [educatorId], references: [id])
+
+  // Ratings (1-5)
+  overallRating    Int?
+  contentRating    Int?
+  engagementRating Int?
+
+  // Detailed feedback
+  positives     String?
+  improvements  String?
+  comments      String?
+
+  // Session effectiveness
+  topicsClarity    Int?
+  paceRating       Int?
+
+  // Follow-up
+  suggestedTopics  String[]
+  nextSessionNeeds String?
+}
+```
+
+**Feedback Form Component**:
+```tsx
+"use client";
+import { useForm } from 'react-hook-form';
+
+function SessionFeedbackForm({ sessionId, educatorId }) {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    await fetch('/api/sessions/feedback', {
+      method: 'POST',
+      body: JSON.stringify({
+        sessionId,
+        providedBy: 'educator',
+        providerId: educatorId,
+        educatorId,
+        ...data
+      })
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <h3>Session Feedback</h3>
+
+      <label>Overall Rating (1-5)</label>
+      <input type="number" {...register('overallRating')} min="1" max="5" />
+
+      <label>Engagement Rating (1-5)</label>
+      <input type="number" {...register('engagementRating')} min="1" max="5" />
+
+      <label>Positives</label>
+      <textarea {...register('positives')} placeholder="What went well?" />
+
+      <label>Areas for Improvement</label>
+      <textarea {...register('improvements')} placeholder="What could be better?" />
+
+      <label>Homework Assigned</label>
+      <textarea {...register('homework')} placeholder="Describe homework" />
+
+      <label>Suggested Topics for Next Session</label>
+      <input {...register('suggestedTopics')} placeholder="Comma-separated topics" />
+
+      <Button type="submit">Submit Feedback</Button>
+    </form>
+  );
+}
+```
+
+---
+
+### 34.8 Earnings Summary
+
+**EarningsRecord Model**:
+```prisma
+// shared/prisma/schema/financial-system.prisma
+model EarningsRecord {
+  id              String @id @default(cuid())
+  educatorId      String
+
+  sourceType      String // "session", "bonus", "referral"
+  sourceId        String? // Session ID
+
+  grossAmount     Decimal // Total before deductions
+  platformFee     Decimal // NextPhoton commission
+  taxDeduction    Decimal
+  netAmount       Decimal // Amount credited to educator
+
+  earnedDate      DateTime @default(now())
+  payoutDate      DateTime?
+  payoutStatus    String @default("pending") // pending, processing, completed
+}
+```
+
+**Earnings Widget**:
+```tsx
+async function EarningsSummaryWidget({ educatorId }) {
+  const earnings = await prisma.earningsRecord.groupBy({
+    by: ['payoutStatus'],
+    where: { educatorId },
+    _sum: { netAmount: true }
+  });
+
+  const pending = earnings.find(e => e.payoutStatus === 'pending')?._sum.netAmount || 0;
+  const completed = earnings.find(e => e.payoutStatus === 'completed')?._sum.netAmount || 0;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Earnings Summary</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Pending Payout</p>
+            <p className="text-2xl font-bold">₹{pending}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Total Earned</p>
+            <p className="text-2xl font-bold">₹{completed + pending}</p>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <Button>Request Payout</Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 34.9 Rate Proposal System
+
+**RateProposal Model**:
+```prisma
+// shared/prisma/schema/financial-system.prisma
+model RateProposal {
+  id              String @id @default(cuid())
+  educatorId      String
+  educator        EducatorProfile @relation(fields: [educatorId], references: [id])
+
+  subjectId       String?
+  grade           String?
+  sessionType     String // "one-on-one", "group"
+  proposedRate    Decimal
+
+  // Justification
+  justification   String?
+  experience      String?
+  qualifications  String[]
+
+  // Approval workflow
+  status          String @default("pending") // pending, approved, rejected
+  reviewedBy      String? // Admin ID
+  reviewedAt      DateTime?
+  reviewNotes     String?
+
+  effectiveFrom   DateTime
+  currentRate     Decimal?
+}
+```
+
+**Rate Proposal Form**:
+```tsx
+"use client";
+
+function RateProposalForm({ educatorId }) {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    await fetch('/api/educator/rate-proposal', {
+      method: 'POST',
+      body: JSON.stringify({ educatorId, ...data })
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <h3>Propose Hourly Rate</h3>
+
+      <label>Subject</label>
+      <select {...register('subjectId')}>
+        <option value="">All Subjects</option>
+        <option value="math">Mathematics</option>
+        <option value="physics">Physics</option>
+      </select>
+
+      <label>Session Type</label>
+      <select {...register('sessionType')}>
+        <option value="one-on-one">One-on-One</option>
+        <option value="group">Group</option>
+      </select>
+
+      <label>Proposed Rate (₹/hour)</label>
+      <input type="number" {...register('proposedRate')} step="50" />
+
+      <label>Justification</label>
+      <textarea {...register('justification')} placeholder="Why this rate?" />
+
+      <Button type="submit">Submit Proposal</Button>
+    </form>
+  );
+}
+```
+
+---
+
+### 34.10 Educator-Learner Assignment
+
+**Learner Roster Widget**:
+```tsx
+async function LearnerRosterWidget({ educatorId }) {
+  // Get unique learners from completed sessions
+  const learners = await prisma.learnerProfile.findMany({
+    where: {
+      learningSessions: {
+        some: { educatorId }
+      }
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      currentGrade: true,
+      _count: {
+        select: {
+          learningSessions: {
+            where: {
+              educatorId,
+              status: 'completed'
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>My Learners</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Grade</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {learners.map(learner => (
+              <tr key={learner.id}>
+                <td>{learner.firstName} {learner.lastName}</td>
+                <td>{learner.currentGrade}</td>
+                <td>{learner._count.learningSessions}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 34.11 Performance Metrics
+
+**Performance Tracking Fields**:
+```prisma
+model EducatorProfile {
+  averageRating      Decimal? @default(0)  // Calculated from SessionFeedback
+  totalRatings       Int      @default(0)  // Number of ratings received
+  totalSessionsHours Decimal? @default(0)  // Sum of all session durations
+}
+```
+
+**Performance Widget**:
+```tsx
+async function PerformanceMetrics({ educatorId }) {
+  const profile = await prisma.educatorProfile.findUnique({
+    where: { id: educatorId },
+    select: {
+      averageRating: true,
+      totalRatings: true,
+      totalSessionsHours: true,
+      _count: {
+        select: {
+          learningSessions: { where: { status: 'completed' } }
+        }
+      }
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Performance Metrics</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Average Rating</p>
+            <p className="text-2xl font-bold">{profile.averageRating}/5</p>
+            <p className="text-xs">({profile.totalRatings} ratings)</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Sessions Completed</p>
+            <p className="text-2xl font-bold">{profile._count.learningSessions}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Total Hours Taught</p>
+            <p className="text-2xl font-bold">{profile.totalSessionsHours}h</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 34.12 Key Takeaways - Chapter 34
+
+✅ **Educator Role**: Conduct sessions, provide feedback, set availability, earn income
+
+✅ **Onboarding Workflow**:
+- `verificationStatus`: pending → verified/rejected
+- `backgroundCheck`: pending → completed/failed
+- `rateStatus`: pending → approved/rejected
+
+✅ **EducatorProfile Schema**:
+- `qualifications[]` - Educational credentials
+- `specializations[]` - Subject expertise
+- `hourlyRate` - Approved hourly rate
+- `averageRating` - Performance metric
+- `totalSessionsHours` - Experience metric
+
+✅ **Dashboard Features**:
+- Today's sessions widget
+- Availability calendar (date + time slot selection)
+- Session feedback form (after completion)
+- Earnings summary (pending + completed payouts)
+- Learner roster (students taught)
+
+✅ **Session Lifecycle**:
+- SCHEDULED → IN_PROGRESS (educator clicks "Start")
+- IN_PROGRESS → COMPLETED (educator clicks "End")
+- Educator fills SessionFeedback after completion
+
+✅ **SessionFeedback Model**:
+- Ratings: overall, content, engagement (1-5)
+- Text: positives, improvements, comments
+- Follow-up: homework, next session topics
+
+✅ **Rate Proposal System**:
+- Educators propose rates per subject/grade/session type
+- Admin reviews and approves/rejects
+- `RateProposal` model tracks approval workflow
+
+✅ **Educator-Learner Assignment**: Dynamic roster based on completed sessions
+
+✅ **Performance Metrics**:
+- `averageRating` - Auto-calculated from feedback
+- `totalSessionsHours` - Sum of session durations
+- `totalRatings` - Number of feedbacks received
+
+✅ **Earnings Tracking**:
+- `EarningsRecord` model: grossAmount - platformFee = netAmount
+- Payout statuses: pending → processing → completed
+
+**Next Up: Chapter 35 - ECM Tools: Micromanagement Features**
+
+---
+
+# Chapter 35: ECM Tools - Micromanagement Features
+
+## What is an ECM (EduCare Manager)?
+
+**ECM = The core operational role in NextPhoton**
+
+Unlike competitors that focus on content delivery, NextPhoton's **80% focus is micromanagement and outside-classroom monitoring**. The ECM role is central to this value proposition.
+
+**Core Responsibilities**:
+- Monitor up to 50 learners daily
+- Assign and track daily tasks
+- Identify struggling learners → trigger interventions
+- Communicate with guardians, learners, and educators
+- Generate progress reports
+- Ensure learner success through proactive management
+
+**Think of ECM as**: A student success coordinator who watches every learner like a hawk.
+
+---
+
+## 35.1 ECMProfile Schema
+
+```prisma
+model ECMProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+  employeeId    String? @unique
+
+  // Professional Information
+  department    String?
+  specialization String[] // Age groups, subjects, etc.
+  experience     Int?     // Years in education
+
+  // Workload Management
+  maxLearners    Int      @default(50) // Max capacity
+  currentLoad    Int      @default(0)  // Current assigned learners
+
+  // Performance Metrics
+  interventionSuccess Decimal? @default(0) // % of successful interventions
+  avgResponseTime     Int?     @default(0) // Minutes to respond to alerts
+
+  // Relations
+  assignedLearners   LearnerProfile[]  @relation("ECMLearners")
+  interventions      Intervention[]
+  progressReports    ProgressReport[]
+  managedSessions    LearningSession[] @relation("ECMSessions")
+}
+```
+
+**Key Fields**:
+- **maxLearners** (50): Maximum portfolio size
+- **currentLoad**: How many learners are currently assigned
+- **interventionSuccess**: % of interventions that worked (KPI)
+- **avgResponseTime**: How quickly ECM responds to alerts (KPI)
+
+---
+
+## 35.2 ECM Dashboard Overview
+
+**Dashboard Components**:
+1. **Learner Portfolio Grid** - All 50 learners at a glance
+2. **Task Assignment Panel** - Assign homework/tasks
+3. **Progress Tracker** - Who's on track? Who's falling behind?
+4. **Intervention Manager** - Active interventions and outcomes
+5. **Communication Hub** - Messages with guardians/learners/educators
+6. **Alerts Feed** - System-generated alerts (attendance drops, grade drops)
+7. **Session Monitor** - Track live and upcoming sessions
+
+**ECM Dashboard Component**:
+```tsx
+// frontend/web/src/app/(dashboard)/ecm/page.tsx
+async function ECMDashboard({ ecmId }) {
+  const profile = await prisma.eCMProfile.findUnique({
+    where: { id: ecmId },
+    include: {
+      assignedLearners: {
+        include: {
+          _count: {
+            select: {
+              assignments: { where: { status: 'assigned' } },
+              attendanceRecords: true
+            }
+          }
+        }
+      },
+      interventions: { where: { status: 'active' } }
+    }
+  });
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <WorkloadCard
+        current={profile.currentLoad}
+        max={profile.maxLearners}
+      />
+      <InterventionSuccessCard
+        rate={profile.interventionSuccess}
+      />
+      <ResponseTimeCard
+        avgMinutes={profile.avgResponseTime}
+      />
+    </div>
+  );
+}
+```
+
+---
+
+## 35.3 Learner Portfolio View
+
+**All learners in one grid**:
+
+```tsx
+async function LearnerPortfolioGrid({ ecmId }) {
+  const learners = await prisma.learnerProfile.findMany({
+    where: { assignedECMId: ecmId },
+    include: {
+      _count: {
+        select: {
+          assignments: { where: { status: { in: ['assigned', 'in-progress'] } } },
+          attendanceRecords: { where: { status: 'absent', recordDate: { gte: lastWeek } } }
+        }
+      },
+      progressRecords: {
+        where: { recordDate: { gte: last30Days } },
+        orderBy: { recordDate: 'desc' },
+        take: 1
+      }
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>My Learners ({learners.length}/{maxLearners})</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Grade</th>
+              <th>Pending Tasks</th>
+              <th>Attendance</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {learners.map(learner => (
+              <tr key={learner.id}>
+                <td>{learner.firstName} {learner.lastName}</td>
+                <td>{learner.currentGrade}</td>
+                <td>
+                  <Badge variant={learner._count.assignments > 5 ? 'destructive' : 'default'}>
+                    {learner._count.assignments}
+                  </Badge>
+                </td>
+                <td>
+                  {learner._count.attendanceRecords > 2 && (
+                    <Badge variant="destructive">⚠ {learner._count.attendanceRecords} absences</Badge>
+                  )}
+                </td>
+                <td>
+                  <StatusIndicator learner={learner} />
+                </td>
+                <td>
+                  <Button size="sm" variant="ghost">View Details</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 35.4 Task Assignment System
+
+### Assignment Model
+
+```prisma
+model Assignment {
+  id             String @id @default(cuid())
+
+  // Task details
+  title          String
+  description    String
+  instructions   String?
+
+  // Association
+  learnerId      String
+  learner        LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  // Configuration
+  type           String // homework, practice, project, reading
+  priority       String @default("medium") // low, medium, high, urgent
+  difficultyLevel String @default("medium")
+
+  // Timing
+  assignedDate   DateTime @default(now())
+  dueDate        DateTime
+  estimatedHours Decimal?
+
+  // Resources
+  attachments    String[]
+  referenceLinks String[]
+
+  // Submission
+  submissionType String @default("text")
+  totalMarks     Decimal?
+
+  // Status
+  status         String @default("assigned") // assigned, in-progress, submitted, graded, overdue
+
+  // Relations
+  submissions    AssignmentSubmission[]
+  createdBy      String // ECM ID
+}
+```
+
+### Assign Task Form
+
+```tsx
+"use client";
+
+function AssignTaskForm({ learnerId, ecmId }) {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    await fetch('/api/ecm/assign-task', {
+      method: 'POST',
+      body: JSON.stringify({
+        learnerId,
+        createdBy: ecmId,
+        ...data
+      })
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <h3 className="text-lg font-semibold">Assign New Task</h3>
+
+      <div>
+        <Label>Task Title</Label>
+        <Input {...register('title')} placeholder="Complete Chapter 5 exercises" />
+      </div>
+
+      <div>
+        <Label>Description</Label>
+        <Textarea {...register('description')} rows={3} />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Type</Label>
+          <Select {...register('type')}>
+            <option value="homework">Homework</option>
+            <option value="practice">Practice</option>
+            <option value="project">Project</option>
+            <option value="reading">Reading</option>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Priority</Label>
+          <Select {...register('priority')}>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </Select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Due Date</Label>
+          <Input type="datetime-local" {...register('dueDate')} />
+        </div>
+
+        <div>
+          <Label>Estimated Hours</Label>
+          <Input type="number" step="0.5" {...register('estimatedHours')} />
+        </div>
+      </div>
+
+      <div>
+        <Label>Instructions</Label>
+        <Textarea {...register('instructions')} rows={4} placeholder="Detailed instructions..." />
+      </div>
+
+      <Button type="submit">Assign Task</Button>
+    </form>
+  );
+}
+```
+
+### Pre-built Task Library
+
+```tsx
+const TASK_TEMPLATES = [
+  {
+    title: "Complete Math Homework",
+    type: "homework",
+    description: "Finish assigned problems from textbook",
+    estimatedHours: 1.5,
+  },
+  {
+    title: "Practice Science Experiment",
+    type: "practice",
+    description: "Follow lab procedure and document results",
+    estimatedHours: 2,
+  },
+  {
+    title: "Read Chapter and Summarize",
+    type: "reading",
+    description: "Read assigned chapter and write 1-page summary",
+    estimatedHours: 1,
+  }
+];
+
+function TaskLibrary({ onSelect }) {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {TASK_TEMPLATES.map((template, idx) => (
+        <Card key={idx} onClick={() => onSelect(template)} className="cursor-pointer hover:bg-accent">
+          <CardHeader>
+            <CardTitle className="text-sm">{template.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground">{template.description}</p>
+            <Badge className="mt-2">{template.type}</Badge>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 35.5 Assignment Submission Tracking
+
+### AssignmentSubmission Model
+
+```prisma
+model AssignmentSubmission {
+  id            String @id @default(cuid())
+  assignmentId  String
+  learnerId     String
+
+  assignment    Assignment     @relation(fields: [assignmentId], references: [id])
+  learner       LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  // Content
+  content       String?
+  attachments   String[]
+  links         String[]
+
+  // Tracking
+  submittedAt   DateTime @default(now())
+  isLate        Boolean  @default(false)
+  attemptNumber Int      @default(1)
+
+  // Grading
+  score         Decimal?
+  percentage    Decimal?
+  grade         String?
+  feedback      String?
+  gradedBy      String?
+  gradedAt      DateTime?
+
+  status        String @default("submitted")
+}
+```
+
+### Submission Tracker Widget
+
+```tsx
+async function SubmissionTracker({ learnerId }) {
+  const assignments = await prisma.assignment.findMany({
+    where: { learnerId },
+    include: {
+      submissions: true
+    },
+    orderBy: { dueDate: 'asc' }
+  });
+
+  const pendingCount = assignments.filter(a => a.status === 'assigned').length;
+  const overdueCount = assignments.filter(a => a.status === 'overdue').length;
+  const completionRate = (assignments.filter(a => a.status === 'submitted').length / assignments.length) * 100;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Assignment Tracker</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Pending</p>
+            <p className="text-2xl font-bold">{pendingCount}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Overdue</p>
+            <p className="text-2xl font-bold text-red-500">{overdueCount}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Completion Rate</p>
+            <p className="text-2xl font-bold">{completionRate.toFixed(0)}%</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {assignments.map(assignment => (
+            <div key={assignment.id} className="flex items-center justify-between p-2 border rounded">
+              <div>
+                <p className="font-medium">{assignment.title}</p>
+                <p className="text-xs text-muted-foreground">Due: {formatDate(assignment.dueDate)}</p>
+              </div>
+              <Badge variant={assignment.status === 'overdue' ? 'destructive' : 'default'}>
+                {assignment.status}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 35.6 Progress Monitoring
+
+### ProgressRecord Model
+
+```prisma
+model ProgressRecord {
+  id              String @id @default(cuid())
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  // Metrics
+  progressType    String // academic, behavioral, engagement, attendance
+  metricName      String // test_score, assignment_completion, participation
+  value           Decimal
+  maxValue        Decimal?
+  unit            String? // percentage, score, hours
+
+  // Comparison
+  previousValue   Decimal?
+  improvement     Decimal?
+  percentile      Decimal? // vs peers
+
+  // Timeline
+  recordDate      DateTime @default(now())
+  notes           String?
+  recordedBy      String // ECM, Educator, or System
+}
+```
+
+### Progress Tracker Dashboard
+
+```tsx
+async function ProgressDashboard({ learnerId }) {
+  const records = await prisma.progressRecord.findMany({
+    where: {
+      learnerId,
+      recordDate: { gte: last30Days }
+    },
+    orderBy: { recordDate: 'desc' }
+  });
+
+  // Group by type
+  const academic = records.filter(r => r.progressType === 'academic');
+  const behavioral = records.filter(r => r.progressType === 'behavioral');
+  const attendance = records.filter(r => r.progressType === 'attendance');
+
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <ProgressCard
+        title="Academic Progress"
+        records={academic}
+        icon="📚"
+      />
+      <ProgressCard
+        title="Behavioral"
+        records={behavioral}
+        icon="🎯"
+      />
+      <ProgressCard
+        title="Attendance"
+        records={attendance}
+        icon="✅"
+      />
+    </div>
+  );
+}
+```
+
+### Daily Check-ins
+
+```tsx
+"use client";
+
+function DailyCheckInForm({ learnerId, ecmId }) {
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = async (data) => {
+    await fetch('/api/ecm/progress-record', {
+      method: 'POST',
+      body: JSON.stringify({
+        learnerId,
+        recordedBy: ecmId,
+        recordDate: new Date(),
+        ...data
+      })
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <h3>Daily Check-In</h3>
+
+      <div>
+        <Label>Progress Type</Label>
+        <Select {...register('progressType')}>
+          <option value="academic">Academic</option>
+          <option value="behavioral">Behavioral</option>
+          <option value="engagement">Engagement</option>
+          <option value="attendance">Attendance</option>
+        </Select>
+      </div>
+
+      <div>
+        <Label>Metric</Label>
+        <Input {...register('metricName')} placeholder="e.g., homework_completion" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Value</Label>
+          <Input type="number" step="0.1" {...register('value')} />
+        </div>
+        <div>
+          <Label>Max Value (optional)</Label>
+          <Input type="number" step="0.1" {...register('maxValue')} />
+        </div>
+      </div>
+
+      <div>
+        <Label>Notes</Label>
+        <Textarea {...register('notes')} rows={3} />
+      </div>
+
+      <Button type="submit">Record Progress</Button>
+    </form>
+  );
+}
+```
+
+---
+
+## 35.7 Attendance Tracking
+
+### AttendanceRecord Model
+
+```prisma
+model AttendanceRecord {
+  id            String @id @default(cuid())
+  sessionId     String
+  learnerId     String
+
+  session       LearningSession @relation(fields: [sessionId], references: [id])
+  learner       LearnerProfile  @relation(fields: [learnerId], references: [id])
+
+  status        String @default("present") // present, absent, late, left-early
+  joinedAt      DateTime?
+  leftAt        DateTime?
+  duration      Int? // Minutes
+}
+```
+
+### Attendance Widget
+
+```tsx
+async function AttendanceWidget({ learnerId }) {
+  const last30DaysRecords = await prisma.attendanceRecord.findMany({
+    where: {
+      learnerId,
+      session: {
+        scheduledStartTime: { gte: last30Days }
+      }
+    }
+  });
+
+  const totalSessions = last30DaysRecords.length;
+  const presentCount = last30DaysRecords.filter(r => r.status === 'present').length;
+  const absentCount = last30DaysRecords.filter(r => r.status === 'absent').length;
+  const lateCount = last30DaysRecords.filter(r => r.status === 'late').length;
+
+  const attendanceRate = (presentCount / totalSessions) * 100;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Attendance (Last 30 Days)</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center mb-4">
+          <p className="text-4xl font-bold">{attendanceRate.toFixed(0)}%</p>
+          <p className="text-sm text-muted-foreground">Attendance Rate</p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-2xl font-semibold text-green-500">{presentCount}</p>
+            <p className="text-xs">Present</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-yellow-500">{lateCount}</p>
+            <p className="text-xs">Late</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold text-red-500">{absentCount}</p>
+            <p className="text-xs">Absent</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 35.8 Intervention System
+
+### Intervention Model
+
+```prisma
+model Intervention {
+  id              String @id @default(cuid())
+
+  // Target
+  learnerId       String
+  learner         LearnerProfile @relation(fields: [learnerId], references: [id])
+
+  // Details
+  type            String // academic_support, behavioral, motivational, parent_meeting
+  category        String // preventive, corrective, supportive
+  priority        String @default("medium") // low, medium, high, critical
+
+  // Trigger
+  triggerType     String // poor_performance, attendance_issue, behavioral_concern
+  triggerData     Json?
+
+  // Plan
+  title           String
+  description     String
+  objectives      String[]
+  actionPlan      String
+  expectedOutcome String?
+
+  // Timeline
+  plannedStart    DateTime
+  plannedEnd      DateTime
+  actualStart     DateTime?
+  actualEnd       DateTime?
+
+  // Assignment
+  assignedTo      String // ECM ID
+  ecm             ECMProfile @relation(fields: [assignedTo], references: [id])
+
+  // Collaboration
+  involvedParties String[]
+  guardianInformed Boolean @default(false)
+  educatorInformed Boolean @default(false)
+
+  // Status
+  status          String @default("planned") // planned, active, completed, cancelled
+
+  // Outcome
+  actualOutcome   String?
+  effectivenessRating Int? // 1-5
+
+  // Follow-up
+  followUpRequired Boolean @default(false)
+  followUpDate     DateTime?
+}
+```
+
+### Intervention Triggers (Auto-Detection)
+
+```tsx
+// This runs as a cron job or background worker
+async function checkInterventionTriggers() {
+  const learners = await prisma.learnerProfile.findMany({
+    include: {
+      attendanceRecords: { where: { createdAt: { gte: last7Days } } },
+      progressRecords: { where: { recordDate: { gte: last14Days } } },
+      assignments: { where: { status: 'overdue' } }
+    }
+  });
+
+  for (const learner of learners) {
+    // Trigger 1: Attendance drops below 70%
+    const attendanceRate = calculateAttendanceRate(learner.attendanceRecords);
+    if (attendanceRate < 70) {
+      await createIntervention({
+        learnerId: learner.id,
+        type: 'parent_meeting',
+        triggerType: 'attendance_issue',
+        priority: 'high',
+        title: 'Low Attendance Intervention',
+        description: `Attendance dropped to ${attendanceRate}%`,
+        triggerData: { attendanceRate }
+      });
+    }
+
+    // Trigger 2: More than 3 overdue assignments
+    if (learner.assignments.length > 3) {
+      await createIntervention({
+        learnerId: learner.id,
+        type: 'academic_support',
+        triggerType: 'poor_performance',
+        priority: 'medium',
+        title: 'Overdue Assignments Support',
+        description: `${learner.assignments.length} overdue assignments`
+      });
+    }
+
+    // Trigger 3: Declining test scores
+    const recentScores = learner.progressRecords
+      .filter(r => r.metricName === 'test_score')
+      .map(r => r.value);
+
+    if (isDecreasingTrend(recentScores)) {
+      await createIntervention({
+        learnerId: learner.id,
+        type: 'academic_support',
+        triggerType: 'poor_performance',
+        priority: 'high',
+        title: 'Declining Test Scores',
+        description: 'Test scores show downward trend'
+      });
+    }
+  }
+}
+```
+
+### Intervention Management Panel
+
+```tsx
+async function InterventionPanel({ ecmId }) {
+  const interventions = await prisma.intervention.findMany({
+    where: { assignedTo: ecmId },
+    include: { learner: true },
+    orderBy: { priority: 'desc' }
+  });
+
+  const active = interventions.filter(i => i.status === 'active');
+  const planned = interventions.filter(i => i.status === 'planned');
+  const completed = interventions.filter(i => i.status === 'completed');
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Interventions</CardTitle>
+        <div className="flex gap-2">
+          <Badge>Active: {active.length}</Badge>
+          <Badge variant="secondary">Planned: {planned.length}</Badge>
+          <Badge variant="outline">Completed: {completed.length}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="active">
+          <TabsList>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="planned">Planned</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="active">
+            {active.map(intervention => (
+              <InterventionCard key={intervention.id} intervention={intervention} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="planned">
+            {planned.map(intervention => (
+              <InterventionCard key={intervention.id} intervention={intervention} />
+            ))}
+          </TabsContent>
+
+          <TabsContent value="completed">
+            {completed.map(intervention => (
+              <InterventionCard key={intervention.id} intervention={intervention} />
+            ))}
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+}
+
+function InterventionCard({ intervention }) {
+  return (
+    <div className="border rounded-lg p-4 mb-4">
+      <div className="flex items-start justify-between">
+        <div>
+          <h4 className="font-semibold">{intervention.title}</h4>
+          <p className="text-sm text-muted-foreground">
+            Learner: {intervention.learner.firstName} {intervention.learner.lastName}
+          </p>
+        </div>
+        <Badge variant={
+          intervention.priority === 'critical' ? 'destructive' :
+          intervention.priority === 'high' ? 'destructive' : 'default'
+        }>
+          {intervention.priority}
+        </Badge>
+      </div>
+
+      <p className="text-sm mt-2">{intervention.description}</p>
+
+      <div className="flex gap-2 mt-4">
+        <Button size="sm">View Details</Button>
+        <Button size="sm" variant="outline">Mark Complete</Button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 35.9 Communication Hub
+
+**ECM communicates with**:
+- **Guardians**: Notify about issues, share progress
+- **Learners**: Check-ins, motivation, reminders
+- **Educators**: Coordinate interventions, share learner context
+
+```tsx
+async function CommunicationHub({ ecmId }) {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      <MessagingPanel
+        title="Guardian Messages"
+        userType="guardian"
+        ecmId={ecmId}
+      />
+      <MessagingPanel
+        title="Learner Messages"
+        userType="learner"
+        ecmId={ecmId}
+      />
+      <MessagingPanel
+        title="Educator Messages"
+        userType="educator"
+        ecmId={ecmId}
+      />
+    </div>
+  );
+}
+
+function MessagingPanel({ title, userType, ecmId }) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {/* List of recent conversations */}
+          <ConversationList userType={userType} ecmId={ecmId} />
+        </div>
+        <Button className="mt-4 w-full">New Message</Button>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 35.10 ECM Performance Metrics
+
+**Key KPIs**:
+- **interventionSuccess**: % of interventions rated 4-5 stars
+- **avgResponseTime**: Minutes to respond to alerts
+- **currentLoad**: Learners assigned (should not exceed maxLearners)
+
+```tsx
+async function ECMPerformanceWidget({ ecmId }) {
+  const profile = await prisma.eCMProfile.findUnique({
+    where: { id: ecmId },
+    include: {
+      interventions: {
+        where: { status: 'completed', effectivenessRating: { gte: 4 } }
+      },
+      _count: {
+        select: {
+          interventions: { where: { status: 'completed' } },
+          assignedLearners: true
+        }
+      }
+    }
+  });
+
+  const successfulInterventions = profile.interventions.length;
+  const totalInterventions = profile._count.interventions;
+  const successRate = (successfulInterventions / totalInterventions) * 100;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>My Performance</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Workload</p>
+            <p className="text-2xl font-bold">
+              {profile.currentLoad}/{profile.maxLearners}
+            </p>
+            <Progress value={(profile.currentLoad / profile.maxLearners) * 100} className="mt-2" />
+          </div>
+
+          <div>
+            <p className="text-sm text-muted-foreground">Intervention Success</p>
+            <p className="text-2xl font-bold">{successRate.toFixed(0)}%</p>
+            <p className="text-xs">({successfulInterventions}/{totalInterventions})</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-muted-foreground">Avg Response Time</p>
+            <p className="text-2xl font-bold">{profile.avgResponseTime}min</p>
+            <p className="text-xs">Target: &lt;30min</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 35.11 Key Takeaways - Chapter 35
+
+✅ **ECM Role**: Core operational role, manages up to 50 learners
+
+✅ **ECMProfile Schema**:
+- `maxLearners` (50) - Portfolio capacity
+- `currentLoad` - Current assignments
+- `interventionSuccess` - KPI for intervention effectiveness
+- `avgResponseTime` - KPI for responsiveness
+
+✅ **Dashboard Components**:
+- Learner portfolio grid (all 50 at a glance)
+- Task assignment panel
+- Progress tracking
+- Intervention manager
+- Communication hub
+
+✅ **Task Assignment System**:
+- Assignment model (title, type, dueDate, status)
+- Pre-built task library
+- AssignmentSubmission tracking
+- Completion rates
+
+✅ **Progress Monitoring**:
+- ProgressRecord model (academic, behavioral, attendance)
+- Daily check-ins
+- AttendanceRecord tracking
+- Homework completion rates
+
+✅ **Intervention System**:
+- Auto-triggers (attendance < 70%, overdue tasks, declining scores)
+- Intervention model (type, priority, status, outcome)
+- Escalation workflow
+- Effectiveness rating (1-5)
+
+✅ **Communication Flows**:
+- ECM ↔ Guardian (progress updates, alerts)
+- ECM ↔ Learner (check-ins, motivation)
+- ECM ↔ Educator (coordination, context sharing)
+
+✅ **Workload Management**: maxLearners vs currentLoad prevents overload
+
+**Next Up: Chapter 36 - Admin Panel: Platform Management**
+
+---
+
+# Chapter 36: Admin Panel - Platform Management
+
+## Admin Role Purpose
+
+**Admin = Highest-level access, system-wide control**
+
+**Core Responsibilities**:
+- Manage all user roles (Learner, Guardian, Educator, ECM, Employee, Intern, Admin)
+- Approve/reject educator applications
+- Approve/reject educator rate proposals
+- Monitor platform analytics
+- Oversee financials (revenue, payouts, invoices)
+- Configure system settings
+
+**Think of Admin as**: Platform operator with full control panel.
+
+---
+
+## 36.1 AdminProfile Schema
+
+```prisma
+model AdminProfile {
+  id       String @id @default(cuid())
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+
+  // Basic Information
+  firstName     String
+  lastName      String
+  phoneNumber   String
+
+  // Admin Configuration
+  adminLevel    String @default("platform") // platform, organization, department
+  permissions   Json?  // Additional granular permissions
+}
+```
+
+**Admin Levels**:
+- **platform**: Full system access (superadmin)
+- **organization**: Organization-wide access
+- **department**: Department-specific access
+
+**Permissions JSON**:
+```json
+{
+  "canApproveEducators": true,
+  "canApproveRates": true,
+  "canManageUsers": true,
+  "canViewFinancials": true,
+  "canConfigureSystem": true
+}
+```
+
+---
+
+## 36.2 Admin Dashboard Overview
+
+```tsx
+async function AdminDashboard() {
+  const stats = await getSystemStats();
+
+  return (
+    <div className="space-y-6">
+      {/* Quick Stats */}
+      <div className="grid grid-cols-4 gap-4">
+        <StatCard title="Total Users" value={stats.totalUsers} icon="👥" />
+        <StatCard title="Active Sessions" value={stats.activeSessions} icon="📚" />
+        <StatCard title="Revenue (Month)" value={`₹${stats.monthlyRevenue}`} icon="💰" />
+        <StatCard title="Pending Approvals" value={stats.pendingApprovals} icon="⏳" />
+      </div>
+
+      {/* Management Sections */}
+      <div className="grid grid-cols-2 gap-6">
+        <PendingEducatorsCard />
+        <PendingRateProposalsCard />
+        <UserManagementCard />
+        <SystemHealthCard />
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## 36.3 User Management (All 7 Roles)
+
+```tsx
+async function UserManagementPanel() {
+  const usersByRole = await prisma.user.groupBy({
+    by: ['role'],
+    _count: true
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>User Management</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Role</th>
+              <th>Count</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {usersByRole.map(row => (
+              <tr key={row.role}>
+                <td className="font-medium">{row.role}</td>
+                <td>{row._count}</td>
+                <td>
+                  <Button size="sm" variant="ghost">View All</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+
+// View all users of a specific role
+async function UserListByRole({ role }) {
+  const users = await prisma.user.findMany({
+    where: { role },
+    include: {
+      learnerProfile: role === 'LEARNER',
+      guardianProfile: role === 'GUARDIAN',
+      educatorProfile: role === 'EDUCATOR',
+      ecmProfile: role === 'ECM',
+      adminProfile: role === 'ADMIN'
+    }
+  });
+
+  return (
+    <div className="space-y-2">
+      {users.map(user => (
+        <UserCard key={user.id} user={user} />
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+## 36.4 Educator Approval Workflow
+
+### Step 1: Pending Educators List
+
+```tsx
+async function PendingEducatorsCard() {
+  const pending = await prisma.educatorProfile.findMany({
+    where: {
+      OR: [
+        { verificationStatus: 'pending' },
+        { backgroundCheck: 'pending' }
+      ]
+    },
+    include: { user: true }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Pending Educator Approvals</CardTitle>
+        <Badge>{pending.length} pending</Badge>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {pending.map(educator => (
+            <div key={educator.id} className="border rounded p-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold">{educator.firstName} {educator.lastName}</p>
+                  <p className="text-sm text-muted-foreground">{educator.user.email}</p>
+                </div>
+                <Button size="sm">Review</Button>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Badge variant={educator.verificationStatus === 'pending' ? 'secondary' : 'default'}>
+                  Verification: {educator.verificationStatus}
+                </Badge>
+                <Badge variant={educator.backgroundCheck === 'pending' ? 'secondary' : 'default'}>
+                  Background: {educator.backgroundCheck}
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+### Step 2: Review Educator Application
+
+```tsx
+async function EducatorReviewPage({ educatorId }) {
+  const educator = await prisma.educatorProfile.findUnique({
+    where: { id: educatorId },
+    include: { user: true }
+  });
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Review Educator Application</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Name</Label>
+              <p>{educator.firstName} {educator.lastName}</p>
+            </div>
+
+            <div>
+              <Label>Email</Label>
+              <p>{educator.user.email}</p>
+            </div>
+
+            <div>
+              <Label>Phone</Label>
+              <p>{educator.phoneNumber}</p>
+            </div>
+
+            <div>
+              <Label>Experience</Label>
+              <p>{educator.experience} years</p>
+            </div>
+
+            <div className="col-span-2">
+              <Label>Qualifications</Label>
+              <ul className="list-disc list-inside">
+                {educator.qualifications.map((q, i) => (
+                  <li key={i}>{q}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="col-span-2">
+              <Label>Specializations</Label>
+              <div className="flex gap-2">
+                {educator.specializations.map((s, i) => (
+                  <Badge key={i}>{s}</Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Document Review */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Uploaded Documents</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {educator.documentsUploaded.map((url, i) => (
+              <div key={i} className="flex justify-between items-center p-2 border rounded">
+                <p className="text-sm">Document {i + 1}</p>
+                <Button size="sm" variant="outline" asChild>
+                  <a href={url} target="_blank">View</a>
+                </Button>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Approval Actions */}
+      <ApprovalActions educatorId={educatorId} />
+    </div>
+  );
+}
+```
+
+### Step 3: Approve/Reject Actions
+
+```tsx
+"use client";
+
+function ApprovalActions({ educatorId }) {
+  const { register, handleSubmit } = useForm();
+
+  const onApprove = async (data) => {
+    await fetch('/api/admin/educator/approve', {
+      method: 'POST',
+      body: JSON.stringify({
+        educatorId,
+        verificationStatus: 'verified',
+        backgroundCheck: 'completed',
+        reviewNotes: data.notes
+      })
+    });
+  };
+
+  const onReject = async (data) => {
+    await fetch('/api/admin/educator/reject', {
+      method: 'POST',
+      body: JSON.stringify({
+        educatorId,
+        verificationStatus: 'rejected',
+        reviewNotes: data.notes
+      })
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Approval Decision</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form className="space-y-4">
+          <div>
+            <Label>Review Notes</Label>
+            <Textarea {...register('notes')} rows={4} placeholder="Document your review..." />
+          </div>
+
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant="default"
+              onClick={handleSubmit(onApprove)}
+            >
+              ✅ Approve Educator
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleSubmit(onReject)}
+            >
+              ❌ Reject Application
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+## 36.5 Rate Approval System
+
+### RateProposal Model
+
+```prisma
+model RateProposal {
+  id              String @id @default(cuid())
+  educatorId      String
+  educator        EducatorProfile @relation(fields: [educatorId], references: [id])
+
+  // Rate details
+  subjectId       String?
+  grade           String?
+  sessionType     String // one-on-one, group, demo
+  proposedRate    Decimal
+  currency        String @default("INR")
+
+  // Justification
+  justification   String?
+  experience      String?
+  qualifications  String[]
+
+  // Approval workflow
+  status          String @default("pending") // pending, approved, rejected
+  reviewedBy      String? // Admin ID
+  reviewedAt      DateTime?
+  reviewNotes     String?
+
+  effectiveFrom   DateTime
+  currentRate     Decimal?
+}
+```
+
+### Rate Approval Panel
+
+```tsx
+async function RateApprovalPanel() {
+  const pending = await prisma.rateProposal.findMany({
+    where: { status: 'pending' },
+    include: {
+      educator: { include: { user: true } }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Rate Proposals</CardTitle>
+        <Badge>{pending.length} pending</Badge>
+      </CardHeader>
+      <CardContent>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Educator</th>
+              <th>Subject</th>
+              <th>Type</th>
+              <th>Proposed Rate</th>
+              <th>Current Rate</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pending.map(proposal => (
+              <tr key={proposal.id}>
+                <td>
+                  {proposal.educator.firstName} {proposal.educator.lastName}
+                </td>
+                <td>{proposal.subjectId || 'All'}</td>
+                <td>{proposal.sessionType}</td>
+                <td className="font-bold">₹{proposal.proposedRate}/hr</td>
+                <td>₹{proposal.currentRate || 0}/hr</td>
+                <td>
+                  <Button size="sm">Review</Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Review specific proposal
+function RateProposalReview({ proposalId }) {
+  const { register, handleSubmit } = useForm();
+
+  const onApprove = async (data) => {
+    await fetch('/api/admin/rate/approve', {
+      method: 'POST',
+      body: JSON.stringify({ proposalId, ...data })
+    });
+  };
+
+  const onReject = async (data) => {
+    await fetch('/api/admin/rate/reject', {
+      method: 'POST',
+      body: JSON.stringify({ proposalId, ...data })
+    });
+  };
+
+  return (
+    <form className="space-y-4">
+      <div>
+        <Label>Admin Notes</Label>
+        <Textarea {...register('reviewNotes')} />
+      </div>
+
+      <div className="flex gap-4">
+        <Button onClick={handleSubmit(onApprove)}>Approve</Button>
+        <Button variant="destructive" onClick={handleSubmit(onReject)}>Reject</Button>
+      </div>
+    </form>
+  );
+}
+```
+
+---
+
+## 36.6 User Role Management
+
+### Assign/Revoke Roles
+
+```tsx
+async function UserRoleManager({ userId }) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      roles: true // UserRole table
+    }
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Manage User Roles</CardTitle>
+        <p className="text-sm text-muted-foreground">{user.email}</p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div>
+            <Label>Current Roles</Label>
+            <div className="flex gap-2 mt-2">
+              {user.roles.map(role => (
+                <Badge key={role.id}>
+                  {role.roleName}
+                  <button onClick={() => revokeRole(role.id)}>✕</button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <Label>Add Role</Label>
+            <Select onChange={(e) => assignRole(userId, e.target.value)}>
+              <option value="">Select role...</option>
+              <option value="LEARNER">Learner</option>
+              <option value="GUARDIAN">Guardian</option>
+              <option value="EDUCATOR">Educator</option>
+              <option value="ECM">ECM</option>
+              <option value="EMPLOYEE">Employee</option>
+              <option value="INTERN">Intern</option>
+              <option value="ADMIN">Admin</option>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+async function assignRole(userId: string, role: string) {
+  await fetch('/api/admin/user/assign-role', {
+    method: 'POST',
+    body: JSON.stringify({ userId, role })
+  });
+}
+
+async function revokeRole(roleId: string) {
+  await fetch('/api/admin/user/revoke-role', {
+    method: 'DELETE',
+    body: JSON.stringify({ roleId })
+  });
+}
+```
+
+---
+
+## 36.7 Platform Analytics
+
+```tsx
+async function PlatformAnalytics() {
+  const stats = await getAnalytics();
+
+  return (
+    <div className="space-y-6">
+      {/* Users by Role */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Users by Role</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-4 gap-4">
+            <StatBox label="Learners" value={stats.learners} color="blue" />
+            <StatBox label="Guardians" value={stats.guardians} color="green" />
+            <StatBox label="Educators" value={stats.educators} color="purple" />
+            <StatBox label="ECMs" value={stats.ecms} color="orange" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Session Stats */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Session Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-4">
+            <StatBox label="Total Sessions" value={stats.totalSessions} />
+            <StatBox label="Completed" value={stats.completedSessions} />
+            <StatBox label="Avg Duration" value={`${stats.avgDuration}h`} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Revenue Metrics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Revenue Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-4">
+            <StatBox label="Monthly Revenue" value={`₹${stats.monthlyRevenue}`} />
+            <StatBox label="Platform Fees" value={`₹${stats.platformFees}`} />
+            <StatBox label="Educator Earnings" value={`₹${stats.educatorEarnings}`} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Educator Leaderboard */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Educators</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Educator</th>
+                <th>Rating</th>
+                <th>Sessions</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.topEducators.map((educator, i) => (
+                <tr key={educator.id}>
+                  <td>{i + 1}</td>
+                  <td>{educator.name}</td>
+                  <td>⭐ {educator.rating}</td>
+                  <td>{educator.sessions}</td>
+                  <td>₹{educator.revenue}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+---
+
+## 36.8 Financial Dashboard
+
+```tsx
+async function FinancialDashboard() {
+  const financials = await getFinancialData();
+
+  return (
+    <div className="space-y-6">
+      {/* Revenue Tracking */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Revenue Tracking</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-4 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Total Revenue</p>
+              <p className="text-2xl font-bold">₹{financials.totalRevenue}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Platform Commission</p>
+              <p className="text-2xl font-bold">₹{financials.commission}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Educator Payouts</p>
+              <p className="text-2xl font-bold">₹{financials.payouts}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Pending Payouts</p>
+              <p className="text-2xl font-bold text-orange-500">₹{financials.pendingPayouts}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payout Management */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Pending Payouts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th>Educator</th>
+                <th>Amount</th>
+                <th>Sessions</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {financials.pendingPayoutsList.map(payout => (
+                <tr key={payout.id}>
+                  <td>{payout.educatorName}</td>
+                  <td>₹{payout.amount}</td>
+                  <td>{payout.sessionCount}</td>
+                  <td><Badge>{payout.status}</Badge></td>
+                  <td>
+                    <Button size="sm">Process Payout</Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      {/* Invoice Oversight */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Invoices</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Guardian</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {financials.recentInvoices.map(invoice => (
+                <tr key={invoice.id}>
+                  <td>{invoice.invoiceNumber}</td>
+                  <td>{invoice.guardianName}</td>
+                  <td>₹{invoice.totalAmount}</td>
+                  <td><Badge variant={invoice.status === 'paid' ? 'default' : 'destructive'}>{invoice.status}</Badge></td>
+                  <td>{formatDate(invoice.createdAt)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </CardContent>
+      </Card>
+
+      {/* Commission Configuration */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Commission Settings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4">
+            <div>
+              <Label>Platform Commission (%)</Label>
+              <Input type="number" step="0.1" defaultValue={financials.commissionRate} />
+              <p className="text-xs text-muted-foreground mt-1">
+                Current: {financials.commissionRate}% of session fee
+              </p>
+            </div>
+
+            <Button>Update Commission Rate</Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+---
+
+## 36.9 System Settings
+
+```tsx
+function SystemSettingsPanel() {
+  return (
+    <div className="space-y-6">
+      {/* Feature Flags */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature Flags</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <FeatureToggle name="Enable Group Sessions" enabled={true} />
+            <FeatureToggle name="Enable Demo Sessions" enabled={true} />
+            <FeatureToggle name="Auto Interventions" enabled={false} />
+            <FeatureToggle name="Email Notifications" enabled={true} />
+            <FeatureToggle name="SMS Notifications" enabled={false} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Email Templates */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Email Templates</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <TemplateRow name="Welcome Email" />
+            <TemplateRow name="Session Reminder" />
+            <TemplateRow name="Payment Receipt" />
+            <TemplateRow name="Intervention Alert" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Notification Preferences */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Notification Settings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form className="space-y-4">
+            <div>
+              <Label>Session Reminder (hours before)</Label>
+              <Input type="number" defaultValue={2} />
+            </div>
+
+            <div>
+              <Label>Overdue Assignment Alert (days after)</Label>
+              <Input type="number" defaultValue={1} />
+            </div>
+
+            <div>
+              <Label>Low Attendance Alert Threshold (%)</Label>
+              <Input type="number" defaultValue={70} />
+            </div>
+
+            <Button>Save Settings</Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Integration Management */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Integrations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <IntegrationRow name="Razorpay" status="active" />
+            <IntegrationRow name="AWS S3" status="active" />
+            <IntegrationRow name="SendGrid" status="inactive" />
+            <IntegrationRow name="Twilio SMS" status="inactive" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function FeatureToggle({ name, enabled }) {
+  return (
+    <div className="flex items-center justify-between p-2 border rounded">
+      <span>{name}</span>
+      <Switch defaultChecked={enabled} />
+    </div>
+  );
+}
+
+function IntegrationRow({ name, status }) {
+  return (
+    <div className="flex items-center justify-between p-2 border rounded">
+      <span>{name}</span>
+      <Badge variant={status === 'active' ? 'default' : 'secondary'}>{status}</Badge>
+    </div>
+  );
+}
+```
+
+---
+
+## 36.10 Key Takeaways - Chapter 36
+
+✅ **Admin Role**: Highest-level access, system-wide platform management
+
+✅ **AdminProfile Schema**:
+- `adminLevel`: platform / organization / department
+- `permissions`: Granular JSON permissions
+
+✅ **Dashboard Features**:
+- User management (all 7 roles)
+- Educator approval workflow
+- Rate approval system
+- Platform analytics
+- Financial oversight
+- System configuration
+
+✅ **Educator Approval**:
+- Review documents (qualifications, background)
+- Verify background check
+- Approve/Reject with notes
+- Status: WAITLIST → APPROVED/REJECTED
+
+✅ **Rate Approval**:
+- RateProposal model (subject, grade, sessionType, proposedRate)
+- Admin reviews justification
+- Approve/reject with commission calculation
+
+✅ **User Role Management**:
+- Assign/revoke roles dynamically
+- UserRole table operations
+- Permission overrides via JSON
+
+✅ **Platform Analytics**:
+- Users by role (7 types)
+- Session statistics
+- Revenue metrics
+- Educator performance leaderboard
+
+✅ **Financial Dashboard**:
+- Revenue tracking
+- Payout management (pending → processing → completed)
+- Invoice oversight
+- Commission configuration
+
+✅ **System Settings**:
+- Feature flags (enable/disable features)
+- Email templates
+- Notification preferences
+- Integration management (Razorpay, AWS S3, SendGrid, Twilio)
+
+**Next Up: Chapter 37 - Session Booking System**
+
+---
+
+## Chapter 37: Session Booking System
+
+### 37.1 Session Booking Overview
+
+**Purpose**: Guardian books learning sessions for their Learner with an Educator. NextPhoton's unique **dual approval system** requires both Educator AND Learner to approve before a session is confirmed.
+
+**Key Players**:
+- **Guardian**: Initiates booking request
+- **Educator**: Reviews and approves/rejects request
+- **Learner**: Confirms or declines educator-approved bookings
+- **System**: Creates LearningSession once both approve
+
+**Why Dual Approval?**
+- Respects learner's autonomy and schedule
+- Ensures educator availability confirmation
+- Prevents unwanted sessions
+- Aligns with NextPhoton's learner-centric philosophy
+
+---
+
+### 37.2 SessionBooking Model
+
+```prisma
+// shared/prisma/schema/session-management.prisma
+model SessionBooking {
+  id             String @id @default(cuid())
+
+  // Participants
+  learnerId      String
+  educatorId     String
+  requestedBy    String // Guardian or Learner userId
+
+  learner        LearnerProfile  @relation(fields: [learnerId], references: [id])
+  educator       EducatorProfile @relation(fields: [educatorId], references: [id])
+
+  // Session preferences
+  preferredDates DateTime[] // Multiple date options
+  preferredTimes String[]   // ["morning", "afternoon", "evening"]
+  subject        String
+  topics         String[]
+  sessionType    String @default("one-on-one") // one-on-one, group, demo
+  format         String @default("online")     // online, offline, hybrid
+  duration       Int    @default(60)           // Minutes
+
+  // Special requirements
+  requirements   String?
+  learningGoals  String?
+
+  // Status workflow
+  status         String @default("pending") // pending, educator_approved, learner_approved, confirmed, rejected, cancelled
+  approvedBy     String[] // Track who approved: ["educator", "learner"]
+
+  // Final session reference
+  learningSessionId String?
+  learningSession   LearningSession?
+
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+```
+
+**Status Flow**:
+1. `pending` → Initial state after Guardian creates booking
+2. `educator_approved` → Educator accepts, waiting for Learner
+3. `learner_approved` → Learner accepts (but educator hasn't yet - rare)
+4. `confirmed` → Both approved, LearningSession created
+5. `rejected` → Either party rejected
+6. `cancelled` → Cancelled after creation
+
+---
+
+### 37.3 Booking Flow (8 Steps)
+
+**Step-by-Step Process**:
+
+```
+1. Guardian initiates booking
+   ↓
+2. System creates SessionBooking (status: "pending")
+   ↓
+3. Educator receives notification
+   ↓
+4. Educator reviews → Approve/Reject
+   ↓ (if approved)
+5. Learner receives notification
+   ↓
+6. Learner confirms → Accept/Decline
+   ↓ (if accepted)
+7. System creates LearningSession
+   ↓
+8. All parties notified (Guardian, Educator, Learner)
+```
+
+**approvedBy Array Logic**:
+```typescript
+// Example state transitions
+// Initial: approvedBy = []
+// Educator approves: approvedBy = ["educator"]
+// Learner confirms: approvedBy = ["educator", "learner"]
+// Once both in array → status = "confirmed"
+```
+
+---
+
+### 37.4 Guardian Booking Interface
+
+**Booking Form Component**:
+```tsx
+// frontend/web/src/app/(dashboard)/guardian/book-session/page.tsx
+"use client";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const bookingSchema = z.object({
+  learnerId: z.string().min(1, "Select a learner"),
+  educatorId: z.string().min(1, "Select an educator"),
+  subject: z.string().min(1, "Subject required"),
+  topics: z.array(z.string()).min(1, "At least one topic"),
+  preferredDates: z.array(z.date()).min(1, "Choose at least one date"),
+  preferredTimes: z.array(z.string()).min(1, "Select time slots"),
+  sessionType: z.enum(["one-on-one", "group", "demo"]),
+  format: z.enum(["online", "offline", "hybrid"]),
+  duration: z.number().min(30).max(180),
+  requirements: z.string().optional(),
+  learningGoals: z.string().optional()
+});
+
+export default function BookSessionForm({ learners, educators }) {
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(bookingSchema)
+  });
+
+  const onSubmit = async (data) => {
+    const response = await fetch('/api/bookings/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      // Show success notification
+      // Redirect to bookings list
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Learner Selection */}
+      <div>
+        <Label>Select Learner</Label>
+        <Select {...register("learnerId")}>
+          {learners.map(learner => (
+            <option key={learner.id} value={learner.id}>
+              {learner.firstName} {learner.lastName}
+            </option>
+          ))}
+        </Select>
+        {errors.learnerId && <p className="text-red-500 text-sm">{errors.learnerId.message}</p>}
+      </div>
+
+      {/* Educator Selection (from approved list) */}
+      <div>
+        <Label>Choose Educator</Label>
+        <Select {...register("educatorId")}>
+          {educators.map(educator => (
+            <option key={educator.id} value={educator.id}>
+              {educator.firstName} {educator.lastName} - {educator.specialization}
+            </option>
+          ))}
+        </Select>
+      </div>
+
+      {/* Subject & Topics */}
+      <div>
+        <Label>Subject</Label>
+        <Input {...register("subject")} placeholder="e.g., Mathematics" />
+      </div>
+
+      <div>
+        <Label>Topics (comma-separated)</Label>
+        <Input {...register("topics")} placeholder="Algebra, Quadratic Equations" />
+      </div>
+
+      {/* Date & Time Selection */}
+      <div>
+        <Label>Preferred Dates (select multiple)</Label>
+        <DatePicker multiple {...register("preferredDates")} />
+      </div>
+
+      <div>
+        <Label>Preferred Times</Label>
+        <CheckboxGroup {...register("preferredTimes")}>
+          <Checkbox value="morning">Morning (8 AM - 12 PM)</Checkbox>
+          <Checkbox value="afternoon">Afternoon (12 PM - 5 PM)</Checkbox>
+          <Checkbox value="evening">Evening (5 PM - 9 PM)</Checkbox>
+        </CheckboxGroup>
+      </div>
+
+      {/* Session Type & Format */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Session Type</Label>
+          <RadioGroup {...register("sessionType")}>
+            <Radio value="one-on-one">One-on-One</Radio>
+            <Radio value="group">Group Session</Radio>
+            <Radio value="demo">Demo Session</Radio>
+          </RadioGroup>
+        </div>
+
+        <div>
+          <Label>Format</Label>
+          <RadioGroup {...register("format")}>
+            <Radio value="online">Online</Radio>
+            <Radio value="offline">Offline</Radio>
+            <Radio value="hybrid">Hybrid</Radio>
+          </RadioGroup>
+        </div>
+      </div>
+
+      {/* Duration */}
+      <div>
+        <Label>Duration (minutes)</Label>
+        <Input type="number" {...register("duration", { valueAsNumber: true })} defaultValue={60} />
+      </div>
+
+      {/* Optional Fields */}
+      <div>
+        <Label>Special Requirements (optional)</Label>
+        <Textarea {...register("requirements")} placeholder="Any specific needs..." />
+      </div>
+
+      <div>
+        <Label>Learning Goals (optional)</Label>
+        <Textarea {...register("learningGoals")} placeholder="What should the learner achieve..." />
+      </div>
+
+      <Button type="submit">Submit Booking Request</Button>
+    </form>
+  );
+}
+```
+
+**Server Action**:
+```typescript
+// frontend/web/src/app/api/bookings/create/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/shared/db';
+import { getCurrentUserId } from '@/lib/auth-utils';
+
+export async function POST(req: NextRequest) {
+  const userId = await getCurrentUserId();
+  const data = await req.json();
+
+  const booking = await prisma.sessionBooking.create({
+    data: {
+      learnerId: data.learnerId,
+      educatorId: data.educatorId,
+      requestedBy: userId,
+      subject: data.subject,
+      topics: data.topics,
+      preferredDates: data.preferredDates,
+      preferredTimes: data.preferredTimes,
+      sessionType: data.sessionType,
+      format: data.format,
+      duration: data.duration,
+      requirements: data.requirements,
+      learningGoals: data.learningGoals,
+      status: "pending",
+      approvedBy: []
+    }
+  });
+
+  // Send notification to educator
+  await sendNotification({
+    userId: data.educatorId,
+    type: "new_booking_request",
+    message: "New session booking request received",
+    bookingId: booking.id
+  });
+
+  return NextResponse.json({ success: true, bookingId: booking.id });
+}
+```
+
+---
+
+### 37.5 Educator Approval Page
+
+**Pending Requests List**:
+```tsx
+// frontend/web/src/app/(dashboard)/educator/bookings/pending/page.tsx
+async function EducatorPendingBookings() {
+  const educatorProfile = await getEducatorProfile();
+
+  const pendingBookings = await prisma.sessionBooking.findMany({
+    where: {
+      educatorId: educatorProfile.id,
+      status: "pending"
+    },
+    include: {
+      learner: {
+        select: { firstName: true, lastName: true, currentGrade: true }
+      }
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Pending Booking Requests</h1>
+
+      {pendingBookings.length === 0 ? (
+        <p className="text-muted-foreground">No pending requests</p>
+      ) : (
+        pendingBookings.map(booking => (
+          <BookingRequestCard key={booking.id} booking={booking} />
+        ))
+      )}
+    </div>
+  );
+}
+```
+
+**Booking Request Card**:
+```tsx
+"use client";
+function BookingRequestCard({ booking }) {
+  const [isApproving, setIsApproving] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const handleApprove = async () => {
+    setIsApproving(true);
+
+    await fetch('/api/bookings/educator-approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId: booking.id,
+        finalDate: selectedDate
+      })
+    });
+
+    // Refresh or redirect
+  };
+
+  const handleReject = async (reason) => {
+    await fetch('/api/bookings/reject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId: booking.id, reason })
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Session Request - {booking.subject}</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Learner: {booking.learner.firstName} {booking.learner.lastName} (Grade {booking.learner.currentGrade})
+        </p>
+      </CardHeader>
+
+      <CardContent>
+        <div className="space-y-2">
+          <p><strong>Topics:</strong> {booking.topics.join(', ')}</p>
+          <p><strong>Duration:</strong> {booking.duration} minutes</p>
+          <p><strong>Format:</strong> {booking.format}</p>
+          <p><strong>Type:</strong> {booking.sessionType}</p>
+
+          <div>
+            <strong>Preferred Dates:</strong>
+            <div className="flex gap-2 mt-2">
+              {booking.preferredDates.map((date, i) => (
+                <Button
+                  key={i}
+                  variant={selectedDate === date ? "default" : "outline"}
+                  onClick={() => setSelectedDate(date)}
+                >
+                  {new Date(date).toLocaleDateString()}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <strong>Preferred Times:</strong>
+            <p>{booking.preferredTimes.join(', ')}</p>
+          </div>
+
+          {booking.requirements && (
+            <div>
+              <strong>Special Requirements:</strong>
+              <p>{booking.requirements}</p>
+            </div>
+          )}
+
+          {booking.learningGoals && (
+            <div>
+              <strong>Learning Goals:</strong>
+              <p>{booking.learningGoals}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Check Availability */}
+        <div className="mt-4 p-3 bg-secondary rounded">
+          <p className="text-sm font-medium">Check Your Availability:</p>
+          <AvailabilityChecker dates={booking.preferredDates} />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 mt-4">
+          <Button onClick={handleApprove} disabled={!selectedDate || isApproving}>
+            Approve & Select Date
+          </Button>
+          <Button variant="destructive" onClick={() => handleReject("Not available")}>
+            Reject
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Educator Approval API**:
+```typescript
+// frontend/web/src/app/api/bookings/educator-approve/route.ts
+export async function POST(req: NextRequest) {
+  const { bookingId, finalDate } = await req.json();
+
+  const booking = await prisma.sessionBooking.update({
+    where: { id: bookingId },
+    data: {
+      status: "educator_approved",
+      approvedBy: ["educator"],
+      // Store final selected date
+    }
+  });
+
+  // Notify learner to confirm
+  await sendNotification({
+    userId: booking.learnerId,
+    type: "booking_educator_approved",
+    message: "Educator approved your session. Please confirm.",
+    bookingId: booking.id
+  });
+
+  return NextResponse.json({ success: true });
+}
+```
+
+---
+
+### 37.6 Learner Confirmation Page
+
+**Learner Pending Confirmations**:
+```tsx
+// frontend/web/src/app/(dashboard)/learner/bookings/confirm/page.tsx
+async function LearnerConfirmationPage() {
+  const learnerProfile = await getLearnerProfile();
+
+  const pendingConfirmations = await prisma.sessionBooking.findMany({
+    where: {
+      learnerId: learnerProfile.id,
+      status: "educator_approved"
+    },
+    include: {
+      educator: {
+        select: { firstName: true, lastName: true, specialization: true, avatarUrl: true }
+      }
+    }
+  });
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Sessions Awaiting Your Confirmation</h1>
+
+      {pendingConfirmations.length === 0 ? (
+        <p className="text-muted-foreground">No sessions to confirm</p>
+      ) : (
+        pendingConfirmations.map(booking => (
+          <LearnerConfirmationCard key={booking.id} booking={booking} />
+        ))
+      )}
+    </div>
+  );
+}
+```
+
+**Confirmation Card**:
+```tsx
+"use client";
+function LearnerConfirmationCard({ booking }) {
+  const handleAccept = async () => {
+    await fetch('/api/bookings/learner-confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId: booking.id, action: 'accept' })
+    });
+  };
+
+  const handleDecline = async () => {
+    await fetch('/api/bookings/learner-confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId: booking.id, action: 'decline' })
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center gap-4">
+        <Avatar>
+          <AvatarImage src={booking.educator.avatarUrl} />
+          <AvatarFallback>{booking.educator.firstName[0]}</AvatarFallback>
+        </Avatar>
+        <div>
+          <CardTitle>{booking.subject} Session</CardTitle>
+          <p className="text-sm">
+            with {booking.educator.firstName} {booking.educator.lastName}
+          </p>
+          <p className="text-xs text-muted-foreground">{booking.educator.specialization}</p>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <div className="space-y-2">
+          <p><strong>Topics:</strong> {booking.topics.join(', ')}</p>
+          <p><strong>Duration:</strong> {booking.duration} minutes</p>
+          <p><strong>Format:</strong> {booking.format}</p>
+          <p><strong>Scheduled:</strong> {new Date(booking.finalDate).toLocaleString()}</p>
+
+          {booking.learningGoals && (
+            <div className="mt-3 p-3 bg-secondary rounded">
+              <p className="text-sm font-medium">Learning Goals:</p>
+              <p className="text-sm">{booking.learningGoals}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex gap-3 mt-4">
+          <Button onClick={handleAccept} className="flex-1">
+            Confirm Session
+          </Button>
+          <Button variant="outline" onClick={handleDecline} className="flex-1">
+            Decline
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 37.7 LearningSession Creation
+
+**Learner Confirmation API**:
+```typescript
+// frontend/web/src/app/api/bookings/learner-confirm/route.ts
+export async function POST(req: NextRequest) {
+  const { bookingId, action } = await req.json();
+
+  if (action === 'decline') {
+    await prisma.sessionBooking.update({
+      where: { id: bookingId },
+      data: { status: "rejected" }
+    });
+    return NextResponse.json({ success: true, declined: true });
+  }
+
+  // If accepting, create LearningSession
+  const booking = await prisma.sessionBooking.findUnique({
+    where: { id: bookingId },
+    include: { learner: true, educator: true }
+  });
+
+  // Update booking to confirmed
+  await prisma.sessionBooking.update({
+    where: { id: bookingId },
+    data: {
+      status: "confirmed",
+      approvedBy: ["educator", "learner"]
+    }
+  });
+
+  // Create LearningSession
+  const learningSession = await prisma.learningSession.create({
+    data: {
+      learnerId: booking.learnerId,
+      educatorId: booking.educatorId,
+      title: `${booking.subject} Session`,
+      description: booking.learningGoals || `Session on ${booking.topics.join(', ')}`,
+      subject: booking.subject,
+      topics: booking.topics,
+      scheduledStart: booking.finalDate,
+      scheduledEnd: new Date(booking.finalDate.getTime() + booking.duration * 60000),
+      sessionType: booking.sessionType,
+      format: booking.format,
+      duration: booking.duration,
+      status: "scheduled"
+    }
+  });
+
+  // Generate meeting link if online
+  if (booking.format === "online") {
+    const meetingLink = await generateMeetingLink(learningSession.id);
+    await prisma.learningSession.update({
+      where: { id: learningSession.id },
+      data: { meetingUrl: meetingLink }
+    });
+  }
+
+  // Link booking to session
+  await prisma.sessionBooking.update({
+    where: { id: bookingId },
+    data: { learningSessionId: learningSession.id }
+  });
+
+  // Notify all parties
+  await notifyAllParties(booking, learningSession);
+
+  return NextResponse.json({ success: true, sessionId: learningSession.id });
+}
+```
+
+**Notification Helper**:
+```typescript
+async function notifyAllParties(booking, session) {
+  // Notify Guardian
+  await sendNotification({
+    userId: booking.requestedBy,
+    type: "session_confirmed",
+    message: `Session confirmed for ${new Date(session.scheduledStart).toLocaleString()}`,
+    sessionId: session.id
+  });
+
+  // Notify Educator
+  await sendNotification({
+    userId: booking.educator.userId,
+    type: "session_confirmed",
+    message: `Session with ${booking.learner.firstName} confirmed`,
+    sessionId: session.id
+  });
+
+  // Notify Learner
+  await sendNotification({
+    userId: booking.learner.userId,
+    type: "session_confirmed",
+    message: `Your ${booking.subject} session is scheduled`,
+    sessionId: session.id
+  });
+}
+```
+
+---
+
+### 37.8 Notification System
+
+**Notification Triggers**:
+
+| Event | Recipient | Message |
+|-------|-----------|---------|
+| Booking created | Educator | "New session booking request from [Learner]" |
+| Educator approves | Learner | "Your session request was approved. Please confirm." |
+| Educator approves | Guardian | "[Educator] approved the session. Awaiting learner confirmation." |
+| Learner confirms | All parties | "Session confirmed for [Date/Time]" |
+| Learner declines | Guardian & Educator | "Session request declined by learner" |
+| Educator rejects | Guardian & Learner | "Session request declined by educator: [Reason]" |
+
+**Notification Component**:
+```tsx
+// frontend/web/src/components/notifications/BookingNotification.tsx
+function BookingNotification({ notification }) {
+  const { type, message, bookingId, sessionId } = notification;
+
+  const getActionButton = () => {
+    switch (type) {
+      case "new_booking_request":
+        return <Link href={`/educator/bookings/${bookingId}`}>Review Request</Link>;
+      case "booking_educator_approved":
+        return <Link href={`/learner/bookings/confirm`}>Confirm Session</Link>;
+      case "session_confirmed":
+        return <Link href={`/sessions/${sessionId}`}>View Session</Link>;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3 border-b">
+      <div>
+        <p className="font-medium">{message}</p>
+        <p className="text-xs text-muted-foreground">{notification.createdAt}</p>
+      </div>
+      {getActionButton()}
+    </div>
+  );
+}
+```
+
+---
+
+### 37.9 Cancellation Workflow
+
+**Cancellation Rules**:
+- Before confirmation: Either party can cancel anytime
+- After confirmation (LearningSession created): Requires cancellation notice
+- Within 24 hours of session: May incur cancellation fee
+
+**Cancellation API**:
+```typescript
+// frontend/web/src/app/api/bookings/cancel/route.ts
+export async function POST(req: NextRequest) {
+  const { bookingId, reason, cancelledBy } = await req.json();
+
+  const booking = await prisma.sessionBooking.findUnique({
+    where: { id: bookingId },
+    include: { learningSession: true }
+  });
+
+  // If session already created, check cancellation policy
+  if (booking.learningSessionId) {
+    const session = booking.learningSession;
+    const hoursTillSession = (session.scheduledStart - new Date()) / (1000 * 60 * 60);
+
+    if (hoursTillSession < 24) {
+      // Apply cancellation fee logic
+      await createCancellationFee(booking, cancelledBy);
+    }
+
+    // Cancel the LearningSession
+    await prisma.learningSession.update({
+      where: { id: booking.learningSessionId },
+      data: { status: "cancelled", cancellationReason: reason }
+    });
+  }
+
+  // Update booking status
+  await prisma.sessionBooking.update({
+    where: { id: bookingId },
+    data: { status: "cancelled" }
+  });
+
+  // Notify all parties
+  await notifyCancellation(booking, cancelledBy, reason);
+
+  return NextResponse.json({ success: true });
+}
+```
+
+---
+
+### 37.10 Key Takeaways - Chapter 37
+
+✅ **Dual Approval System**: Unique to NextPhoton - both Educator AND Learner must approve
+
+✅ **SessionBooking Model**:
+- Tracks booking requests from pending → confirmed
+- `approvedBy` array stores who approved
+- `status` field manages workflow state
+
+✅ **Booking Flow**:
+1. Guardian initiates
+2. Educator reviews & approves
+3. Learner confirms
+4. System creates LearningSession
+
+✅ **Guardian Interface**:
+- Select learner, educator, dates, times
+- Specify subject, topics, format
+- Add special requirements
+
+✅ **Educator Approval**:
+- Review pending requests
+- Check availability
+- Approve with final date selection
+- Reject with reason
+
+✅ **Learner Confirmation**:
+- View educator-approved sessions
+- See all session details
+- Accept or decline
+
+✅ **LearningSession Creation**:
+- Created only after both approvals
+- Status: SCHEDULED
+- Generate meeting link for online sessions
+- Link to SessionBooking record
+
+✅ **Notifications**:
+- Real-time alerts at each stage
+- All parties kept informed
+- Action buttons in notifications
+
+✅ **Cancellation**:
+- Pre-confirmation: Free cancellation
+- Post-confirmation: Cancellation policy applies
+- <24 hours notice: May incur fees
+
+**Next Up: Chapter 38 - Task Assignment & Tracking**
+
+---
+
+## Chapter 38: Task Assignment & Tracking
+
+### 38.1 Task System Purpose
+
+**Overview**: NextPhoton's task system manages homework, assignments, assessments, and practice exercises. ECMs (EduCare Managers) are the primary task assigners, focusing on daily micromanagement.
+
+**Task Types**:
+- **Homework**: Daily/weekly assignments from sessions
+- **Assignments**: Graded coursework with deadlines
+- **Assessments**: Formal evaluations and tests
+- **Practice**: Non-graded practice exercises
+
+**Key Users**:
+- **ECM**: Primary task assigner (80% of tasks), tracks all learners
+- **Educator**: Assigns session-related homework
+- **Admin**: Platform-wide assessments and standardized tests
+- **Learner**: Receives, completes, and submits tasks
+
+---
+
+### 38.2 Assignment Model
+
+```prisma
+// shared/prisma/schema/session-management.prisma
+model Assignment {
+  id             String @id @default(cuid())
+
+  // Assignment details
+  title          String
+  description    String
+  instructions   String?
+
+  // Association
+  learnerId      String
+  sessionId      String? // Optional: linked to specific session
+  topicId        String? // Optional: linked to curriculum topic
+
+  learner        LearnerProfile   @relation(fields: [learnerId], references: [id])
+  session        LearningSession? @relation(fields: [sessionId], references: [id])
+  topic          Topic?           @relation(fields: [topicId], references: [id])
+
+  // Assignment configuration
+  type           String // homework, assignment, assessment, practice
+  priority       String @default("medium") // low, medium, high, urgent
+  difficultyLevel String @default("medium") // easy, medium, hard
+
+  // Timing
+  assignedDate   DateTime @default(now())
+  dueDate        DateTime
+  estimatedHours Decimal?
+
+  // Grading criteria
+  totalPoints    Decimal?
+  passingScore   Decimal?
+
+  // Attachments
+  attachments    String[] // URLs to attached files (PDFs, images, etc.)
+  referenceLinks String[] // External resources
+
+  // Status
+  status         String @default("assigned") // assigned, in_progress, submitted, reviewed, completed
+
+  // Tracking
+  createdBy      String // ECM, Educator, or Admin userId
+  submissions    AssignmentSubmission[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+```
+
+**Status Flow**:
+- `assigned` → Initial state when task created
+- `in_progress` → Learner started working
+- `submitted` → Learner submitted work
+- `reviewed` → ECM/Educator reviewed
+- `completed` → Graded and closed
+
+---
+
+### 38.3 Who Can Assign Tasks
+
+**Primary: ECM (EduCare Manager)**
+```typescript
+// ECM assigns daily tasks to all their managed learners
+async function assignTaskAsECM(ecmId: string, learnerId: string, taskData) {
+  const assignment = await prisma.assignment.create({
+    data: {
+      ...taskData,
+      learnerId,
+      createdBy: ecmId,
+      status: "assigned"
+    }
+  });
+
+  await sendNotification({
+    userId: learnerId,
+    type: "new_task_assigned",
+    message: `New ${taskData.type} assigned: ${taskData.title}`,
+    assignmentId: assignment.id
+  });
+
+  return assignment;
+}
+```
+
+**Secondary: Educator**
+```typescript
+// Educator assigns session-related homework
+async function assignSessionHomework(educatorId: string, sessionId: string, taskData) {
+  const session = await prisma.learningSession.findUnique({
+    where: { id: sessionId },
+    select: { learnerId: true }
+  });
+
+  const assignment = await prisma.assignment.create({
+    data: {
+      ...taskData,
+      learnerId: session.learnerId,
+      sessionId,
+      createdBy: educatorId,
+      type: "homework"
+    }
+  });
+
+  return assignment;
+}
+```
+
+**Tertiary: Admin**
+```typescript
+// Admin assigns platform-wide assessments
+async function assignPlatformAssessment(adminId: string, learnerIds: string[], taskData) {
+  const assignments = await prisma.assignment.createMany({
+    data: learnerIds.map(learnerId => ({
+      ...taskData,
+      learnerId,
+      createdBy: adminId,
+      type: "assessment"
+    }))
+  });
+
+  // Bulk notify all learners
+  await bulkNotify(learnerIds, "new_assessment", taskData.title);
+
+  return assignments;
+}
+```
+
+---
+
+### 38.4 Task Assignment Flow
+
+**ECM Task Assignment Interface**:
+```tsx
+// frontend/web/src/app/(dashboard)/ecm/tasks/assign/page.tsx
+"use client";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+const taskSchema = z.object({
+  learnerIds: z.array(z.string()).min(1, "Select at least one learner"),
+  title: z.string().min(1, "Title required"),
+  description: z.string().min(1, "Description required"),
+  type: z.enum(["homework", "assignment", "assessment", "practice"]),
+  priority: z.enum(["low", "medium", "high", "urgent"]),
+  dueDate: z.date(),
+  totalPoints: z.number().optional(),
+  attachments: z.array(z.string()).optional()
+});
+
+export default function AssignTaskForm({ learners }) {
+  const { register, handleSubmit, watch } = useForm();
+  const [selectedLearners, setSelectedLearners] = useState([]);
+  const [attachments, setAttachments] = useState([]);
+
+  const onSubmit = async (data) => {
+    const response = await fetch('/api/tasks/assign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...data,
+        learnerIds: selectedLearners,
+        attachments
+      })
+    });
+
+    if (response.ok) {
+      // Success notification
+      // Redirect to task list
+    }
+  };
+
+  const handleFileUpload = async (files) => {
+    // Upload files to S3/storage
+    const urls = await uploadFiles(files);
+    setAttachments([...attachments, ...urls]);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <h1 className="text-2xl font-bold">Assign New Task</h1>
+
+      {/* Learner Selection */}
+      <div>
+        <Label>Select Learners</Label>
+        <MultiSelect
+          options={learners.map(l => ({ value: l.id, label: `${l.firstName} ${l.lastName}` }))}
+          value={selectedLearners}
+          onChange={setSelectedLearners}
+        />
+        <p className="text-xs text-muted-foreground mt-1">
+          {selectedLearners.length} learner(s) selected
+        </p>
+      </div>
+
+      {/* Task Type */}
+      <div>
+        <Label>Task Type</Label>
+        <Select {...register("type")}>
+          <option value="homework">Homework</option>
+          <option value="assignment">Assignment</option>
+          <option value="assessment">Assessment</option>
+          <option value="practice">Practice</option>
+        </Select>
+      </div>
+
+      {/* Title & Description */}
+      <div>
+        <Label>Task Title</Label>
+        <Input {...register("title")} placeholder="e.g., Math Worksheet - Chapter 5" />
+      </div>
+
+      <div>
+        <Label>Description</Label>
+        <Textarea {...register("description")} rows={4} placeholder="Detailed instructions..." />
+      </div>
+
+      {/* Due Date & Priority */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Due Date</Label>
+          <DatePicker {...register("dueDate")} />
+        </div>
+
+        <div>
+          <Label>Priority</Label>
+          <Select {...register("priority")}>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </Select>
+        </div>
+      </div>
+
+      {/* Points (for graded assignments) */}
+      {watch("type") !== "practice" && (
+        <div>
+          <Label>Total Points</Label>
+          <Input type="number" {...register("totalPoints", { valueAsNumber: true })} />
+        </div>
+      )}
+
+      {/* File Attachments */}
+      <div>
+        <Label>Attachments</Label>
+        <FileUpload onChange={handleFileUpload} multiple />
+        <div className="mt-2 space-y-1">
+          {attachments.map((url, i) => (
+            <div key={i} className="flex items-center justify-between p-2 border rounded">
+              <span className="text-sm">{url.split('/').pop()}</span>
+              <Button variant="ghost" size="sm" onClick={() => setAttachments(attachments.filter((_, idx) => idx !== i))}>
+                Remove
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Button type="submit">Assign Task</Button>
+    </form>
+  );
+}
+```
+
+---
+
+### 38.5 Pre-Built Task Library
+
+**TaskTemplate Concept** (not in schema, but can be implemented):
+```typescript
+// Store frequently used task templates
+interface TaskTemplate {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  subject: string;
+  grade: string;
+  difficultyLevel: string;
+  estimatedHours: number;
+  attachments: string[];
+}
+
+// Example templates
+const mathTemplates = [
+  {
+    title: "Multiplication Table Practice",
+    subject: "Mathematics",
+    grade: "4",
+    difficultyLevel: "easy",
+    description: "Complete multiplication tables 1-12"
+  },
+  {
+    title: "Algebraic Equations Worksheet",
+    subject: "Mathematics",
+    grade: "8",
+    difficultyLevel: "medium",
+    description: "Solve 20 linear equations"
+  }
+];
+```
+
+**Template Selector**:
+```tsx
+function TemplateSelector({ onSelect }) {
+  const [templates, setTemplates] = useState([]);
+
+  useEffect(() => {
+    // Load templates by subject/grade
+    loadTemplates();
+  }, []);
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {templates.map(template => (
+        <Card key={template.id} className="cursor-pointer hover:border-primary" onClick={() => onSelect(template)}>
+          <CardHeader>
+            <CardTitle className="text-sm">{template.title}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground">{template.subject} - Grade {template.grade}</p>
+            <Badge variant="secondary">{template.difficultyLevel}</Badge>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+```
+
+---
+
+### 38.6 AssignmentSubmission Model
+
+```prisma
+// shared/prisma/schema/session-management.prisma
+model AssignmentSubmission {
+  id            String @id @default(cuid())
+  assignmentId  String
+  learnerId     String
+
+  assignment    Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  learner       LearnerProfile @relation(fields: [learnerId], references: [id], onDelete: Cascade)
+
+  // Submission content
+  content       String?  // Text content (for text-based submissions)
+  attachments   String[] // File URLs (PDFs, images, videos)
+  links         String[] // External links
+
+  // Submission tracking
+  submittedAt   DateTime @default(now())
+  isLate        Boolean  @default(false)
+  attemptNumber Int      @default(1)
+
+  // Grading
+  score         Decimal?
+  maxScore      Decimal?
+  percentage    Decimal?
+  grade         String?  // A, B, C, etc.
+
+  // Feedback
+  feedback      String?
+  reviewedBy    String?  // ECM or Educator userId
+  reviewedAt    DateTime?
+
+  status        String @default("submitted") // submitted, under_review, graded
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+```
+
+---
+
+### 38.7 Learner Task View
+
+**Task List Page**:
+```tsx
+// frontend/web/src/app/(dashboard)/learner/tasks/page.tsx
+async function LearnerTasksPage() {
+  const learnerProfile = await getLearnerProfile();
+
+  const tasks = await prisma.assignment.findMany({
+    where: { learnerId: learnerProfile.id },
+    orderBy: { dueDate: 'asc' },
+    include: {
+      submissions: {
+        where: { learnerId: learnerProfile.id }
+      }
+    }
+  });
+
+  const pending = tasks.filter(t => t.status === "assigned");
+  const inProgress = tasks.filter(t => t.status === "in_progress");
+  const submitted = tasks.filter(t => t.status === "submitted");
+  const completed = tasks.filter(t => t.status === "completed");
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">My Tasks</h1>
+
+      <Tabs defaultValue="pending">
+        <TabsList>
+          <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
+          <TabsTrigger value="in-progress">In Progress ({inProgress.length})</TabsTrigger>
+          <TabsTrigger value="submitted">Submitted ({submitted.length})</TabsTrigger>
+          <TabsTrigger value="completed">Completed ({completed.length})</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pending">
+          <TaskList tasks={pending} />
+        </TabsContent>
+
+        <TabsContent value="in-progress">
+          <TaskList tasks={inProgress} />
+        </TabsContent>
+
+        <TabsContent value="submitted">
+          <TaskList tasks={submitted} />
+        </TabsContent>
+
+        <TabsContent value="completed">
+          <TaskList tasks={completed} />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+```
+
+**Task Card Component**:
+```tsx
+function TaskCard({ task }) {
+  const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "completed";
+  const daysLeft = Math.ceil((new Date(task.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+
+  return (
+    <Card className={isOverdue ? "border-red-500" : ""}>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle>{task.title}</CardTitle>
+            <p className="text-sm text-muted-foreground">{task.type}</p>
+          </div>
+          <Badge variant={task.priority === "urgent" ? "destructive" : "default"}>
+            {task.priority}
+          </Badge>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <p className="text-sm mb-3">{task.description}</p>
+
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div>
+            <span className="text-muted-foreground">Due:</span>
+            <span className={isOverdue ? "text-red-500 font-medium ml-1" : "ml-1"}>
+              {new Date(task.dueDate).toLocaleDateString()}
+            </span>
+          </div>
+
+          <div>
+            <span className="text-muted-foreground">Points:</span>
+            <span className="ml-1">{task.totalPoints || "N/A"}</span>
+          </div>
+
+          {!isOverdue && task.status === "assigned" && (
+            <div className="col-span-2">
+              <span className="text-muted-foreground">Time left:</span>
+              <span className="ml-1 font-medium">{daysLeft} days</span>
+            </div>
+          )}
+        </div>
+
+        {task.attachments.length > 0 && (
+          <div className="mt-3">
+            <p className="text-xs text-muted-foreground mb-1">Attachments:</p>
+            {task.attachments.map((url, i) => (
+              <a key={i} href={url} target="_blank" className="text-xs text-primary hover:underline block">
+                {url.split('/').pop()}
+              </a>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4">
+          <Link href={`/learner/tasks/${task.id}`}>
+            <Button variant="default" className="w-full">
+              {task.status === "assigned" ? "Start Task" : "View Details"}
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Task Submission Form**:
+```tsx
+// frontend/web/src/app/(dashboard)/learner/tasks/[id]/submit/page.tsx
+"use client";
+function TaskSubmissionForm({ task }) {
+  const [content, setContent] = useState("");
+  const [files, setFiles] = useState([]);
+  const [links, setLinks] = useState([]);
+
+  const handleSubmit = async () => {
+    // Upload files first
+    const attachmentUrls = await uploadFiles(files);
+
+    await fetch('/api/tasks/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assignmentId: task.id,
+        content,
+        attachments: attachmentUrls,
+        links
+      })
+    });
+
+    // Success notification
+  };
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-xl font-bold">Submit: {task.title}</h1>
+
+      <div>
+        <Label>Your Work (Text)</Label>
+        <Textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={8}
+          placeholder="Write your solution here..."
+        />
+      </div>
+
+      <div>
+        <Label>Attach Files</Label>
+        <FileUpload onChange={setFiles} multiple accept=".pdf,.doc,.docx,.jpg,.png" />
+      </div>
+
+      <div>
+        <Label>External Links (optional)</Label>
+        <Input
+          placeholder="https://..."
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.target.value) {
+              setLinks([...links, e.target.value]);
+              e.target.value = "";
+            }
+          }}
+        />
+        {links.map((link, i) => (
+          <div key={i} className="text-sm mt-1">{link}</div>
+        ))}
+      </div>
+
+      <Button onClick={handleSubmit}>Submit Assignment</Button>
+    </div>
+  );
+}
+```
+
+---
+
+### 38.8 ECM Task Tracking
+
+**ECM Task Dashboard**:
+```tsx
+// frontend/web/src/app/(dashboard)/ecm/tasks/page.tsx
+async function ECMTaskTrackingDashboard() {
+  const ecmProfile = await getECMProfile();
+
+  // Get all tasks for ECM's managed learners
+  const tasks = await prisma.assignment.findMany({
+    where: {
+      learner: {
+        ecmId: ecmProfile.id
+      }
+    },
+    include: {
+      learner: {
+        select: { firstName: true, lastName: true }
+      },
+      submissions: true
+    },
+    orderBy: { dueDate: 'asc' }
+  });
+
+  const stats = {
+    totalTasks: tasks.length,
+    pending: tasks.filter(t => t.status === "assigned").length,
+    submitted: tasks.filter(t => t.status === "submitted").length,
+    overdue: tasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== "completed").length,
+    completionRate: (tasks.filter(t => t.status === "completed").length / tasks.length) * 100
+  };
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold">Task Tracking Dashboard</h1>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-4 gap-4">
+        <StatCard label="Total Tasks" value={stats.totalTasks} />
+        <StatCard label="Pending" value={stats.pending} color="blue" />
+        <StatCard label="Submitted" value={stats.submitted} color="green" />
+        <StatCard label="Overdue" value={stats.overdue} color="red" />
+      </div>
+
+      {/* Completion Rate Progress Bar */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Overall Completion Rate</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Progress value={stats.completionRate} />
+          <p className="text-sm text-muted-foreground mt-2">{stats.completionRate.toFixed(1)}% completed</p>
+        </CardContent>
+      </Card>
+
+      {/* Overdue Tasks Highlighted */}
+      {stats.overdue > 0 && (
+        <Card className="border-red-500">
+          <CardHeader>
+            <CardTitle className="text-red-500">Overdue Tasks</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <OverdueTasksList tasks={tasks.filter(t => new Date(t.dueDate) < new Date() && t.status !== "completed")} />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Task Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Tasks</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TaskTable tasks={tasks} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+**Bulk Actions**:
+```tsx
+function TaskTable({ tasks }) {
+  const [selectedTasks, setSelectedTasks] = useState([]);
+
+  const handleBulkExtendDeadline = async (days) => {
+    await fetch('/api/tasks/bulk-extend', {
+      method: 'POST',
+      body: JSON.stringify({ taskIds: selectedTasks, extensionDays: days })
+    });
+  };
+
+  return (
+    <table className="w-full">
+      <thead>
+        <tr>
+          <th><Checkbox onChange={(e) => e.target.checked ? setSelectedTasks(tasks.map(t => t.id)) : setSelectedTasks([])} /></th>
+          <th>Learner</th>
+          <th>Task</th>
+          <th>Type</th>
+          <th>Due Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {tasks.map(task => (
+          <tr key={task.id}>
+            <td><Checkbox checked={selectedTasks.includes(task.id)} onChange={(e) => { /* toggle */ }} /></td>
+            <td>{task.learner.firstName} {task.learner.lastName}</td>
+            <td>{task.title}</td>
+            <td><Badge>{task.type}</Badge></td>
+            <td>{new Date(task.dueDate).toLocaleDateString()}</td>
+            <td><Badge variant={task.status === "completed" ? "default" : "secondary"}>{task.status}</Badge></td>
+            <td>
+              <Link href={`/ecm/tasks/${task.id}`}>
+                <Button size="sm">View</Button>
+              </Link>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+```
+
+---
+
+### 38.9 Educator Review Interface
+
+**Submitted Tasks List**:
+```tsx
+// frontend/web/src/app/(dashboard)/educator/tasks/review/page.tsx
+async function EducatorReviewPage() {
+  const educatorProfile = await getEducatorProfile();
+
+  const submittedTasks = await prisma.assignmentSubmission.findMany({
+    where: {
+      assignment: {
+        createdBy: educatorProfile.userId
+      },
+      status: "submitted"
+    },
+    include: {
+      assignment: true,
+      learner: {
+        select: { firstName: true, lastName: true }
+      }
+    }
+  });
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Tasks to Review</h1>
+
+      {submittedTasks.map(submission => (
+        <SubmissionReviewCard key={submission.id} submission={submission} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Grading Form**:
+```tsx
+"use client";
+function SubmissionReviewCard({ submission }) {
+  const [score, setScore] = useState(0);
+  const [feedback, setFeedback] = useState("");
+
+  const handleGrade = async () => {
+    await fetch('/api/tasks/grade', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        submissionId: submission.id,
+        score,
+        feedback
+      })
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{submission.assignment.title}</CardTitle>
+        <p className="text-sm">Learner: {submission.learner.firstName} {submission.learner.lastName}</p>
+        <p className="text-xs text-muted-foreground">
+          Submitted: {new Date(submission.submittedAt).toLocaleString()}
+          {submission.isLate && <span className="text-red-500 ml-2">(Late)</span>}
+        </p>
+      </CardHeader>
+
+      <CardContent>
+        {/* Student's Work */}
+        <div className="mb-4">
+          <h4 className="font-medium mb-2">Submitted Work:</h4>
+          <div className="p-3 bg-secondary rounded">
+            <p className="text-sm whitespace-pre-wrap">{submission.content}</p>
+          </div>
+
+          {submission.attachments.length > 0 && (
+            <div className="mt-2">
+              <p className="text-sm font-medium">Attachments:</p>
+              {submission.attachments.map((url, i) => (
+                <a key={i} href={url} target="_blank" className="text-sm text-primary hover:underline block">
+                  {url.split('/').pop()}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Grading Section */}
+        <div className="space-y-3">
+          <div>
+            <Label>Score (out of {submission.assignment.totalPoints})</Label>
+            <Input
+              type="number"
+              value={score}
+              onChange={(e) => setScore(Number(e.target.value))}
+              max={submission.assignment.totalPoints}
+            />
+          </div>
+
+          <div>
+            <Label>Feedback</Label>
+            <Textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              rows={4}
+              placeholder="Provide constructive feedback..."
+            />
+          </div>
+
+          <Button onClick={handleGrade}>Submit Grade</Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+---
+
+### 38.10 Notification System
+
+**Task Notification Triggers**:
+
+| Event | Recipient | Message |
+|-------|-----------|---------|
+| New task assigned | Learner | "New [type] assigned: [title]" |
+| Task due in 24h | Learner | "Reminder: [task] due tomorrow" |
+| Task overdue | Learner + ECM | "[Learner] has overdue task: [title]" |
+| Task submitted | ECM/Educator | "[Learner] submitted [task]" |
+| Task graded | Learner | "Your [task] has been graded: [score]" |
+
+**Notification Component**:
+```tsx
+function TaskNotification({ notification }) {
+  const { type, data } = notification;
+
+  switch (type) {
+    case "new_task_assigned":
+      return (
+        <NotificationCard
+          icon="📝"
+          title="New Task Assigned"
+          message={`${data.taskType}: ${data.taskTitle}`}
+          action={<Link href={`/learner/tasks/${data.taskId}`}>View Task</Link>}
+        />
+      );
+
+    case "task_submitted":
+      return (
+        <NotificationCard
+          icon="✅"
+          title="Task Submitted"
+          message={`${data.learnerName} submitted ${data.taskTitle}`}
+          action={<Link href={`/ecm/tasks/${data.submissionId}/review`}>Review</Link>}
+        />
+      );
+
+    case "task_graded":
+      return (
+        <NotificationCard
+          icon="⭐"
+          title="Task Graded"
+          message={`You scored ${data.score}/${data.maxScore} on ${data.taskTitle}`}
+          action={<Link href={`/learner/tasks/${data.taskId}`}>View Feedback</Link>}
+        />
+      );
+
+    default:
+      return null;
+  }
+}
+```
+
+---
+
+### 38.11 Key Takeaways - Chapter 38
+
+✅ **Task System Purpose**: Homework, assignments, assessments, practice exercises
+
+✅ **Assignment Model**:
+- `type`: homework, assignment, assessment, practice
+- `status`: assigned → in_progress → submitted → reviewed → completed
+- `attachments`: File URLs for resources
+- `totalPoints`, `passingScore` for grading
+
+✅ **Task Assigners**:
+- **ECM**: Primary user (80% of tasks), daily micromanagement
+- **Educator**: Session-related homework
+- **Admin**: Platform-wide assessments
+
+✅ **Task Assignment Flow**:
+1. ECM/Educator creates task
+2. System assigns to learner(s)
+3. Learner receives notification
+4. Learner completes and submits
+
+✅ **AssignmentSubmission Model**:
+- `content`: Text submission
+- `attachments`: File uploads
+- `score`, `feedback`: Grading data
+- `isLate`: Tracks late submissions
+
+✅ **Learner Interface**:
+- Task list with tabs (pending, in-progress, submitted, completed)
+- Overdue tasks highlighted
+- Submission form with text + file upload
+
+✅ **ECM Tracking Dashboard**:
+- All learners' tasks in one view
+- Completion rate metrics
+- Overdue tasks highlighted
+- Bulk actions (extend deadline, etc.)
+
+✅ **Educator Review**:
+- View submitted work
+- Grading form (score + feedback)
+- Mark as reviewed
+
+✅ **Notifications**:
+- New task assigned → Learner
+- Task submitted → ECM/Educator
+- Task graded → Learner
+- Overdue reminders → All parties
+
+✅ **Pre-Built Templates** (concept):
+- Subject-wise task library
+- Difficulty levels
+- Reusable templates for common tasks
+
+**Next Up: Chapter 39 - Real-Time Notifications**
+
+---
+
+## Chapter 39: Real-Time Notifications
+
+### 39.1 Why Notifications Matter
+
+**The Communication Gap in Traditional Education Platforms**:
+
+Imagine a learner who misses a session because they didn't know it was scheduled. Or a guardian who doesn't realize a payment is overdue. Or an ECM who finds out about a struggling learner a week too late.
+
+**Next Photon's Notification Philosophy**:
+- **Real-time awareness**: Keep all stakeholders informed instantly
+- **Multi-channel delivery**: In-app, email, SMS (where users prefer)
+- **Action-oriented**: Every notification has a purpose and clear next step
+- **Role-specific**: Learners, Guardians, Educators, ECMs get relevant alerts
+
+**Business Impact**:
+- ↑ Session attendance (timely reminders)
+- ↑ Payment collection (due date alerts)
+- ↑ Intervention effectiveness (ECMs notified of issues immediately)
+- ↑ User engagement (users feel connected and informed)
+
+---
+
+### 39.2 Notification Data Model
+
+**Notification Schema** (`/home/teamzenith/ZenCo/NextPhoton/shared/prisma/schema/communication.prisma`):
+
+```prisma
+model Notification {
+  id              String @id @default(cuid())
+
+  // Target user
+  userId          String
+
+  // Notification content
+  type            String // message, session_reminder, assignment_due, payment_due, etc.
+  title           String
+  content         String
+
+  // Additional data
+  data            Json? // Flexible metadata (learner name, amount due, etc.)
+
+  // Reference to source entity
+  referenceType   String? // message, session, assignment, payment, etc.
+  referenceId     String? // ID of the referenced entity
+
+  // Delivery channels
+  channels        String[] // ["push", "email", "sms", "in_app"]
+
+  // Status tracking
+  status          String @default("pending") // pending, sent, delivered, read, failed
+
+  // Read tracking
+  isRead          Boolean @default(false)
+  readAt          DateTime?
+
+  // Channel-specific delivery tracking
+  pushSent        Boolean @default(false)
+  pushSentAt      DateTime?
+  emailSent       Boolean @default(false)
+  emailSentAt     DateTime?
+  smsSent         Boolean @default(false)
+  smsSentAt       DateTime?
+
+  // Scheduling
+  scheduledFor    DateTime? // Send notification at specific time
+
+  // User actions
+  actionTaken     Boolean @default(false)
+  actionType      String? // clicked, dismissed, etc.
+  actionUrl       String? // Where to redirect when clicked
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+```
+
+**Key Fields Explained**:
+
+1. **`type`**: Categorizes notification (determines icon, color, priority)
+   - `session_reminder`, `session_cancelled`, `session_completed`
+   - `assignment_assigned`, `assignment_due`, `assignment_graded`
+   - `payment_due`, `payment_received`, `payment_overdue`
+   - `intervention_triggered`, `alert_created`
+   - `message_received`, `announcement_posted`
+
+2. **`data` (JSON)**: Flexible metadata
+   ```json
+   {
+     "learnerName": "John Doe",
+     "sessionDate": "2025-10-15",
+     "amountDue": 5000,
+     "dueDate": "2025-10-20"
+   }
+   ```
+
+3. **`referenceType` + `referenceId`**: Link to source entity
+   - Example: `referenceType: "session"`, `referenceId: "session_xyz123"`
+   - Allows fetching full details if needed
+
+4. **`actionUrl`**: Where user goes when clicking notification
+   - `/learner/sessions/xyz123` (view session details)
+   - `/guardian/payments/abc456` (pay invoice)
+   - `/ecm/interventions/def789` (review intervention)
+
+---
+
+### 39.3 Notification Types by Role
+
+**Learner Notifications**:
+
+| Event | Title | Content | actionUrl |
+|-------|-------|---------|-----------|
+| Task assigned | "New Homework Assigned" | "Complete 'Math Worksheet 5' by Oct 10" | `/learner/tasks/{id}` |
+| Session reminder | "Session in 1 Hour" | "Chemistry with Dr. Smith at 3:00 PM" | `/learner/sessions/{id}` |
+| Session cancelled | "Session Cancelled" | "Chemistry session on Oct 10 cancelled" | `/learner/sessions` |
+| Grade published | "Assignment Graded" | "You scored 85/100 on Math Quiz" | `/learner/tasks/{id}` |
+| Message received | "New Message from ECM" | "Your ECM wants to discuss progress" | `/learner/messages/{id}` |
+
+**Guardian Notifications**:
+
+| Event | Title | Content | actionUrl |
+|-------|-------|---------|-----------|
+| Payment due | "Payment Due Soon" | "₹5,000 due on Oct 15 for sessions" | `/guardian/payments/{id}` |
+| Payment overdue | "Payment Overdue" | "₹5,000 payment is 3 days overdue" | `/guardian/payments/{id}` |
+| Session cancelled | "Session Cancelled" | "John's Chemistry session cancelled" | `/guardian/learners/{id}/sessions` |
+| Progress report ready | "Progress Report Available" | "Monthly report for John is ready" | `/guardian/reports/{id}` |
+| Low attendance alert | "Attendance Alert" | "John attended only 60% of sessions" | `/guardian/learners/{id}/attendance` |
+
+**Educator Notifications**:
+
+| Event | Title | Content | actionUrl |
+|-------|-------|---------|-----------|
+| Session request | "New Session Request" | "Guardian booked Chemistry on Oct 12" | `/educator/sessions/{id}` |
+| Payment received | "Payment Received" | "₹2,000 received for session on Oct 10" | `/educator/payments` |
+| Session reminder | "Session in 30 Minutes" | "Chemistry with John at 3:00 PM" | `/educator/sessions/{id}` |
+| Learner absent | "Learner Absent" | "John marked absent for session" | `/educator/sessions/{id}` |
+
+**ECM Notifications**:
+
+| Event | Title | Content | actionUrl |
+|-------|-------|---------|-----------|
+| Intervention triggered | "Intervention Needed" | "John's attendance below 70%" | `/ecm/interventions/{id}` |
+| Task overdue | "Task Overdue" | "John hasn't submitted Math homework" | `/ecm/tasks/{id}` |
+| Educator issue | "Educator Issue" | "Dr. Smith cancelled 3 sessions this week" | `/ecm/educators/{id}` |
+| Payment overdue | "Payment Alert" | "Guardian of John has overdue payment" | `/ecm/payments/{id}` |
+| Alert created | "System Alert" | "3 learners absent today" | `/ecm/alerts/{id}` |
+
+---
+
+### 39.4 Notification Delivery Channels
+
+**Multi-Channel Strategy**:
+
+```typescript
+// Create notification with multiple channels
+await createNotification({
+  userId: learner.id,
+  type: "session_reminder",
+  title: "Session in 1 Hour",
+  content: "Chemistry with Dr. Smith at 3:00 PM",
+  channels: ["in_app", "email", "sms"], // Multi-channel
+  actionUrl: `/learner/sessions/${sessionId}`,
+  data: {
+    sessionId,
+    educatorName: "Dr. Smith",
+    subject: "Chemistry",
+    time: "3:00 PM"
+  }
+});
+```
+
+**Channel Comparison**:
+
+| Channel | Speed | Cost | User Attention | Use Case |
+|---------|-------|------|----------------|----------|
+| **In-App** | Instant | Free | Medium | Real-time updates while using app |
+| **Email** | 1-5 min | Free | Low | Detailed info, receipts, reports |
+| **SMS** | Instant | Paid | High | Urgent alerts (payment due, session soon) |
+| **Push** | Instant | Free | High | Mobile engagement (future) |
+
+**Channel Selection Logic**:
+
+```typescript
+function selectChannels(notificationType: string, urgency: string) {
+  // Critical notifications (payment overdue, session in 30 min)
+  if (urgency === "high") {
+    return ["in_app", "email", "sms"];
+  }
+
+  // Important notifications (new task, session reminder)
+  if (urgency === "medium") {
+    return ["in_app", "email"];
+  }
+
+  // Standard notifications (message received, announcement)
+  return ["in_app"];
+}
+```
+
+---
+
+### 39.5 In-App Notification Center
+
+**UI Components**:
+
+**1. Notification Bell Icon** (Navigation Bar):
+```tsx
+function NotificationBell() {
+  const { unreadCount } = useNotifications();
+
+  return (
+    <button className="relative">
+      <Bell size={24} />
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
+      )}
+    </button>
+  );
+}
+```
+
+**2. Notification Dropdown**:
+```tsx
+function NotificationDropdown() {
+  const { notifications, markAsRead, deleteNotification } = useNotifications();
+
+  return (
+    <div className="w-96 max-h-[500px] overflow-y-auto">
+      <div className="p-4 border-b">
+        <h3 className="font-semibold">Notifications</h3>
+        <div className="flex gap-2 mt-2">
+          <Button size="sm" onClick={() => setFilter("all")}>All</Button>
+          <Button size="sm" onClick={() => setFilter("unread")}>Unread</Button>
+        </div>
+      </div>
+
+      {notifications.map((notif) => (
+        <NotificationItem
+          key={notif.id}
+          notification={notif}
+          onRead={() => markAsRead(notif.id)}
+          onDelete={() => deleteNotification(notif.id)}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+**3. Notification Item**:
+```tsx
+function NotificationItem({ notification, onRead, onDelete }) {
+  const icon = getNotificationIcon(notification.type);
+  const color = getNotificationColor(notification.type);
+
+  return (
+    <div
+      className={`p-4 border-b hover:bg-gray-50 ${!notification.isRead ? "bg-blue-50" : ""}`}
+      onClick={() => {
+        onRead();
+        router.push(notification.actionUrl);
+      }}
+    >
+      <div className="flex gap-3">
+        <div className={`w-10 h-10 rounded-full ${color} flex items-center justify-center`}>
+          {icon}
+        </div>
+        <div className="flex-1">
+          <h4 className="font-semibold text-sm">{notification.title}</h4>
+          <p className="text-xs text-gray-600">{notification.content}</p>
+          <span className="text-xs text-gray-400">{formatTimeAgo(notification.createdAt)}</span>
+        </div>
+        <button onClick={(e) => { e.stopPropagation(); onDelete(); }}>
+          <X size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+**Helper Functions**:
+```typescript
+function getNotificationIcon(type: string) {
+  const icons = {
+    session_reminder: <Calendar size={20} />,
+    assignment_assigned: <FileText size={20} />,
+    payment_due: <CreditCard size={20} />,
+    message_received: <MessageSquare size={20} />,
+    intervention_triggered: <AlertTriangle size={20} />
+  };
+  return icons[type] || <Bell size={20} />;
+}
+
+function getNotificationColor(type: string) {
+  const colors = {
+    session_reminder: "bg-blue-100 text-blue-600",
+    assignment_assigned: "bg-green-100 text-green-600",
+    payment_due: "bg-orange-100 text-orange-600",
+    intervention_triggered: "bg-red-100 text-red-600"
+  };
+  return colors[type] || "bg-gray-100 text-gray-600";
+}
+```
+
+---
+
+### 39.6 Frontend Notification Management
+
+**NotificationContext** (`/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/contexts/notification-context.tsx`):
+
+```typescript
+interface NotificationContextType {
+  notifications: Notification[];
+  unreadCount: number;
+  fetchNotifications: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
+}
+
+export function NotificationProvider({ children }) {
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch notifications on mount and periodically
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+    return () => clearInterval(interval);
+  }, []);
+
+  async function fetchNotifications() {
+    const response = await fetch("/api/notifications");
+    const data = await response.json();
+    setNotifications(data.notifications);
+    setUnreadCount(data.notifications.filter(n => !n.isRead).length);
+  }
+
+  async function markAsRead(id: string) {
+    await fetch(`/api/notifications/${id}/read`, { method: "POST" });
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true, readAt: new Date() } : n))
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+  }
+
+  async function markAllAsRead() {
+    await fetch("/api/notifications/mark-all-read", { method: "POST" });
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnreadCount(0);
+  }
+
+  async function deleteNotification(id: string) {
+    await fetch(`/api/notifications/${id}`, { method: "DELETE" });
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  }
+
+  return (
+    <NotificationContext.Provider value={{ notifications, unreadCount, fetchNotifications, markAsRead, markAllAsRead, deleteNotification }}>
+      {children}
+    </NotificationContext.Provider>
+  );
+}
+```
+
+**useNotifications Hook**:
+```typescript
+export function useNotifications() {
+  const context = useContext(NotificationContext);
+  if (!context) throw new Error("useNotifications must be used within NotificationProvider");
+  return context;
+}
+```
+
+---
+
+### 39.7 Backend Notification Service
+
+**NotificationService** (`backend/server_NestJS/src/notifications/notification.service.ts`):
+
+```typescript
+@Injectable()
+export class NotificationService {
+  constructor(
+    private prisma: PrismaService,
+    private emailService: EmailService,
+    private smsService: SmsService
+  ) {}
+
+  async createNotification(data: CreateNotificationDto) {
+    // Create notification record
+    const notification = await this.prisma.notification.create({
+      data: {
+        userId: data.userId,
+        type: data.type,
+        title: data.title,
+        content: data.content,
+        channels: data.channels || ["in_app"],
+        actionUrl: data.actionUrl,
+        data: data.data,
+        referenceType: data.referenceType,
+        referenceId: data.referenceId
+      }
+    });
+
+    // Send via specified channels
+    await this.deliverNotification(notification);
+
+    return notification;
+  }
+
+  private async deliverNotification(notification: Notification) {
+    const { channels } = notification;
+
+    // In-app notification (already created in DB)
+    if (channels.includes("in_app")) {
+      // Already handled by creating the record
+    }
+
+    // Email notification
+    if (channels.includes("email")) {
+      await this.sendEmailNotification(notification);
+    }
+
+    // SMS notification
+    if (channels.includes("sms")) {
+      await this.sendSmsNotification(notification);
+    }
+
+    // Push notification (future)
+    if (channels.includes("push")) {
+      await this.sendPushNotification(notification);
+    }
+  }
+
+  private async sendEmailNotification(notification: Notification) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: notification.userId },
+        select: { email: true, name: true }
+      });
+
+      await this.emailService.sendEmail({
+        to: user.email,
+        subject: notification.title,
+        template: "notification",
+        data: {
+          userName: user.name,
+          title: notification.title,
+          content: notification.content,
+          actionUrl: `${process.env.APP_URL}${notification.actionUrl}`,
+          actionText: "View Details"
+        }
+      });
+
+      // Update notification record
+      await this.prisma.notification.update({
+        where: { id: notification.id },
+        data: { emailSent: true, emailSentAt: new Date() }
+      });
+    } catch (error) {
+      console.error("Email notification failed:", error);
+    }
+  }
+
+  private async sendSmsNotification(notification: Notification) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: notification.userId },
+        select: { phone: true }
+      });
+
+      if (!user.phone) return;
+
+      await this.smsService.sendSms({
+        to: user.phone,
+        message: `${notification.title}: ${notification.content}`
+      });
+
+      // Update notification record
+      await this.prisma.notification.update({
+        where: { id: notification.id },
+        data: { smsSent: true, smsSentAt: new Date() }
+      });
+    } catch (error) {
+      console.error("SMS notification failed:", error);
+    }
+  }
+
+  async getUserNotifications(userId: string, filters?: { isRead?: boolean }) {
+    return this.prisma.notification.findMany({
+      where: {
+        userId,
+        ...(filters?.isRead !== undefined && { isRead: filters.isRead })
+      },
+      orderBy: { createdAt: "desc" },
+      take: 50
+    });
+  }
+
+  async markAsRead(notificationId: string, userId: string) {
+    return this.prisma.notification.update({
+      where: { id: notificationId, userId },
+      data: { isRead: true, readAt: new Date(), status: "read" }
+    });
+  }
+
+  async markAllAsRead(userId: string) {
+    return this.prisma.notification.updateMany({
+      where: { userId, isRead: false },
+      data: { isRead: true, readAt: new Date(), status: "read" }
+    });
+  }
+
+  async deleteNotification(notificationId: string, userId: string) {
+    return this.prisma.notification.delete({
+      where: { id: notificationId, userId }
+    });
+  }
+}
+```
+
+---
+
+### 39.8 Real-Time Delivery Options
+
+**Three Approaches**:
+
+| Approach | How It Works | Pros | Cons | Best For |
+|----------|-------------|------|------|----------|
+| **Polling** | Frontend requests `/api/notifications` every 30s | Simple, works everywhere | Wastes bandwidth, slight delay | MVP, low traffic |
+| **Server-Sent Events (SSE)** | Server pushes updates to client via HTTP stream | One-way, efficient, simple | HTTP/2 limits, no IE support | Read-only notifications |
+| **WebSockets** | Bi-directional real-time connection | True real-time, two-way | More complex, resource-heavy | Chat, live dashboards |
+
+**1. Polling (Current Implementation)**:
+```typescript
+// Frontend (already shown in NotificationContext)
+useEffect(() => {
+  fetchNotifications();
+  const interval = setInterval(fetchNotifications, 30000); // Every 30s
+  return () => clearInterval(interval);
+}, []);
+```
+
+**2. Server-Sent Events (SSE)**:
+```typescript
+// Backend: SSE endpoint
+@Get('stream')
+async streamNotifications(@Req() req, @Res() res) {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+
+  const userId = req.user.id;
+
+  // Send initial notifications
+  const notifications = await this.notificationService.getUserNotifications(userId);
+  res.write(`data: ${JSON.stringify(notifications)}\n\n`);
+
+  // Listen for new notifications (using event emitter)
+  this.eventEmitter.on(`notification:${userId}`, (notification) => {
+    res.write(`data: ${JSON.stringify(notification)}\n\n`);
+  });
+
+  req.on('close', () => {
+    this.eventEmitter.removeAllListeners(`notification:${userId}`);
+  });
+}
+
+// Frontend: Connect to SSE
+useEffect(() => {
+  const eventSource = new EventSource("/api/notifications/stream");
+
+  eventSource.onmessage = (event) => {
+    const notification = JSON.parse(event.data);
+    setNotifications((prev) => [notification, ...prev]);
+  };
+
+  return () => eventSource.close();
+}, []);
+```
+
+**3. WebSockets (Socket.io)**:
+```typescript
+// Backend: WebSocket gateway
+@WebSocketGateway()
+export class NotificationsGateway {
+  @WebSocketServer()
+  server: Server;
+
+  @SubscribeMessage('join_notifications')
+  handleJoin(@ConnectedSocket() client: Socket, @MessageBody() userId: string) {
+    client.join(`user:${userId}`);
+  }
+
+  async sendNotification(userId: string, notification: Notification) {
+    this.server.to(`user:${userId}`).emit('new_notification', notification);
+  }
+}
+
+// Frontend: Connect to WebSocket
+useEffect(() => {
+  const socket = io(process.env.NEXT_PUBLIC_API_URL);
+
+  socket.emit("join_notifications", userId);
+
+  socket.on("new_notification", (notification) => {
+    setNotifications((prev) => [notification, ...prev]);
+    setUnreadCount((prev) => prev + 1);
+  });
+
+  return () => socket.disconnect();
+}, [userId]);
+```
+
+---
+
+### 39.9 Notification Preferences
+
+**NotificationPreference Model** (from schema):
+
+```prisma
+model NotificationPreference {
+  id              String @id @default(cuid())
+  userId          String
+
+  // Notification type (messages, sessions, assignments, payments, etc.)
+  notificationType String
+
+  // Channel preferences
+  pushEnabled     Boolean @default(true)
+  emailEnabled    Boolean @default(true)
+  smsEnabled      Boolean @default(false)
+  inAppEnabled    Boolean @default(true)
+
+  // Timing preferences
+  quietHoursStart String? // "22:00"
+  quietHoursEnd   String? // "08:00"
+  timezone        String @default("Asia/Kolkata")
+
+  // Frequency settings
+  frequency       String @default("immediate") // immediate, daily_digest, weekly_digest
+
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, notificationType])
+  @@map("notification_preferences")
+}
+```
+
+**Preferences UI**:
+```tsx
+function NotificationSettings() {
+  const preferences = [
+    { type: "sessions", label: "Session Reminders" },
+    { type: "assignments", label: "Assignments & Tasks" },
+    { type: "payments", label: "Payment Notifications" },
+    { type: "messages", label: "Messages" },
+    { type: "interventions", label: "Alerts & Interventions" }
+  ];
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Notification Preferences</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <table className="w-full">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>In-App</th>
+              <th>Email</th>
+              <th>SMS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {preferences.map((pref) => (
+              <tr key={pref.type}>
+                <td>{pref.label}</td>
+                <td><Checkbox checked={pref.inAppEnabled} /></td>
+                <td><Checkbox checked={pref.emailEnabled} /></td>
+                <td><Checkbox checked={pref.smsEnabled} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="mt-6">
+          <h4 className="font-semibold mb-2">Quiet Hours</h4>
+          <div className="flex gap-4">
+            <Input type="time" label="Start" defaultValue="22:00" />
+            <Input type="time" label="End" defaultValue="08:00" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Respecting Preferences**:
+```typescript
+async function createNotificationWithPreferences(userId: string, type: string, data: any) {
+  // Fetch user preferences
+  const preference = await prisma.notificationPreference.findUnique({
+    where: { userId_notificationType: { userId, notificationType: type } }
+  });
+
+  // Determine channels based on preferences
+  const channels = [];
+  if (preference?.inAppEnabled !== false) channels.push("in_app");
+  if (preference?.emailEnabled) channels.push("email");
+  if (preference?.smsEnabled) channels.push("sms");
+
+  // Check quiet hours
+  const now = new Date();
+  const currentHour = now.getHours();
+  const quietStart = parseInt(preference?.quietHoursStart?.split(":")[0] || "22");
+  const quietEnd = parseInt(preference?.quietHoursEnd?.split(":")[0] || "8");
+
+  const isQuietHours = currentHour >= quietStart || currentHour < quietEnd;
+
+  if (isQuietHours && preference?.frequency !== "immediate") {
+    // Schedule for later
+    data.scheduledFor = new Date(now.setHours(quietEnd, 0, 0, 0));
+  }
+
+  return createNotification({ userId, type, channels, ...data });
+}
+```
+
+---
+
+### 39.10 Alert Model (Critical Notifications)
+
+**Alert vs Notification**:
+
+| Feature | Notification | Alert |
+|---------|-------------|-------|
+| **Purpose** | Inform user of event | Urgent issue requiring action |
+| **Severity** | Low to medium | High to critical |
+| **Dismissible** | Yes | Requires acknowledgment |
+| **Examples** | "New message", "Session reminder" | "Attendance below 70%", "Payment 7 days overdue" |
+| **UI** | Notification dropdown | Pop-up modal, banner |
+
+**Alert Model** (`shared/prisma/schema/monitoring-progress.prisma`):
+
+```prisma
+model Alert {
+  id              String @id @default(cuid())
+
+  // Context
+  learnerId       String?
+  educatorId      String?
+  ecmId           String?
+
+  // Alert details
+  type            String // performance_drop, attendance_issue, payment_overdue, etc.
+  severity        String // low, medium, high, critical
+  title           String
+  message         String
+
+  // Trigger data
+  triggerMetric   String? // "attendance_rate"
+  thresholdValue  Decimal? // 70
+  actualValue     Decimal? // 55
+
+  // Status
+  status          String @default("active") // active, acknowledged, resolved, dismissed
+
+  // Response tracking
+  acknowledgedBy  String?
+  acknowledgedAt  DateTime?
+  resolvedBy      String?
+  resolvedAt      DateTime?
+  resolution      String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("alerts")
+}
+```
+
+**Alert Triggers**:
+```typescript
+// ECM monitoring triggers alert
+async function checkLearnerAttendance(learnerId: string) {
+  const attendance = await calculateAttendanceRate(learnerId);
+
+  if (attendance < 70) {
+    await createAlert({
+      learnerId,
+      ecmId: learner.ecmId,
+      type: "attendance_issue",
+      severity: "high",
+      title: "Low Attendance Alert",
+      message: `${learner.name}'s attendance is ${attendance}% (below 70% threshold)`,
+      triggerMetric: "attendance_rate",
+      thresholdValue: 70,
+      actualValue: attendance
+    });
+
+    // Also create notification for ECM
+    await createNotification({
+      userId: learner.ecmId,
+      type: "intervention_triggered",
+      title: "Attendance Alert",
+      content: `${learner.name}'s attendance is critically low`,
+      channels: ["in_app", "email"],
+      actionUrl: `/ecm/learners/${learnerId}/attendance`
+    });
+  }
+}
+```
+
+---
+
+### 39.11 Key Takeaways - Chapter 39
+
+✅ **Notification System Purpose**: Keep all stakeholders informed in real-time
+
+✅ **Notification Model**:
+- `userId`, `type`, `title`, `content`
+- `channels` (in_app, email, sms, push)
+- `status` (pending, sent, delivered, read)
+- `isRead`, `readAt` tracking
+- `actionUrl` for navigation
+- `data` JSON for metadata
+
+✅ **Role-Specific Notifications**:
+- **Learner**: Tasks, sessions, grades
+- **Guardian**: Payments, reports, attendance alerts
+- **Educator**: Session requests, payments received
+- **ECM**: Interventions, overdue tasks, system alerts
+
+✅ **Delivery Channels**:
+- **In-app**: Real-time, free, medium attention
+- **Email**: Detailed, free, low attention
+- **SMS**: Urgent, paid, high attention
+- **Push**: Future, mobile engagement
+
+✅ **In-App Notification Center**:
+- Bell icon with unread badge
+- Dropdown with filters (All/Unread)
+- Click to navigate to `actionUrl`
+- Mark as read, delete
+
+✅ **Frontend Implementation**:
+- `NotificationContext` for global state
+- `useNotifications` hook
+- Polling every 30s (MVP)
+- Future: SSE or WebSockets
+
+✅ **Backend Service**:
+- `createNotification()` method
+- Multi-channel delivery (email, SMS)
+- SendGrid for email
+- Twilio for SMS
+
+✅ **Real-Time Delivery**:
+- **Polling**: Simple, works everywhere (current)
+- **SSE**: One-way push, efficient
+- **WebSockets**: Two-way, true real-time
+
+✅ **Notification Preferences**:
+- Per-notification-type settings
+- Enable/disable channels
+- Quiet hours (no SMS at night)
+- Frequency (immediate, daily digest)
+
+✅ **Alert Model** (Critical):
+- High-severity issues (low attendance, payment overdue)
+- Requires acknowledgment
+- Tracks resolution
+- Different UI (modal vs dropdown)
+
+**Next Up: Chapter 40 - File Upload & Google Drive Integration**
+
+---
+
+## Chapter 40: File Upload & Google Drive Integration
+
+### 40.1 Why File Management Matters
+
+**Real-World Scenarios**:
+
+- **Learner**: Submits assignment PDF, uploads profile photo
+- **Educator**: Uploads qualification certificates (PhD, teaching license)
+- **Guardian**: Uploads payment receipt for record-keeping
+- **ECM**: Generates and shares progress reports
+
+**The Challenge**:
+- Where to store files? Local disk (risky), S3 (scalable), Google Drive (easy sharing)?
+- How to secure files? Only owner should access their documents
+- How to handle large files? File size limits, virus scanning
+- How to organize files? Link to assignments, profiles, payments
+
+**Next Photon's Approach**:
+- **Primary storage**: AWS S3 (production-ready, scalable)
+- **Secondary storage**: Google Drive (for shared access, ECM reports)
+- **Local storage**: Development only
+- **Security-first**: File type whitelist, size limits, virus scanning
+
+---
+
+### 40.2 File Upload Use Cases
+
+**By Role**:
+
+| Role | Use Case | File Types | Max Size |
+|------|----------|-----------|----------|
+| **Learner** | Assignment submission | PDF, DOC, DOCX, JPG, PNG | 10 MB |
+| | Profile photo | JPG, PNG | 2 MB |
+| | ID proof (for verification) | PDF, JPG | 5 MB |
+| **Educator** | Qualifications (degrees) | PDF, JPG | 5 MB |
+| | Background check docs | PDF | 5 MB |
+| | Session materials | PDF, PPT, DOCX | 10 MB |
+| **Guardian** | Payment receipt | PDF, JPG | 5 MB |
+| | ID proof | PDF, JPG | 5 MB |
+| **ECM** | Progress reports | PDF | 10 MB |
+| | Intervention documentation | PDF, DOC | 5 MB |
+
+---
+
+### 40.3 File Storage Architecture
+
+**Three Storage Providers**:
+
+| Provider | When to Use | Pros | Cons |
+|----------|------------|------|------|
+| **Local Storage** | Development only | Simple, no setup | Not scalable, lost on server restart |
+| **AWS S3** | Production (primary) | Scalable, reliable, cheap | Requires AWS account |
+| **Google Drive** | Shared documents, ECM reports | Easy sharing, familiar UI | API complexity, quota limits |
+
+**File Storage Decision Tree**:
+```
+Is this a shared document (progress report, session plan)?
+├─ YES → Google Drive (generate shareable link)
+└─ NO → AWS S3 (secure, private access)
+
+Is this development environment?
+├─ YES → Local Storage (simple)
+└─ NO → AWS S3 (production)
+```
+
+---
+
+### 40.4 File Data Model
+
+**File Association Pattern** (Polymorphic):
+
+Since we don't have a dedicated `File` model, we use embedded file fields in relevant models:
+
+**MessageAttachment** (from `communication.prisma`):
+```prisma
+model MessageAttachment {
+  id              String @id @default(cuid())
+  messageId       String
+  message         Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  // File details
+  fileName        String
+  originalName    String
+  fileType        String // MIME type: "application/pdf", "image/jpeg"
+  fileSize        Int // In bytes
+
+  // Storage
+  storageUrl      String // S3 URL or Google Drive link
+  thumbnailUrl    String? // For images/videos
+
+  // Metadata
+  metadata        Json? // Image dimensions, video duration, etc.
+
+  uploadedAt      DateTime @default(now())
+
+  @@map("message_attachments")
+}
+```
+
+**AssignmentSubmission Attachments**:
+```prisma
+model AssignmentSubmission {
+  id              String @id @default(cuid())
+  assignmentId    String
+  learnerId       String
+
+  // Submission content
+  content         String? // Text submission
+  attachments     String[] // Array of file URLs
+
+  // ... other fields
+}
+```
+
+**Generic File Metadata Structure**:
+```json
+{
+  "fileName": "homework_math_chapter5.pdf",
+  "originalName": "Math Homework.pdf",
+  "fileType": "application/pdf",
+  "fileSize": 524288, // 512 KB in bytes
+  "storageProvider": "S3",
+  "storageUrl": "https://nextphoton-bucket.s3.amazonaws.com/assignments/abc123.pdf",
+  "uploadedBy": "user_xyz789",
+  "uploadedAt": "2025-10-06T10:30:00Z"
+}
+```
+
+---
+
+### 40.5 Frontend File Upload Component
+
+**FileUpload Component** (`frontend/web/src/components/FileUpload.tsx`):
+
+```tsx
+import { useState } from "react";
+import { Upload, X, File, Image as ImageIcon } from "lucide-react";
+
+interface FileUploadProps {
+  onUpload: (file: File) => Promise<string>; // Returns file URL
+  acceptedTypes?: string[];
+  maxSizeMB?: number;
+}
+
+export function FileUpload({ onUpload, acceptedTypes = ["image/*", "application/pdf"], maxSizeMB = 10 }: FileUploadProps) {
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [uploadedFile, setUploadedFile] = useState<{ name: string; url: string } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file size
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    if (file.size > maxSizeBytes) {
+      setError(`File size must be less than ${maxSizeMB} MB`);
+      return;
+    }
+
+    // Validate file type
+    const fileType = file.type;
+    const isValidType = acceptedTypes.some((type) => {
+      if (type.endsWith("/*")) {
+        return fileType.startsWith(type.replace("/*", ""));
+      }
+      return fileType === type;
+    });
+
+    if (!isValidType) {
+      setError(`Invalid file type. Accepted: ${acceptedTypes.join(", ")}`);
+      return;
+    }
+
+    // Upload file
+    setError(null);
+    setUploading(true);
+    setProgress(0);
+
+    try {
+      const url = await onUpload(file);
+      setUploadedFile({ name: file.name, url });
+      setProgress(100);
+    } catch (err) {
+      setError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function handleRemove() {
+    setUploadedFile(null);
+    setProgress(0);
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Drag & Drop Zone */}
+      {!uploadedFile && (
+        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <Upload className="w-8 h-8 mb-2 text-gray-400" />
+            <p className="text-sm text-gray-600">
+              <span className="font-semibold">Click to upload</span> or drag and drop
+            </p>
+            <p className="text-xs text-gray-500">
+              {acceptedTypes.join(", ")} (Max {maxSizeMB} MB)
+            </p>
+          </div>
+          <input
+            type="file"
+            className="hidden"
+            accept={acceptedTypes.join(",")}
+            onChange={handleFileChange}
+            disabled={uploading}
+          />
+        </label>
+      )}
+
+      {/* Upload Progress */}
+      {uploading && (
+        <div className="space-y-2">
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-600 h-2 rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-sm text-gray-600">Uploading... {progress}%</p>
+        </div>
+      )}
+
+      {/* Uploaded File Preview */}
+      {uploadedFile && (
+        <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+          {uploadedFile.url.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+            <ImageIcon className="w-8 h-8 text-green-600" />
+          ) : (
+            <File className="w-8 h-8 text-green-600" />
+          )}
+          <div className="flex-1">
+            <p className="text-sm font-medium text-green-900">{uploadedFile.name}</p>
+            <a href={uploadedFile.url} target="_blank" className="text-xs text-green-600 hover:underline">
+              View file
+            </a>
+          </div>
+          <button onClick={handleRemove} className="text-green-600 hover:text-green-800">
+            <X size={20} />
+          </button>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && <p className="text-sm text-red-600">{error}</p>}
+    </div>
+  );
+}
+```
+
+**Usage in Assignment Submission**:
+```tsx
+function AssignmentSubmissionForm({ assignmentId }) {
+  const [attachments, setAttachments] = useState<string[]>([]);
+
+  async function handleUpload(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "assignment");
+    formData.append("assignmentId", assignmentId);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+    return data.fileUrl; // Return S3 URL
+  }
+
+  return (
+    <form>
+      <FileUpload
+        onUpload={handleUpload}
+        acceptedTypes={["application/pdf", "application/msword", "image/*"]}
+        maxSizeMB={10}
+      />
+      <Button type="submit">Submit Assignment</Button>
+    </form>
+  );
+}
+```
+
+---
+
+### 40.6 Backend Upload Endpoint
+
+**File Upload API** (`backend/server_NestJS/src/upload/upload.controller.ts`):
+
+```typescript
+import { Controller, Post, UseInterceptors, UploadedFile, Body, BadRequestException } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { S3Service } from "./s3.service";
+
+@Controller("upload")
+export class UploadController {
+  constructor(private s3Service: S3Service) {}
+
+  @Post()
+  @UseInterceptors(FileInterceptor("file"))
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { type: string; assignmentId?: string; userId: string }
+  ) {
+    // Validate file
+    if (!file) {
+      throw new BadRequestException("No file provided");
+    }
+
+    // File type validation
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf", "application/msword"];
+    if (!allowedTypes.includes(file.mimetype)) {
+      throw new BadRequestException("Invalid file type");
+    }
+
+    // File size validation (10 MB)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      throw new BadRequestException("File too large (max 10 MB)");
+    }
+
+    // Upload to S3
+    const fileUrl = await this.s3Service.uploadFile(file, body.type);
+
+    // Save file metadata to database (if needed)
+    // await this.prisma.messageAttachment.create({ ... })
+
+    return {
+      success: true,
+      fileUrl,
+      fileName: file.originalname,
+      fileSize: file.size,
+      fileType: file.mimetype
+    };
+  }
+}
+```
+
+---
+
+### 40.7 AWS S3 Integration
+
+**S3Service** (`backend/server_NestJS/src/upload/s3.service.ts`):
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+@Injectable()
+export class S3Service {
+  private s3Client: S3Client;
+  private bucketName = process.env.AWS_S3_BUCKET_NAME;
+
+  constructor() {
+    this.s3Client = new S3Client({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      }
+    });
+  }
+
+  async uploadFile(file: Express.Multer.File, folder: string = "uploads"): Promise<string> {
+    const key = `${folder}/${Date.now()}-${file.originalname}`;
+
+    const command = new PutObjectCommand({
+      Bucket: this.bucketName,
+      Key: key,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+      ACL: "private" // Not publicly accessible
+    });
+
+    await this.s3Client.send(command);
+
+    return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+  }
+
+  async getPresignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucketName,
+      Key: key
+    });
+
+    return getSignedUrl(this.s3Client, command, { expiresIn });
+  }
+}
+```
+
+**S3 Bucket Configuration** (AWS Console):
+1. Create S3 bucket: `nextphoton-files`
+2. Set permissions: Block public access
+3. Enable versioning (optional)
+4. Set lifecycle policy: Delete files after 365 days (optional)
+5. Create IAM user with S3 access
+6. Add credentials to `.env`:
+   ```
+   AWS_REGION=us-east-1
+   AWS_ACCESS_KEY_ID=AKIA...
+   AWS_SECRET_ACCESS_KEY=...
+   AWS_S3_BUCKET_NAME=nextphoton-files
+   ```
+
+---
+
+### 40.8 Google Drive Integration
+
+**When to Use Google Drive**:
+- ECM-generated progress reports (shared with guardians)
+- Session plans (shared with educators)
+- Certificates (shareable links for verification)
+
+**Google Drive Service** (`backend/server_NestJS/src/upload/drive.service.ts`):
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { google } from "googleapis";
+
+@Injectable()
+export class GoogleDriveService {
+  private drive;
+
+  constructor() {
+    const auth = new google.auth.GoogleAuth({
+      keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH,
+      scopes: ["https://www.googleapis.com/auth/drive.file"]
+    });
+
+    this.drive = google.drive({ version: "v3", auth });
+  }
+
+  async uploadFile(file: Express.Multer.File, folderName: string = "NextPhoton") {
+    // Create folder if doesn't exist
+    const folderId = await this.getOrCreateFolder(folderName);
+
+    // Upload file
+    const response = await this.drive.files.create({
+      requestBody: {
+        name: file.originalname,
+        parents: [folderId]
+      },
+      media: {
+        mimeType: file.mimetype,
+        body: file.buffer
+      },
+      fields: "id, webViewLink, webContentLink"
+    });
+
+    // Make file shareable
+    await this.drive.permissions.create({
+      fileId: response.data.id,
+      requestBody: {
+        role: "reader",
+        type: "anyone"
+      }
+    });
+
+    return {
+      fileId: response.data.id,
+      viewLink: response.data.webViewLink,
+      downloadLink: response.data.webContentLink
+    };
+  }
+
+  private async getOrCreateFolder(folderName: string): Promise<string> {
+    // Search for folder
+    const response = await this.drive.files.list({
+      q: `name='${folderName}' and mimeType='application/vnd.google-apps.folder'`,
+      fields: "files(id, name)"
+    });
+
+    if (response.data.files.length > 0) {
+      return response.data.files[0].id;
+    }
+
+    // Create folder
+    const folder = await this.drive.files.create({
+      requestBody: {
+        name: folderName,
+        mimeType: "application/vnd.google-apps.folder"
+      },
+      fields: "id"
+    });
+
+    return folder.data.id;
+  }
+
+  async deleteFile(fileId: string) {
+    await this.drive.files.delete({ fileId });
+  }
+}
+```
+
+**Google Drive Setup**:
+1. Create Google Cloud Project
+2. Enable Google Drive API
+3. Create Service Account
+4. Download JSON key file
+5. Add to `.env`:
+   ```
+   GOOGLE_SERVICE_ACCOUNT_KEY_PATH=/path/to/service-account-key.json
+   ```
+
+---
+
+### 40.9 File Download & Preview
+
+**Secure Download Endpoint**:
+```typescript
+@Get("download/:fileId")
+async downloadFile(@Param("fileId") fileId: string, @Req() req, @Res() res) {
+  // Fetch file metadata from database
+  const file = await this.prisma.messageAttachment.findUnique({
+    where: { id: fileId }
+  });
+
+  if (!file) {
+    throw new NotFoundException("File not found");
+  }
+
+  // Authorization check (only owner or admin can access)
+  const canAccess = await this.checkFileAccess(req.user.id, file);
+  if (!canAccess) {
+    throw new ForbiddenException("Access denied");
+  }
+
+  // Generate presigned URL (temporary access)
+  const presignedUrl = await this.s3Service.getPresignedUrl(file.storageUrl, 300); // 5 min
+
+  // Redirect to presigned URL
+  res.redirect(presignedUrl);
+}
+```
+
+**In-Browser Preview** (Frontend):
+```tsx
+function FilePreview({ fileUrl, fileType }) {
+  if (fileType === "application/pdf") {
+    return <iframe src={fileUrl} className="w-full h-[600px]" />;
+  }
+
+  if (fileType.startsWith("image/")) {
+    return <img src={fileUrl} alt="Preview" className="max-w-full" />;
+  }
+
+  return (
+    <div>
+      <p>Preview not available</p>
+      <a href={fileUrl} download>Download File</a>
+    </div>
+  );
+}
+```
+
+---
+
+### 40.10 Security Considerations
+
+**1. File Type Whitelist**:
+```typescript
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+];
+
+function validateFileType(mimetype: string): boolean {
+  return ALLOWED_TYPES.includes(mimetype);
+}
+```
+
+**2. File Size Limits**:
+```typescript
+const MAX_FILE_SIZES = {
+  image: 2 * 1024 * 1024, // 2 MB
+  document: 10 * 1024 * 1024, // 10 MB
+  video: 50 * 1024 * 1024 // 50 MB
+};
+```
+
+**3. Virus Scanning** (using ClamAV):
+```typescript
+import NodeClam from "clamscan";
+
+async function scanFile(file: Express.Multer.File): Promise<boolean> {
+  const clamscan = await new NodeClam().init({
+    clamdscan: {
+      host: "localhost",
+      port: 3310
+    }
+  });
+
+  const { isInfected } = await clamscan.scanBuffer(file.buffer);
+  return !isInfected;
+}
+```
+
+**4. Access Control**:
+```typescript
+async function checkFileAccess(userId: string, file: MessageAttachment): Promise<boolean> {
+  // Check if user is the uploader
+  const message = await prisma.message.findUnique({
+    where: { id: file.messageId },
+    select: { senderId: true, conversationId: true }
+  });
+
+  if (message.senderId === userId) return true;
+
+  // Check if user is in the conversation
+  const participant = await prisma.conversationParticipant.findUnique({
+    where: {
+      conversationId_userId: {
+        conversationId: message.conversationId,
+        userId
+      }
+    }
+  });
+
+  return !!participant;
+}
+```
+
+---
+
+### 40.11 Key Takeaways - Chapter 40
+
+✅ **File Upload Use Cases**:
+- **Learner**: Assignment submissions, profile photos
+- **Educator**: Qualifications, background checks
+- **Guardian**: Payment receipts
+- **ECM**: Progress reports
+
+✅ **Storage Architecture**:
+- **Local**: Development only
+- **AWS S3**: Production primary (scalable, secure)
+- **Google Drive**: Shared documents (ECM reports)
+
+✅ **File Model** (Polymorphic):
+- No dedicated `File` model
+- Embedded in `MessageAttachment`, `AssignmentSubmission`
+- Fields: `fileName`, `fileSize`, `fileType`, `storageUrl`
+
+✅ **Frontend Component**:
+- Drag-and-drop file upload
+- File type validation (client-side)
+- File size limit (10 MB)
+- Progress bar during upload
+- Preview thumbnail
+
+✅ **Backend Upload Endpoint**:
+- POST `/api/upload`
+- Multer middleware for file handling
+- Server-side validation (type, size)
+- Upload to S3 with unique key
+- Return file URL
+
+✅ **AWS S3 Integration**:
+- S3Client from `@aws-sdk/client-s3`
+- Private ACL (not publicly accessible)
+- Presigned URLs for secure downloads (expire after 5 min)
+- IAM permissions for access control
+
+✅ **Google Drive Integration**:
+- OAuth2 or Service Account authentication
+- Create folder structure per learner
+- Upload file, generate shareable link
+- Use for ECM-generated reports
+
+✅ **Download & Preview**:
+- Secure download endpoint with auth check
+- Generate temporary presigned URL
+- In-browser preview for PDFs/images
+- Direct download for other types
+
+✅ **Security**:
+- **File type whitelist** (PDF, DOC, JPG, PNG only)
+- **File size limits** (2 MB images, 10 MB documents)
+- **Virus scanning** (ClamAV optional)
+- **Access control** (only owner/conversation participants)
+
+**Next Up: Chapter 41 - Payment Processing Architecture**
+
+---
+
+## Chapter 41: Payment Processing Architecture
+
+### 41.1 NextPhoton Revenue Model
+
+**Core Payment Flow**:
+```
+Guardian pays for session → Platform takes commission → Educator receives remainder
+```
+
+**Example**:
+- Session fee: ₹1000
+- Platform commission (20%): ₹200
+- Educator earnings: ₹800
+
+**Key Principles**:
+- **Guardian is the payer**: All payments come from guardians
+- **Platform acts as intermediary**: Collects payment, deducts commission, pays educator
+- **Transparent pricing**: All fees shown upfront to guardian
+- **Automatic calculations**: Commission and educator earnings calculated automatically
+
+---
+
+### 41.2 Payment Models in Schema
+
+**1. PaymentMethod Model** (`financial-system.prisma`):
+```prisma
+model PaymentMethod {
+  id              String @id @default(cuid())
+  guardianId      String
+
+  // Method details
+  type            String // card, upi, bank_transfer, wallet
+  provider        String // razorpay, paytm, stripe
+  methodData      Json   // Encrypted payment details
+  displayName     String // "XXXX 4567", "user@upi"
+
+  // Status
+  isActive        Boolean @default(true)
+  isDefault       Boolean @default(false)
+  isVerified      Boolean @default(false)
+
+  // Tracking
+  lastUsedAt      DateTime?
+  usageCount      Int @default(0)
+}
+```
+
+**Supported Payment Types**:
+- **CARD**: Credit/debit cards
+- **UPI**: Google Pay, PhonePe, Paytm
+- **NET_BANKING**: Direct bank transfer
+- **WALLET**: Paytm wallet, Amazon Pay
+
+**2. Transaction Model**:
+```prisma
+model Transaction {
+  id              String @id @default(cuid())
+
+  // Parties
+  payerId         String // Guardian ID
+  payeeId         String? // Educator ID
+  paymentMethodId String?
+
+  // Amounts
+  amount          Decimal
+  platformFee     Decimal @default(0)
+  educatorEarning Decimal @default(0)
+  taxAmount       Decimal @default(0)
+
+  // Reference
+  referenceType   String? // session, subscription, invoice
+  referenceId     String?
+
+  // Gateway
+  gatewayProvider String // razorpay, stripe, paytm
+  gatewayTxnId    String?
+  gatewayResponse Json?
+
+  // Status
+  status          String @default("pending")
+  // pending, processing, completed, failed, cancelled, refunded
+
+  // Timing
+  initiatedAt     DateTime @default(now())
+  completedAt     DateTime?
+
+  // Refund
+  refundAmount    Decimal @default(0)
+  refundReason    String?
+}
+```
+
+**3. Invoice Model**:
+```prisma
+model Invoice {
+  id              String @id @default(cuid())
+  invoiceNumber   String @unique
+  guardianId      String
+
+  // Financial details
+  subtotal        Decimal
+  taxAmount       Decimal @default(0)
+  discountAmount  Decimal @default(0)
+  totalAmount     Decimal
+
+  // Timeline
+  issueDate       DateTime @default(now())
+  dueDate         DateTime
+  paidDate        DateTime?
+
+  // Items
+  items           InvoiceItem[]
+
+  // Payment tracking
+  paidAmount      Decimal @default(0)
+  pendingAmount   Decimal
+  transactions    Transaction[]
+
+  // Status
+  status          String @default("draft")
+  // draft, sent, paid, overdue, cancelled
+}
+```
+
+**4. EarningsRecord Model**:
+```prisma
+model EarningsRecord {
+  id              String @id @default(cuid())
+  educatorId      String
+
+  // Context
+  sourceType      String // session, bonus, referral
+  sourceId        String? // Session ID
+
+  // Financials
+  grossAmount     Decimal // Total before deductions
+  platformFee     Decimal // Commission
+  taxDeduction    Decimal @default(0)
+  netAmount       Decimal // Amount to educator
+
+  // Payout
+  earnedDate      DateTime @default(now())
+  payoutDate      DateTime?
+  payoutStatus    String @default("pending")
+  // pending, processing, completed, failed
+  payoutMethod    String? // bank_transfer, upi, wallet
+  payoutReference String? // Bank reference
+}
+```
+
+---
+
+### 41.3 Razorpay Integration (India-Focused)
+
+**Why Razorpay?**
+- Leading payment gateway in India
+- Supports all Indian payment methods (UPI, cards, net banking, wallets)
+- Good developer experience
+- Automatic tax compliance (GST)
+
+**Setup Steps**:
+
+**1. Install Razorpay SDK**:
+```bash
+bun add razorpay
+```
+
+**2. Configuration** (`backend/server_NestJS/src/config/razorpay.config.ts`):
+```typescript
+import Razorpay from "razorpay";
+
+export const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID!,
+  key_secret: process.env.RAZORPAY_KEY_SECRET!
+});
+```
+
+**3. Create Order** (Backend):
+```typescript
+async createPaymentOrder(invoiceId: string) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { guardian: true }
+  });
+
+  // Create Razorpay order
+  const order = await razorpayInstance.orders.create({
+    amount: Number(invoice.totalAmount) * 100, // Convert to paise
+    currency: "INR",
+    receipt: invoice.invoiceNumber,
+    notes: {
+      invoiceId: invoice.id,
+      guardianId: invoice.guardianId
+    }
+  });
+
+  return {
+    orderId: order.id,
+    amount: order.amount,
+    currency: order.currency
+  };
+}
+```
+
+**4. Frontend Checkout** (`frontend/web/src/components/payments/RazorpayCheckout.tsx`):
+```typescript
+"use client";
+
+import { useEffect } from "react";
+
+interface RazorpayCheckoutProps {
+  orderId: string;
+  amount: number;
+  onSuccess: (paymentId: string) => void;
+  onFailure: (error: any) => void;
+}
+
+export function RazorpayCheckout({ orderId, amount, onSuccess, onFailure }: RazorpayCheckoutProps) {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
+  const handlePayment = () => {
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: amount,
+      currency: "INR",
+      order_id: orderId,
+      name: "NextPhoton",
+      description: "Session Payment",
+
+      handler: function (response: any) {
+        // Verify signature on backend
+        verifyPayment(response).then(() => {
+          onSuccess(response.razorpay_payment_id);
+        });
+      },
+
+      prefill: {
+        email: "guardian@example.com",
+        contact: "9999999999"
+      },
+
+      theme: {
+        color: "#3399cc"
+      }
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.on("payment.failed", function (response: any) {
+      onFailure(response.error);
+    });
+    rzp.open();
+  };
+
+  return (
+    <button onClick={handlePayment} className="btn-primary">
+      Pay ₹{amount / 100}
+    </button>
+  );
+}
+```
+
+**5. Verify Payment Signature** (Backend):
+```typescript
+import crypto from "crypto";
+
+async verifyPaymentSignature(
+  orderId: string,
+  paymentId: string,
+  signature: string
+) {
+  const body = orderId + "|" + paymentId;
+
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+    .update(body)
+    .digest("hex");
+
+  if (expectedSignature !== signature) {
+    throw new Error("Invalid payment signature");
+  }
+
+  // Signature verified - update transaction
+  await prisma.transaction.update({
+    where: { gatewayTxnId: orderId },
+    data: {
+      status: "completed",
+      completedAt: new Date(),
+      gatewayResponse: { paymentId, signature }
+    }
+  });
+}
+```
+
+**6. Webhook Handler** (for payment confirmations):
+```typescript
+import { Request, Response } from "express";
+import crypto from "crypto";
+
+async function razorpayWebhook(req: Request, res: Response) {
+  const webhookSignature = req.headers["x-razorpay-signature"] as string;
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET!;
+
+  // Verify webhook signature
+  const body = JSON.stringify(req.body);
+  const expectedSignature = crypto
+    .createHmac("sha256", webhookSecret)
+    .update(body)
+    .digest("hex");
+
+  if (expectedSignature !== webhookSignature) {
+    return res.status(400).send("Invalid signature");
+  }
+
+  // Process webhook event
+  const event = req.body.event;
+  const payload = req.body.payload;
+
+  if (event === "payment.captured") {
+    // Payment successful
+    await handleSuccessfulPayment(payload.payment.entity);
+  } else if (event === "payment.failed") {
+    // Payment failed
+    await handleFailedPayment(payload.payment.entity);
+  }
+
+  res.json({ status: "ok" });
+}
+```
+
+---
+
+### 41.4 Payment Flow (8 Steps)
+
+**Step 1: Guardian Books Session**
+```typescript
+// Guardian selects educator, date, time
+const booking = await prisma.learningSession.create({
+  data: {
+    learnerId,
+    educatorId,
+    scheduledAt,
+    duration: 60,
+    status: "scheduled"
+  }
+});
+```
+
+**Step 2: Invoice Generated**
+```typescript
+// Auto-generate invoice on booking
+const invoice = await prisma.invoice.create({
+  data: {
+    invoiceNumber: `INV-${Date.now()}`,
+    guardianId,
+    type: "session_fees",
+    status: "sent",
+    subtotal: 1000,
+    taxAmount: 180, // 18% GST
+    totalAmount: 1180,
+    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+    items: {
+      create: {
+        description: `Learning Session with ${educator.name}`,
+        type: "session",
+        referenceId: booking.id,
+        quantity: 1,
+        unitPrice: 1000,
+        totalPrice: 1000,
+        taxRate: 18,
+        taxAmount: 180
+      }
+    }
+  }
+});
+```
+
+**Step 3: Guardian Pays via Razorpay**
+```typescript
+// Create payment transaction
+const transaction = await prisma.transaction.create({
+  data: {
+    payerId: guardianId,
+    payeeId: educatorId,
+    invoiceId: invoice.id,
+    amount: invoice.totalAmount,
+    platformFee: invoice.totalAmount * 0.20, // 20% commission
+    educatorEarning: invoice.totalAmount * 0.80,
+    type: "session_payment",
+    gatewayProvider: "razorpay",
+    status: "pending"
+  }
+});
+
+// Create Razorpay order
+const order = await createPaymentOrder(invoice.id);
+```
+
+**Step 4: Transaction Recorded**
+```typescript
+// On successful payment (webhook)
+await prisma.transaction.update({
+  where: { id: transaction.id },
+  data: {
+    status: "completed",
+    completedAt: new Date(),
+    gatewayTxnId: paymentId
+  }
+});
+```
+
+**Step 5: Commission Calculated**
+```typescript
+// Record platform commission
+await prisma.commission.create({
+  data: {
+    type: "platform_fee",
+    referenceType: "transaction",
+    referenceId: transaction.id,
+    baseAmount: transaction.amount,
+    commissionRate: 20,
+    commissionAmount: transaction.platformFee,
+    recipientType: "platform",
+    status: "calculated",
+    earnedDate: new Date()
+  }
+});
+```
+
+**Step 6: Educator Earnings Updated**
+```typescript
+// Record educator earnings
+await prisma.earningsRecord.create({
+  data: {
+    educatorId,
+    sourceType: "session",
+    sourceId: booking.id,
+    grossAmount: invoice.totalAmount,
+    platformFee: transaction.platformFee,
+    netAmount: transaction.educatorEarning,
+    earnedDate: new Date(),
+    payoutStatus: "pending"
+  }
+});
+```
+
+**Step 7: Payout Scheduled**
+```typescript
+// Check if payout threshold met (₹5000)
+const pendingEarnings = await prisma.earningsRecord.aggregate({
+  where: {
+    educatorId,
+    payoutStatus: "pending"
+  },
+  _sum: { netAmount: true }
+});
+
+if (pendingEarnings._sum.netAmount >= 5000) {
+  // Schedule payout (bi-weekly on Monday)
+  await scheduleEducatorPayout(educatorId);
+}
+```
+
+**Step 8: Confirmation Emails Sent**
+```typescript
+// Email to guardian
+await sendEmail({
+  to: guardian.email,
+  subject: "Payment Successful",
+  template: "payment-confirmation",
+  data: { invoice, transaction }
+});
+
+// Email to educator
+await sendEmail({
+  to: educator.email,
+  subject: "Earnings Credited",
+  template: "earnings-notification",
+  data: { amount: transaction.educatorEarning }
+});
+```
+
+---
+
+### 41.5 Guardian Payment Interface
+
+**Invoice Display** (`frontend/web/src/components/payments/InvoiceView.tsx`):
+```typescript
+"use client";
+
+interface InvoiceViewProps {
+  invoice: Invoice;
+}
+
+export function InvoiceView({ invoice }: InvoiceViewProps) {
+  return (
+    <div className="invoice-container">
+      <div className="invoice-header">
+        <h2>Invoice #{invoice.invoiceNumber}</h2>
+        <span className={`status-badge ${invoice.status}`}>
+          {invoice.status}
+        </span>
+      </div>
+
+      <div className="invoice-items">
+        {invoice.items.map((item) => (
+          <div key={item.id} className="invoice-item">
+            <span>{item.description}</span>
+            <span>₹{item.totalPrice}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="invoice-totals">
+        <div className="total-row">
+          <span>Subtotal</span>
+          <span>₹{invoice.subtotal}</span>
+        </div>
+        <div className="total-row">
+          <span>GST (18%)</span>
+          <span>₹{invoice.taxAmount}</span>
+        </div>
+        {invoice.discountAmount > 0 && (
+          <div className="total-row discount">
+            <span>Discount</span>
+            <span>-₹{invoice.discountAmount}</span>
+          </div>
+        )}
+        <div className="total-row grand-total">
+          <span>Total Amount</span>
+          <span>₹{invoice.totalAmount}</span>
+        </div>
+      </div>
+
+      {invoice.status !== "paid" && (
+        <PaymentMethodSelector invoiceId={invoice.id} />
+      )}
+    </div>
+  );
+}
+```
+
+**Payment Method Selection**:
+```typescript
+function PaymentMethodSelector({ invoiceId }: { invoiceId: string }) {
+  const [selectedMethod, setSelectedMethod] = useState<string>();
+  const { data: methods } = useQuery({
+    queryKey: ["paymentMethods"],
+    queryFn: fetchPaymentMethods
+  });
+
+  return (
+    <div className="payment-methods">
+      <h3>Select Payment Method</h3>
+
+      {methods?.map((method) => (
+        <button
+          key={method.id}
+          className={`method-btn ${selectedMethod === method.id ? "selected" : ""}`}
+          onClick={() => setSelectedMethod(method.id)}
+        >
+          <span className="method-icon">{getMethodIcon(method.type)}</span>
+          <span>{method.displayName}</span>
+          {method.isDefault && <span className="badge">Default</span>}
+        </button>
+      ))}
+
+      <button className="add-method-btn">
+        + Add New Payment Method
+      </button>
+
+      {selectedMethod && (
+        <RazorpayCheckout
+          invoiceId={invoiceId}
+          paymentMethodId={selectedMethod}
+        />
+      )}
+    </div>
+  );
+}
+```
+
+---
+
+### 41.6 Invoice Generation
+
+**Auto-Generate on Session Booking**:
+```typescript
+// In booking service
+async createSessionBooking(data: CreateBookingDto) {
+  // 1. Create session
+  const session = await prisma.learningSession.create({
+    data: {
+      learnerId: data.learnerId,
+      educatorId: data.educatorId,
+      scheduledAt: data.scheduledAt,
+      duration: data.duration,
+      sessionType: data.sessionType,
+      status: "scheduled"
+    }
+  });
+
+  // 2. Get educator rate
+  const rate = await prisma.rateProposal.findFirst({
+    where: {
+      educatorId: data.educatorId,
+      status: "approved",
+      effectiveFrom: { lte: new Date() }
+    },
+    orderBy: { effectiveFrom: "desc" }
+  });
+
+  // 3. Calculate amounts
+  const sessionFee = rate.proposedRate * data.duration / 60;
+  const gst = sessionFee * 0.18;
+  const total = sessionFee + gst;
+
+  // 4. Generate invoice
+  const invoice = await prisma.invoice.create({
+    data: {
+      invoiceNumber: `INV-${Date.now()}-${session.id.slice(0, 8)}`,
+      guardianId: session.learner.guardianId,
+      type: "session_fees",
+      status: "sent",
+      subtotal: sessionFee,
+      taxAmount: gst,
+      totalAmount: total,
+      pendingAmount: total,
+      issueDate: new Date(),
+      dueDate: new Date(session.scheduledAt.getTime() - 24 * 60 * 60 * 1000),
+      items: {
+        create: {
+          description: `${data.duration}-minute session with ${educator.name}`,
+          type: "session",
+          referenceType: "session",
+          referenceId: session.id,
+          quantity: 1,
+          unitPrice: sessionFee,
+          totalPrice: sessionFee,
+          taxRate: 18,
+          taxAmount: gst
+        }
+      }
+    }
+  });
+
+  // 5. Send email to guardian
+  await sendInvoiceEmail(invoice);
+
+  return { session, invoice };
+}
+```
+
+**PDF Generation** (using `pdfkit`):
+```typescript
+import PDFDocument from "pdfkit";
+import fs from "fs";
+
+async function generateInvoicePDF(invoiceId: string): Promise<string> {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: { guardian: true, items: true }
+  });
+
+  const doc = new PDFDocument();
+  const filePath = `/tmp/invoice-${invoice.invoiceNumber}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  // Header
+  doc.fontSize(20).text("NextPhoton", { align: "center" });
+  doc.fontSize(12).text("Invoice", { align: "center" });
+  doc.moveDown();
+
+  // Invoice details
+  doc.fontSize(10);
+  doc.text(`Invoice Number: ${invoice.invoiceNumber}`);
+  doc.text(`Date: ${invoice.issueDate.toLocaleDateString()}`);
+  doc.text(`Due Date: ${invoice.dueDate.toLocaleDateString()}`);
+  doc.moveDown();
+
+  // Guardian details
+  doc.text(`Billed To:`);
+  doc.text(invoice.guardian.name);
+  doc.text(invoice.guardian.email);
+  doc.moveDown();
+
+  // Items table
+  doc.text("Items:", { underline: true });
+  invoice.items.forEach((item) => {
+    doc.text(`${item.description} - ₹${item.totalPrice}`);
+  });
+  doc.moveDown();
+
+  // Totals
+  doc.text(`Subtotal: ₹${invoice.subtotal}`);
+  doc.text(`GST (18%): ₹${invoice.taxAmount}`);
+  doc.fontSize(12).text(`Total: ₹${invoice.totalAmount}`, { bold: true });
+
+  doc.end();
+
+  // Upload to S3 and return URL
+  const pdfUrl = await uploadToS3(filePath, `invoices/${invoice.invoiceNumber}.pdf`);
+  return pdfUrl;
+}
+```
+
+---
+
+### 41.7 Transaction Tracking
+
+**Payment History for Guardian**:
+```typescript
+// GraphQL resolver
+@Query(() => [Transaction])
+async guardianTransactions(
+  @Args("guardianId") guardianId: string,
+  @Args("status", { nullable: true }) status?: string
+) {
+  return prisma.transaction.findMany({
+    where: {
+      payerId: guardianId,
+      ...(status && { status })
+    },
+    orderBy: { initiatedAt: "desc" },
+    include: {
+      invoice: {
+        include: { items: true }
+      },
+      paymentMethod: true
+    }
+  });
+}
+```
+
+**Transaction States**:
+- **pending**: Payment initiated, waiting for gateway
+- **processing**: Payment in progress at gateway
+- **completed**: Payment successful
+- **failed**: Payment failed
+- **cancelled**: Guardian cancelled
+- **refunded**: Payment refunded
+
+**Refund Handling**:
+```typescript
+async processRefund(transactionId: string, reason: string) {
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId }
+  });
+
+  if (transaction.status !== "completed") {
+    throw new Error("Can only refund completed transactions");
+  }
+
+  // Create refund record
+  const refund = await prisma.refund.create({
+    data: {
+      transactionId,
+      refundAmount: transaction.amount,
+      refundReason: reason,
+      refundType: "full",
+      requestedBy: transaction.payerId,
+      status: "pending"
+    }
+  });
+
+  // Process refund with Razorpay
+  const razorpayRefund = await razorpayInstance.payments.refund(
+    transaction.gatewayTxnId!,
+    {
+      amount: Number(transaction.amount) * 100,
+      notes: { refundId: refund.id }
+    }
+  );
+
+  // Update refund status
+  await prisma.refund.update({
+    where: { id: refund.id },
+    data: {
+      status: "processed",
+      processedAt: new Date(),
+      gatewayRefundId: razorpayRefund.id
+    }
+  });
+
+  // Update transaction
+  await prisma.transaction.update({
+    where: { id: transactionId },
+    data: {
+      status: "refunded",
+      refundAmount: transaction.amount,
+      refundReason: reason,
+      refundedAt: new Date()
+    }
+  });
+
+  return refund;
+}
+```
+
+---
+
+### 41.8 Educator Earnings
+
+**Accumulated Balance Calculation**:
+```typescript
+async getEducatorBalance(educatorId: string) {
+  // Total pending earnings
+  const pending = await prisma.earningsRecord.aggregate({
+    where: {
+      educatorId,
+      payoutStatus: "pending"
+    },
+    _sum: { netAmount: true }
+  });
+
+  // Total earnings this month
+  const thisMonth = await prisma.earningsRecord.aggregate({
+    where: {
+      educatorId,
+      earnedDate: {
+        gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      }
+    },
+    _sum: { netAmount: true }
+  });
+
+  // Total lifetime earnings
+  const lifetime = await prisma.earningsRecord.aggregate({
+    where: { educatorId },
+    _sum: { netAmount: true }
+  });
+
+  return {
+    pendingBalance: pending._sum.netAmount || 0,
+    thisMonthEarnings: thisMonth._sum.netAmount || 0,
+    lifetimeEarnings: lifetime._sum.netAmount || 0,
+    canWithdraw: (pending._sum.netAmount || 0) >= 5000 // ₹5000 minimum
+  };
+}
+```
+
+**Payout Processing** (Bi-weekly on Mondays):
+```typescript
+// Cron job: Every Monday at 9 AM
+@Cron("0 9 * * 1")
+async processEducatorPayouts() {
+  // Find educators eligible for payout
+  const educators = await prisma.earningsRecord.groupBy({
+    by: ["educatorId"],
+    where: { payoutStatus: "pending" },
+    having: {
+      netAmount: { _sum: { gte: 5000 } }
+    },
+    _sum: { netAmount: true }
+  });
+
+  for (const { educatorId, _sum } of educators) {
+    // Get educator bank details
+    const educator = await prisma.educatorProfile.findUnique({
+      where: { id: educatorId },
+      select: { bankAccountNumber: true, ifscCode: true }
+    });
+
+    if (!educator.bankAccountNumber) {
+      // Skip if no bank details
+      continue;
+    }
+
+    // Initiate bank transfer (via Razorpay Payouts)
+    const payout = await razorpayInstance.payouts.create({
+      account_number: process.env.RAZORPAY_ACCOUNT_NUMBER,
+      amount: Number(_sum.netAmount) * 100,
+      currency: "INR",
+      mode: "NEFT",
+      purpose: "payout",
+      fund_account: {
+        account_type: "bank_account",
+        bank_account: {
+          name: educator.name,
+          ifsc: educator.ifscCode,
+          account_number: educator.bankAccountNumber
+        }
+      }
+    });
+
+    // Update earnings records
+    await prisma.earningsRecord.updateMany({
+      where: {
+        educatorId,
+        payoutStatus: "pending"
+      },
+      data: {
+        payoutStatus: "completed",
+        payoutDate: new Date(),
+        payoutMethod: "bank_transfer",
+        payoutReference: payout.id
+      }
+    });
+  }
+}
+```
+
+---
+
+### 41.9 Admin Financial Dashboard
+
+**Dashboard Metrics Query**:
+```typescript
+async getFinancialDashboard(periodStart: Date, periodEnd: Date) {
+  // Total revenue (all completed transactions)
+  const revenue = await prisma.transaction.aggregate({
+    where: {
+      status: "completed",
+      completedAt: { gte: periodStart, lte: periodEnd }
+    },
+    _sum: { amount: true, platformFee: true, educatorEarning: true }
+  });
+
+  // Pending payouts
+  const pendingPayouts = await prisma.earningsRecord.aggregate({
+    where: { payoutStatus: "pending" },
+    _sum: { netAmount: true }
+  });
+
+  // Commission collected
+  const commission = await prisma.commission.aggregate({
+    where: {
+      status: "calculated",
+      earnedDate: { gte: periodStart, lte: periodEnd }
+    },
+    _sum: { commissionAmount: true }
+  });
+
+  // Refunds processed
+  const refunds = await prisma.refund.aggregate({
+    where: {
+      status: "processed",
+      processedAt: { gte: periodStart, lte: periodEnd }
+    },
+    _sum: { refundAmount: true }
+  });
+
+  return {
+    totalRevenue: revenue._sum.amount || 0,
+    platformEarnings: revenue._sum.platformFee || 0,
+    educatorEarnings: revenue._sum.educatorEarning || 0,
+    pendingPayouts: pendingPayouts._sum.netAmount || 0,
+    commissionCollected: commission._sum.commissionAmount || 0,
+    refundsIssued: refunds._sum.refundAmount || 0,
+    netProfit: (revenue._sum.platformFee || 0) - (refunds._sum.refundAmount || 0)
+  };
+}
+```
+
+**Financial Reports Generation**:
+```typescript
+async generateMonthlyFinancialReport(month: number, year: number) {
+  const periodStart = new Date(year, month - 1, 1);
+  const periodEnd = new Date(year, month, 0, 23, 59, 59);
+
+  const report = await prisma.report.create({
+    data: {
+      name: `Financial Report - ${month}/${year}`,
+      type: "financial_summary",
+      parameters: { month, year },
+      reportData: await getFinancialDashboard(periodStart, periodEnd),
+      summary: {
+        period: `${month}/${year}`,
+        totalTransactions: await prisma.transaction.count({
+          where: { completedAt: { gte: periodStart, lte: periodEnd } }
+        })
+      },
+      isScheduled: true,
+      frequency: "monthly",
+      generatedBy: "system",
+      exportFormat: "pdf"
+    }
+  });
+
+  // Generate PDF
+  const pdfUrl = await generateFinancialReportPDF(report.id);
+
+  await prisma.report.update({
+    where: { id: report.id },
+    data: { exportUrl: pdfUrl }
+  });
+
+  return report;
+}
+```
+
+---
+
+### 41.10 Security Best Practices
+
+**1. Never Store Card Details**:
+```typescript
+// ❌ WRONG - Never do this
+const paymentMethod = {
+  cardNumber: "4111111111111111", // NEVER STORE
+  cvv: "123" // NEVER STORE
+};
+
+// ✅ CORRECT - Store only token from gateway
+const paymentMethod = {
+  type: "card",
+  provider: "razorpay",
+  methodData: { token: "pay_abc123" }, // Encrypted gateway token
+  displayName: "XXXX 4111"
+};
+```
+
+**2. Webhook Signature Verification** (Always verify):
+```typescript
+function verifyWebhookSignature(req: Request): boolean {
+  const signature = req.headers["x-razorpay-signature"];
+  const body = JSON.stringify(req.body);
+
+  const expectedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
+    .update(body)
+    .digest("hex");
+
+  return signature === expectedSignature;
+}
+```
+
+**3. Transaction Idempotency** (Prevent duplicate charges):
+```typescript
+async createTransaction(data: CreateTransactionDto, idempotencyKey: string) {
+  // Check if transaction already exists with this key
+  const existing = await prisma.transaction.findFirst({
+    where: {
+      gatewayResponse: {
+        path: ["idempotencyKey"],
+        equals: idempotencyKey
+      }
+    }
+  });
+
+  if (existing) {
+    return existing; // Return existing transaction
+  }
+
+  // Create new transaction
+  return prisma.transaction.create({
+    data: {
+      ...data,
+      gatewayResponse: { idempotencyKey }
+    }
+  });
+}
+```
+
+**4. PCI DSS Compliance**:
+- Use Razorpay's hosted checkout (payment page on their domain)
+- Never handle raw card data on your servers
+- Use HTTPS for all payment-related communication
+- Implement proper access controls
+- Regular security audits
+
+---
+
+### 41.11 Key Takeaways - Chapter 41
+
+✅ **Revenue Model**:
+- Guardian pays for sessions
+- Platform takes 20% commission
+- Educator receives 80%
+- Automatic calculation and distribution
+
+✅ **Payment Models**:
+- **PaymentMethod**: Guardian's saved payment methods
+- **Transaction**: All payment records with status tracking
+- **Invoice**: Auto-generated billing documents
+- **EarningsRecord**: Educator earnings with payout tracking
+
+✅ **Razorpay Integration**:
+- Leading payment gateway for India
+- Supports UPI, cards, net banking, wallets
+- Hosted checkout for PCI compliance
+- Webhook for payment confirmations
+- Signature verification for security
+
+✅ **Payment Flow**:
+1. Guardian books session
+2. Invoice auto-generated
+3. Guardian pays via Razorpay
+4. Transaction recorded
+5. Commission calculated
+6. Educator earnings updated
+7. Payout scheduled (bi-weekly, ₹5000 minimum)
+8. Confirmation emails sent
+
+✅ **Invoice Generation**:
+- Auto-generated on session booking
+- Includes session fee, GST (18%), discounts
+- PDF generation for download
+- Email to guardian with payment link
+
+✅ **Educator Payouts**:
+- Bi-weekly payouts (every Monday)
+- ₹5000 minimum threshold
+- Bank transfer via Razorpay Payouts
+- Automatic status tracking
+
+✅ **Security**:
+- Never store card details (use tokens)
+- Webhook signature verification
+- Transaction idempotency keys
+- PCI DSS compliance via hosted checkout
+
+**Next Up: Chapter 42 - Analytics & Reporting**
+
+---
+
+## Chapter 42: Analytics & Reporting
+
+### 42.1 Analytics Purpose & Goals
+
+**Why Analytics Matter**:
+- **Data-driven decisions**: Make informed choices based on actual data
+- **Performance tracking**: Monitor learner progress, educator effectiveness
+- **Business intelligence**: Understand revenue, growth, user behavior
+- **Early intervention**: Identify at-risk learners before it's too late
+- **Platform optimization**: Improve features based on usage patterns
+
+**Analytics in NextPhoton**:
+- **Learner-focused**: Track academic progress, engagement, attendance
+- **Educator-focused**: Monitor teaching effectiveness, earnings, ratings
+- **Guardian-focused**: Provide insights into child's learning journey
+- **ECM-focused**: Measure intervention success, response times
+- **Admin-focused**: Business metrics, revenue, platform growth
+
+---
+
+### 42.2 Analytics Architecture
+
+**System Components**:
+
+```
+┌─────────────────┐
+│  Real-time      │  → WebSocket updates for dashboards
+│  Analytics      │  → Instant metric calculations
+└─────────────────┘
+
+┌─────────────────┐
+│  Batch          │  → Scheduled jobs for reports
+│  Processing     │  → Daily/weekly/monthly aggregations
+└─────────────────┘
+
+┌─────────────────┐
+│  Data           │  → Future: Separate analytics DB
+│  Warehouse      │  → Historical data storage
+└─────────────────┘
+
+┌─────────────────┐
+│  Visualization  │  → Recharts, Chart.js
+│  Layer          │  → Interactive dashboards
+└─────────────────┘
+```
+
+**Analytics Models** (from `analytics-reporting.prisma`):
+
+1. **AnalyticsEvent**: Raw event tracking
+2. **DashboardMetric**: Aggregated metrics
+3. **Report**: Generated reports
+4. **LearningAnalytics**: Learner-specific analytics
+5. **EducatorAnalytics**: Educator-specific analytics
+6. **BusinessAnalytics**: Platform-wide analytics
+
+**Visualization Libraries**:
+```json
+{
+  "recharts": "^2.10.0", // React charts library
+  "chart.js": "^4.4.0",   // Canvas-based charts
+  "react-chartjs-2": "^5.2.0" // React wrapper for Chart.js
+}
+```
+
+---
+
+### 42.3 Key Metrics by Role
+
+**1. Learner Metrics**:
+```typescript
+interface LearnerMetrics {
+  // Progress
+  progressPercentage: number;      // Overall progress %
+  subjectWiseProgress: {           // Per subject
+    [subjectId: string]: number;
+  };
+
+  // Attendance
+  attendanceRate: number;          // Sessions attended / total
+  onTimeRate: number;              // On-time attendance %
+
+  // Performance
+  averageScore: number;            // Across all assessments
+  taskCompletionRate: number;      // Tasks completed / assigned
+  improvementRate: number;         // Progress trend
+
+  // Engagement
+  studyTimeMinutes: number;        // Total study time
+  streakDays: number;              // Consecutive active days
+  participationScore: number;      // Class participation
+}
+```
+
+**2. Guardian Metrics**:
+```typescript
+interface GuardianMetrics {
+  // Financial
+  totalSpent: number;              // Total amount paid
+  upcomingPayments: number;        // Pending invoices
+  paymentHistory: Transaction[];
+
+  // Child Performance
+  childProgressSummary: {
+    overallProgress: number;
+    recentTrend: "improving" | "stable" | "declining";
+    areasOfConcern: string[];
+  };
+
+  // Engagement
+  sessionsBooked: number;
+  sessionsCompleted: number;
+  cancellationRate: number;
+
+  // ROI Metrics
+  learningOutcomes: {
+    testScoreImprovement: number;
+    skillsAcquired: string[];
+    goalProgress: number;
+  };
+}
+```
+
+**3. Educator Metrics**:
+```typescript
+interface EducatorMetrics {
+  // Financial
+  totalEarnings: number;
+  thisMonthEarnings: number;
+  pendingPayout: number;
+  averageRatePerHour: number;
+
+  // Performance
+  averageRating: number;           // From student feedback
+  totalSessions: number;
+  completionRate: number;          // Completed / scheduled
+
+  // Student Outcomes
+  studentImprovement: number;      // Avg improvement across students
+  retentionRate: number;           // Students who rebook
+
+  // Time Management
+  sessionHours: number;            // Total teaching hours
+  punctualityScore: number;        // On-time session starts
+  responseTime: number;            // Avg response to messages
+}
+```
+
+**4. ECM Metrics**:
+```typescript
+interface ECMMetrics {
+  // Caseload
+  learnersManaged: number;
+  activeInterventions: number;
+
+  // Performance
+  interventionSuccessRate: number; // Successful / total
+  averageResponseTime: number;     // Minutes to respond
+  taskAssignmentEfficiency: number;
+
+  // Outcomes
+  learnerProgressImprovement: number;
+  attendanceImprovement: number;
+  guardianSatisfaction: number;
+}
+```
+
+**5. Admin Metrics**:
+```typescript
+interface AdminMetrics {
+  // Growth
+  totalUsers: number;
+  newUsersThisMonth: number;
+  userGrowthRate: number;          // Month-over-month %
+
+  // Revenue
+  totalRevenue: number;
+  recurringRevenue: number;
+  averageRevenuePerUser: number;
+
+  // Engagement
+  dailyActiveUsers: number;
+  weeklyActiveUsers: number;
+  monthlyActiveUsers: number;
+
+  // Platform Health
+  sessionCompletionRate: number;
+  platformUptime: number;
+  averageSessionRating: number;
+}
+```
+
+---
+
+### 42.4 Learner Progress Tracking
+
+**ProgressRecord Aggregation**:
+```typescript
+// Service: Calculate learner progress
+async getLearnerProgress(learnerId: string, periodDays: number = 30) {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - periodDays);
+
+  // Get all progress records
+  const records = await prisma.progressRecord.findMany({
+    where: {
+      learnerId,
+      recordDate: { gte: startDate }
+    },
+    orderBy: { recordDate: "asc" }
+  });
+
+  // Calculate overall progress %
+  const academicRecords = records.filter(r => r.progressType === "academic");
+  const averageProgress = academicRecords.reduce((sum, r) => {
+    const percentage = (Number(r.value) / Number(r.maxValue || 100)) * 100;
+    return sum + percentage;
+  }, 0) / academicRecords.length;
+
+  // Subject-wise breakdown
+  const subjectProgress = await prisma.progressRecord.groupBy({
+    by: ["subjectId"],
+    where: {
+      learnerId,
+      progressType: "academic",
+      recordDate: { gte: startDate }
+    },
+    _avg: { value: true, improvement: true }
+  });
+
+  // Attendance calculation
+  const attendanceRecords = records.filter(r => r.progressType === "attendance");
+  const attendanceRate = attendanceRecords.length > 0
+    ? attendanceRecords.reduce((sum, r) => sum + Number(r.value), 0) / attendanceRecords.length
+    : 0;
+
+  return {
+    overallProgress: averageProgress,
+    subjectWiseProgress: subjectProgress.map(s => ({
+      subjectId: s.subjectId,
+      averageScore: s._avg.value,
+      improvement: s._avg.improvement
+    })),
+    attendanceRate,
+    trendData: records.map(r => ({
+      date: r.recordDate,
+      value: Number(r.value),
+      metric: r.metricName
+    }))
+  };
+}
+```
+
+**Time-Series Charts** (last 30 days):
+```typescript
+"use client";
+
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+
+interface ProgressChartProps {
+  data: Array<{ date: Date; value: number; metric: string }>;
+}
+
+export function ProgressChart({ data }: ProgressChartProps) {
+  // Transform data for chart
+  const chartData = data.reduce((acc, item) => {
+    const dateKey = item.date.toLocaleDateString();
+    if (!acc[dateKey]) acc[dateKey] = { date: dateKey };
+    acc[dateKey][item.metric] = item.value;
+    return acc;
+  }, {} as Record<string, any>);
+
+  const chartArray = Object.values(chartData);
+
+  return (
+    <div className="progress-chart">
+      <h3>Progress Over Last 30 Days</h3>
+      <LineChart width={600} height={300} data={chartArray}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="date" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line type="monotone" dataKey="test_score" stroke="#8884d8" name="Test Scores" />
+        <Line type="monotone" dataKey="assignment_completion" stroke="#82ca9d" name="Assignments" />
+        <Line type="monotone" dataKey="participation" stroke="#ffc658" name="Participation" />
+      </LineChart>
+    </div>
+  );
+}
+```
+
+**Goal Achievement Tracking**:
+```typescript
+async getLearnerGoalProgress(learnerId: string) {
+  const goals = await prisma.learnerGoal.findMany({
+    where: { learnerId, status: "active" },
+    include: { milestones: true }
+  });
+
+  return goals.map(goal => {
+    const completedMilestones = goal.milestones.filter(m => m.completed).length;
+    const totalMilestones = goal.milestones.length;
+    const progressPercentage = (completedMilestones / totalMilestones) * 100;
+
+    return {
+      goalId: goal.id,
+      goalName: goal.name,
+      targetDate: goal.targetDate,
+      progress: progressPercentage,
+      milestonesCompleted: completedMilestones,
+      milestonesTotal: totalMilestones,
+      onTrack: progressPercentage >= expectedProgress(goal.startDate, goal.targetDate)
+    };
+  });
+}
+
+function expectedProgress(startDate: Date, targetDate: Date): number {
+  const totalDays = (targetDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+  const elapsedDays = (new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+  return (elapsedDays / totalDays) * 100;
+}
+```
+
+---
+
+### 42.5 Session Analytics
+
+**Total Sessions by Status**:
+```typescript
+async getSessionAnalytics(periodStart: Date, periodEnd: Date) {
+  const sessionsByStatus = await prisma.learningSession.groupBy({
+    by: ["status"],
+    where: {
+      scheduledAt: { gte: periodStart, lte: periodEnd }
+    },
+    _count: true
+  });
+
+  const totalSessions = sessionsByStatus.reduce((sum, s) => sum + s._count, 0);
+
+  return {
+    total: totalSessions,
+    breakdown: sessionsByStatus.map(s => ({
+      status: s.status,
+      count: s._count,
+      percentage: (s._count / totalSessions) * 100
+    })),
+    completionRate: (
+      sessionsByStatus.find(s => s.status === "completed")?._count || 0
+    ) / totalSessions * 100
+  };
+}
+```
+
+**Attendance Rates**:
+```typescript
+async getAttendanceAnalytics(learnerId?: string) {
+  const where = {
+    status: { in: ["completed", "cancelled", "no_show"] },
+    ...(learnerId && { learnerId })
+  };
+
+  const sessions = await prisma.learningSession.groupBy({
+    by: ["status"],
+    where,
+    _count: true
+  });
+
+  const total = sessions.reduce((sum, s) => sum + s._count, 0);
+  const attended = sessions.find(s => s.status === "completed")?._count || 0;
+  const noShows = sessions.find(s => s.status === "no_show")?._count || 0;
+
+  return {
+    totalSessions: total,
+    attended,
+    noShows,
+    attendanceRate: (attended / total) * 100,
+    noShowRate: (noShows / total) * 100
+  };
+}
+```
+
+**Peak Booking Times**:
+```typescript
+async getBookingPatterns() {
+  const sessions = await prisma.learningSession.findMany({
+    select: { scheduledAt: true }
+  });
+
+  // Group by hour of day
+  const hourlyDistribution = sessions.reduce((acc, session) => {
+    const hour = session.scheduledAt.getHours();
+    acc[hour] = (acc[hour] || 0) + 1;
+    return acc;
+  }, {} as Record<number, number>);
+
+  // Group by day of week
+  const dailyDistribution = sessions.reduce((acc, session) => {
+    const day = session.scheduledAt.getDay(); // 0 = Sunday, 6 = Saturday
+    acc[day] = (acc[day] || 0) + 1;
+    return acc;
+  }, {} as Record<number, number>);
+
+  return {
+    peakHour: Object.entries(hourlyDistribution)
+      .sort(([, a], [, b]) => b - a)[0][0],
+    peakDay: Object.entries(dailyDistribution)
+      .sort(([, a], [, b]) => b - a)[0][0],
+    hourlyChart: Object.entries(hourlyDistribution).map(([hour, count]) => ({
+      hour: `${hour}:00`,
+      bookings: count
+    })),
+    dailyChart: Object.entries(dailyDistribution).map(([day, count]) => ({
+      day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][Number(day)],
+      bookings: count
+    }))
+  };
+}
+```
+
+---
+
+### 42.6 Educator Performance Analytics
+
+**Leaderboard by Ratings**:
+```typescript
+async getEducatorLeaderboard(limit: number = 10) {
+  const educators = await prisma.educatorProfile.findMany({
+    select: {
+      id: true,
+      name: true,
+      specialization: true,
+      sessions: {
+        where: { status: "completed" },
+        select: {
+          feedback: {
+            select: { rating: true }
+          }
+        }
+      }
+    }
+  });
+
+  // Calculate average rating for each educator
+  const educatorsWithRatings = educators.map(educator => {
+    const ratings = educator.sessions
+      .flatMap(s => s.feedback)
+      .map(f => f.rating)
+      .filter(r => r !== null);
+
+    const averageRating = ratings.length > 0
+      ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length
+      : 0;
+
+    return {
+      ...educator,
+      averageRating,
+      totalSessions: educator.sessions.length,
+      totalRatings: ratings.length
+    };
+  });
+
+  // Sort by rating and return top educators
+  return educatorsWithRatings
+    .sort((a, b) => b.averageRating - a.averageRating)
+    .slice(0, limit);
+}
+```
+
+**Session Completion Rates**:
+```typescript
+async getEducatorCompletionRate(educatorId: string) {
+  const sessions = await prisma.learningSession.groupBy({
+    by: ["status"],
+    where: { educatorId },
+    _count: true
+  });
+
+  const total = sessions.reduce((sum, s) => sum + s._count, 0);
+  const completed = sessions.find(s => s.status === "completed")?._count || 0;
+  const cancelled = sessions.find(s => s.status === "cancelled")?._count || 0;
+
+  return {
+    totalSessions: total,
+    completed,
+    cancelled,
+    completionRate: (completed / total) * 100,
+    cancellationRate: (cancelled / total) * 100
+  };
+}
+```
+
+**Earnings Over Time**:
+```typescript
+"use client";
+
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+
+interface EarningsChartProps {
+  educatorId: string;
+}
+
+export function EarningsChart({ educatorId }: EarningsChartProps) {
+  const { data } = useQuery({
+    queryKey: ["educatorEarnings", educatorId],
+    queryFn: async () => {
+      const earnings = await prisma.earningsRecord.groupBy({
+        by: ["earnedDate"],
+        where: { educatorId },
+        _sum: { netAmount: true }
+      });
+
+      // Group by month
+      const monthlyEarnings = earnings.reduce((acc, e) => {
+        const month = e.earnedDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short"
+        });
+        acc[month] = (acc[month] || 0) + Number(e._sum.netAmount);
+        return acc;
+      }, {} as Record<string, number>);
+
+      return Object.entries(monthlyEarnings).map(([month, amount]) => ({
+        month,
+        earnings: amount
+      }));
+    }
+  });
+
+  return (
+    <div className="earnings-chart">
+      <h3>Monthly Earnings</h3>
+      <BarChart width={600} height={300} data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="month" />
+        <YAxis />
+        <Tooltip formatter={(value) => `₹${value}`} />
+        <Bar dataKey="earnings" fill="#8884d8" />
+      </BarChart>
+    </div>
+  );
+}
+```
+
+---
+
+### 42.7 ECM Performance Metrics
+
+**Intervention Success Rates**:
+```typescript
+async getECMInterventionMetrics(ecmId: string) {
+  const interventions = await prisma.intervention.findMany({
+    where: { createdBy: ecmId },
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      outcome: true,
+      createdAt: true,
+      resolvedAt: true
+    }
+  });
+
+  const total = interventions.length;
+  const successful = interventions.filter(i => i.outcome === "improved").length;
+  const ongoing = interventions.filter(i => i.status === "active").length;
+
+  // Average resolution time
+  const resolvedInterventions = interventions.filter(i => i.resolvedAt);
+  const avgResolutionTime = resolvedInterventions.length > 0
+    ? resolvedInterventions.reduce((sum, i) => {
+        const time = i.resolvedAt!.getTime() - i.createdAt.getTime();
+        return sum + time;
+      }, 0) / resolvedInterventions.length / (1000 * 60 * 60) // Convert to hours
+    : 0;
+
+  return {
+    totalInterventions: total,
+    successfulInterventions: successful,
+    successRate: (successful / total) * 100,
+    ongoingInterventions: ongoing,
+    averageResolutionHours: avgResolutionTime
+  };
+}
+```
+
+**Response Time Averages**:
+```typescript
+async getECMResponseMetrics(ecmId: string) {
+  // Get all tasks assigned by ECM
+  const tasks = await prisma.learnerTask.findMany({
+    where: { assignedBy: ecmId },
+    select: {
+      createdAt: true,
+      dueDate: true,
+      completedAt: true,
+      submissions: {
+        select: {
+          submittedAt: true,
+          feedback: {
+            select: { createdAt: true }
+          }
+        }
+      }
+    }
+  });
+
+  // Calculate average feedback time (submission to feedback)
+  const feedbackTimes = tasks.flatMap(task =>
+    task.submissions
+      .filter(s => s.feedback.length > 0)
+      .map(s => {
+        const feedbackTime = s.feedback[0].createdAt.getTime() - s.submittedAt.getTime();
+        return feedbackTime / (1000 * 60); // Convert to minutes
+      })
+  );
+
+  const avgFeedbackTime = feedbackTimes.length > 0
+    ? feedbackTimes.reduce((sum, t) => sum + t, 0) / feedbackTimes.length
+    : 0;
+
+  return {
+    totalTasks: tasks.length,
+    averageFeedbackTimeMinutes: avgFeedbackTime,
+    tasksWithFeedback: feedbackTimes.length,
+    feedbackRate: (feedbackTimes.length / tasks.length) * 100
+  };
+}
+```
+
+---
+
+### 42.8 Admin Business Intelligence
+
+**User Growth Charts**:
+```typescript
+async getUserGrowthMetrics(period: "daily" | "weekly" | "monthly") {
+  const groupByFormat = {
+    daily: "yyyy-MM-dd",
+    weekly: "yyyy-'W'ww",
+    monthly: "yyyy-MM"
+  }[period];
+
+  const users = await prisma.user.findMany({
+    select: { createdAt: true }
+  });
+
+  // Group users by period
+  const growth = users.reduce((acc, user) => {
+    const key = user.createdAt.toLocaleDateString("en-CA", {
+      year: "numeric",
+      month: "2-digit",
+      day: period === "daily" ? "2-digit" : undefined
+    });
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  // Calculate cumulative growth
+  let cumulative = 0;
+  const chartData = Object.entries(growth)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, count]) => {
+      cumulative += count;
+      return {
+        date,
+        newUsers: count,
+        totalUsers: cumulative,
+        growthRate: count > 0 ? ((count / (cumulative - count)) * 100).toFixed(2) : 0
+      };
+    });
+
+  return chartData;
+}
+```
+
+**Revenue Trends**:
+```typescript
+async getRevenueTrends(months: number = 12) {
+  const startDate = new Date();
+  startDate.setMonth(startDate.getMonth() - months);
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      status: "completed",
+      completedAt: { gte: startDate }
+    },
+    select: {
+      amount: true,
+      platformFee: true,
+      completedAt: true
+    }
+  });
+
+  // Group by month
+  const monthlyRevenue = transactions.reduce((acc, t) => {
+    const month = t.completedAt!.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short"
+    });
+    if (!acc[month]) acc[month] = { revenue: 0, commission: 0 };
+    acc[month].revenue += Number(t.amount);
+    acc[month].commission += Number(t.platformFee);
+    return acc;
+  }, {} as Record<string, { revenue: number; commission: number }>);
+
+  return Object.entries(monthlyRevenue).map(([month, data]) => ({
+    month,
+    totalRevenue: data.revenue,
+    platformCommission: data.commission,
+    educatorEarnings: data.revenue - data.commission
+  }));
+}
+```
+
+**Conversion Funnels**:
+```typescript
+async getConversionFunnel() {
+  // Step 1: Users who signed up
+  const signups = await prisma.user.count();
+
+  // Step 2: Users who completed profile
+  const profilesCompleted = await prisma.user.count({
+    where: {
+      OR: [
+        { learnerProfile: { isNot: null } },
+        { guardianProfile: { isNot: null } },
+        { educatorProfile: { isNot: null } }
+      ]
+    }
+  });
+
+  // Step 3: Guardians who booked a session
+  const booked = await prisma.guardianProfile.count({
+    where: {
+      learners: {
+        some: {
+          sessions: {
+            some: {}
+          }
+        }
+      }
+    }
+  });
+
+  // Step 4: Guardians who completed payment
+  const paid = await prisma.transaction.count({
+    where: { status: "completed" },
+    distinct: ["payerId"]
+  });
+
+  // Step 5: Guardians who rebooked
+  const repeat = await prisma.guardianProfile.count({
+    where: {
+      learners: {
+        some: {
+          sessions: {
+            some: {
+              status: "completed"
+            }
+          }
+        }
+      }
+    }
+  });
+
+  return [
+    { stage: "Sign Up", count: signups, percentage: 100 },
+    { stage: "Complete Profile", count: profilesCompleted, percentage: (profilesCompleted / signups) * 100 },
+    { stage: "Book Session", count: booked, percentage: (booked / signups) * 100 },
+    { stage: "Complete Payment", count: paid, percentage: (paid / signups) * 100 },
+    { stage: "Repeat Booking", count: repeat, percentage: (repeat / signups) * 100 }
+  ];
+}
+```
+
+---
+
+### 42.9 Report Generation
+
+**Progress Reports** (Weekly/Monthly):
+```typescript
+async generateProgressReport(
+  learnerId: string,
+  frequency: "weekly" | "monthly"
+) {
+  const days = frequency === "weekly" ? 7 : 30;
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  // Collect all data
+  const progress = await getLearnerProgress(learnerId, days);
+  const attendance = await getAttendanceAnalytics(learnerId);
+  const tasks = await prisma.learnerTask.count({
+    where: {
+      learnerId,
+      completedAt: { gte: startDate }
+    }
+  });
+
+  // Generate report
+  const report = await prisma.report.create({
+    data: {
+      name: `${frequency.charAt(0).toUpperCase() + frequency.slice(1)} Progress Report`,
+      type: "academic_progress",
+      parameters: { learnerId, frequency, startDate },
+      reportData: {
+        progress,
+        attendance,
+        tasksCompleted: tasks,
+        summary: generateSummary(progress, attendance, tasks)
+      },
+      summary: {
+        overallProgress: progress.overallProgress,
+        attendanceRate: attendance.attendanceRate,
+        tasksCompleted: tasks
+      },
+      isScheduled: true,
+      frequency,
+      generatedBy: "system",
+      recipients: [learnerId]
+    }
+  });
+
+  // Generate PDF
+  const pdfUrl = await generateProgressReportPDF(report.id);
+
+  await prisma.report.update({
+    where: { id: report.id },
+    data: { exportUrl: pdfUrl, exportFormat: "pdf" }
+  });
+
+  return report;
+}
+
+function generateSummary(progress: any, attendance: any, tasks: number): string {
+  let summary = "";
+
+  if (progress.overallProgress >= 80) {
+    summary += "Excellent progress this period! ";
+  } else if (progress.overallProgress >= 60) {
+    summary += "Good progress, keep it up! ";
+  } else {
+    summary += "Needs improvement. Consider additional support. ";
+  }
+
+  if (attendance.attendanceRate >= 90) {
+    summary += "Outstanding attendance. ";
+  } else if (attendance.attendanceRate < 70) {
+    summary += "Attendance needs improvement. ";
+  }
+
+  if (tasks >= 10) {
+    summary += "Great job on completing tasks!";
+  }
+
+  return summary;
+}
+```
+
+**Email Scheduling**:
+```typescript
+// Cron job: Every Monday at 8 AM for weekly reports
+@Cron("0 8 * * 1")
+async sendWeeklyReports() {
+  const learners = await prisma.learnerProfile.findMany({
+    select: { id: true, guardian: { select: { email: true } } }
+  });
+
+  for (const learner of learners) {
+    const report = await generateProgressReport(learner.id, "weekly");
+
+    await sendEmail({
+      to: learner.guardian.email,
+      subject: "Weekly Progress Report",
+      template: "weekly-progress",
+      attachments: [{
+        filename: `progress-report-${learner.id}.pdf`,
+        path: report.exportUrl
+      }]
+    });
+  }
+}
+```
+
+---
+
+### 42.10 Data Export
+
+**CSV Export for Excel**:
+```typescript
+import { stringify } from "csv-stringify/sync";
+
+async function exportTransactionsCSV(
+  startDate: Date,
+  endDate: Date
+): Promise<string> {
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      completedAt: { gte: startDate, lte: endDate }
+    },
+    include: {
+      invoice: true
+    }
+  });
+
+  // Convert to CSV format
+  const csvData = transactions.map(t => ({
+    "Transaction ID": t.id,
+    "Date": t.completedAt?.toLocaleDateString(),
+    "Amount": Number(t.amount),
+    "Platform Fee": Number(t.platformFee),
+    "Educator Earning": Number(t.educatorEarning),
+    "Status": t.status,
+    "Invoice Number": t.invoice?.invoiceNumber
+  }));
+
+  const csv = stringify(csvData, { header: true });
+
+  // Save to file
+  const filePath = `/tmp/transactions-${Date.now()}.csv`;
+  await fs.promises.writeFile(filePath, csv);
+
+  // Upload to S3
+  const csvUrl = await uploadToS3(filePath, `exports/transactions-${Date.now()}.csv`);
+  return csvUrl;
+}
+```
+
+**API for External Tools**:
+```typescript
+// GraphQL API for analytics export
+@Query(() => AnalyticsExport)
+async exportAnalytics(
+  @Args("type") type: string,
+  @Args("startDate") startDate: Date,
+  @Args("endDate") endDate: Date,
+  @Args("format") format: "json" | "csv"
+) {
+  let data;
+
+  switch (type) {
+    case "learner_progress":
+      data = await exportLearnerProgressData(startDate, endDate);
+      break;
+    case "financial":
+      data = await exportFinancialData(startDate, endDate);
+      break;
+    case "sessions":
+      data = await exportSessionData(startDate, endDate);
+      break;
+  }
+
+  if (format === "csv") {
+    const csvUrl = await convertToCSV(data);
+    return { format: "csv", url: csvUrl };
+  }
+
+  return { format: "json", data };
+}
+```
+
+**Webhook for Third-Party Integrations**:
+```typescript
+// Send analytics data to external webhook
+async function sendAnalyticsWebhook(event: string, data: any) {
+  const webhookUrl = process.env.ANALYTICS_WEBHOOK_URL;
+
+  if (!webhookUrl) return;
+
+  await fetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Webhook-Secret": process.env.WEBHOOK_SECRET!
+    },
+    body: JSON.stringify({
+      event,
+      timestamp: new Date().toISOString(),
+      data
+    })
+  });
+}
+
+// Trigger on significant events
+async function onSessionCompleted(sessionId: string) {
+  const session = await prisma.learningSession.findUnique({
+    where: { id: sessionId },
+    include: { learner: true, educator: true }
+  });
+
+  await sendAnalyticsWebhook("session.completed", {
+    sessionId: session.id,
+    learnerId: session.learnerId,
+    educatorId: session.educatorId,
+    duration: session.duration,
+    rating: session.feedback?.[0]?.rating
+  });
+}
+```
+
+---
+
+### 42.11 Key Takeaways - Chapter 42
+
+✅ **Analytics Architecture**:
+- Real-time dashboard metrics via WebSocket
+- Batch processing for scheduled reports
+- Future: Separate data warehouse for historical data
+- Visualization with Recharts and Chart.js
+
+✅ **Key Metrics by Role**:
+- **Learner**: Progress %, attendance %, task completion %, subject-wise performance
+- **Guardian**: Sessions booked, payment history, child progress summary, ROI metrics
+- **Educator**: Total earnings, avg rating, session hours, student retention
+- **ECM**: Intervention success %, avg response time, learners managed
+- **Admin**: Platform growth, revenue trends, user acquisition, engagement
+
+✅ **Progress Tracking**:
+- ProgressRecord model aggregation
+- Subject-wise performance breakdown
+- Time-series charts for last 30 days
+- Goal achievement percentage
+- Trend analysis (improving/stable/declining)
+
+✅ **Session Analytics**:
+- Total sessions by status (scheduled, completed, cancelled)
+- Attendance rates and no-show tracking
+- Average session duration
+- Peak booking times (hourly/daily patterns)
+
+✅ **Educator Performance**:
+- Leaderboard by average ratings
+- Session completion rates
+- Monthly earnings charts
+- Student improvement tracking
+- Retention and rebooking rates
+
+✅ **ECM Performance**:
+- Intervention success rates
+- Average response time to learner issues
+- Task assignment efficiency
+- Learner progress improvement rates
+
+✅ **Business Intelligence**:
+- User growth charts (daily/weekly/monthly)
+- Revenue trends with commission breakdown
+- Conversion funnels (signup → payment → retention)
+- Retention cohorts
+- Customer acquisition cost and lifetime value
+
+✅ **Report Generation**:
+- Automated progress reports (weekly/monthly)
+- Financial reports with PDF export
+- Email scheduling for report delivery
+- Custom report parameters and filters
+
+✅ **Data Export**:
+- CSV export for Excel analysis
+- JSON API for external tools
+- Webhook integration for third-party platforms
+- Scheduled exports via cron jobs
+
+**End of Part IV: Feature Deep-Dives**
+
+---
+
+## Part IV Summary (Chapters 29-42)
+
+**What We Covered**:
+Part IV provided comprehensive, production-ready implementations of NextPhoton's core features. Each chapter demonstrated end-to-end data flows with real code examples from the schema.
+
+**Key Implementations**:
+
+1. **Authentication & Authorization** (29-31):
+   - JWT-based authentication flow
+   - Multi-role registration system
+   - ABAC (Attribute-Based Access Control)
+   - Route protection and permission checks
+
+2. **Role-Specific Interfaces** (32-36):
+   - Learner dashboard with progress tracking
+   - Guardian portal for monitoring
+   - Educator session management
+   - ECM micromanagement tools
+   - Admin platform controls
+
+3. **Core Features** (37-40):
+   - Session booking with calendar integration
+   - Task assignment and tracking system
+   - Real-time notifications (WebSocket + Email)
+   - File uploads with AWS S3 and Google Drive
+
+4. **Business Operations** (41-42):
+   - Payment processing with Razorpay
+   - Invoice generation and tracking
+   - Educator earnings and payouts
+   - Comprehensive analytics and reporting
+
+**Production Patterns Learned**:
+- Prisma model relationships and queries
+- GraphQL resolvers with type safety
+- Real-time updates with WebSocket
+- Third-party API integrations (Razorpay, AWS, Google)
+- Scheduled jobs with cron
+- PDF generation and email delivery
+- Data aggregation and chart visualization
+
+**End-to-End Data Flows**:
+Every feature showed complete flow from user action → frontend component → API call → database operation → response handling → UI update.
+
+---
+
+**Next Up: Part V - Advanced Concepts (Chapters 43-52)**
+
+In Part V, we'll dive into advanced topics:
+- Apollo Client for frontend GraphQL
+- Optimistic updates and cache management
+- Server-Side Rendering (SSR) patterns
+- Middleware and advanced route protection
+- Performance optimization techniques
+- Security best practices
+- Deployment and DevOps
+- Debugging strategies
+- Future scalability planning
+
+These chapters will elevate your understanding from feature implementation to enterprise-grade architecture.
+
+---
+
+# Part V: Advanced Concepts
+
+---
+
+## Part V Introduction: Enterprise-Grade Architecture
+
+Welcome to Part V, the advanced section of The Next Photon Project Guide. In Parts I-IV, you learned the foundations, built features, and implemented complete user flows. Now it's time to master the sophisticated patterns that separate good applications from production-ready, enterprise-grade systems.
+
+### What This Part Covers
+
+**1. Advanced Data Management (Chapters 43-44)**
+- Apollo Client for frontend GraphQL operations
+- Optimistic updates for instant UI feedback
+- Sophisticated caching strategies
+- Real-time data synchronization
+
+**2. Rendering & Performance (Chapters 45-48)**
+- Server-Side Rendering (SSR) in Next.js
+- API routes and middleware patterns
+- Route protection and security layers
+- Performance optimization techniques
+
+**3. Production Readiness (Chapters 49-52)**
+- Security best practices and vulnerability prevention
+- Deployment strategies and DevOps workflows
+- Debugging tools and techniques
+- Scalability planning for growth
+
+### Why These Topics Matter
+
+In Part IV, you built features that **work**. In Part V, you'll learn how to make them **work exceptionally well** at scale:
+
+- **Performance**: Users expect instant feedback. Optimistic updates and smart caching make your app feel native.
+- **Security**: Production apps handle real user data. One vulnerability can compromise everything.
+- **Scalability**: Today's 100 users become tomorrow's 10,000. Your architecture must support growth.
+- **Reliability**: Downtime costs money and trust. Proper deployment and monitoring prevent disasters.
+
+### How to Approach This Part
+
+Unlike earlier chapters that followed linear feature implementation, Part V explores cross-cutting concerns that affect your entire application:
+
+1. **Read sequentially first**: Concepts build on each other (e.g., understanding Apollo Client before optimistic updates)
+2. **Apply immediately**: Test these patterns in existing features from Part IV
+3. **Think holistically**: Consider how each pattern affects the entire system, not just one component
+
+### Real-World Context
+
+NextPhoton's production requirements drive these advanced patterns:
+
+- **Real-time updates**: When an educator marks attendance, guardians see it instantly
+- **Offline resilience**: Learners submit assignments even with poor connectivity
+- **Security**: Protect sensitive student data and payment information
+- **Scale**: Handle thousands of concurrent sessions during exam prep season
+- **Performance**: Fast load times are critical for user retention
+
+By the end of Part V, you'll understand not just **how** to build features, but **how to build them right** for production environments where performance, security, and reliability are non-negotiable.
+
+Let's begin with one of the most powerful tools in modern web development: Apollo Client.
+
+---
+
+## Chapter 43: Apollo Client - Frontend GraphQL
+
+### What You'll Learn
+- What Apollo Client is and how it differs from REST
+- Setting up Apollo Client in Next.js
+- Writing queries and mutations
+- Real-time subscriptions
+- Cache management fundamentals
+- Error handling and retry logic
+
+### 43.1 What is Apollo Client?
+
+**Apollo Client** is a comprehensive state management library for JavaScript that integrates with GraphQL. Think of it as a bridge between your React components and your GraphQL API.
+
+**Key Concept**: Instead of making REST API calls with fetch or axios, Apollo Client handles GraphQL operations with built-in caching, optimistic updates, and state management.
+
+```typescript
+// ❌ Old way (REST with fetch)
+const response = await fetch('/api/learners/123');
+const learner = await response.json();
+
+// ✅ New way (GraphQL with Apollo)
+const { data } = useQuery(GET_LEARNER, {
+  variables: { id: '123' }
+});
+```
+
+### 43.2 Why GraphQL Over REST?
+
+**1. Request Exactly What You Need**
+
+REST forces you to get entire resources. GraphQL lets you specify fields:
+
+```graphql
+# REST endpoint returns EVERYTHING
+GET /api/learners/123
+# Returns: id, firstName, lastName, email, phone, address,
+#          guardians (full objects), batches (full objects),
+#          attendance (full history), etc.
+
+# GraphQL query requests ONLY needed fields
+query GetLearnerName {
+  learner(id: "123") {
+    id
+    firstName
+    lastName
+  }
+}
+# Returns: Only the 3 fields requested
+```
+
+**2. Single Endpoint**
+
+REST requires multiple endpoints for different resources. GraphQL uses one:
+
+```typescript
+// ❌ REST: Multiple endpoints, multiple requests
+fetch('/api/learners/123')
+fetch('/api/guardians/456')
+fetch('/api/batches/789')
+
+// ✅ GraphQL: One endpoint, one request
+query GetLearnerData {
+  learner(id: "123") {
+    firstName
+    guardians {
+      firstName
+      email
+    }
+    batches {
+      name
+      subject
+    }
+  }
+}
+```
+
+**3. Strongly Typed**
+
+GraphQL schemas provide type safety. TypeScript integration is seamless:
+
+```typescript
+// Auto-generated types from schema
+type Learner = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  // ... etc
+};
+
+// Type-safe queries
+const { data } = useQuery<{ learner: Learner }>(GET_LEARNER);
+// data.learner is fully typed!
+```
+
+**4. Real-Time Subscriptions**
+
+WebSocket subscriptions are built into GraphQL:
+
+```graphql
+subscription OnNewNotification {
+  notificationAdded {
+    id
+    message
+    timestamp
+  }
+}
+```
+
+### 43.3 Apollo Client Setup in Next.js
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/apollo/client.ts`
+
+**Step 1: Create HTTP Link**
+
+The link connects Apollo Client to your GraphQL endpoint:
+
+```typescript
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+
+// Points to Next.js API route (currently mock data)
+// Later: Point to NestJS backend GraphQL endpoint
+const httpLink = createHttpLink({
+  uri: '/api/graphql',
+  credentials: 'same-origin',
+  fetchOptions: {
+    timeout: 10000, // 10 second timeout
+  },
+});
+```
+
+**Step 2: Configure Error Handling**
+
+Handle GraphQL errors and network errors separately:
+
+```typescript
+import { onError } from '@apollo/client/link/error';
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      console.error(`[GraphQL error]: ${message}`)
+    );
+  }
+
+  if (networkError) {
+    console.error(`[Network error]: ${networkError}`);
+  }
+});
+```
+
+**Step 3: Add Retry Logic**
+
+Automatically retry failed requests (useful for flaky networks):
+
+```typescript
+import { RetryLink } from '@apollo/client/link/retry';
+
+const retryLink = new RetryLink({
+  delay: {
+    initial: 300,    // Start with 300ms delay
+    max: 2000,       // Max 2 second delay
+    jitter: true,    // Add randomness to prevent thundering herd
+  },
+  attempts: {
+    max: 3,          // Retry up to 3 times
+    retryIf: (error) => {
+      // Only retry network errors, not GraphQL errors
+      return !!error && !error.message.includes('GraphQL');
+    },
+  },
+});
+```
+
+**Step 4: Configure Cache**
+
+The InMemoryCache stores query results for fast access:
+
+```typescript
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        // Define how to merge arrays (prevent duplicates)
+        learners: {
+          merge(existing = [], incoming) {
+            return incoming; // Replace old data with new
+          },
+        },
+      },
+    },
+    // Tell Apollo how to identify each entity for caching
+    Learner: {
+      keyFields: ['id'], // Use 'id' field as unique identifier
+    },
+    Educator: {
+      keyFields: ['id'],
+    },
+  },
+});
+```
+
+**Step 5: Create Apollo Client Instance**
+
+Chain all links together and create the client:
+
+```typescript
+import { from } from '@apollo/client';
+
+const link = from([errorLink, retryLink, httpLink]);
+
+export const apolloClient = new ApolloClient({
+  link,
+  cache,
+  devtools: {
+    enabled: process.env.NODE_ENV === 'development', // Apollo DevTools in dev only
+  },
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'cache-and-network', // Check cache first, then fetch
+      errorPolicy: 'all',                // Return partial data on errors
+    },
+    query: {
+      fetchPolicy: 'network-only',       // Always fetch fresh data
+      errorPolicy: 'all',
+    },
+    mutate: {
+      errorPolicy: 'all',
+    },
+  },
+});
+```
+
+**Step 6: Wrap App with ApolloProvider**
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/apollo/ApolloProvider.tsx`
+
+```typescript
+'use client';
+
+import { ApolloProvider as BaseApolloProvider } from '@apollo/client';
+import { apolloClient } from './client';
+import { ReactNode } from 'react';
+
+export function ApolloProvider({ children }: { children: ReactNode }) {
+  return (
+    <BaseApolloProvider client={apolloClient}>
+      {children}
+    </BaseApolloProvider>
+  );
+}
+```
+
+**Use in layout**:
+
+```typescript
+// app/layout.tsx
+import { ApolloProvider } from '@/lib/apollo/ApolloProvider';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <ApolloProvider>
+          {children}
+        </ApolloProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### 43.4 Writing GraphQL Queries
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/apollo/queries.ts`
+
+**Query Anatomy**:
+
+```graphql
+query GetLearner($id: ID!) {    # Query name and variables
+  learner(id: $id) {             # Field with argument
+    id                           # Fields to return
+    firstName
+    lastName
+    email
+    guardians {                  # Nested fields
+      firstName
+      relationship
+    }
+  }
+}
+```
+
+**Using useQuery Hook**:
+
+```typescript
+import { useQuery } from '@apollo/client';
+import { GET_LEARNER } from '@/lib/apollo/queries';
+
+function LearnerProfile({ learnerId }: { learnerId: string }) {
+  const { data, loading, error, refetch } = useQuery(GET_LEARNER, {
+    variables: { id: learnerId },
+    fetchPolicy: 'cache-first', // Try cache first, then network
+  });
+
+  // Loading state
+  if (loading) return <Spinner />;
+
+  // Error state
+  if (error) return <ErrorMessage error={error} onRetry={refetch} />;
+
+  // Success state
+  const learner = data.learner;
+
+  return (
+    <div>
+      <h1>{learner.firstName} {learner.lastName}</h1>
+      <p>{learner.email}</p>
+      <h2>Guardians</h2>
+      {learner.guardians.map(guardian => (
+        <div key={guardian.id}>
+          {guardian.firstName} ({guardian.relationship})
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+**Query with Multiple Variables**:
+
+```typescript
+const GET_LEARNERS_BY_GRADE = gql`
+  query GetLearnersByGrade($grade: String!, $isActive: Boolean) {
+    learnersByGrade(grade: $grade, isActive: $isActive) {
+      id
+      firstName
+      lastName
+      grade
+    }
+  }
+`;
+
+// Usage
+const { data } = useQuery(GET_LEARNERS_BY_GRADE, {
+  variables: {
+    grade: "12th",
+    isActive: true
+  },
+});
+```
+
+**Conditional Query Execution**:
+
+```typescript
+// Skip query until userId is available
+const { data } = useQuery(GET_USER_PROFILE, {
+  variables: { userId },
+  skip: !userId, // Don't execute query if userId is null/undefined
+});
+```
+
+**Polling for Updates**:
+
+```typescript
+// Re-fetch data every 5 seconds
+const { data } = useQuery(GET_NOTIFICATIONS, {
+  pollInterval: 5000, // 5000ms = 5 seconds
+});
+```
+
+### 43.5 Writing GraphQL Mutations
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/lib/apollo/mutations.ts`
+
+**Mutation Anatomy**:
+
+```graphql
+mutation UpdateLearner($id: ID!, $input: UpdateLearnerInput!) {
+  updateLearner(id: $id, input: $input) {
+    id
+    firstName
+    lastName
+    email
+    updatedAt
+  }
+}
+```
+
+**Using useMutation Hook**:
+
+```typescript
+import { useMutation } from '@apollo/client';
+import { UPDATE_LEARNER } from '@/lib/apollo/mutations';
+
+function EditLearnerForm({ learner }) {
+  const [updateLearner, { data, loading, error }] = useMutation(UPDATE_LEARNER, {
+    onCompleted: (data) => {
+      toast.success('Learner updated successfully!');
+      console.log('Updated learner:', data.updateLearner);
+    },
+    onError: (error) => {
+      toast.error(`Failed to update: ${error.message}`);
+    },
+  });
+
+  const handleSubmit = async (formData) => {
+    await updateLearner({
+      variables: {
+        id: learner.id,
+        input: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+        },
+      },
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+      <button type="submit" disabled={loading}>
+        {loading ? 'Saving...' : 'Save Changes'}
+      </button>
+    </form>
+  );
+}
+```
+
+**Mutation with Refetch**:
+
+Automatically refetch related queries after mutation:
+
+```typescript
+const [createLearner] = useMutation(CREATE_LEARNER, {
+  refetchQueries: [
+    { query: GET_LEARNERS },           // Refetch all learners
+    { query: GET_LEARNERS_BY_GRADE, variables: { grade: "12th" } },
+  ],
+  awaitRefetchQueries: true, // Wait for refetch before calling onCompleted
+});
+```
+
+**Mutation with Cache Update**:
+
+Manually update cache instead of refetching:
+
+```typescript
+const [createLearner] = useMutation(CREATE_LEARNER, {
+  update(cache, { data: { createLearner } }) {
+    // Read existing learners from cache
+    const existing = cache.readQuery({ query: GET_LEARNERS });
+
+    // Write updated data back to cache
+    cache.writeQuery({
+      query: GET_LEARNERS,
+      data: {
+        learners: [...existing.learners, createLearner],
+      },
+    });
+  },
+});
+```
+
+### 43.6 GraphQL Subscriptions (Real-Time)
+
+Subscriptions use WebSocket for real-time updates.
+
+**Subscription Definition**:
+
+```graphql
+subscription OnNotificationAdded($userId: ID!) {
+  notificationAdded(userId: $userId) {
+    id
+    message
+    type
+    timestamp
+    isRead
+  }
+}
+```
+
+**Using useSubscription Hook**:
+
+```typescript
+import { useSubscription } from '@apollo/client';
+
+function NotificationBell({ userId }) {
+  const { data, loading } = useSubscription(ON_NOTIFICATION_ADDED, {
+    variables: { userId },
+    onSubscriptionData: ({ subscriptionData }) => {
+      const newNotification = subscriptionData.data.notificationAdded;
+      toast.info(newNotification.message);
+      playNotificationSound();
+    },
+  });
+
+  return (
+    <div>
+      {loading && <span>Connecting...</span>}
+      {/* Notification UI */}
+    </div>
+  );
+}
+```
+
+**WebSocket Setup** (for subscriptions):
+
+```typescript
+import { split, HttpLink } from '@apollo/client';
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { createClient } from 'graphql-ws';
+
+// HTTP link for queries and mutations
+const httpLink = new HttpLink({
+  uri: 'http://localhost:4000/graphql',
+});
+
+// WebSocket link for subscriptions
+const wsLink = new GraphQLWsLink(createClient({
+  url: 'ws://localhost:4000/graphql',
+}));
+
+// Split traffic between HTTP and WebSocket
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,      // Use WebSocket for subscriptions
+  httpLink,    // Use HTTP for queries and mutations
+);
+```
+
+### 43.7 Cache Management Basics
+
+**Reading from Cache**:
+
+```typescript
+// Read query from cache
+const learners = apolloClient.cache.readQuery({
+  query: GET_LEARNERS,
+});
+
+// Read specific fragment from cache
+const learner = apolloClient.cache.readFragment({
+  id: 'Learner:123',
+  fragment: gql`
+    fragment LearnerName on Learner {
+      id
+      firstName
+      lastName
+    }
+  `,
+});
+```
+
+**Writing to Cache**:
+
+```typescript
+// Write query result to cache
+apolloClient.cache.writeQuery({
+  query: GET_LEARNERS,
+  data: {
+    learners: [/* ... */],
+  },
+});
+
+// Write fragment to cache
+apolloClient.cache.writeFragment({
+  id: 'Learner:123',
+  fragment: gql`
+    fragment LearnerName on Learner {
+      firstName
+      lastName
+    }
+  `,
+  data: {
+    firstName: 'Updated',
+    lastName: 'Name',
+  },
+});
+```
+
+**Modifying Cache Fields**:
+
+```typescript
+apolloClient.cache.modify({
+  fields: {
+    learners(existingLearners = [], { readField }) {
+      // Filter out a specific learner
+      return existingLearners.filter(
+        learnerRef => readField('id', learnerRef) !== '123'
+      );
+    },
+  },
+});
+```
+
+### 43.8 Error Handling in Apollo
+
+**Types of Errors**:
+
+1. **Network Errors**: Failed to reach server
+2. **GraphQL Errors**: Server returned errors in response
+
+```typescript
+const { data, error } = useQuery(GET_LEARNERS);
+
+if (error) {
+  // Check error type
+  if (error.networkError) {
+    // Network issue (offline, timeout, etc.)
+    return <div>Unable to connect. Check your internet connection.</div>;
+  }
+
+  if (error.graphQLErrors) {
+    // GraphQL errors from server
+    error.graphQLErrors.forEach(({ message, extensions }) => {
+      if (extensions.code === 'UNAUTHENTICATED') {
+        // Handle authentication errors
+        redirect('/login');
+      }
+    });
+  }
+}
+```
+
+**Error Policies**:
+
+```typescript
+const { data } = useQuery(GET_LEARNERS, {
+  errorPolicy: 'all', // Options: 'none' | 'all' | 'ignore'
+});
+
+// 'none': Default, throw error and return no data
+// 'all': Return both data and errors
+// 'ignore': Ignore errors, only return data
+```
+
+**Retry on Error**:
+
+```typescript
+const [updateLearner] = useMutation(UPDATE_LEARNER, {
+  onError: (error) => {
+    if (error.message.includes('timeout')) {
+      // Retry mutation
+      updateLearner({
+        variables: { /* ... */ },
+      });
+    }
+  },
+});
+```
+
+### 43.9 Pagination with Apollo
+
+**Offset-Based Pagination**:
+
+```graphql
+query GetLearners($offset: Int!, $limit: Int!) {
+  learners(offset: $offset, limit: $limit) {
+    id
+    firstName
+    lastName
+  }
+}
+```
+
+```typescript
+const { data, fetchMore } = useQuery(GET_LEARNERS, {
+  variables: { offset: 0, limit: 20 },
+});
+
+const loadMore = () => {
+  fetchMore({
+    variables: {
+      offset: data.learners.length, // Continue from current count
+    },
+  });
+};
+```
+
+**Cursor-Based Pagination**:
+
+```graphql
+query GetLearners($after: String, $first: Int!) {
+  learners(after: $after, first: $first) {
+    edges {
+      cursor
+      node {
+        id
+        firstName
+        lastName
+      }
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+```
+
+```typescript
+const { data, fetchMore } = useQuery(GET_LEARNERS, {
+  variables: { first: 20 },
+});
+
+const loadMore = () => {
+  if (data.learners.pageInfo.hasNextPage) {
+    fetchMore({
+      variables: {
+        after: data.learners.pageInfo.endCursor,
+      },
+    });
+  }
+};
+```
+
+**Merge Function for Pagination**:
+
+```typescript
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        learners: {
+          keyArgs: false, // Don't separate cache by variables
+          merge(existing = [], incoming) {
+            // Merge new results with existing
+            return [...existing, ...incoming];
+          },
+        },
+      },
+    },
+  },
+});
+```
+
+### 43.10 Apollo DevTools
+
+**Chrome Extension**: Install "Apollo Client Devtools" from Chrome Web Store.
+
+**Features**:
+
+1. **View All Queries**: See every query executed in your app
+2. **Inspect Cache**: Browse all cached data by type
+3. **Run Queries Manually**: Test queries in GraphiQL interface
+4. **Mutation Testing**: Execute mutations with custom variables
+5. **Cache Manipulation**: Manually edit cache for testing
+
+**Using DevTools**:
+
+```typescript
+// Enable in development
+const apolloClient = new ApolloClient({
+  devtools: {
+    enabled: process.env.NODE_ENV === 'development',
+  },
+});
+```
+
+**Debugging Cache Issues**:
+
+```typescript
+// Log entire cache to console
+console.log(apolloClient.cache.extract());
+
+// Log specific query result
+const data = apolloClient.cache.readQuery({ query: GET_LEARNERS });
+console.log('Cached learners:', data);
+```
+
+### 43.11 Key Takeaways
+
+**Apollo Client Benefits**:
+- ✅ Automatic caching reduces network requests
+- ✅ Optimistic updates for instant UI feedback
+- ✅ Built-in loading and error states
+- ✅ Real-time subscriptions with WebSocket
+- ✅ Strong TypeScript integration
+- ✅ Normalized cache prevents data duplication
+
+**When to Use Apollo Client**:
+- Complex data requirements with nested relationships
+- Need for real-time updates (subscriptions)
+- Want automatic caching and state management
+- Building large-scale applications
+
+**When REST Might Be Better**:
+- Simple CRUD operations
+- File uploads (GraphQL requires special handling)
+- Legacy systems without GraphQL support
+- Team lacks GraphQL experience
+
+**Next Steps**:
+In Chapter 44, we'll dive deeper into Apollo's caching system and learn optimistic updates for lightning-fast user interfaces.
+
+---
+
+## Chapter 44: Optimistic Updates & Caching
+
+### What You'll Learn
+- What optimistic updates are and why they matter
+- Implementing optimistic updates with useMutation
+- Deep dive into Apollo's InMemoryCache
+- Reading and writing to cache programmatically
+- Cache eviction and garbage collection
+- Cache persistence for offline support
+- Understanding cache policies
+
+### 44.1 What Are Optimistic Updates?
+
+**Optimistic updates** = Updating the UI **before** the server responds.
+
+**Traditional Flow**:
+```
+User clicks "Mark Complete"
+  → Show loading spinner
+  → Send request to server
+  → Wait for response (500ms - 2s)
+  → Update UI
+  → Hide spinner
+```
+
+**Optimistic Flow**:
+```
+User clicks "Mark Complete"
+  → Update UI immediately (feels instant!)
+  → Send request to server in background
+  → If success: Keep UI as-is
+  → If error: Rollback UI change
+```
+
+**Real-World Example**:
+
+```typescript
+// ❌ Without optimistic updates (slow, shows spinner)
+function TaskItem({ task }) {
+  const [updateTask, { loading }] = useMutation(UPDATE_TASK);
+
+  const handleComplete = async () => {
+    await updateTask({
+      variables: { id: task.id, completed: true },
+    });
+    // UI updates only AFTER server responds
+  };
+
+  return (
+    <div>
+      <input
+        type="checkbox"
+        checked={task.completed}
+        onChange={handleComplete}
+        disabled={loading} // Disabled during network request
+      />
+      {loading && <Spinner />}
+      {task.title}
+    </div>
+  );
+}
+
+// ✅ With optimistic updates (instant, no spinner)
+function TaskItem({ task }) {
+  const [updateTask] = useMutation(UPDATE_TASK, {
+    optimisticResponse: {
+      updateTask: {
+        __typename: 'Task',
+        id: task.id,
+        completed: true,
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  });
+
+  const handleComplete = () => {
+    updateTask({
+      variables: { id: task.id, completed: true },
+    });
+    // UI updates IMMEDIATELY, server request happens in background
+  };
+
+  return (
+    <div>
+      <input
+        type="checkbox"
+        checked={task.completed}
+        onChange={handleComplete}
+        // No disabled state, no spinner!
+      />
+      {task.title}
+    </div>
+  );
+}
+```
+
+### 44.2 Why Optimistic Updates Improve UX
+
+**1. Perceived Performance**
+- Users perceive instant responses as "fast"
+- 100ms = feels instantaneous, 1000ms = feels sluggish
+- Optimistic updates eliminate wait time
+
+**2. Offline-First Experience**
+- App remains usable with poor connectivity
+- Changes queue up and sync when online
+
+**3. Reduce Loading Spinners**
+- Too many spinners frustrate users
+- Optimistic updates eliminate most spinners
+
+**4. Mobile-Friendly**
+- Mobile networks are slower and less reliable
+- Optimistic updates mask network latency
+
+**Real Data**: Studies show 100ms improvement in response time increases conversions by 1%.
+
+### 44.3 Implementing Optimistic Updates
+
+**Basic Example**:
+
+```typescript
+import { useMutation } from '@apollo/client';
+import { MARK_ATTENDANCE } from '@/lib/apollo/mutations';
+
+function AttendanceMarker({ learner, sessionId }) {
+  const [markAttendance] = useMutation(MARK_ATTENDANCE, {
+    // Optimistic response predicts server response
+    optimisticResponse: {
+      markAttendance: {
+        __typename: 'Attendance',
+        id: 'temp-id-' + Date.now(), // Temporary ID
+        sessionId,
+        learnerId: learner.id,
+        status: 'PRESENT',
+        checkInTime: new Date().toISOString(),
+        learner: {
+          __typename: 'Learner',
+          id: learner.id,
+          firstName: learner.firstName,
+          lastName: learner.lastName,
+        },
+      },
+    },
+    // Update cache optimistically
+    update(cache, { data: { markAttendance } }) {
+      // Read existing attendance records
+      const existing = cache.readQuery({
+        query: GET_ATTENDANCE_BY_SESSION,
+        variables: { sessionId },
+      });
+
+      // Write updated data to cache
+      cache.writeQuery({
+        query: GET_ATTENDANCE_BY_SESSION,
+        variables: { sessionId },
+        data: {
+          attendanceBySession: [
+            ...existing.attendanceBySession,
+            markAttendance,
+          ],
+        },
+      });
+    },
+  });
+
+  const handleMarkPresent = () => {
+    markAttendance({
+      variables: {
+        input: {
+          sessionId,
+          learnerId: learner.id,
+          status: 'PRESENT',
+        },
+      },
+    });
+    // UI updates immediately!
+  };
+
+  return (
+    <button onClick={handleMarkPresent}>
+      Mark Present
+    </button>
+  );
+}
+```
+
+**Optimistic Update with Rollback**:
+
+```typescript
+const [deleteLearner] = useMutation(DELETE_LEARNER, {
+  optimisticResponse: {
+    deleteLearner: true,
+  },
+  update(cache, { data: { deleteLearner } }, { variables }) {
+    if (deleteLearner) {
+      // Optimistically remove from cache
+      cache.evict({
+        id: cache.identify({ __typename: 'Learner', id: variables.id }),
+      });
+      cache.gc(); // Garbage collect
+    }
+  },
+  onError: (error) => {
+    // If server rejects, Apollo automatically rolls back cache changes
+    toast.error('Failed to delete learner: ' + error.message);
+  },
+});
+```
+
+**Complex Example - Adding to List**:
+
+```typescript
+// Scenario: Add new notification to list
+const [createNotification] = useMutation(CREATE_NOTIFICATION, {
+  optimisticResponse: ({ input }) => ({
+    createNotification: {
+      __typename: 'Notification',
+      id: 'temp-' + Date.now(),
+      message: input.message,
+      type: input.type,
+      userId: input.userId,
+      isRead: false,
+      timestamp: new Date().toISOString(),
+    },
+  }),
+  update(cache, { data: { createNotification } }) {
+    cache.modify({
+      fields: {
+        notifications(existingNotifications = []) {
+          const newNotificationRef = cache.writeFragment({
+            data: createNotification,
+            fragment: gql`
+              fragment NewNotification on Notification {
+                id
+                message
+                type
+                isRead
+                timestamp
+              }
+            `,
+          });
+          // Add to beginning of list (newest first)
+          return [newNotificationRef, ...existingNotifications];
+        },
+      },
+    });
+  },
+});
+```
+
+### 44.4 Apollo Cache Deep-Dive
+
+**Normalized Cache**:
+
+Apollo normalizes data to prevent duplication. Each entity stored once by unique identifier.
+
+```typescript
+// Before normalization (duplicate data):
+{
+  learners: [
+    { id: '1', name: 'Alice', grade: '12th' },
+    { id: '2', name: 'Bob', grade: '11th' },
+  ],
+  batches: [
+    {
+      id: 'batch-1',
+      name: 'Physics',
+      learners: [
+        { id: '1', name: 'Alice', grade: '12th' }, // Duplicate!
+      ],
+    },
+  ],
+}
+
+// After normalization (single source of truth):
+{
+  'Learner:1': { id: '1', name: 'Alice', grade: '12th' },
+  'Learner:2': { id: '2', name: 'Bob', grade: '11th' },
+  'Batch:batch-1': {
+    id: 'batch-1',
+    name: 'Physics',
+    learners: [{ __ref: 'Learner:1' }], // Reference, not duplicate
+  },
+}
+```
+
+**Cache Key = `__typename:id`**
+
+```typescript
+// Apollo generates cache keys automatically
+'Learner:123'        // Learner with id=123
+'Educator:456'       // Educator with id=456
+'Batch:batch-1'      // Batch with id=batch-1
+```
+
+**Custom Cache Keys**:
+
+```typescript
+const cache = new InMemoryCache({
+  typePolicies: {
+    // Use 'email' as key instead of 'id'
+    User: {
+      keyFields: ['email'],
+    },
+    // Composite key from multiple fields
+    Assignment: {
+      keyFields: ['batchId', 'educatorId', 'dueDate'],
+    },
+  },
+});
+```
+
+### 44.5 Reading from Cache
+
+**readQuery**: Read entire query from cache
+
+```typescript
+import { useApolloClient } from '@apollo/client';
+
+function NotificationCount() {
+  const client = useApolloClient();
+
+  const getUnreadCount = () => {
+    const data = client.cache.readQuery({
+      query: GET_NOTIFICATIONS,
+      variables: { userId: currentUserId },
+    });
+
+    if (data) {
+      return data.notifications.filter(n => !n.isRead).length;
+    }
+    return 0;
+  };
+
+  return <span>Unread: {getUnreadCount()}</span>;
+}
+```
+
+**readFragment**: Read specific fragment from cache
+
+```typescript
+const learner = client.cache.readFragment({
+  id: 'Learner:123', // Cache identifier
+  fragment: gql`
+    fragment LearnerName on Learner {
+      id
+      firstName
+      lastName
+      email
+    }
+  `,
+});
+
+console.log(learner); // { id: '123', firstName: 'Alice', ... }
+```
+
+**Use Case - Avoid Refetch**:
+
+```typescript
+// Instead of refetching data from server
+const { data } = useQuery(GET_LEARNER, { variables: { id: '123' } });
+
+// Read directly from cache (instant, no network request)
+const client = useApolloClient();
+const learner = client.cache.readFragment({
+  id: 'Learner:123',
+  fragment: gql`
+    fragment LearnerData on Learner {
+      id
+      firstName
+      email
+    }
+  `,
+});
+```
+
+### 44.6 Writing to Cache
+
+**writeQuery**: Write query result to cache
+
+```typescript
+client.cache.writeQuery({
+  query: GET_NOTIFICATIONS,
+  variables: { userId: '123' },
+  data: {
+    notifications: [
+      { id: 'n1', message: 'New message', isRead: false },
+      { id: 'n2', message: 'Assignment due', isRead: true },
+    ],
+  },
+});
+```
+
+**writeFragment**: Update specific entity in cache
+
+```typescript
+// Update learner's email in cache
+client.cache.writeFragment({
+  id: 'Learner:123',
+  fragment: gql`
+    fragment UpdateEmail on Learner {
+      email
+    }
+  `,
+  data: {
+    email: 'newemail@example.com',
+  },
+});
+```
+
+**cache.modify**: Modify cache fields with function
+
+```typescript
+// Mark all notifications as read
+client.cache.modify({
+  fields: {
+    notifications(existingNotifications, { readField }) {
+      return existingNotifications.map(notifRef => {
+        const id = readField('id', notifRef);
+        // Update each notification fragment
+        client.cache.writeFragment({
+          id: client.cache.identify({ __typename: 'Notification', id }),
+          fragment: gql`
+            fragment MarkRead on Notification {
+              isRead
+            }
+          `,
+          data: { isRead: true },
+        });
+        return notifRef;
+      });
+    },
+  },
+});
+```
+
+**Use Case - Update UI Without Mutation**:
+
+```typescript
+// Scenario: User toggles notification read status locally before syncing to server
+function NotificationItem({ notification }) {
+  const client = useApolloClient();
+
+  const toggleRead = () => {
+    // Update cache immediately
+    client.cache.writeFragment({
+      id: `Notification:${notification.id}`,
+      fragment: gql`
+        fragment ToggleRead on Notification {
+          isRead
+        }
+      `,
+      data: {
+        isRead: !notification.isRead,
+      },
+    });
+
+    // Sync to server in background
+    markAsRead({ variables: { id: notification.id } });
+  };
+
+  return <div onClick={toggleRead}>{notification.message}</div>;
+}
+```
+
+### 44.7 Cache Eviction
+
+**Evict Entity**: Remove from cache
+
+```typescript
+// Remove learner from cache
+client.cache.evict({
+  id: 'Learner:123',
+});
+
+// Garbage collect to clean up orphaned references
+client.cache.gc();
+```
+
+**Evict Field**: Remove specific field from entity
+
+```typescript
+// Remove 'batches' field from learner (keep rest of data)
+client.cache.evict({
+  id: 'Learner:123',
+  fieldName: 'batches',
+});
+```
+
+**Use Case - After Delete Mutation**:
+
+```typescript
+const [deleteLearner] = useMutation(DELETE_LEARNER, {
+  update(cache, { data: { deleteLearner } }, { variables }) {
+    if (deleteLearner) {
+      // Remove learner from cache
+      cache.evict({
+        id: cache.identify({ __typename: 'Learner', id: variables.id }),
+      });
+
+      // Clean up dangling references
+      cache.gc();
+
+      // Also evict from query results
+      cache.modify({
+        fields: {
+          learners(existingLearners, { readField }) {
+            return existingLearners.filter(
+              learnerRef => variables.id !== readField('id', learnerRef)
+            );
+          },
+        },
+      });
+    }
+  },
+});
+```
+
+### 44.8 Cache Persistence
+
+**Store cache in localStorage** for offline support:
+
+```typescript
+import { InMemoryCache } from '@apollo/client';
+import { persistCache, LocalStorageWrapper } from 'apollo3-cache-persist';
+
+const cache = new InMemoryCache();
+
+// Persist cache to localStorage
+await persistCache({
+  cache,
+  storage: new LocalStorageWrapper(window.localStorage),
+  maxSize: 1048576, // 1MB max
+  debug: true,
+});
+
+const client = new ApolloClient({
+  cache,
+  // ... other config
+});
+```
+
+**Restore on App Load**:
+
+```typescript
+// On app startup
+const cache = new InMemoryCache();
+
+// Restore cache from localStorage
+await persistCache({
+  cache,
+  storage: new LocalStorageWrapper(window.localStorage),
+});
+
+// Cache is now populated with previous session data
+```
+
+**Clear Persisted Cache**:
+
+```typescript
+// Clear localStorage cache
+await localStorage.removeItem('apollo-cache-persist');
+
+// Clear Apollo cache
+client.cache.reset();
+```
+
+**Benefits**:
+- Instant app load with cached data
+- Offline functionality
+- Reduced network requests
+- Better mobile experience
+
+### 44.9 Cache Policies Explained
+
+**cache-first** (default, fastest):
+```typescript
+const { data } = useQuery(GET_LEARNERS, {
+  fetchPolicy: 'cache-first',
+});
+```
+- ✅ Check cache first
+- ✅ If cached, return immediately (no network request)
+- ✅ If not cached, fetch from network
+
+**network-only** (always fresh):
+```typescript
+const { data } = useQuery(GET_LEARNERS, {
+  fetchPolicy: 'network-only',
+});
+```
+- ✅ Always fetch from network
+- ✅ Ignore cache
+- ✅ Update cache with result
+
+**cache-and-network** (best of both):
+```typescript
+const { data } = useQuery(GET_LEARNERS, {
+  fetchPolicy: 'cache-and-network',
+});
+```
+- ✅ Return cached data immediately
+- ✅ Also fetch from network in background
+- ✅ Update UI when network response arrives
+
+**no-cache** (bypass cache completely):
+```typescript
+const { data } = useQuery(GET_LEARNERS, {
+  fetchPolicy: 'no-cache',
+});
+```
+- ✅ Always fetch from network
+- ❌ Don't cache result
+- ❌ Don't read from cache
+
+**cache-only** (offline mode):
+```typescript
+const { data } = useQuery(GET_LEARNERS, {
+  fetchPolicy: 'cache-only',
+});
+```
+- ✅ Only read from cache
+- ❌ Never fetch from network
+- ❌ Error if not in cache
+
+**Comparison Table**:
+
+| Policy | Read Cache? | Fetch Network? | Update Cache? | Use Case |
+|--------|-------------|----------------|---------------|----------|
+| **cache-first** | Yes (first) | Only if not cached | Yes | Most queries (default) |
+| **network-only** | No | Yes (always) | Yes | Critical real-time data |
+| **cache-and-network** | Yes (immediate) | Yes (background) | Yes | Best UX, always fresh |
+| **no-cache** | No | Yes (always) | No | One-time data, reports |
+| **cache-only** | Yes (only) | No | No | Offline mode |
+
+**Choosing the Right Policy**:
+
+```typescript
+// User profile: Rarely changes, cache-first
+const { data } = useQuery(GET_USER_PROFILE, {
+  fetchPolicy: 'cache-first',
+});
+
+// Live notifications: Must be fresh, network-only
+const { data } = useQuery(GET_NOTIFICATIONS, {
+  fetchPolicy: 'network-only',
+  pollInterval: 5000, // Fetch every 5 seconds
+});
+
+// Dashboard stats: Show cached, update in background
+const { data } = useQuery(GET_DASHBOARD_STATS, {
+  fetchPolicy: 'cache-and-network',
+});
+
+// Export report: One-time use, don't cache
+const { data } = useQuery(GENERATE_REPORT, {
+  fetchPolicy: 'no-cache',
+});
+
+// Offline mode: Only use cache
+const { data } = useQuery(GET_LEARNERS, {
+  fetchPolicy: 'cache-only',
+});
+```
+
+### 44.10 React Query Alternative (Brief Comparison)
+
+**React Query** (TanStack Query) is an alternative to Apollo Client for data fetching.
+
+**Apollo Client**:
+- ✅ Built for GraphQL
+- ✅ Normalized cache
+- ✅ Real-time subscriptions built-in
+- ✅ GraphQL-specific features (fragments, directives)
+- ❌ Steeper learning curve
+- ❌ Larger bundle size
+
+**React Query**:
+- ✅ Works with REST and GraphQL
+- ✅ Simpler API
+- ✅ Smaller bundle size
+- ✅ Great for REST APIs
+- ❌ No normalized cache (can be added with plugins)
+- ❌ Manual subscription setup
+
+**When to Use Apollo Client**:
+- GraphQL API
+- Complex data relationships
+- Need real-time subscriptions
+- Want normalized caching
+
+**When to Use React Query**:
+- REST API
+- Simple data fetching
+- Smaller bundle size priority
+- Team prefers simpler API
+
+**Side-by-Side Example**:
+
+```typescript
+// Apollo Client
+const { data, loading, error } = useQuery(GET_LEARNERS);
+
+// React Query
+const { data, isLoading, error } = useQuery({
+  queryKey: ['learners'],
+  queryFn: () => fetch('/api/learners').then(res => res.json()),
+});
+```
+
+**NextPhoton uses Apollo Client** because:
+- NestJS backend uses GraphQL
+- Need normalized cache for complex relationships
+- Real-time notifications via subscriptions
+
+### 44.11 Key Takeaways
+
+**Optimistic Updates**:
+- ✅ Update UI immediately before server responds
+- ✅ Makes app feel instant and responsive
+- ✅ Automatically rolls back on error
+- ✅ Essential for good mobile UX
+
+**Apollo Cache**:
+- ✅ Normalized storage prevents duplication
+- ✅ Read/write cache programmatically
+- ✅ Cache policies control freshness
+- ✅ Persist cache for offline support
+
+**Best Practices**:
+- Use `cache-and-network` for best UX
+- Implement optimistic updates for mutations
+- Persist cache for mobile apps
+- Evict cache after deletes
+- Choose appropriate cache policies per query
+
+**Performance Impact**:
+- Optimistic updates: 0ms perceived latency
+- Cache-first queries: ~10ms (vs ~500ms network)
+- Cache persistence: Instant app startup
+
+**Next Up**: Chapter 45 - Server-Side Rendering (SSR) in Next.js
+
+---
+
+## Chapter 45: Server-Side Rendering (SSR) in Next.js
+
+### 45.1 What is Server-Side Rendering (SSR)?
+
+**Server-Side Rendering (SSR)** means the server generates complete HTML for a page before sending it to the browser.
+
+**Traditional Flow (CSR - Client-Side Rendering)**:
+1. Browser requests page
+2. Server sends minimal HTML + large JavaScript bundle
+3. Browser downloads and executes JavaScript
+4. JavaScript fetches data from API
+5. JavaScript renders UI
+6. User sees content (3-5 seconds later)
+
+**SSR Flow**:
+1. Browser requests page
+2. Server fetches data and renders HTML
+3. Server sends complete HTML to browser
+4. User sees content immediately (~200ms)
+5. JavaScript "hydrates" to make it interactive
+
+**Key Benefit**: User sees content FASTER because server does the heavy lifting.
+
+### 45.2 SSR vs CSR Comparison
+
+**Server-Side Rendering (SSR)**:
+- ✅ **Faster first paint**: User sees content in ~200ms
+- ✅ **Better SEO**: Search engines see complete HTML
+- ✅ **Social sharing**: Preview cards work (Facebook, Twitter)
+- ✅ **Works without JavaScript**: Content visible even if JS disabled
+- ❌ Slower navigation (full page reload)
+- ❌ Higher server load (server renders every request)
+- ❌ More complex caching
+
+**Client-Side Rendering (CSR)**:
+- ✅ **Faster navigation**: Only fetch data, not HTML
+- ✅ **Lower server load**: Server just sends JSON
+- ✅ **Simpler deployment**: Static files on CDN
+- ✅ **Rich interactivity**: Full control over rendering
+- ❌ Slower first paint (3-5 seconds)
+- ❌ Poor SEO (search engines see empty div)
+- ❌ Large JavaScript bundles
+
+**Comparison Table**:
+
+| Metric | SSR | CSR | Winner |
+|--------|-----|-----|--------|
+| **First Paint** | ~200ms | ~3000ms | SSR |
+| **SEO** | Excellent | Poor | SSR |
+| **Navigation Speed** | Slow | Fast | CSR |
+| **Server Load** | High | Low | CSR |
+| **Initial Bundle Size** | Small | Large | SSR |
+| **Interactivity Delay** | ~1s (hydration) | Immediate | CSR |
+| **Offline Support** | No | Yes (with service worker) | CSR |
+| **Social Sharing** | Works | Broken | SSR |
+
+**NextPhoton's Approach**: Hybrid (SSR + CSR)
+- SSR for public pages (landing, pricing)
+- CSR for dashboards (rich interactivity)
+- Next.js 15 makes this easy with Server Components
+
+### 45.3 Next.js 15 Rendering Patterns
+
+Next.js 15 introduces **React Server Components** as the default rendering model.
+
+**Two Component Types**:
+
+1. **Server Components** (default):
+   - Run ONLY on the server
+   - Never sent to the browser
+   - Can be `async` functions
+   - Can access database directly
+   - Zero JavaScript bundle
+
+2. **Client Components** (`'use client'` directive):
+   - Run on both server (initial render) and browser
+   - Sent to browser as JavaScript
+   - Can use React hooks (useState, useEffect)
+   - Can handle user interactions
+
+**File Structure Example**:
+
+```
+app/
+├── page.tsx                    # Server Component (default)
+├── layout.tsx                  # Server Component (default)
+└── components/
+    ├── SessionList.tsx         # Server Component (fetches data)
+    └── JoinButton.tsx          # Client Component ('use client')
+```
+
+**When to Use Each**:
+
+**Server Components** (default):
+- ✅ Fetching data from database
+- ✅ Accessing backend resources (files, APIs)
+- ✅ Keeping sensitive data secure (API keys, tokens)
+- ✅ Reducing client bundle size
+- ✅ Static content (text, images)
+
+**Client Components** (`'use client'`):
+- ✅ User interactions (onClick, onChange, onSubmit)
+- ✅ React hooks (useState, useEffect, useContext)
+- ✅ Browser APIs (localStorage, window, document)
+- ✅ Third-party libraries not SSR-compatible
+- ✅ Event listeners
+
+### 45.4 Server Components Benefits
+
+**1. Zero JavaScript Bundle Size**
+
+Server Components don't ship JavaScript to the browser.
+
+```typescript
+// app/learners/page.tsx (Server Component - NO 'use client')
+import { prisma } from '@/shared/db';
+
+// This component is NEVER sent to browser
+// Zero KB added to JavaScript bundle
+export default async function LearnersPage() {
+  // Fetch data directly from database (secure, no API needed)
+  const learners = await prisma.learner.findMany({
+    include: { user: true },
+  });
+
+  return (
+    <div>
+      <h1>Learners ({learners.length})</h1>
+      <ul>
+        {learners.map((learner) => (
+          <li key={learner.id}>{learner.user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**Bundle Impact**:
+- Server Component: 0 KB
+- Client Component with same code: ~15 KB (React + component logic)
+
+**2. Direct Database Access**
+
+No need for API routes. Query database directly in component.
+
+```typescript
+// ❌ OLD WAY (Client Component + API Route)
+// app/api/learners/route.ts
+export async function GET() {
+  const learners = await prisma.learner.findMany();
+  return Response.json(learners);
+}
+
+// app/learners/page.tsx
+'use client';
+import { useEffect, useState } from 'react';
+
+export default function LearnersPage() {
+  const [learners, setLearners] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/learners')
+      .then(res => res.json())
+      .then(setLearners);
+  }, []);
+
+  return <div>{/* render learners */}</div>;
+}
+
+// ✅ NEW WAY (Server Component)
+// app/learners/page.tsx
+import { prisma } from '@/shared/db';
+
+export default async function LearnersPage() {
+  const learners = await prisma.learner.findMany();
+  return <div>{/* render learners */}</div>;
+}
+```
+
+**Benefits**:
+- ✅ Fewer files (no API route needed)
+- ✅ Faster (no HTTP round-trip)
+- ✅ Simpler code (no useEffect, useState)
+- ✅ Better TypeScript (direct database types)
+
+**3. Secure (API Keys Safe)**
+
+Server Components run ONLY on server. Secrets never leak to browser.
+
+```typescript
+// app/dashboard/page.tsx (Server Component)
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // ✅ Safe! Never sent to browser
+
+async function generateSummary() {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    headers: {
+      'Authorization': `Bearer ${OPENAI_API_KEY}`, // ✅ Secure!
+    },
+  });
+  return response.json();
+}
+
+export default async function DashboardPage() {
+  const summary = await generateSummary();
+  return <div>{summary}</div>;
+}
+```
+
+**If this was a Client Component**:
+- ❌ OPENAI_API_KEY would be in browser JavaScript
+- ❌ Anyone can steal it from DevTools
+- ❌ $$$$ stolen API usage
+
+**4. Fast Initial Load**
+
+Server sends complete HTML. Browser displays immediately.
+
+```typescript
+// app/sessions/page.tsx (Server Component)
+export default async function SessionsPage() {
+  const sessions = await prisma.session.findMany({
+    include: { learner: true, educator: true },
+  });
+
+  return (
+    <div>
+      <h1>Today's Sessions</h1>
+      {sessions.map((session) => (
+        <SessionCard key={session.id} session={session} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Performance**:
+- Server Component: ~200ms (server renders HTML)
+- Client Component: ~3000ms (download JS + fetch API + render)
+
+### 45.5 Server Component Example
+
+**Real NextPhoton Example: Learner Dashboard**
+
+```typescript
+// app/learner/dashboard/page.tsx (Server Component)
+import { prisma } from '@/shared/db';
+import { auth } from '@/lib/auth-utils';
+import { SessionCard } from '@/components/SessionCard'; // Client Component
+import { UpcomingTasks } from '@/components/UpcomingTasks'; // Server Component
+
+// Server Component can be async!
+export default async function LearnerDashboard() {
+  // 1. Get authenticated user
+  const user = await auth.getCurrentUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  // 2. Fetch all data in parallel (FAST!)
+  const [learner, sessions, tasks, progress] = await Promise.all([
+    prisma.learner.findUnique({
+      where: { userId: user.id },
+      include: { user: true, guardian: true },
+    }),
+    prisma.session.findMany({
+      where: { learnerId: learner?.id },
+      include: { educator: { include: { user: true } } },
+      orderBy: { scheduledAt: 'asc' },
+      take: 5,
+    }),
+    prisma.task.findMany({
+      where: {
+        assignedToId: learner?.id,
+        status: 'PENDING',
+      },
+      orderBy: { dueDate: 'asc' },
+      take: 10,
+    }),
+    prisma.learnerProgress.findMany({
+      where: { learnerId: learner?.id },
+    }),
+  ]);
+
+  // 3. Render HTML with data (no useState, useEffect needed!)
+  return (
+    <div className="dashboard">
+      <h1>Welcome, {learner.user.name}</h1>
+
+      <div className="grid grid-cols-3 gap-4">
+        {/* Server Component: Just renders HTML */}
+        <StatCard title="Total Sessions" value={sessions.length} />
+        <StatCard title="Pending Tasks" value={tasks.length} />
+        <StatCard title="Progress" value={`${progress.length}%`} />
+      </div>
+
+      <section>
+        <h2>Upcoming Sessions</h2>
+        {sessions.map((session) => (
+          // Client Component: Handles "Join" button click
+          <SessionCard key={session.id} session={session} />
+        ))}
+      </section>
+
+      <section>
+        <h2>Tasks Due Soon</h2>
+        {/* Server Component: Just displays data */}
+        <UpcomingTasks tasks={tasks} />
+      </section>
+    </div>
+  );
+}
+```
+
+**Key Points**:
+- ✅ No `'use client'` directive = Server Component
+- ✅ `async` function = fetch data directly
+- ✅ No `useState`, `useEffect`, `useContext`
+- ✅ Database queries run on server (fast, secure)
+- ✅ All data fetched in parallel with `Promise.all()`
+- ✅ HTML sent to browser (instant display)
+
+### 45.6 Client Components Use Cases
+
+**When You MUST Use 'use client'**:
+
+**1. User Interactions**
+
+```typescript
+// components/JoinSessionButton.tsx
+'use client'; // ✅ Required for onClick
+
+import { useState } from 'react';
+
+export function JoinSessionButton({ sessionId }: { sessionId: string }) {
+  const [joining, setJoining] = useState(false);
+
+  const handleJoin = async () => {
+    setJoining(true);
+    await fetch(`/api/sessions/${sessionId}/join`, { method: 'POST' });
+    window.location.href = `/session/${sessionId}`;
+  };
+
+  return (
+    <button onClick={handleJoin} disabled={joining}>
+      {joining ? 'Joining...' : 'Join Session'}
+    </button>
+  );
+}
+```
+
+**2. Browser APIs**
+
+```typescript
+// components/ThemeToggle.tsx
+'use client'; // ✅ Required for localStorage
+
+import { useEffect, useState } from 'react';
+
+export function ThemeToggle() {
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    // Access localStorage (browser-only API)
+    const saved = localStorage.getItem('theme') || 'light';
+    setTheme(saved);
+    document.documentElement.classList.toggle('dark', saved === 'dark');
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+  };
+
+  return <button onClick={toggleTheme}>{theme} Mode</button>;
+}
+```
+
+**3. React Hooks**
+
+```typescript
+// components/SearchLearners.tsx
+'use client'; // ✅ Required for useState
+
+import { useState } from 'react';
+
+export function SearchLearners({ learners }: { learners: Learner[] }) {
+  const [query, setQuery] = useState('');
+
+  const filtered = learners.filter((learner) =>
+    learner.user.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search learners..."
+      />
+      <ul>
+        {filtered.map((learner) => (
+          <li key={learner.id}>{learner.user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**4. Third-Party Libraries (Not SSR-Compatible)**
+
+```typescript
+// components/MapView.tsx
+'use client'; // ✅ Required for react-leaflet (uses window object)
+
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+
+export function MapView({ lat, lng }: { lat: number; lng: number }) {
+  return (
+    <MapContainer center={[lat, lng]} zoom={13}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <Marker position={[lat, lng]} />
+    </MapContainer>
+  );
+}
+```
+
+**5. Context Providers**
+
+```typescript
+// contexts/auth-context.tsx
+'use client'; // ✅ Required for useContext
+
+import { createContext, useContext, useState } from 'react';
+
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState(null);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
+```
+
+### 45.7 Mixing Server and Client Components
+
+**Key Rules**:
+1. ✅ Server Component can import Client Component
+2. ❌ Client Component CANNOT import Server Component
+3. ✅ Pass server data to client component as props
+4. ❌ Don't pass functions or class instances as props
+
+**Example: Session List (Server) with Join Button (Client)**
+
+```typescript
+// app/sessions/page.tsx (Server Component)
+import { prisma } from '@/shared/db';
+import { SessionCard } from '@/components/SessionCard'; // Client Component
+
+export default async function SessionsPage() {
+  // Fetch data on server
+  const sessions = await prisma.session.findMany({
+    include: { educator: { include: { user: true } } },
+  });
+
+  return (
+    <div>
+      <h1>Available Sessions</h1>
+      {sessions.map((session) => (
+        // Pass data as props to Client Component
+        <SessionCard key={session.id} session={session} />
+      ))}
+    </div>
+  );
+}
+```
+
+```typescript
+// components/SessionCard.tsx (Client Component)
+'use client';
+
+import { useState } from 'react';
+import { Session } from '@prisma/client';
+
+export function SessionCard({ session }: { session: Session }) {
+  const [joining, setJoining] = useState(false);
+
+  const handleJoin = async () => {
+    setJoining(true);
+    await fetch(`/api/sessions/${session.id}/join`, { method: 'POST' });
+    alert('Joined session!');
+    setJoining(false);
+  };
+
+  return (
+    <div className="card">
+      <h3>{session.title}</h3>
+      <p>Educator: {session.educator.user.name}</p>
+      <p>Time: {new Date(session.scheduledAt).toLocaleString()}</p>
+
+      {/* Client-side interactivity */}
+      <button onClick={handleJoin} disabled={joining}>
+        {joining ? 'Joining...' : 'Join Session'}
+      </button>
+    </div>
+  );
+}
+```
+
+**Data Flow**:
+1. Server Component fetches data from database
+2. Server Component renders and passes data as props
+3. Client Component receives props
+4. Client Component handles user interactions
+
+**Composition Pattern**:
+
+```typescript
+// app/dashboard/page.tsx (Server Component)
+import { ClientWrapper } from '@/components/ClientWrapper';
+import { ServerStats } from '@/components/ServerStats';
+
+export default async function Dashboard() {
+  const stats = await fetchStats(); // Server-side fetch
+
+  return (
+    <div>
+      {/* Server Component */}
+      <ServerStats stats={stats} />
+
+      {/* Client Component wrapping Server Component as children */}
+      <ClientWrapper>
+        <ServerStats stats={stats} /> {/* Server Component inside Client */}
+      </ClientWrapper>
+    </div>
+  );
+}
+```
+
+```typescript
+// components/ClientWrapper.tsx (Client Component)
+'use client';
+
+export function ClientWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="interactive-wrapper">
+      {children} {/* Server Component children work! */}
+    </div>
+  );
+}
+```
+
+### 45.8 Data Fetching Patterns
+
+**1. Basic Fetch with Cache**
+
+```typescript
+// app/learners/page.tsx
+export default async function LearnersPage() {
+  // fetch() is enhanced in Next.js 15 with automatic caching
+  const res = await fetch('https://api.example.com/learners', {
+    cache: 'force-cache', // Cache forever (default)
+  });
+  const learners = await res.json();
+
+  return <div>{/* render learners */}</div>;
+}
+```
+
+**Cache Options**:
+- `cache: 'force-cache'` - Cache forever (default for fetch)
+- `cache: 'no-store'` - Never cache (always fetch fresh)
+- `next: { revalidate: 60 }` - Cache for 60 seconds
+
+**2. Revalidation (Time-Based Cache)**
+
+```typescript
+// app/dashboard/page.tsx
+export default async function Dashboard() {
+  // Cache for 10 seconds, then revalidate
+  const res = await fetch('https://api.example.com/stats', {
+    next: { revalidate: 10 },
+  });
+  const stats = await res.json();
+
+  return <div>{/* render stats */}</div>;
+}
+```
+
+**3. Parallel Data Fetching**
+
+```typescript
+// app/learner/[id]/page.tsx
+export default async function LearnerProfile({ params }: { params: { id: string } }) {
+  // Fetch all data in parallel (FAST!)
+  const [learner, sessions, tasks] = await Promise.all([
+    prisma.learner.findUnique({ where: { id: params.id } }),
+    prisma.session.findMany({ where: { learnerId: params.id } }),
+    prisma.task.findMany({ where: { assignedToId: params.id } }),
+  ]);
+
+  return (
+    <div>
+      <h1>{learner.user.name}</h1>
+      <Sessions sessions={sessions} />
+      <Tasks tasks={tasks} />
+    </div>
+  );
+}
+```
+
+**Performance**:
+- Sequential: 3 requests × 100ms = 300ms
+- Parallel: max(100ms, 100ms, 100ms) = 100ms
+
+**4. Streaming with Suspense**
+
+```typescript
+// app/dashboard/page.tsx
+import { Suspense } from 'react';
+import { SlowComponent } from '@/components/SlowComponent';
+
+export default function Dashboard() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+
+      {/* Fast content shows immediately */}
+      <QuickStats />
+
+      {/* Slow content streams in when ready */}
+      <Suspense fallback={<div>Loading analytics...</div>}>
+        <SlowComponent />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+```typescript
+// components/SlowComponent.tsx (Server Component)
+export async function SlowComponent() {
+  // Slow database query
+  const analytics = await prisma.analytics.findMany({
+    // Complex aggregation takes 2-3 seconds
+  });
+
+  return <AnalyticsChart data={analytics} />;
+}
+```
+
+**User Experience**:
+1. Page loads with header and quick stats (200ms)
+2. "Loading analytics..." shown
+3. Analytics streams in when ready (2-3s later)
+
+### 45.9 Loading States with loading.tsx
+
+Next.js 15 provides a **special file** for loading states.
+
+**File Structure**:
+```
+app/
+├── learners/
+│   ├── page.tsx       # Main content
+│   └── loading.tsx    # Loading UI (automatic Suspense boundary)
+```
+
+**loading.tsx Example**:
+
+```typescript
+// app/learners/loading.tsx
+export default function Loading() {
+  return (
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Learners</h1>
+
+      {/* Skeleton UI */}
+      <div className="grid grid-cols-3 gap-4">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="h-32 bg-gray-200 animate-pulse rounded" />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+**How It Works**:
+1. User navigates to `/learners`
+2. `loading.tsx` shows immediately
+3. `page.tsx` fetches data (async)
+4. When data ready, `page.tsx` replaces `loading.tsx`
+
+**Automatic Suspense**:
+
+Next.js automatically wraps `page.tsx` with Suspense:
+
+```typescript
+// Next.js does this automatically:
+<Suspense fallback={<Loading />}>
+  <Page />
+</Suspense>
+```
+
+**Nested Loading States**:
+
+```
+app/
+├── loading.tsx              # Root loading (navbar + sidebar)
+└── learners/
+    ├── loading.tsx          # Learners loading (learner list skeleton)
+    └── [id]/
+        └── loading.tsx      # Learner detail loading (profile skeleton)
+```
+
+### 45.10 Error Boundaries with error.tsx
+
+Next.js 15 provides a **special file** for error handling.
+
+**File Structure**:
+```
+app/
+├── learners/
+│   ├── page.tsx       # Main content
+│   ├── loading.tsx    # Loading UI
+│   └── error.tsx      # Error UI (catches errors in page.tsx)
+```
+
+**error.tsx Example**:
+
+```typescript
+// app/learners/error.tsx
+'use client'; // ✅ MUST be a Client Component
+
+import { useEffect } from 'react';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log error to error reporting service (Sentry, LogRocket)
+    console.error('Error loading learners:', error);
+  }, [error]);
+
+  return (
+    <div className="error-boundary">
+      <h2>Something went wrong!</h2>
+      <p>{error.message}</p>
+
+      {/* reset() re-renders page.tsx */}
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
+}
+```
+
+**How It Works**:
+1. User navigates to `/learners`
+2. `page.tsx` throws error (database timeout, etc.)
+3. `error.tsx` catches error and displays UI
+4. User clicks "Try again"
+5. `reset()` re-renders `page.tsx`
+
+**Error Hierarchy**:
+
+```
+app/
+├── error.tsx                # Catches errors in all pages
+└── learners/
+    ├── error.tsx            # Catches errors in learners pages
+    └── [id]/
+        └── error.tsx        # Catches errors in specific learner page
+```
+
+**Global Error Handling**:
+
+```typescript
+// app/global-error.tsx
+'use client';
+
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  return (
+    <html>
+      <body>
+        <h2>Application Error</h2>
+        <p>{error.message}</p>
+        <button onClick={reset}>Try again</button>
+      </body>
+    </html>
+  );
+}
+```
+
+### 45.11 Static vs Dynamic Rendering
+
+Next.js 15 automatically chooses rendering strategy:
+
+**Static Rendering** (Build-Time):
+- Page rendered once at build time
+- HTML cached and reused for all requests
+- ⚡ FASTEST (served from CDN)
+- Best for: Landing pages, blog posts, docs
+
+**Dynamic Rendering** (Request-Time):
+- Page rendered on every request
+- Fresh data on every load
+- 🔄 Always up-to-date
+- Best for: Dashboards, user profiles, admin panels
+
+**Next.js Auto-Detection**:
+
+```typescript
+// app/about/page.tsx
+// ✅ STATIC (no dynamic functions)
+export default function AboutPage() {
+  return <div>About NextPhoton</div>;
+}
+
+// app/dashboard/page.tsx
+// ✅ DYNAMIC (uses cookies())
+import { cookies } from 'next/headers';
+
+export default async function Dashboard() {
+  const token = cookies().get('auth-token'); // Dynamic function!
+  const user = await verifyToken(token);
+  return <div>Welcome, {user.name}</div>;
+}
+```
+
+**Dynamic Functions** (trigger dynamic rendering):
+- `cookies()` - Read cookies
+- `headers()` - Read request headers
+- `searchParams` - Read URL query params
+- `fetch(..., { cache: 'no-store' })` - Fetch without cache
+
+**Force Static Rendering**:
+
+```typescript
+// app/stats/page.tsx
+export const dynamic = 'force-static'; // Force static even if dynamic functions used
+
+export default async function StatsPage() {
+  const stats = await prisma.stats.findMany();
+  return <div>{/* render stats */}</div>;
+}
+```
+
+**Force Dynamic Rendering**:
+
+```typescript
+// app/dashboard/page.tsx
+export const dynamic = 'force-dynamic'; // Force dynamic even if no dynamic functions
+
+export default async function Dashboard() {
+  const data = await fetchData(); // Always fresh
+  return <div>{/* render data */}</div>;
+}
+```
+
+**Revalidation (Static with Periodic Updates)**:
+
+```typescript
+// app/blog/page.tsx
+export const revalidate = 60; // Revalidate every 60 seconds
+
+export default async function BlogPage() {
+  const posts = await prisma.post.findMany();
+  return <div>{/* render posts */}</div>;
+}
+```
+
+**How It Works**:
+1. First request: Generate static HTML
+2. Cache for 60 seconds
+3. After 60 seconds: Next request triggers regeneration
+4. Serve stale content while regenerating (no downtime)
+
+### 45.12 Key Takeaways
+
+**Server-Side Rendering**:
+- ✅ Server renders HTML before sending to browser
+- ✅ Faster first paint (~200ms vs ~3000ms)
+- ✅ Better SEO (search engines see content)
+- ✅ Social sharing works (preview cards)
+
+**Next.js 15 Component Types**:
+- **Server Components** (default): async, direct DB access, zero JS bundle
+- **Client Components** (`'use client'`): interactivity, hooks, browser APIs
+
+**When to Use Server Components**:
+- ✅ Fetching data from database
+- ✅ Accessing backend resources
+- ✅ Keeping secrets secure (API keys)
+- ✅ Reducing bundle size
+
+**When to Use Client Components**:
+- ✅ User interactions (onClick, onChange)
+- ✅ React hooks (useState, useEffect)
+- ✅ Browser APIs (localStorage, window)
+- ✅ Third-party libraries (not SSR-compatible)
+
+**Data Fetching Patterns**:
+- Use `Promise.all()` for parallel fetching
+- Use `Suspense` for streaming
+- Use `loading.tsx` for loading states
+- Use `error.tsx` for error handling
+
+**Rendering Strategies**:
+- **Static**: Build-time (fastest, cached)
+- **Dynamic**: Request-time (always fresh)
+- **Revalidate**: Static + periodic updates (best of both)
+
+**Performance Impact**:
+- Server Components: 0 KB JavaScript
+- Static rendering: ~50ms (served from CDN)
+- Dynamic rendering: ~200ms (server renders on-demand)
+
+**Next Up**: Chapter 46 - API Routes in Next.js
+
+---
+
+## Chapter 46: API Routes in Next.js
+
+### 46.1 What are API Routes?
+
+**API Routes** are serverless functions in Next.js that handle backend logic without a separate server.
+
+**File-Based Routing**:
+```
+app/
+└── api/
+    ├── learners/
+    │   └── route.ts        # /api/learners
+    ├── sessions/
+    │   ├── route.ts        # /api/sessions
+    │   └── [id]/
+    │       └── route.ts    # /api/sessions/:id
+    └── webhooks/
+        └── razorpay/
+            └── route.ts    # /api/webhooks/razorpay
+```
+
+**Basic Structure**:
+
+```typescript
+// app/api/hello/route.ts
+export async function GET(request: Request) {
+  return Response.json({ message: 'Hello World' });
+}
+
+export async function POST(request: Request) {
+  const body = await request.json();
+  return Response.json({ received: body });
+}
+```
+
+**HTTP Methods**:
+- `GET` - Fetch data
+- `POST` - Create resource
+- `PUT` - Update resource (full)
+- `PATCH` - Update resource (partial)
+- `DELETE` - Delete resource
+
+### 46.2 When to Use API Routes
+
+**✅ Use API Routes For**:
+
+1. **Serverless Functions**
+   - Simple CRUD operations
+   - Data transformation
+   - External API proxying
+
+2. **Authentication Callbacks**
+   - OAuth callback endpoints
+   - Email verification links
+   - Password reset tokens
+
+3. **Webhooks**
+   - Payment providers (Razorpay, Stripe)
+   - SMS providers (Twilio)
+   - Third-party integrations
+
+4. **File Uploads**
+   - Image uploads to S3
+   - Document processing
+   - CSV imports
+
+5. **External API Proxying**
+   - Hide API keys from frontend
+   - CORS workarounds
+   - Rate limiting
+
+**❌ Don't Use API Routes For**:
+
+1. **Complex Business Logic**
+   - Use NestJS backend instead
+   - Better structure, testing, scalability
+
+2. **Real-Time Communication**
+   - Use WebSockets (NestJS GraphQL subscriptions)
+   - API routes are request/response only
+
+3. **Long-Running Tasks**
+   - API routes timeout after 10s (Vercel)
+   - Use background jobs (Bull, Agenda)
+
+4. **High-Traffic Endpoints**
+   - API routes are serverless (cold starts)
+   - Use dedicated backend (NestJS) for performance
+
+**NextPhoton's Approach**:
+- **NestJS backend**: Primary API (GraphQL)
+- **API routes**: Webhooks, file uploads, OAuth callbacks
+
+### 46.3 API Route File Structure
+
+**File Naming**:
+- `route.ts` - Handles HTTP methods
+- `[id]/route.ts` - Dynamic segments (like pages)
+
+**Example Structure**:
+
+```
+app/api/
+├── auth/
+│   ├── login/route.ts              # POST /api/auth/login
+│   ├── register/route.ts           # POST /api/auth/register
+│   ├── logout/route.ts             # POST /api/auth/logout
+│   └── verify/[token]/route.ts     # GET /api/auth/verify/:token
+├── learners/
+│   ├── route.ts                    # GET, POST /api/learners
+│   └── [id]/
+│       ├── route.ts                # GET, PUT, DELETE /api/learners/:id
+│       └── sessions/route.ts       # GET /api/learners/:id/sessions
+├── tasks/
+│   ├── route.ts                    # GET, POST /api/tasks
+│   └── [id]/
+│       ├── route.ts                # GET, PUT, DELETE /api/tasks/:id
+│       └── complete/route.ts       # POST /api/tasks/:id/complete
+├── uploads/
+│   └── avatar/route.ts             # POST /api/uploads/avatar
+└── webhooks/
+    ├── razorpay/route.ts           # POST /api/webhooks/razorpay
+    └── twilio/route.ts             # POST /api/webhooks/twilio
+```
+
+### 46.4 Creating GET Endpoint
+
+**Basic GET Endpoint**:
+
+```typescript
+// app/api/learners/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/shared/db';
+
+export async function GET(request: NextRequest) {
+  try {
+    // Fetch all learners from database
+    const learners = await prisma.learner.findMany({
+      include: { user: true },
+    });
+
+    // Return JSON response
+    return NextResponse.json({
+      success: true,
+      data: learners,
+    });
+  } catch (error) {
+    console.error('Error fetching learners:', error);
+
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch learners' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+**GET with URL Parameters**:
+
+```typescript
+// app/api/learners/route.ts
+export async function GET(request: NextRequest) {
+  // Get query params: /api/learners?page=2&limit=10
+  const searchParams = request.nextUrl.searchParams;
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '10');
+  const skip = (page - 1) * limit;
+
+  const learners = await prisma.learner.findMany({
+    skip,
+    take: limit,
+    include: { user: true },
+  });
+
+  const total = await prisma.learner.count();
+
+  return NextResponse.json({
+    success: true,
+    data: learners,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  });
+}
+```
+
+**GET with Dynamic Route**:
+
+```typescript
+// app/api/learners/[id]/route.ts
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { id } = params; // Get :id from URL
+
+  const learner = await prisma.learner.findUnique({
+    where: { id },
+    include: { user: true, guardian: true },
+  });
+
+  if (!learner) {
+    return NextResponse.json(
+      { success: false, error: 'Learner not found' },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    data: learner,
+  });
+}
+```
+
+### 46.5 Creating POST Endpoint
+
+**Basic POST Endpoint**:
+
+```typescript
+// app/api/tasks/assign/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/shared/db';
+import { z } from 'zod';
+
+// Validation schema
+const AssignTaskSchema = z.object({
+  title: z.string().min(1, 'Title required'),
+  description: z.string().optional(),
+  assignedToId: z.string().uuid('Invalid learner ID'),
+  dueDate: z.string().datetime('Invalid date format'),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Parse request body
+    const body = await request.json();
+
+    // 2. Validate input
+    const validated = AssignTaskSchema.parse(body);
+
+    // 3. Check learner exists
+    const learner = await prisma.learner.findUnique({
+      where: { id: validated.assignedToId },
+    });
+
+    if (!learner) {
+      return NextResponse.json(
+        { success: false, error: 'Learner not found' },
+        { status: 404 }
+      );
+    }
+
+    // 4. Create task in database
+    const task = await prisma.task.create({
+      data: {
+        title: validated.title,
+        description: validated.description,
+        assignedToId: validated.assignedToId,
+        dueDate: new Date(validated.dueDate),
+        priority: validated.priority,
+        status: 'PENDING',
+      },
+    });
+
+    // 5. Send notification (async, don't wait)
+    sendTaskNotification(task.id).catch(console.error);
+
+    // 6. Return success response
+    return NextResponse.json(
+      {
+        success: true,
+        data: task,
+        message: 'Task assigned successfully',
+      },
+      { status: 201 } // 201 = Created
+    );
+  } catch (error) {
+    // Zod validation errors
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Validation failed',
+          details: error.errors,
+        },
+        { status: 400 } // 400 = Bad Request
+      );
+    }
+
+    // Database errors
+    console.error('Error assigning task:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to assign task' },
+      { status: 500 } // 500 = Internal Server Error
+    );
+  }
+}
+```
+
+**Request Example**:
+
+```typescript
+// Frontend code
+const response = await fetch('/api/tasks/assign', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    title: 'Complete homework',
+    description: 'Math exercises 1-10',
+    assignedToId: 'learner-uuid-123',
+    dueDate: '2025-10-10T18:00:00Z',
+    priority: 'HIGH',
+  }),
+});
+
+const data = await response.json();
+console.log(data);
+// {
+//   success: true,
+//   data: { id: 'task-uuid', title: 'Complete homework', ... },
+//   message: 'Task assigned successfully'
+// }
+```
+
+### 46.6 Authentication in API Routes
+
+**Check JWT Token from Headers**:
+
+```typescript
+// app/api/learner/profile/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { verify } from 'jsonwebtoken';
+import { prisma } from '@/shared/db';
+
+// Helper function to get user from token
+async function authenticateRequest(request: NextRequest) {
+  // Get token from Authorization header
+  const authHeader = request.headers.get('authorization');
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    // Verify JWT token
+    const decoded = verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+      email: string;
+    };
+
+    // Get user from database
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: { roles: true },
+    });
+
+    return user;
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    return null;
+  }
+}
+
+export async function GET(request: NextRequest) {
+  // Authenticate request
+  const user = await authenticateRequest(request);
+
+  if (!user) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 } // 401 = Unauthorized
+    );
+  }
+
+  // Get learner profile
+  const learner = await prisma.learner.findUnique({
+    where: { userId: user.id },
+    include: { user: true, guardian: true },
+  });
+
+  return NextResponse.json({
+    success: true,
+    data: learner,
+  });
+}
+```
+
+**Reusable Middleware Pattern**:
+
+```typescript
+// lib/api-auth.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { verify } from 'jsonwebtoken';
+import { prisma } from '@/shared/db';
+
+export async function withAuth(
+  request: NextRequest,
+  handler: (request: NextRequest, user: User) => Promise<NextResponse>
+) {
+  const authHeader = request.headers.get('authorization');
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    return NextResponse.json(
+      { success: false, error: 'Unauthorized' },
+      { status: 401 }
+    );
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = verify(token, process.env.JWT_SECRET!) as {
+      userId: string;
+    };
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: { roles: true },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // Call handler with authenticated user
+    return handler(request, user);
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: 'Invalid token' },
+      { status: 401 }
+    );
+  }
+}
+```
+
+**Usage**:
+
+```typescript
+// app/api/learner/profile/route.ts
+import { withAuth } from '@/lib/api-auth';
+
+export async function GET(request: NextRequest) {
+  return withAuth(request, async (req, user) => {
+    const learner = await prisma.learner.findUnique({
+      where: { userId: user.id },
+    });
+
+    return NextResponse.json({ success: true, data: learner });
+  });
+}
+```
+
+### 46.7 Error Handling
+
+**Consistent Error Format**:
+
+```typescript
+// lib/api-response.ts
+import { NextResponse } from 'next/server';
+
+export function successResponse(data: any, status = 200) {
+  return NextResponse.json(
+    { success: true, data },
+    { status }
+  );
+}
+
+export function errorResponse(message: string, status = 500, details?: any) {
+  return NextResponse.json(
+    {
+      success: false,
+      error: message,
+      ...(details && { details }),
+    },
+    { status }
+  );
+}
+```
+
+**Usage**:
+
+```typescript
+// app/api/learners/[id]/route.ts
+import { successResponse, errorResponse } from '@/lib/api-response';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const learner = await prisma.learner.findUnique({
+      where: { id: params.id },
+    });
+
+    if (!learner) {
+      return errorResponse('Learner not found', 404);
+    }
+
+    return successResponse(learner);
+  } catch (error) {
+    console.error('Error fetching learner:', error);
+    return errorResponse('Failed to fetch learner', 500);
+  }
+}
+```
+
+**HTTP Status Codes**:
+
+```typescript
+// Common status codes
+200 // OK - Successful GET, PUT, PATCH, DELETE
+201 // Created - Successful POST
+204 // No Content - Successful DELETE (no response body)
+400 // Bad Request - Validation error
+401 // Unauthorized - Missing/invalid token
+403 // Forbidden - Valid token but insufficient permissions
+404 // Not Found - Resource not found
+409 // Conflict - Duplicate resource (email already exists)
+422 // Unprocessable Entity - Business logic error
+500 // Internal Server Error - Unexpected error
+```
+
+### 46.8 CORS in API Routes
+
+**CORS Headers**:
+
+```typescript
+// app/api/public/learners/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const learners = await prisma.learner.findMany();
+
+  // Add CORS headers
+  return NextResponse.json(
+    { success: true, data: learners },
+    {
+      headers: {
+        'Access-Control-Allow-Origin': '*', // Allow all origins
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    }
+  );
+}
+
+// Handle preflight requests
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+```
+
+**Restrict Origins**:
+
+```typescript
+// app/api/learners/route.ts
+export async function GET(request: NextRequest) {
+  const origin = request.headers.get('origin');
+  const allowedOrigins = [
+    'https://nextphoton.com',
+    'https://app.nextphoton.com',
+  ];
+
+  const learners = await prisma.learner.findMany();
+
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
+  if (origin && allowedOrigins.includes(origin)) {
+    headers['Access-Control-Allow-Origin'] = origin;
+  }
+
+  return NextResponse.json(
+    { success: true, data: learners },
+    { headers }
+  );
+}
+```
+
+### 46.9 Webhook Endpoints
+
+**Razorpay Webhook Example**:
+
+```typescript
+// app/api/webhooks/razorpay/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+import { prisma } from '@/shared/db';
+
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Get raw body (needed for signature verification)
+    const body = await request.text();
+    const payload = JSON.parse(body);
+
+    // 2. Verify signature (critical for security!)
+    const signature = request.headers.get('x-razorpay-signature');
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET!;
+
+    const expectedSignature = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(body)
+      .digest('hex');
+
+    if (signature !== expectedSignature) {
+      console.error('Invalid Razorpay signature');
+      return NextResponse.json(
+        { error: 'Invalid signature' },
+        { status: 400 }
+      );
+    }
+
+    // 3. Handle event
+    const { event, payload: eventPayload } = payload;
+
+    switch (event) {
+      case 'payment.captured':
+        await handlePaymentCaptured(eventPayload.payment.entity);
+        break;
+
+      case 'payment.failed':
+        await handlePaymentFailed(eventPayload.payment.entity);
+        break;
+
+      default:
+        console.log(`Unhandled event: ${event}`);
+    }
+
+    // 4. Return 200 (Razorpay retries if not 200)
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    return NextResponse.json(
+      { error: 'Webhook processing failed' },
+      { status: 500 }
+    );
+  }
+}
+
+async function handlePaymentCaptured(payment: any) {
+  // Update payment record in database
+  await prisma.payment.update({
+    where: { razorpayPaymentId: payment.id },
+    data: {
+      status: 'CAPTURED',
+      capturedAt: new Date(),
+    },
+  });
+
+  // Send confirmation email
+  await sendPaymentConfirmation(payment.email, payment.amount);
+}
+
+async function handlePaymentFailed(payment: any) {
+  await prisma.payment.update({
+    where: { razorpayPaymentId: payment.id },
+    data: {
+      status: 'FAILED',
+      failureReason: payment.error_description,
+    },
+  });
+
+  // Send failure notification
+  await sendPaymentFailureEmail(payment.email);
+}
+```
+
+**Idempotency (Prevent Duplicate Processing)**:
+
+```typescript
+// app/api/webhooks/razorpay/route.ts
+export async function POST(request: NextRequest) {
+  const body = await request.text();
+  const payload = JSON.parse(body);
+  const eventId = payload.event_id; // Razorpay provides unique event ID
+
+  // Check if already processed
+  const existingEvent = await prisma.webhookEvent.findUnique({
+    where: { eventId },
+  });
+
+  if (existingEvent) {
+    console.log(`Event ${eventId} already processed`);
+    return NextResponse.json({ success: true }); // Return success to prevent retries
+  }
+
+  // Process event
+  await handleEvent(payload);
+
+  // Mark as processed
+  await prisma.webhookEvent.create({
+    data: {
+      eventId,
+      type: payload.event,
+      processedAt: new Date(),
+    },
+  });
+
+  return NextResponse.json({ success: true });
+}
+```
+
+### 46.10 File Upload Endpoints
+
+**Avatar Upload to S3**:
+
+```typescript
+// app/api/uploads/avatar/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { v4 as uuidv4 } from 'uuid';
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION!,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    // 1. Parse multipart form data
+    const formData = await request.formData();
+    const file = formData.get('avatar') as File;
+
+    if (!file) {
+      return NextResponse.json(
+        { error: 'No file provided' },
+        { status: 400 }
+      );
+    }
+
+    // 2. Validate file
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'File too large (max 5MB)' },
+        { status: 400 }
+      );
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'Invalid file type (must be JPEG, PNG, or WebP)' },
+        { status: 400 }
+      );
+    }
+
+    // 3. Generate unique filename
+    const ext = file.name.split('.').pop();
+    const filename = `avatars/${uuidv4()}.${ext}`;
+
+    // 4. Upload to S3
+    const buffer = await file.arrayBuffer();
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET!,
+        Key: filename,
+        Body: Buffer.from(buffer),
+        ContentType: file.type,
+        ACL: 'public-read', // Make publicly accessible
+      })
+    );
+
+    // 5. Generate public URL
+    const url = `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
+
+    // 6. Update user avatar in database
+    const userId = formData.get('userId') as string;
+    await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl: url },
+    });
+
+    // 7. Return URL
+    return NextResponse.json({
+      success: true,
+      url,
+      message: 'Avatar uploaded successfully',
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      { error: 'Upload failed' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+**Frontend Upload**:
+
+```typescript
+// components/AvatarUpload.tsx
+'use client';
+
+import { useState } from 'react';
+
+export function AvatarUpload({ userId }: { userId: string }) {
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+    formData.append('userId', userId);
+
+    const response = await fetch('/api/uploads/avatar', {
+      method: 'POST',
+      body: formData, // Don't set Content-Type header (browser does it automatically)
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert('Avatar uploaded!');
+      window.location.reload(); // Refresh to show new avatar
+    } else {
+      alert(`Upload failed: ${data.error}`);
+    }
+
+    setUploading(false);
+  };
+
+  return (
+    <div>
+      <input type="file" accept="image/*" onChange={handleUpload} />
+      {uploading && <p>Uploading...</p>}
+    </div>
+  );
+}
+```
+
+### 46.11 Rate Limiting (Future Enhancement)
+
+**Redis-Based Rate Limiter**:
+
+```typescript
+// lib/rate-limit.ts
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_URL!,
+  token: process.env.UPSTASH_REDIS_TOKEN!,
+});
+
+export async function rateLimit(
+  identifier: string, // User ID, IP address, etc.
+  limit: number = 10, // Max requests
+  window: number = 60 // Time window in seconds
+): Promise<{ success: boolean; remaining: number }> {
+  const key = `rate-limit:${identifier}`;
+
+  // Increment request count
+  const count = await redis.incr(key);
+
+  // Set expiry on first request
+  if (count === 1) {
+    await redis.expire(key, window);
+  }
+
+  const remaining = Math.max(0, limit - count);
+
+  return {
+    success: count <= limit,
+    remaining,
+  };
+}
+```
+
+**Usage in API Route**:
+
+```typescript
+// app/api/tasks/assign/route.ts
+import { rateLimit } from '@/lib/rate-limit';
+
+export async function POST(request: NextRequest) {
+  // Get user ID from auth token
+  const user = await authenticateRequest(request);
+
+  if (!user) {
+    return errorResponse('Unauthorized', 401);
+  }
+
+  // Check rate limit (10 requests per minute per user)
+  const { success, remaining } = await rateLimit(user.id, 10, 60);
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        error: 'Rate limit exceeded',
+        retryAfter: 60,
+      },
+      {
+        status: 429, // 429 = Too Many Requests
+        headers: {
+          'X-RateLimit-Remaining': remaining.toString(),
+          'Retry-After': '60',
+        },
+      }
+    );
+  }
+
+  // Process request
+  // ...
+}
+```
+
+### 46.12 Key Takeaways
+
+**API Routes**:
+- ✅ Serverless functions in Next.js
+- ✅ File-based routing (app/api/*/route.ts)
+- ✅ Support all HTTP methods (GET, POST, PUT, DELETE)
+- ✅ Run on server (secure, access database directly)
+
+**When to Use**:
+- ✅ Webhooks (Razorpay, Twilio)
+- ✅ File uploads (S3)
+- ✅ OAuth callbacks
+- ✅ External API proxying
+- ❌ Complex business logic (use NestJS backend)
+- ❌ Real-time communication (use WebSockets)
+
+**Best Practices**:
+- ✅ Validate input with Zod
+- ✅ Authenticate requests (check JWT token)
+- ✅ Return consistent error format
+- ✅ Use proper HTTP status codes
+- ✅ Verify webhook signatures
+- ✅ Implement idempotency for webhooks
+- ✅ Validate file uploads (size, type)
+
+**Security**:
+- ✅ Always verify webhook signatures
+- ✅ Check JWT tokens for authenticated endpoints
+- ✅ Validate and sanitize all inputs
+- ✅ Use CORS headers for public APIs
+- ✅ Rate limit to prevent abuse
+
+**Performance**:
+- ✅ API routes have cold starts (~100-500ms)
+- ✅ Keep handlers lightweight
+- ✅ Use database connection pooling
+- ✅ Implement caching where possible
+- ✅ Timeout: 10s on Vercel, 60s self-hosted
+
+**Next Up**: Chapter 47 - Middleware & Route Protection
+
+---
+
+## Chapter 47: Middleware & Route Protection
+
+### 47.1 What is Next.js Middleware?
+
+**Definition**: Middleware is code that runs **before a request is completed**, allowing you to modify the response based on the incoming request.
+
+**Key Characteristics**:
+- ✅ Runs on **every matched request** (extremely fast)
+- ✅ Executes **before** Server Components, API routes, or pages render
+- ✅ Runs on the **Edge runtime** (globally distributed, close to users)
+- ✅ Perfect for authentication, redirects, and request modification
+
+**Execution Flow**:
+```
+User Request → Middleware → Server Component/API Route → Response
+```
+
+### 47.2 Middleware Use Cases
+
+**1. Authentication Checking**:
+- Verify JWT token exists in cookies
+- Redirect unauthenticated users to /sign-in
+- Example: Protect /admin routes
+
+**2. Role-Based Access Control (RBAC)**:
+- Check user roles from JWT payload
+- Restrict routes by role (admin, educator, learner)
+- Redirect unauthorized users to /unauthorized
+
+**3. Redirects**:
+- Redirect authenticated users from /sign-in to dashboard
+- Redirect root path (/) to role-specific dashboard
+- Example: Admin → /admin, Learner → /learner
+
+**4. Request Rewriting**:
+- Rewrite URL without changing browser address bar
+- Example: Rewrite /docs/v1/intro → /docs/intro
+
+**5. Header Modification**:
+- Add custom headers (X-User-Role, X-Tenant-ID)
+- Set security headers (CSP, HSTS)
+- Add correlation IDs for logging
+
+**6. Logging & Analytics**:
+- Log all incoming requests
+- Track page views
+- Monitor API usage
+
+### 47.3 NextPhoton Middleware Implementation
+
+**File**: `/home/teamzenith/ZenCo/NextPhoton/frontend/web/src/middleware.ts`
+
+**Complete Line-by-Line Explanation**:
+
+**Lines 1-11: Imports & Documentation**
+```typescript
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+```
+- `NextRequest`: Type for incoming request object
+- `NextResponse`: Utility to create responses (redirect, rewrite, next)
+
+**Lines 16-51: Public Routes Array**
+```typescript
+const publicRoutes = [
+  '/sign-in',
+  '/sign-up',
+  '/forgot-password',
+  '/reset-password',
+  // Landing pages
+  '/features',
+  '/pricing',
+  // ... etc
+];
+```
+- **Purpose**: Routes accessible without authentication
+- **Examples**: Sign-in, landing pages, legal pages
+- **Logic**: If request matches, skip authentication check
+
+**Lines 56-62: Authenticated Routes Array**
+```typescript
+const authenticatedRoutes = [
+  '/profile',
+  '/settings',
+  '/logout',
+  '/NextPhotonSettings',
+];
+```
+- **Purpose**: Routes accessible to **any** authenticated user (regardless of role)
+- **No role restriction**: All logged-in users can access
+
+**Lines 67-75: Role-Based Routes Object**
+```typescript
+const roleBasedRoutes: Record<string, string[]> = {
+  '/admin': ['admin'],
+  '/educator': ['educator', 'admin'],
+  '/learner': ['learner', 'guardian', 'admin'],
+  '/guardian': ['guardian', 'admin'],
+  '/ecm': ['ecm', 'admin'],
+};
+```
+- **Key**: Route path (e.g., '/admin')
+- **Value**: Array of allowed roles
+- **Note**: 'admin' has access to all role-based routes
+- **Logic**: Check if user's roles overlap with allowed roles
+
+**Lines 80-81: Middleware Function Start**
+```typescript
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+```
+- Extract pathname from request URL
+- Example: `/admin/users` → pathname = '/admin/users'
+
+**Lines 84-87: Check Public & Authenticated Routes**
+```typescript
+const isPublicRoute = publicRoutes.some(route =>
+  pathname === route || pathname.startsWith(`${route}/`)
+);
+
+const isAuthenticatedRoute = authenticatedRoutes.some(route =>
+  pathname === route || pathname.startsWith(`${route}/`)
+);
+```
+- `pathname === route`: Exact match (e.g., `/sign-in`)
+- `pathname.startsWith(\`${route}/\`)`: Nested routes (e.g., `/sign-in/reset`)
+- **Boolean flags**: Used later for conditional logic
+
+**Lines 90-94: Get JWT Token from Cookies**
+```typescript
+const token = request.cookies.get('nextphoton_jwt_token');
+const isAuthenticated = !!token;
+```
+- **Cookie name**: `nextphoton_jwt_token` (set during login)
+- **Double negation (`!!`)**: Convert to boolean
+- **Limitation**: Only checks token existence, doesn't verify signature
+- **Production**: Should verify JWT signature with backend
+
+**Lines 97-107: Parse User Roles from Cookie**
+```typescript
+const userDataCookie = request.cookies.get('nextphoton_user');
+let userRoles: string[] = [];
+
+if (userDataCookie) {
+  try {
+    const userData = JSON.parse(userDataCookie.value);
+    userRoles = userData.roles || [];
+  } catch (e) {
+    console.error('Failed to parse user data from cookie');
+  }
+}
+```
+- **Cookie**: `nextphoton_user` (contains user data including roles)
+- **Parse JSON**: Extract roles array
+- **Fallback**: Empty array if parsing fails
+- **Example**: `{ id: 1, email: 'admin@test.com', roles: ['admin'] }`
+
+**Lines 110-119: Root Path Redirect for Authenticated Users**
+```typescript
+if (pathname === '/' && isAuthenticated) {
+  if (userRoles.length > 0) {
+    const primaryRole = userRoles[0];
+    const dashboardUrl = new URL(`/${primaryRole}`, request.url);
+    return NextResponse.redirect(dashboardUrl);
+  }
+  return NextResponse.redirect(new URL('/dashboard', request.url));
+}
+```
+- **Logic**: Redirect authenticated users from root (/) to their dashboard
+- **Primary role**: First role in array (e.g., 'admin' → '/admin')
+- **Fallback**: '/dashboard' if no roles
+
+**Lines 122-127: Redirect Unauthenticated Users to Sign-In**
+```typescript
+if (!isAuthenticated && !isPublicRoute && pathname !== '/') {
+  const signInUrl = new URL('/sign-in', request.url);
+  signInUrl.searchParams.set('redirect', pathname);
+  return NextResponse.redirect(signInUrl);
+}
+```
+- **Condition**: Not logged in AND accessing protected route
+- **Redirect to**: `/sign-in?redirect=/admin/users`
+- **After login**: User redirected back to original destination
+
+**Lines 130-132: Allow Authenticated Route Access**
+```typescript
+if (isAuthenticated && isAuthenticatedRoute) {
+  return NextResponse.next();
+}
+```
+- **Purpose**: Allow any logged-in user to access common routes
+- **NextResponse.next()**: Continue to next middleware or render page
+
+**Lines 134-143: Prevent Authenticated Users from Accessing Auth Pages**
+```typescript
+if (isAuthenticated && (pathname === '/sign-in' || pathname === '/sign-up')) {
+  if (userRoles.length > 0) {
+    const primaryRole = userRoles[0];
+    return NextResponse.redirect(new URL(`/${primaryRole}`, request.url));
+  }
+  return NextResponse.redirect(new URL('/dashboard', request.url));
+}
+```
+- **Logic**: Already logged in? Don't show sign-in page
+- **Redirect to**: Role-specific dashboard
+
+**Lines 146-163: Role-Based Access Control**
+```typescript
+for (const [route, allowedRoles] of Object.entries(roleBasedRoutes)) {
+  if (pathname.startsWith(route)) {
+    if (!isAuthenticated) {
+      const signInUrl = new URL('/sign-in', request.url);
+      signInUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(signInUrl);
+    }
+
+    const hasRequiredRole = userRoles.some(role =>
+      allowedRoles.includes(role)
+    );
+
+    if (!hasRequiredRole) {
+      return NextResponse.redirect(new URL('/unauthorized', request.url));
+    }
+  }
+}
+```
+- **Loop**: Check each role-based route
+- **Check 1**: Is user authenticated? If not, redirect to sign-in
+- **Check 2**: Does user have required role? If not, redirect to /unauthorized
+- **Example**: Learner trying to access /admin → Redirect to /unauthorized
+
+**Lines 165: Default - Allow Request**
+```typescript
+return NextResponse.next();
+```
+- **Fallback**: If no conditions matched, allow request through
+
+**Lines 171-183: Matcher Configuration**
+```typescript
+export const config = {
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+  ],
+};
+```
+- **Purpose**: Define which routes middleware runs on
+- **Regex**: Match all routes EXCEPT:
+  - `/api/*` (API routes handle their own auth)
+  - `/_next/static/*` (static files)
+  - `/_next/image/*` (optimized images)
+  - `/favicon.ico`
+  - `/public/*`
+- **Performance**: Skip middleware for static assets (faster)
+
+### 47.4 Middleware Execution Flow
+
+**Step-by-Step Flow**:
+
+1. **User visits `/admin/users`**
+2. **Middleware runs** (before page renders)
+3. **Check if public route**: No (not in publicRoutes array)
+4. **Get JWT token**: `request.cookies.get('nextphoton_jwt_token')`
+5. **Parse user roles**: `['learner']` (from nextphoton_user cookie)
+6. **Check role-based access**: `/admin` requires `['admin']`
+7. **User has role?**: No (learner ≠ admin)
+8. **Redirect**: `NextResponse.redirect('/unauthorized')`
+9. **Result**: User sees "Unauthorized" page
+
+**Successful Access Flow**:
+
+1. **Admin user visits `/admin/users`**
+2. **Middleware runs**
+3. **JWT exists**: ✅
+4. **Roles**: `['admin']`
+5. **Route check**: `/admin` requires `['admin']`
+6. **Match found**: ✅
+7. **NextResponse.next()**: Continue to page
+8. **Result**: Page renders successfully
+
+### 47.5 Cookie-Based Authentication
+
+**Why Cookies for Middleware?**
+- ✅ Server Components **cannot** access localStorage
+- ✅ Middleware runs on **server-side** (Edge runtime)
+- ✅ Cookies are sent automatically with every request
+- ✅ Accessible in middleware via `request.cookies`
+
+**NextPhoton Cookies**:
+
+**1. `nextphoton_jwt_token`**:
+```typescript
+// Set during login (auth-context.tsx)
+document.cookie = `nextphoton_jwt_token=${token}; path=/; max-age=604800`;
+```
+- **Value**: JWT token string
+- **Max-Age**: 604800s (7 days)
+- **Path**: `/` (sent with all requests)
+
+**2. `nextphoton_user`**:
+```typescript
+// Set during login
+const userData = { id: 1, email: 'admin@test.com', roles: ['admin'] };
+document.cookie = `nextphoton_user=${JSON.stringify(userData)}; path=/; max-age=604800`;
+```
+- **Value**: JSON string with user data
+- **Includes**: User ID, email, roles
+- **Parsed in middleware**: `JSON.parse(userDataCookie.value)`
+
+**Cookie Security Best Practices**:
+```typescript
+// Production: Add secure flags
+document.cookie = `nextphoton_jwt_token=${token}; path=/; max-age=604800; secure; httpOnly; samesite=strict`;
+```
+- `secure`: Only send over HTTPS
+- `httpOnly`: JavaScript cannot access (prevents XSS)
+- `samesite=strict`: Prevent CSRF attacks
+
+### 47.6 Matcher Configuration
+
+**Purpose**: Define which routes middleware should run on (performance optimization)
+
+**Basic Syntax**:
+```typescript
+export const config = {
+  matcher: ['/admin/:path*', '/educator/:path*'],
+};
+```
+- Runs middleware **only** on /admin and /educator routes
+
+**NextPhoton's Matcher** (Advanced Regex):
+```typescript
+matcher: ['/((?!api|_next/static|_next/image|favicon.ico|public).*)']
+```
+- **Breakdown**:
+  - `(?!...)`: Negative lookahead (exclude patterns)
+  - `api`: Exclude /api routes
+  - `_next/static`: Exclude static files
+  - `_next/image`: Exclude image optimization
+  - `favicon.ico`: Exclude favicon
+  - `public`: Exclude /public folder
+  - `.*`: Match everything else
+
+**Why Exclude These?**:
+- `/api/*`: API routes handle their own authentication
+- `/_next/static/*`: Static files don't need auth checks (JS, CSS)
+- `/_next/image/*`: Image requests don't need auth
+- `/public/*`: Public assets (logos, images)
+- **Result**: Middleware only runs on actual pages (faster performance)
+
+**Multiple Matchers**:
+```typescript
+matcher: [
+  '/admin/:path*',
+  '/educator/:path*',
+  '/((?!api|_next|public).*)',
+],
+```
+
+### 47.7 Response Manipulation
+
+**1. NextResponse.redirect()**:
+```typescript
+// Redirect to different URL
+return NextResponse.redirect(new URL('/sign-in', request.url));
+
+// With query params
+const signInUrl = new URL('/sign-in', request.url);
+signInUrl.searchParams.set('redirect', pathname);
+return NextResponse.redirect(signInUrl);
+```
+- **Changes browser URL**: User sees new URL
+- **Use case**: Authentication redirects
+
+**2. NextResponse.rewrite()**:
+```typescript
+// Show content from different URL without changing browser URL
+return NextResponse.rewrite(new URL('/maintenance', request.url));
+```
+- **Browser URL unchanged**: User still sees original URL
+- **Use case**: A/B testing, maintenance mode, localization
+
+**3. NextResponse.next()**:
+```typescript
+// Continue to next middleware or render page
+return NextResponse.next();
+```
+- **No modification**: Process request normally
+- **Use case**: After authentication checks pass
+
+**4. Setting Headers**:
+```typescript
+const response = NextResponse.next();
+response.headers.set('X-User-Role', userRoles[0]);
+response.headers.set('X-Tenant-ID', '123');
+return response;
+```
+- **Add custom headers**: Available in Server Components
+- **Use case**: Pass user context to components
+
+**Example - Add Security Headers**:
+```typescript
+const response = NextResponse.next();
+response.headers.set('X-Frame-Options', 'DENY');
+response.headers.set('X-Content-Type-Options', 'nosniff');
+response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+return response;
+```
+
+### 47.8 Middleware vs Server Components
+
+| Aspect | Middleware | Server Components |
+|--------|-----------|-------------------|
+| **Runs** | Before request completes | During page render |
+| **Access to** | Request, cookies, headers | Database, backend APIs |
+| **Can redirect** | ✅ Yes | ❌ No (must use redirect()) |
+| **Can modify response** | ✅ Yes | ❌ No |
+| **Async operations** | ✅ Yes (limited) | ✅ Yes (full) |
+| **Database access** | ❌ No (Edge runtime) | ✅ Yes |
+| **Node.js APIs** | ❌ No | ✅ Yes |
+| **Speed** | ⚡ Extremely fast | 🐢 Slower (server rendering) |
+| **Use for** | Auth checks, redirects | Data fetching, rendering |
+
+**When to Use Middleware**:
+- ✅ JWT token validation (check existence)
+- ✅ Role-based redirects
+- ✅ Setting security headers
+- ✅ URL rewrites
+- ✅ Logging requests
+
+**When to Use Server Components**:
+- ✅ Fetch data from database
+- ✅ Call backend APIs
+- ✅ Complex authentication logic (verify JWT signature)
+- ✅ Business logic
+
+**Best Practice**: Use middleware for **lightweight** checks, Server Components for **heavy** operations.
+
+### 47.9 Edge Runtime
+
+**What is Edge Runtime?**
+- Middleware runs on **Cloudflare/Vercel Edge network**
+- Deployed to **hundreds of locations worldwide**
+- Executes **close to the user** (low latency)
+
+**Benefits**:
+- ⚡ **Extremely fast** (~10-50ms execution time)
+- 🌍 **Globally distributed** (runs in user's region)
+- 📈 **Scales automatically** (handles millions of requests)
+
+**Limitations**:
+- ❌ **No Node.js APIs** (fs, path, crypto modules)
+- ❌ **No native modules** (bcrypt, sharp)
+- ❌ **No database connections** (Prisma won't work)
+- ✅ **Fetch API only** (for HTTP requests)
+
+**Edge Runtime Compatible**:
+```typescript
+// ✅ Works in middleware
+const token = request.cookies.get('jwt_token');
+const response = await fetch('https://api.example.com/verify', {
+  headers: { Authorization: `Bearer ${token}` }
+});
+```
+
+**Not Compatible**:
+```typescript
+// ❌ Won't work in middleware
+import bcrypt from 'bcrypt';
+import { PrismaClient } from '@prisma/client';
+const db = new PrismaClient(); // Error: Prisma not supported in Edge
+```
+
+### 47.10 Testing Middleware Locally
+
+**Test 1: Unauthenticated Access**
+1. Clear cookies (DevTools → Application → Cookies → Delete All)
+2. Visit `/admin` → Should redirect to `/sign-in?redirect=/admin`
+3. Visit `/features` → Should load (public route)
+
+**Test 2: Authenticated Access (Learner Role)**
+1. Sign in as learner (cookies set automatically)
+2. Visit `/learner` → Should load ✅
+3. Visit `/admin` → Should redirect to `/unauthorized` ❌
+4. Visit `/profile` → Should load ✅ (authenticated route)
+
+**Test 3: Admin Role**
+1. Sign in as admin
+2. Visit `/admin` → Should load ✅
+3. Visit `/educator` → Should load ✅ (admin has access to all)
+4. Visit `/` → Should redirect to `/admin` (primary role)
+
+**Test 4: Sign-In Redirect**
+1. Clear cookies
+2. Visit `/educator/courses`
+3. Should redirect to `/sign-in?redirect=/educator/courses`
+4. After login → Should redirect back to `/educator/courses`
+
+**DevTools Console**:
+```javascript
+// Check cookies
+document.cookie; // View all cookies
+
+// View parsed user data
+JSON.parse(decodeURIComponent(document.cookie.match(/nextphoton_user=([^;]+)/)?.[1] || '{}'));
+```
+
+**Testing Checklist**:
+- ✅ Public routes accessible without login
+- ✅ Protected routes redirect to sign-in
+- ✅ Role-based routes enforce correct roles
+- ✅ Authenticated routes accessible to all logged-in users
+- ✅ Redirect after login preserves original destination
+- ✅ Authenticated users can't access sign-in page
+
+### 47.11 Key Takeaways
+
+**Middleware**:
+- ✅ Runs **before request completes** (fastest way to protect routes)
+- ✅ Perfect for authentication, redirects, header modification
+- ✅ Executes on **Edge runtime** (globally distributed, fast)
+- ✅ Limited to **lightweight operations** (no database, no Node.js APIs)
+
+**NextPhoton Implementation**:
+- ✅ **Public routes**: Accessible without login (sign-in, landing pages)
+- ✅ **Authenticated routes**: Any logged-in user (profile, settings)
+- ✅ **Role-based routes**: Restricted by role (admin, educator, learner)
+- ✅ **Cookie-based auth**: JWT token and user data in cookies
+- ✅ **Automatic redirects**: Unauthenticated → sign-in, unauthorized → /unauthorized
+
+**Best Practices**:
+- ✅ Use matcher to exclude static files (performance)
+- ✅ Store JWT in secure, httpOnly cookies
+- ✅ Parse user roles from cookie for RBAC
+- ✅ Redirect with original destination (?redirect=/admin)
+- ✅ Keep middleware lightweight (no heavy operations)
+
+**Security**:
+- ✅ Verify JWT token existence (basic check)
+- ✅ Production: Verify JWT signature with backend
+- ✅ Use secure cookie flags (secure, httpOnly, samesite)
+- ✅ Implement rate limiting for auth endpoints
+
+**Performance**:
+- ✅ Middleware is extremely fast (~10-50ms)
+- ✅ Runs close to user (Edge network)
+- ✅ Exclude static assets from matcher
+- ✅ Keep logic simple (complex checks in Server Components)
+
+**Next Up**: Chapter 48 - Performance Optimization
+
+---
+
+## Chapter 48: Performance Optimization
+
+### 48.1 Why Performance Matters
+
+**Impact on Business**:
+- ❌ **1 second delay** = 7% reduction in conversions
+- ❌ **3 second load time** = 53% of mobile users abandon site
+- ✅ **Fast sites** = Higher engagement, better SEO, more revenue
+
+**User Expectations**:
+- 📱 **Mobile users**: Expect pages to load in <3 seconds
+- 💻 **Desktop users**: Expect pages to load in <2 seconds
+- ⚡ **Interactions**: Should feel instant (<100ms)
+
+**SEO Impact**:
+- ✅ Google uses **Core Web Vitals** as ranking factor
+- ✅ Faster sites rank higher in search results
+- ✅ Better performance = more organic traffic
+
+### 48.2 Performance Metrics (Core Web Vitals)
+
+**1. FCP (First Contentful Paint)**:
+- **What**: Time until first text/image appears
+- **Good**: <1.8 seconds
+- **Poor**: >3.0 seconds
+- **How to improve**: Optimize CSS, reduce render-blocking resources
+
+**2. LCP (Largest Contentful Paint)**:
+- **What**: Time until main content is visible
+- **Good**: <2.5 seconds
+- **Poor**: >4.0 seconds
+- **How to improve**: Optimize images, use CDN, reduce server response time
+
+**3. TTI (Time to Interactive)**:
+- **What**: Time until page is fully interactive
+- **Good**: <3.8 seconds
+- **Poor**: >7.3 seconds
+- **How to improve**: Reduce JavaScript, code splitting, lazy loading
+
+**4. CLS (Cumulative Layout Shift)**:
+- **What**: Visual stability (elements don't shift during load)
+- **Good**: <0.1
+- **Poor**: >0.25
+- **How to improve**: Reserve space for images, avoid inserting content above existing content
+
+**5. FID (First Input Delay)**:
+- **What**: Time from user interaction to browser response
+- **Good**: <100ms
+- **Poor**: >300ms
+- **How to improve**: Reduce JavaScript execution time, use Web Workers
+
+**Measuring Core Web Vitals**:
+```javascript
+// Use web-vitals library
+import { getCLS, getFID, getFCP, getLCP, getTTI } from 'web-vitals';
+
+getCLS(console.log);
+getFID(console.log);
+getFCP(console.log);
+getLCP(console.log);
+getTTI(console.log);
+```
+
+### 48.3 Code Splitting
+
+**What is Code Splitting?**
+- Split JavaScript bundle into **smaller chunks**
+- Load only code needed for current page
+- **Result**: Faster initial load, better performance
+
+**Next.js Automatic Code Splitting**:
+```typescript
+// Next.js automatically splits code by route
+app/
+  page.tsx              // Chunk: home.js
+  about/page.tsx        // Chunk: about.js
+  admin/page.tsx        // Chunk: admin.js
+```
+- Each page gets its own JavaScript bundle
+- **No configuration needed** (works out of the box)
+
+**Dynamic Imports (Manual Code Splitting)**:
+```typescript
+// ❌ Static import (loads immediately)
+import HeavyComponent from '@/components/HeavyComponent';
+
+// ✅ Dynamic import (loads when needed)
+import dynamic from 'next/dynamic';
+
+const HeavyComponent = dynamic(() => import('@/components/HeavyComponent'), {
+  loading: () => <p>Loading...</p>,
+  ssr: false, // Don't render on server (client-only)
+});
+
+export default function Page() {
+  return <HeavyComponent />;
+}
+```
+
+**Use Cases for Dynamic Imports**:
+- 📊 **Charts/graphs** (only load when user opens analytics page)
+- 🗺️ **Maps** (Google Maps is 200KB+, load when needed)
+- 📝 **Rich text editors** (Quill, TinyMCE are heavy)
+- 🎨 **Image editors** (only load when user clicks "Edit Photo")
+
+**Example - Lazy Load Analytics Dashboard**:
+```typescript
+// app/admin/analytics/page.tsx
+import dynamic from 'next/dynamic';
+
+// Load chart library only when analytics page is visited
+const ChartComponent = dynamic(() => import('@/components/Chart'), {
+  loading: () => <div>Loading chart...</div>,
+  ssr: false,
+});
+
+export default function AnalyticsPage() {
+  return (
+    <div>
+      <h1>Analytics Dashboard</h1>
+      <ChartComponent data={analyticsData} />
+    </div>
+  );
+}
+```
+
+**Route-Based Splitting**:
+```typescript
+// Next.js automatically creates separate bundles
+app/
+  learner/page.tsx      // learner.js (50KB)
+  educator/page.tsx     // educator.js (45KB)
+  admin/page.tsx        // admin.js (80KB - more features)
+
+// Users only download the bundle they need
+```
+
+### 48.4 Image Optimization
+
+**next/image Component**:
+```typescript
+// ❌ Regular <img> tag (no optimization)
+<img src="/hero.jpg" alt="Hero" />
+
+// ✅ Next.js Image component (optimized)
+import Image from 'next/image';
+
+<Image
+  src="/hero.jpg"
+  alt="Hero"
+  width={1200}
+  height={600}
+  priority // Load immediately (above fold)
+/>
+```
+
+**Automatic Optimizations**:
+- ✅ **Format conversion**: Serves WebP/AVIF if browser supports (50% smaller)
+- ✅ **Lazy loading**: Images load as user scrolls (not all at once)
+- ✅ **Responsive images**: Serves correct size based on device (mobile gets smaller image)
+- ✅ **Blur placeholder**: Shows low-quality placeholder while loading
+
+**Priority Images (Above the Fold)**:
+```typescript
+// Hero image (visible immediately)
+<Image
+  src="/hero.jpg"
+  alt="Hero"
+  width={1200}
+  height={600}
+  priority // Skip lazy loading, load immediately
+/>
+```
+
+**Lazy Loading (Below the Fold)**:
+```typescript
+// Image in footer (not visible initially)
+<Image
+  src="/footer-logo.jpg"
+  alt="Logo"
+  width={200}
+  height={100}
+  loading="lazy" // Default behavior (lazy load)
+/>
+```
+
+**Blur Placeholder**:
+```typescript
+// Show blurred version while loading
+<Image
+  src="/profile.jpg"
+  alt="Profile"
+  width={400}
+  height={400}
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRg..." // Base64 string
+/>
+```
+
+**Responsive Images**:
+```typescript
+// Serve different sizes based on screen width
+<Image
+  src="/hero.jpg"
+  alt="Hero"
+  width={1200}
+  height={600}
+  sizes="(max-width: 768px) 100vw, 50vw"
+/>
+```
+- Mobile (≤768px): Image takes 100% of viewport width
+- Desktop: Image takes 50% of viewport width
+- **Result**: Mobile devices download smaller images
+
+**External Images**:
+```typescript
+// Configure allowed domains in next.config.js
+module.exports = {
+  images: {
+    domains: ['cdn.example.com', 's3.amazonaws.com'],
+  },
+};
+
+// Use external images
+<Image
+  src="https://cdn.example.com/photo.jpg"
+  alt="Photo"
+  width={800}
+  height={600}
+/>
+```
+
+### 48.5 Font Optimization
+
+**next/font (Self-Hosting Google Fonts)**:
+```typescript
+// app/layout.tsx
+import { Inter, Roboto_Mono } from 'next/font/google';
+
+// Load fonts during build (no runtime request to Google)
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap', // Show fallback font immediately, swap when ready
+  variable: '--font-inter',
+});
+
+const robotoMono = Roboto_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto-mono',
+});
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={`${inter.variable} ${robotoMono.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**Benefits**:
+- ✅ **No external requests**: Fonts downloaded during build, served from your domain
+- ✅ **Zero layout shift**: Font metrics calculated at build time
+- ✅ **Faster loading**: No DNS lookup, no extra HTTP request
+- ✅ **Privacy**: No Google Fonts tracking
+
+**Font Display Strategies**:
+- `swap`: Show fallback immediately, swap when font loads (recommended)
+- `block`: Wait up to 3s for font, then show fallback
+- `fallback`: Wait 100ms for font, then show fallback
+- `optional`: Show fallback if font not loaded in 100ms
+
+**Custom Fonts (Local Files)**:
+```typescript
+// app/layout.tsx
+import localFont from 'next/font/local';
+
+const customFont = localFont({
+  src: './fonts/CustomFont.woff2',
+  display: 'swap',
+  variable: '--font-custom',
+});
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={customFont.variable}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**Reducing Layout Shift**:
+```css
+/* Use size-adjust to match fallback font size to web font */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.woff2');
+  font-display: swap;
+  size-adjust: 100.5%; /* Adjust to match fallback font */
+}
+```
+
+### 48.6 Bundle Size Optimization
+
+**Analyze Bundle Size**:
+```bash
+# Build project and view bundle sizes
+bun run build
+
+# Output example:
+Route (app)              Size     First Load JS
+┌ ○ /                    1.2 kB   85.3 kB
+├ ○ /admin               3.5 kB   120.8 kB
+├ ○ /learner             2.1 kB   95.2 kB
+└ ○ /educator            2.8 kB   102.1 kB
+```
+
+**Install Bundle Analyzer**:
+```bash
+# NextPhoton uses Bun
+bun add @next/bundle-analyzer
+```
+
+**Configure next.config.js**:
+```javascript
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+module.exports = withBundleAnalyzer({
+  // Next.js config
+});
+```
+
+**Run Analyzer**:
+```bash
+ANALYZE=true bun run build
+```
+- Opens interactive treemap in browser
+- **Shows**: Which packages contribute to bundle size
+- **Identify**: Large dependencies to optimize
+
+**Tree Shaking** (Automatic):
+```typescript
+// ❌ Imports entire library (200KB)
+import _ from 'lodash';
+
+// ✅ Import only what you need (5KB)
+import { debounce } from 'lodash';
+// Even better: Use lodash-es (ESM, better tree shaking)
+import debounce from 'lodash-es/debounce';
+```
+
+**Remove Unused Dependencies**:
+```bash
+# Find unused dependencies
+bun run depcheck
+
+# Remove package
+bun remove unused-package
+```
+
+**Code Splitting (Recap)**:
+```typescript
+// Load heavy library only when needed
+const HeavyLibrary = dynamic(() => import('heavy-library'));
+```
+
+### 48.7 Caching Strategies
+
+**1. Browser Caching (Cache-Control Headers)**:
+```typescript
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+- `public`: Can be cached by browsers and CDNs
+- `max-age=31536000`: Cache for 1 year (static assets)
+- `immutable`: File will never change (good for versioned files)
+
+**2. CDN Caching (Vercel/Cloudflare)**:
+- Static assets (JS, CSS, images) cached at Edge locations
+- **Benefit**: Served from location closest to user (faster)
+
+**3. API Response Caching (React Query)**:
+```typescript
+// frontend/web/src/hooks/useAnalytics.ts
+import { useQuery } from '@tanstack/react-query';
+
+export function useAnalytics() {
+  return useQuery({
+    queryKey: ['analytics'],
+    queryFn: fetchAnalytics,
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    cacheTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+  });
+}
+```
+- **staleTime**: How long data is considered fresh (no refetch)
+- **cacheTime**: How long to keep unused data in cache
+
+**4. Next.js Data Caching (Fetch API)**:
+```typescript
+// Server Component (Next.js 15)
+async function getData() {
+  const res = await fetch('https://api.example.com/data', {
+    next: { revalidate: 3600 }, // Cache for 1 hour
+  });
+  return res.json();
+}
+```
+
+**5. Incremental Static Regeneration (ISR)**:
+```typescript
+// app/blog/[slug]/page.tsx
+export const revalidate = 3600; // Regenerate every hour
+
+export default async function BlogPost({ params }) {
+  const post = await fetchBlogPost(params.slug);
+  return <article>{post.content}</article>;
+}
+```
+- **Static at build time**: Page generated during build
+- **Revalidate**: Regenerate page every 1 hour (background)
+- **Benefit**: Static speed + fresh data
+
+### 48.8 Database Query Optimization
+
+**1. Select Only Needed Fields**:
+```typescript
+// ❌ Fetch all fields (slow, large payload)
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+});
+
+// ✅ Fetch only needed fields (fast, small payload)
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  select: {
+    id: true,
+    email: true,
+    firstName: true,
+    lastName: true,
+  },
+});
+```
+
+**2. Avoid N+1 Queries**:
+```typescript
+// ❌ N+1 problem (1 query + N queries for each user's posts)
+const users = await prisma.user.findMany();
+for (const user of users) {
+  const posts = await prisma.post.findMany({ where: { userId: user.id } });
+}
+
+// ✅ Use include (1 query with JOIN)
+const users = await prisma.user.findMany({
+  include: {
+    posts: true, // Fetch posts in same query
+  },
+});
+```
+
+**3. Add Database Indexes**:
+```prisma
+// shared/prisma/schema.prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique // Automatic index on unique fields
+  firstName String
+  lastName  String
+
+  @@index([firstName, lastName]) // Composite index for name searches
+  @@index([createdAt]) // Index for sorting by date
+}
+```
+
+**4. Connection Pooling**:
+```typescript
+// shared/db/index.ts (NextPhoton already implements this)
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma = globalForPrisma.prisma || new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+```
+- **Singleton pattern**: Reuse same Prisma client (connection pool)
+- **Prevents**: Creating new connections on every request
+- **Result**: Faster database queries
+
+**5. Pagination (Avoid Fetching All Records)**:
+```typescript
+// ❌ Fetch all users (slow for large datasets)
+const users = await prisma.user.findMany();
+
+// ✅ Paginate (fetch 20 at a time)
+const users = await prisma.user.findMany({
+  take: 20, // Limit
+  skip: (page - 1) * 20, // Offset
+  orderBy: { createdAt: 'desc' },
+});
+```
+
+### 48.9 React Performance
+
+**1. Memoization (useMemo)**:
+```typescript
+// ❌ Recalculates on every render (expensive)
+function UserList({ users }) {
+  const sortedUsers = users.sort((a, b) => a.name.localeCompare(b.name));
+  return <div>{sortedUsers.map(u => <User key={u.id} user={u} />)}</div>;
+}
+
+// ✅ Memoize (only recalculate when users change)
+function UserList({ users }) {
+  const sortedUsers = useMemo(
+    () => users.sort((a, b) => a.name.localeCompare(b.name)),
+    [users]
+  );
+  return <div>{sortedUsers.map(u => <User key={u.id} user={u} />)}</div>;
+}
+```
+
+**2. useCallback (Prevent Function Re-creation)**:
+```typescript
+// ❌ New function on every render (causes child re-renders)
+function Parent() {
+  const handleClick = () => console.log('Clicked');
+  return <Child onClick={handleClick} />;
+}
+
+// ✅ Memoize function (same reference across renders)
+function Parent() {
+  const handleClick = useCallback(() => console.log('Clicked'), []);
+  return <Child onClick={handleClick} />;
+}
+```
+
+**3. React.memo (Prevent Unnecessary Re-renders)**:
+```typescript
+// ❌ Re-renders even when props unchanged
+function UserCard({ user }) {
+  return <div>{user.name}</div>;
+}
+
+// ✅ Only re-renders when user prop changes
+const UserCard = React.memo(function UserCard({ user }) {
+  return <div>{user.name}</div>;
+});
+```
+
+**4. Virtualization (Long Lists)**:
+```typescript
+// ❌ Render 10,000 items (slow, browser freezes)
+function UserList({ users }) {
+  return (
+    <div>
+      {users.map(user => <UserCard key={user.id} user={user} />)}
+    </div>
+  );
+}
+
+// ✅ Virtualize (only render visible items)
+import { FixedSizeList } from 'react-window';
+
+function UserList({ users }) {
+  return (
+    <FixedSizeList
+      height={600}
+      itemCount={users.length}
+      itemSize={50}
+      width="100%"
+    >
+      {({ index, style }) => (
+        <div style={style}>
+          <UserCard user={users[index]} />
+        </div>
+      )}
+    </FixedSizeList>
+  );
+}
+```
+
+**5. Debouncing (Search Inputs)**:
+```typescript
+// ❌ Search on every keystroke (too many API calls)
+function SearchBar() {
+  const [query, setQuery] = useState('');
+  const { data } = useQuery(['search', query], () => searchAPI(query));
+
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}
+
+// ✅ Debounce (search after 300ms of no typing)
+import { useDebouncedValue } from '@mantine/hooks';
+
+function SearchBar() {
+  const [query, setQuery] = useState('');
+  const [debouncedQuery] = useDebouncedValue(query, 300);
+  const { data } = useQuery(['search', debouncedQuery], () => searchAPI(debouncedQuery));
+
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}
+```
+
+### 48.10 Server-Side Optimization
+
+**1. Static Generation (Fastest)**:
+```typescript
+// app/about/page.tsx (static page)
+export default function AboutPage() {
+  return <div>About Us</div>;
+}
+```
+- **Generated at build time**: HTML created during `bun run build`
+- **Served as static file**: No server computation on request
+- **Best for**: Marketing pages, blog posts, documentation
+
+**2. Incremental Static Regeneration (ISR)**:
+```typescript
+// app/blog/[slug]/page.tsx
+export const revalidate = 3600; // Regenerate every hour
+
+export default async function BlogPost({ params }) {
+  const post = await fetchBlogPost(params.slug);
+  return <article>{post.content}</article>;
+}
+```
+- **Static + Fresh**: Static speed + updated data
+- **Background regeneration**: Page regenerates every hour (no user delay)
+
+**3. Streaming with Suspense**:
+```typescript
+// app/dashboard/page.tsx
+import { Suspense } from 'react';
+
+async function AnalyticsWidget() {
+  const data = await fetchAnalytics(); // Slow query (2s)
+  return <div>Analytics: {data.total}</div>;
+}
+
+export default function Dashboard() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <Suspense fallback={<div>Loading analytics...</div>}>
+        <AnalyticsWidget />
+      </Suspense>
+    </div>
+  );
+}
+```
+- **Streams HTML**: Sends page skeleton immediately, streams content as ready
+- **Result**: User sees page faster (header loads while analytics fetches)
+
+**4. Parallel Data Fetching**:
+```typescript
+// ❌ Sequential (slow, 6s total)
+async function getData() {
+  const user = await fetchUser(); // 2s
+  const posts = await fetchPosts(); // 2s
+  const comments = await fetchComments(); // 2s
+  return { user, posts, comments };
+}
+
+// ✅ Parallel (fast, 2s total)
+async function getData() {
+  const [user, posts, comments] = await Promise.all([
+    fetchUser(), // 2s
+    fetchPosts(), // 2s (runs in parallel)
+    fetchComments(), // 2s (runs in parallel)
+  ]);
+  return { user, posts, comments };
+}
+```
+
+### 48.11 Monitoring Performance
+
+**1. Lighthouse (Chrome DevTools)**:
+- Open Chrome DevTools → Lighthouse tab
+- Click "Generate report"
+- **Scores**: Performance, Accessibility, Best Practices, SEO
+- **Recommendations**: Specific issues to fix
+
+**2. Chrome DevTools Performance Tab**:
+- Record page load
+- **See**: JavaScript execution time, rendering bottlenecks
+- **Identify**: Long tasks (>50ms), layout shifts
+
+**3. Web Vitals (Real User Monitoring)**:
+```typescript
+// app/layout.tsx
+import { sendAnalytics } from '@/lib/analytics';
+import { getCLS, getFID, getFCP, getLCP, getTTI } from 'web-vitals';
+
+export default function RootLayout({ children }) {
+  useEffect(() => {
+    getCLS((metric) => sendAnalytics('CLS', metric.value));
+    getFID((metric) => sendAnalytics('FID', metric.value));
+    getFCP((metric) => sendAnalytics('FCP', metric.value));
+    getLCP((metric) => sendAnalytics('LCP', metric.value));
+    getTTI((metric) => sendAnalytics('TTI', metric.value));
+  }, []);
+
+  return <html><body>{children}</body></html>;
+}
+```
+
+**4. Vercel Analytics** (NextPhoton Deployment):
+- Automatic Web Vitals tracking
+- View metrics in Vercel Dashboard
+- **See**: Real user performance data (not just lab tests)
+
+**5. Performance Budget**:
+```javascript
+// next.config.js
+module.exports = {
+  experimental: {
+    performanceBudget: {
+      maxInitialBundleSize: 200 * 1024, // 200KB
+      maxPageBundleSize: 300 * 1024, // 300KB
+    },
+  },
+};
+```
+- **Fail build** if bundles exceed limits
+- **Prevents**: Shipping bloated code to production
+
+### 48.12 Key Takeaways
+
+**Performance Metrics**:
+- ✅ **FCP** <1.8s (first content visible)
+- ✅ **LCP** <2.5s (main content visible)
+- ✅ **TTI** <3.8s (page fully interactive)
+- ✅ **CLS** <0.1 (no layout shifts)
+- ✅ **FID** <100ms (interaction response time)
+
+**Code Optimization**:
+- ✅ Use **dynamic imports** for heavy components
+- ✅ **next/image** for automatic image optimization
+- ✅ **next/font** to self-host fonts (no external requests)
+- ✅ Analyze bundle size with `@next/bundle-analyzer`
+- ✅ Tree shake imports (`import { fn } from 'lib'` not `import lib`)
+
+**Caching**:
+- ✅ Browser caching with Cache-Control headers
+- ✅ CDN caching for static assets
+- ✅ React Query for API response caching
+- ✅ ISR for static pages with fresh data
+
+**Database**:
+- ✅ **Select** only needed fields (not `select: { * }`)
+- ✅ Use **include** to avoid N+1 queries
+- ✅ Add **indexes** for frequently queried fields
+- ✅ **Paginate** large datasets (don't fetch all records)
+- ✅ Connection pooling with singleton Prisma client
+
+**React**:
+- ✅ **useMemo** for expensive calculations
+- ✅ **useCallback** to prevent function re-creation
+- ✅ **React.memo** to skip re-renders
+- ✅ **Virtualization** for long lists (react-window)
+- ✅ **Debouncing** for search inputs
+
+**Server-Side**:
+- ✅ Use **Static Generation** when possible (fastest)
+- ✅ **ISR** for static pages with fresh data
+- ✅ **Streaming** with Suspense (send page skeleton immediately)
+- ✅ **Parallel data fetching** with Promise.all
+
+**Monitoring**:
+- ✅ Run **Lighthouse** audits regularly
+- ✅ Track **Web Vitals** in production (RUM)
+- ✅ Use **Chrome DevTools** Performance tab
+- ✅ Set **performance budgets** (fail builds if exceeded)
+
+**Quick Wins**:
+1. Use next/image for all images
+2. Self-host fonts with next/font
+3. Enable ISR for blog/marketing pages
+4. Add React Query caching
+5. Implement virtualization for long lists
+6. Optimize database queries (select, include, indexes)
+7. Run Lighthouse audit and fix issues
+
+**Next Up**: Chapter 49 - Security Best Practices
+
+---
+
+# Chapter 49: Security Best Practices
+
+## 49.1 Security Mindset
+
+**Core Principles**:
+1. **Defense in Depth**: Multiple layers of security (not one silver bullet)
+2. **Assume Breach**: Design as if attackers already have access
+3. **Least Privilege**: Give minimal permissions needed
+4. **Never Trust Client**: Always validate on server
+5. **Security by Default**: Secure configurations out of the box
+
+**Threat Model**:
+- **Who**: Script kiddies, hackers, insiders, automated bots
+- **What**: Steal data, inject code, take control, cause downtime
+- **How**: SQL injection, XSS, CSRF, brute force, social engineering
+
+**NextPhoton Focus**:
+- **Student data** (FERPA compliance)
+- **Financial data** (payment info)
+- **Auth credentials** (JWT tokens, passwords)
+- **Role-based access** (Learner can't access Educator data)
+
+---
+
+## 49.2 Authentication Security
+
+### Strong Password Requirements
+
+```typescript
+// lib/formValidationSchemas.ts
+import { z } from 'zod';
+
+export const passwordSchema = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character');
+
+export const signupSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: passwordSchema,
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
+});
+```
+
+**Rules**:
+- ✅ **8+ characters** (longer is better)
+- ✅ **Uppercase + lowercase + number + special char**
+- ✅ **No common passwords** (check against leaked password lists)
+- ✅ **No user info** (not email, name, birthdate)
+
+### Password Hashing (bcrypt)
+
+```typescript
+// backend/server_NestJS/src/auth/auth.service.ts
+import * as bcrypt from 'bcrypt';
+
+export class AuthService {
+  async hashPassword(password: string): Promise<string> {
+    const saltRounds = 12; // 2^12 iterations (secure, not too slow)
+    return bcrypt.hash(password, saltRounds);
+  }
+
+  async verifyPassword(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+  }
+
+  async signup(email: string, password: string) {
+    // Hash password before storing
+    const hashedPassword = await this.hashPassword(password);
+
+    const user = await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword, // NEVER store plaintext
+      },
+    });
+
+    return user;
+  }
+}
+```
+
+**Why bcrypt**:
+- ✅ **Slow by design** (prevents brute force)
+- ✅ **Salted** (same password = different hash)
+- ✅ **Future-proof** (cost factor adjustable)
+- ❌ **Never MD5/SHA256** (too fast, crackable)
+
+**Salt Rounds**:
+- **10 rounds** = 0.01s (minimum acceptable)
+- **12 rounds** = 0.04s (recommended for 2025)
+- **14 rounds** = 0.16s (high security, slower)
+
+### JWT Token Security
+
+```typescript
+// backend/server_NestJS/src/auth/auth.service.ts
+import { JwtService } from '@nestjs/jwt';
+
+export class AuthService {
+  constructor(private jwtService: JwtService) {}
+
+  async login(user: User) {
+    // ✅ Include minimal data (no sensitive info)
+    const payload = {
+      sub: user.id,      // User ID
+      email: user.email, // Email
+      role: user.role,   // Role (Learner, Educator, etc.)
+      // ❌ NEVER: password, SSN, payment info
+    };
+
+    // ✅ Short expiration (15 minutes)
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '15m',
+    });
+
+    // ✅ Longer expiration for refresh token (7 days)
+    const refreshToken = this.jwtService.sign(
+      { sub: user.id },
+      { expiresIn: '7d' }
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+}
+```
+
+**JWT Best Practices**:
+- ✅ **Short expiration** (15 min for access, 7 days for refresh)
+- ✅ **Minimal payload** (no sensitive data)
+- ✅ **Refresh tokens** (rotate access tokens)
+- ✅ **Strong secret** (256-bit random string)
+- ❌ **Never store sensitive data** (JWT is base64-encoded, not encrypted)
+
+**Environment Variables**:
+```bash
+# .env.production (NEVER commit this file)
+JWT_SECRET=a8f3e2d1c7b9a4f6e8d2c5b1a9f7e3d6c8b4a2f9e7d3c1b5a8f6e4d2c9b7a5f3
+JWT_REFRESH_SECRET=c2b5a9f7e4d1c8b6a3f9e7d5c2b8a6f4e1d9c7b5a3f8e6d4c1b9a7f5e3d2c8b6
+```
+
+### Secure Cookies
+
+```typescript
+// frontend/web/src/lib/auth-utils.ts
+export function setAuthCookie(token: string) {
+  document.cookie = `auth_token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=900`; // 15 min
+}
+```
+
+**Cookie Flags**:
+- ✅ **HttpOnly**: JavaScript can't access (prevents XSS token theft)
+- ✅ **Secure**: Only sent over HTTPS (prevents man-in-the-middle)
+- ✅ **SameSite=Strict**: Only sent to same origin (prevents CSRF)
+- ✅ **Short Max-Age**: 15 minutes (rotate frequently)
+
+---
+
+## 49.3 Authorization Security
+
+### Always Verify on Server
+
+```typescript
+// ❌ WRONG: Client-side check only (easily bypassed)
+export default function AdminDashboard() {
+  const { user } = useAuth();
+
+  if (user.role !== 'Admin') {
+    return <p>Access denied</p>; // Attacker can edit this in DevTools
+  }
+
+  return <AdminPanel />;
+}
+
+// ✅ CORRECT: Server-side verification
+// app/api/admin/users/route.ts
+export async function GET(req: Request) {
+  const user = await verifyJWT(req); // Decode JWT from Authorization header
+
+  // Server-side check (attacker can't bypass)
+  if (user.role !== 'Admin') {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  // Only return data if authorized
+  const users = await prisma.user.findMany();
+  return Response.json(users);
+}
+```
+
+**Rules**:
+- ✅ **Server checks**: Always verify role/permissions in API routes
+- ✅ **Client checks**: Only for UX (hide buttons, redirect)
+- ❌ **Never trust client**: Attacker can edit React code in DevTools
+
+### Role-Based Access Control (RBAC)
+
+```typescript
+// backend/server_NestJS/src/auth/guards/roles.guard.ts
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    if (!requiredRoles) return true; // No roles required
+
+    const request = context.switchToHttp().getRequest();
+    const user = request.user; // Set by JWT strategy
+
+    // Check if user has required role
+    return requiredRoles.some((role) => user.role === role);
+  }
+}
+
+// Usage in controller
+@Controller('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class AdminController {
+  @Get('users')
+  @Roles('Admin', 'SuperAdmin') // Only Admins can access
+  async getUsers() {
+    return this.prisma.user.findMany();
+  }
+}
+```
+
+**NextPhoton Roles** (from `pd-roles-permissions.md`):
+- **Learner**: View own courses, submit assignments
+- **Guardian**: View Learner progress (if linked)
+- **Educator**: View/grade assigned Learners
+- **EduCare Manager (ECM)**: Manage Educators + Learners
+- **Admin**: Full system access
+
+### Check Permissions for Every Request
+
+```typescript
+// app/api/learners/[id]/assignments/route.ts
+export async function GET(req: Request, { params }) {
+  const user = await verifyJWT(req);
+  const learnerId = params.id;
+
+  // ✅ Learner can only view own assignments
+  if (user.role === 'Learner' && user.id !== learnerId) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  // ✅ Educator can only view assigned Learners
+  if (user.role === 'Educator') {
+    const isAssigned = await prisma.enrollment.findFirst({
+      where: {
+        learnerId,
+        course: { educatorId: user.id },
+      },
+    });
+
+    if (!isAssigned) {
+      return new Response('Forbidden', { status: 403 });
+    }
+  }
+
+  // ✅ Admin/ECM can view all
+  if (!['Admin', 'EduCareManager'].includes(user.role)) {
+    // Additional checks if needed
+  }
+
+  const assignments = await prisma.assignment.findMany({
+    where: { learnerId },
+  });
+
+  return Response.json(assignments);
+}
+```
+
+---
+
+## 49.4 SQL Injection Prevention
+
+### Prisma Parameterized Queries (Built-in Protection)
+
+```typescript
+// ✅ SAFE: Prisma automatically parameterizes queries
+async function getUser(email: string) {
+  return prisma.user.findUnique({
+    where: { email }, // Prisma escapes this
+  });
+}
+
+// ✅ SAFE: Even with user input
+async function searchUsers(searchTerm: string) {
+  return prisma.user.findMany({
+    where: {
+      OR: [
+        { name: { contains: searchTerm } }, // Prisma escapes
+        { email: { contains: searchTerm } },
+      ],
+    },
+  });
+}
+```
+
+**Why Prisma is Safe**:
+- ✅ **Parameterized queries**: User input never concatenated into SQL
+- ✅ **Type safety**: TypeScript prevents invalid queries
+- ✅ **ORM layer**: Abstracts raw SQL
+
+### Never Use Raw SQL with User Input
+
+```typescript
+// ❌ EXTREMELY DANGEROUS (SQL Injection)
+async function getUserUnsafe(email: string) {
+  const query = `SELECT * FROM User WHERE email = '${email}'`; // DON'T DO THIS
+  return prisma.$queryRawUnsafe(query);
+}
+
+// Attacker input: "' OR '1'='1"
+// Resulting query: SELECT * FROM User WHERE email = '' OR '1'='1'
+// Returns ALL users (bypasses authentication)
+
+// ✅ SAFE: Use parameterized raw queries
+async function getUserSafe(email: string) {
+  return prisma.$queryRaw`SELECT * FROM User WHERE email = ${email}`; // Prisma escapes
+}
+```
+
+**Rules**:
+- ✅ **Use Prisma ORM** (automatic protection)
+- ✅ **$queryRaw** (parameterized) if raw SQL needed
+- ❌ **NEVER $queryRawUnsafe** with user input
+
+---
+
+## 49.5 XSS (Cross-Site Scripting) Prevention
+
+### React Auto-Escapes (Safe by Default)
+
+```typescript
+// ✅ SAFE: React escapes user input automatically
+export default function UserProfile({ user }) {
+  return (
+    <div>
+      <h1>{user.name}</h1> {/* React escapes this */}
+      <p>{user.bio}</p>
+    </div>
+  );
+}
+
+// Even if user.name = "<script>alert('XSS')</script>"
+// React renders: &lt;script&gt;alert('XSS')&lt;/script&gt; (harmless text)
+```
+
+### Dangerous: dangerouslySetInnerHTML
+
+```typescript
+// ❌ DANGEROUS: Renders raw HTML (XSS risk)
+export default function BlogPost({ content }) {
+  return <div dangerouslySetInnerHTML={{ __html: content }} />; // DON'T USE
+}
+
+// If content = "<script>alert('XSS')</script>"
+// Browser executes the script (attacker can steal cookies, redirect, etc.)
+```
+
+### Sanitize User Input (DOMPurify)
+
+```typescript
+import DOMPurify from 'dompurify';
+
+// ✅ SAFE: Sanitize before rendering
+export default function BlogPost({ content }) {
+  const sanitized = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'b', 'i', 'a', 'ul', 'ol', 'li'], // Whitelist tags
+    ALLOWED_ATTR: ['href', 'target'], // Whitelist attributes
+  });
+
+  return <div dangerouslySetInnerHTML={{ __html: sanitized }} />;
+}
+```
+
+**When to Use**:
+- ✅ **Rich text editors** (WYSIWYG content)
+- ✅ **Markdown rendering** (after converting to HTML)
+- ❌ **Don't use for plain text** (React handles it)
+
+### CSP (Content Security Policy) Headers
+
+```javascript
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'", // Only load from same origin
+              "script-src 'self' 'unsafe-inline'", // Allow inline scripts (Next.js needs this)
+              "style-src 'self' 'unsafe-inline'", // Allow inline styles
+              "img-src 'self' data: https:", // Allow images from HTTPS
+              "font-src 'self' data:", // Allow fonts
+              "connect-src 'self' https://api.nextphoton.com", // API calls
+            ].join('; '),
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+
+**CSP Blocks**:
+- ❌ Inline scripts from attacker
+- ❌ Loading scripts from malicious sites
+- ❌ Eval() (code injection)
+
+---
+
+## 49.6 CSRF (Cross-Site Request Forgery) Prevention
+
+### SameSite Cookies
+
+```typescript
+// frontend/web/src/lib/auth-utils.ts
+export function setAuthCookie(token: string) {
+  document.cookie = `auth_token=${token}; SameSite=Strict; HttpOnly; Secure`;
+}
+```
+
+**SameSite Options**:
+- **Strict**: Cookie only sent on same-site requests (most secure)
+- **Lax**: Cookie sent on top-level navigation (e.g., clicking link)
+- **None**: Cookie sent on all requests (must use with Secure)
+
+**NextPhoton**: Use `Strict` (no cross-origin requests needed)
+
+### CSRF Tokens for Forms
+
+```typescript
+// backend/server_NestJS/src/main.ts
+import * as csurf from 'csurf';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Enable CSRF protection
+  app.use(csurf({ cookie: true }));
+
+  await app.listen(3001);
+}
+```
+
+```typescript
+// frontend/web/app/settings/page.tsx
+export default function SettingsPage() {
+  const [csrfToken, setCsrfToken] = useState('');
+
+  useEffect(() => {
+    // Fetch CSRF token on load
+    fetch('/api/csrf-token')
+      .then(res => res.json())
+      .then(data => setCsrfToken(data.csrfToken));
+  }, []);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+
+    await fetch('/api/settings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': csrfToken, // Include token
+      },
+      body: JSON.stringify({ /* settings */ }),
+    });
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form fields */}
+      <button type="submit">Save Settings</button>
+    </form>
+  );
+}
+```
+
+### Verify Origin/Referer Headers
+
+```typescript
+// backend/server_NestJS/src/auth/guards/csrf.guard.ts
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+
+@Injectable()
+export class CsrfGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const origin = request.headers.origin;
+    const referer = request.headers.referer;
+
+    const allowedOrigins = ['https://nextphoton.com', 'https://app.nextphoton.com'];
+
+    // Verify request comes from allowed origin
+    if (!allowedOrigins.some(allowed => origin?.startsWith(allowed) || referer?.startsWith(allowed))) {
+      return false; // Block cross-origin requests
+    }
+
+    return true;
+  }
+}
+```
+
+---
+
+## 49.7 API Security
+
+### Rate Limiting (Prevent Brute Force)
+
+```typescript
+// backend/server_NestJS/src/main.ts
+import rateLimit from 'express-rate-limit';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Global rate limit: 100 requests per 15 minutes
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 100, // 100 requests
+      message: 'Too many requests from this IP, please try again later',
+    })
+  );
+
+  // Stricter limit for auth endpoints
+  app.use(
+    '/auth/login',
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 5, // Only 5 login attempts per 15 min
+      message: 'Too many login attempts, please try again later',
+    })
+  );
+
+  await app.listen(3001);
+}
+```
+
+**Why Rate Limit**:
+- ✅ **Prevents brute force** (attacker can't try 1000s of passwords)
+- ✅ **Prevents DDoS** (attacker can't flood server)
+- ✅ **Reduces costs** (prevents excessive API calls)
+
+### Input Validation (Zod Schemas)
+
+```typescript
+// app/api/learners/route.ts
+import { z } from 'zod';
+
+const createLearnerSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  age: z.number().min(5).max(120),
+  guardianEmail: z.string().email().optional(),
+});
+
+export async function POST(req: Request) {
+  const body = await req.json();
+
+  // Validate input
+  const result = createLearnerSchema.safeParse(body);
+  if (!result.success) {
+    return Response.json({ error: result.error.issues }, { status: 400 });
+  }
+
+  const learner = await prisma.learner.create({
+    data: result.data,
+  });
+
+  return Response.json(learner);
+}
+```
+
+**Validate Everything**:
+- ✅ **Type** (string, number, boolean)
+- ✅ **Length** (min/max)
+- ✅ **Format** (email, URL, UUID)
+- ✅ **Range** (min/max for numbers)
+- ❌ **Never trust client** (validate on server)
+
+### API Keys in Environment Variables
+
+```bash
+# .env.production (NEVER commit)
+STRIPE_SECRET_KEY=sk_live_51abc123def456...
+SENDGRID_API_KEY=SG.xyz789...
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+```
+
+```typescript
+// lib/stripe.ts
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2023-10-16',
+});
+
+export default stripe;
+```
+
+**Rules**:
+- ✅ **Never hardcode** API keys in code
+- ✅ **Use .env files** (different keys for dev/prod)
+- ✅ **Add .env to .gitignore** (never commit secrets)
+- ✅ **Rotate keys regularly** (every 90 days)
+
+### CORS Configuration
+
+```typescript
+// backend/server_NestJS/src/main.ts
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // Enable CORS for frontend
+  app.enableCors({
+    origin: ['https://nextphoton.com', 'https://app.nextphoton.com'], // Whitelist origins
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
+    credentials: true, // Allow cookies
+  });
+
+  await app.listen(3001);
+}
+```
+
+**Why CORS**:
+- ✅ **Prevents unauthorized sites** from calling your API
+- ✅ **Whitelist trusted origins** (your frontend)
+- ❌ **Don't use origin: '*'** in production (allows any site)
+
+---
+
+## 49.8 File Upload Security
+
+### File Type Whitelist
+
+```typescript
+// app/api/upload/route.ts
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+export async function POST(req: Request) {
+  const formData = await req.formData();
+  const file = formData.get('file') as File;
+
+  // 1. Validate file type
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    return Response.json({ error: 'Invalid file type' }, { status: 400 });
+  }
+
+  // 2. Validate file size
+  if (file.size > MAX_SIZE) {
+    return Response.json({ error: 'File too large' }, { status: 400 });
+  }
+
+  // 3. Rename file (prevent directory traversal)
+  const uuid = crypto.randomUUID();
+  const ext = file.name.split('.').pop();
+  const newFilename = `${uuid}.${ext}`;
+
+  // 4. Store file (outside web root)
+  const uploadDir = '/var/uploads'; // NOT in /public
+  const filepath = `${uploadDir}/${newFilename}`;
+  await writeFile(filepath, Buffer.from(await file.arrayBuffer()));
+
+  return Response.json({ filename: newFilename });
+}
+```
+
+**Security Rules**:
+- ✅ **Whitelist file types** (not blacklist)
+- ✅ **Check MIME type** (not just extension)
+- ✅ **Limit file size** (prevent DoS)
+- ✅ **Rename files** (UUID prevents path traversal)
+- ✅ **Store outside web root** (can't execute uploaded scripts)
+
+### Virus Scanning (ClamAV)
+
+```typescript
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+async function scanFile(filepath: string): Promise<boolean> {
+  try {
+    await execAsync(`clamscan --infected --no-summary ${filepath}`);
+    return true; // Clean
+  } catch (error) {
+    return false; // Infected
+  }
+}
+
+export async function POST(req: Request) {
+  const file = /* upload file */;
+
+  // Scan for viruses
+  const isClean = await scanFile(filepath);
+  if (!isClean) {
+    await unlink(filepath); // Delete infected file
+    return Response.json({ error: 'File infected' }, { status: 400 });
+  }
+
+  return Response.json({ filename: newFilename });
+}
+```
+
+---
+
+## 49.9 Environment Variables
+
+### Never Commit .env to Git
+
+```bash
+# .gitignore
+.env
+.env.local
+.env.production
+.env.*.local
+```
+
+```bash
+# .env.example (commit this as template)
+DATABASE_URL=postgresql://user:password@localhost:5432/nextphoton
+JWT_SECRET=your_jwt_secret_here
+JWT_REFRESH_SECRET=your_refresh_secret_here
+STRIPE_SECRET_KEY=sk_test_...
+SENDGRID_API_KEY=SG...
+```
+
+**Workflow**:
+1. Developer clones repo
+2. Copy `.env.example` to `.env`
+3. Fill in real values (get from team)
+4. `.env` is gitignored (never committed)
+
+### Different Secrets for Dev/Prod
+
+```bash
+# .env.development (local dev)
+DATABASE_URL=postgresql://localhost:5432/nextphoton_dev
+STRIPE_SECRET_KEY=sk_test_123... # Test key
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# .env.production (Vercel deployment)
+DATABASE_URL=postgresql://prod-db.supabase.co:5432/nextphoton_prod
+STRIPE_SECRET_KEY=sk_live_789... # Live key
+NEXT_PUBLIC_API_URL=https://api.nextphoton.com
+```
+
+**Rules**:
+- ✅ **Test keys in dev** (no real charges)
+- ✅ **Live keys in prod** (different database, API keys)
+- ✅ **Rotate prod secrets** every 90 days
+
+---
+
+## 49.10 HTTPS Everywhere
+
+### SSL/TLS Certificates
+
+```bash
+# Install Certbot (Let's Encrypt)
+sudo apt-get install certbot
+
+# Generate certificate
+sudo certbot certonly --standalone -d nextphoton.com -d www.nextphoton.com
+
+# Certificates saved to:
+# /etc/letsencrypt/live/nextphoton.com/fullchain.pem
+# /etc/letsencrypt/live/nextphoton.com/privkey.pem
+```
+
+### Redirect HTTP to HTTPS
+
+```javascript
+// next.config.js
+module.exports = {
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'header', key: 'x-forwarded-proto', value: 'http' }],
+        destination: 'https://nextphoton.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+};
+```
+
+### HSTS Headers
+
+```javascript
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=31536000; includeSubDomains; preload', // 1 year
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+
+**HSTS (HTTP Strict Transport Security)**:
+- ✅ **Forces HTTPS** (browser remembers for 1 year)
+- ✅ **Prevents downgrade attacks** (attacker can't force HTTP)
+- ✅ **Preload list**: Submit to browsers (hardcoded HTTPS)
+
+---
+
+## 49.11 Dependency Security
+
+### npm audit
+
+```bash
+# Check for vulnerabilities
+npm audit
+
+# Fix vulnerabilities automatically
+npm audit fix
+
+# Force fix (may break things)
+npm audit fix --force
+```
+
+**Run Regularly**:
+- ✅ **Before every deployment**
+- ✅ **Weekly in CI/CD**
+- ✅ **After installing new packages**
+
+### Keep Dependencies Updated
+
+```bash
+# Check outdated packages
+npm outdated
+
+# Update to latest minor/patch versions
+npm update
+
+# Update to latest major versions (review breaking changes)
+npm install <package>@latest
+```
+
+**Update Strategy**:
+- ✅ **Patch versions** (bug fixes): Auto-update
+- ✅ **Minor versions** (new features): Review weekly
+- ⚠️ **Major versions** (breaking changes): Test thoroughly
+
+### Use Snyk or Dependabot
+
+```yaml
+# .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+```
+
+**GitHub Dependabot**:
+- ✅ **Auto-detects vulnerabilities**
+- ✅ **Creates PRs to fix**
+- ✅ **Free for public/private repos**
+
+---
+
+## 49.12 Logging & Monitoring
+
+### Log All Auth Attempts
+
+```typescript
+// backend/server_NestJS/src/auth/auth.service.ts
+import { Logger } from '@nestjs/common';
+
+export class AuthService {
+  private logger = new Logger(AuthService.name);
+
+  async login(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      this.logger.warn(`Failed login attempt for ${email}: User not found`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      this.logger.warn(`Failed login attempt for ${email}: Invalid password`);
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    this.logger.log(`Successful login for ${email}`);
+    return this.generateTokens(user);
+  }
+}
+```
+
+### Log API Errors
+
+```typescript
+// backend/server_NestJS/src/filters/http-exception.filter.ts
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
+
+@Catch(HttpException)
+export class HttpExceptionFilter implements ExceptionFilter {
+  private logger = new Logger(HttpExceptionFilter.name);
+
+  catch(exception: HttpException, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const request = ctx.getRequest();
+    const status = exception.getStatus();
+
+    // Log error
+    this.logger.error(
+      `${request.method} ${request.url} - Status: ${status} - Error: ${exception.message}`,
+      exception.stack
+    );
+
+    // Send response
+    ctx.getResponse().status(status).json({
+      statusCode: status,
+      message: exception.message,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+    });
+  }
+}
+```
+
+### Never Log Passwords/Tokens
+
+```typescript
+// ❌ DANGEROUS: Logs sensitive data
+this.logger.log(`User login: ${email} with password ${password}`); // DON'T DO THIS
+
+// ✅ SAFE: Only log non-sensitive data
+this.logger.log(`User login attempt for ${email}`);
+```
+
+### Set Up Alerts for Anomalies
+
+```typescript
+// Monitor for unusual activity
+async function checkLoginAnomalies() {
+  const recentFailures = await prisma.loginAttempt.count({
+    where: {
+      success: false,
+      createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) }, // Last 15 min
+    },
+  });
+
+  // Alert if more than 100 failed logins in 15 minutes
+  if (recentFailures > 100) {
+    await sendAlert('Possible brute force attack detected');
+  }
+}
+```
+
+---
+
+## 49.13 Security Headers
+
+```javascript
+// next.config.js
+module.exports = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Prevent MIME type sniffing
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+
+          // Prevent clickjacking (embedding site in iframe)
+          { key: 'X-Frame-Options', value: 'DENY' },
+
+          // Enable XSS filter (legacy browsers)
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+
+          // Force HTTPS
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+
+          // Control which origins can access resources
+          { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
+
+          // Limit Referrer information
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+
+          // Permissions Policy (disable unused features)
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
+  },
+};
+```
+
+---
+
+## 49.14 Key Takeaways
+
+**Authentication**:
+- ✅ **Strong passwords**: 8+ chars, complexity requirements
+- ✅ **bcrypt hashing**: 12+ rounds, salted
+- ✅ **JWT tokens**: Short expiration (15 min), refresh tokens
+- ✅ **Secure cookies**: HttpOnly, Secure, SameSite=Strict
+
+**Authorization**:
+- ✅ **Always verify on server** (never trust client)
+- ✅ **RBAC**: Role-based access control (Learner, Educator, Admin)
+- ✅ **Check permissions** for every request
+
+**Injection Attacks**:
+- ✅ **SQL Injection**: Use Prisma ORM (parameterized queries)
+- ✅ **XSS**: React auto-escapes, sanitize with DOMPurify if needed
+- ✅ **CSRF**: SameSite cookies, CSRF tokens for forms
+
+**API Security**:
+- ✅ **Rate limiting**: 100 req/15 min (5 for auth)
+- ✅ **Input validation**: Zod schemas on server
+- ✅ **CORS**: Whitelist trusted origins
+- ✅ **API keys**: Store in .env, rotate every 90 days
+
+**File Uploads**:
+- ✅ **Whitelist file types** (MIME type, not extension)
+- ✅ **Limit file size** (5MB)
+- ✅ **Rename files** (UUID prevents path traversal)
+- ✅ **Store outside web root**
+- ✅ **Virus scanning** (ClamAV)
+
+**Environment Variables**:
+- ✅ **Never commit .env** (add to .gitignore)
+- ✅ **Different secrets** for dev/prod
+- ✅ **Rotate secrets** every 90 days
+
+**HTTPS**:
+- ✅ **SSL certificates** (Let's Encrypt)
+- ✅ **Redirect HTTP to HTTPS**
+- ✅ **HSTS headers** (force HTTPS for 1 year)
+
+**Dependencies**:
+- ✅ **npm audit** before every deployment
+- ✅ **Keep updated** (weekly minor updates)
+- ✅ **Use Dependabot** (auto-detect vulnerabilities)
+
+**Logging**:
+- ✅ **Log all auth attempts** (success + failures)
+- ✅ **Log API errors** (with stack traces)
+- ✅ **Never log passwords/tokens**
+- ✅ **Set up alerts** (>100 failed logins = brute force)
+
+**Security Headers**:
+- ✅ **X-Content-Type-Options**: nosniff
+- ✅ **X-Frame-Options**: DENY
+- ✅ **Strict-Transport-Security**: max-age=31536000
+
+**Quick Security Checklist**:
+1. ✅ Strong passwords (8+ chars, bcrypt 12 rounds)
+2. ✅ JWT tokens (15 min expiration, HttpOnly cookies)
+3. ✅ Server-side authorization (never trust client)
+4. ✅ Prisma ORM (SQL injection protection)
+5. ✅ React auto-escaping (XSS protection)
+6. ✅ Rate limiting (5 login attempts per 15 min)
+7. ✅ Input validation (Zod schemas)
+8. ✅ HTTPS everywhere (SSL + HSTS)
+9. ✅ Security headers (X-Frame-Options, CSP, etc.)
+10. ✅ npm audit weekly (fix vulnerabilities)
+
+**Next Up**: Chapter 50 - Deployment & DevOps
+
+---
+
+# Chapter 50: Deployment & DevOps
+
+## 50.1 Deployment Overview
+
+**Deployment Pipeline**:
+```
+Local Development → Staging → Production
+     (dev)          (test)    (live users)
+```
+
+**Environments**:
+1. **Development**: Local machine (`bun run start:all`)
+2. **Staging**: Pre-production testing (identical to prod)
+3. **Production**: Live users (stable, monitored)
+
+**NextPhoton Stack**:
+- **Frontend**: Vercel (Next.js hosting)
+- **Backend**: DigitalOcean/AWS (NestJS on Docker)
+- **Database**: Supabase (PostgreSQL)
+- **CDN**: Cloudflare (static assets, DDoS protection)
+- **CI/CD**: GitHub Actions (automated tests + deployments)
+
+---
+
+## 50.2 Environment Setup
+
+### Development (.env.local)
+
+```bash
+# frontend/web/.env.local
+NODE_ENV=development
+NEXT_PUBLIC_API_URL=http://localhost:3001
+DATABASE_URL=postgresql://dev:password@localhost:5432/nextphoton_dev
+
+# Test API keys (no real charges)
+STRIPE_SECRET_KEY=sk_test_51abc...
+SENDGRID_API_KEY=SG.test...
+
+# JWT secrets (dev only)
+JWT_SECRET=dev_secret_not_for_production
+JWT_REFRESH_SECRET=dev_refresh_secret
+```
+
+### Staging (.env.staging)
+
+```bash
+# frontend/web/.env.staging
+NODE_ENV=staging
+NEXT_PUBLIC_API_URL=https://staging-api.nextphoton.com
+DATABASE_URL=postgresql://staging:pass@staging-db.supabase.co:5432/nextphoton_staging
+
+# Test API keys (still safe to test with)
+STRIPE_SECRET_KEY=sk_test_51xyz...
+SENDGRID_API_KEY=SG.staging...
+
+# Different JWT secrets (staging)
+JWT_SECRET=staging_secret_256_bit_random_string
+JWT_REFRESH_SECRET=staging_refresh_secret_256_bit_random
+```
+
+### Production (.env.production)
+
+```bash
+# frontend/web/.env.production
+NODE_ENV=production
+NEXT_PUBLIC_API_URL=https://api.nextphoton.com
+DATABASE_URL=postgresql://prod:strong_pass@prod-db.supabase.co:5432/nextphoton_prod
+
+# Live API keys (real charges, real emails)
+STRIPE_SECRET_KEY=sk_live_51real...
+SENDGRID_API_KEY=SG.live...
+
+# Strong JWT secrets (production)
+JWT_SECRET=prod_secret_a8f3e2d1c7b9a4f6e8d2c5b1a9f7e3d6c8b4a2f9e7d3c1b5a8f6e4d2c9b7a5f3
+JWT_REFRESH_SECRET=prod_refresh_c2b5a9f7e4d1c8b6a3f9e7d5c2b8a6f4e1d9c7b5a3f8e6d4c1b9a7f5e3d2c8b6
+```
+
+**Environment Variable Management**:
+- ✅ **Never commit .env files** (add to .gitignore)
+- ✅ **Use Vercel/AWS env UI** to set production secrets
+- ✅ **Rotate secrets every 90 days**
+- ✅ **Different databases** for dev/staging/prod
+
+---
+
+## 50.3 Database Deployment
+
+### Prisma Migrations
+
+```bash
+# 1. Create migration (after schema changes)
+bun run prisma:migrate dev --name add_user_roles
+
+# Generates:
+# shared/prisma/migrations/20250106_add_user_roles/migration.sql
+
+# 2. Test migration on staging
+export DATABASE_URL="postgresql://staging-db..."
+bun run prisma:migrate deploy
+
+# 3. Deploy to production
+export DATABASE_URL="postgresql://prod-db..."
+bun run prisma:migrate deploy
+```
+
+**Migration Workflow**:
+1. ✅ **Dev**: Create migration (`prisma migrate dev`)
+2. ✅ **Staging**: Test migration (`prisma migrate deploy`)
+3. ✅ **Production**: Deploy migration (`prisma migrate deploy`)
+4. ❌ **Never**: Edit migrations after creation
+
+### Backup Strategy
+
+```bash
+# Daily automated backups (cron job)
+0 2 * * * pg_dump -U postgres -d nextphoton_prod > /backups/backup_$(date +\%Y\%m\%d).sql
+
+# Retention policy:
+# - Daily backups for 7 days
+# - Weekly backups for 1 month
+# - Monthly backups for 1 year
+```
+
+**Backup Locations**:
+- ✅ **Primary**: AWS S3 (us-east-1)
+- ✅ **Secondary**: Google Cloud Storage (us-central1)
+- ✅ **Tertiary**: Local NAS (offline backup)
+
+### Rollback Plan
+
+```bash
+# If migration fails, rollback:
+1. Stop backend server (prevent new writes)
+2. Restore from backup:
+   psql -U postgres -d nextphoton_prod < /backups/backup_20250106.sql
+3. Revert code to previous commit:
+   git revert HEAD
+4. Redeploy backend
+5. Test thoroughly
+6. Resume traffic
+```
+
+**Rollback SLA**: 15 minutes (from detection to restored service)
+
+---
+
+## 50.4 Frontend Deployment (Next.js)
+
+### Vercel (Recommended)
+
+**Why Vercel**:
+- ✅ **Zero-config**: Push to GitHub, auto-deploys
+- ✅ **Edge Network**: CDN + serverless functions globally
+- ✅ **Preview Deployments**: Every PR gets unique URL
+- ✅ **Built for Next.js**: Created by Next.js team
+
+**Setup**:
+```bash
+# 1. Install Vercel CLI
+npm i -g vercel
+
+# 2. Login
+vercel login
+
+# 3. Deploy
+cd frontend/web
+vercel --prod
+```
+
+**GitHub Integration**:
+1. Go to https://vercel.com
+2. Click "Import Project"
+3. Connect GitHub repo (NextPhoton)
+4. Configure:
+   - **Root Directory**: `frontend/web`
+   - **Build Command**: `bun run build`
+   - **Output Directory**: `.next`
+5. Add environment variables (from .env.production)
+6. Deploy
+
+**Automatic Deployments**:
+- ✅ **Push to `main`**: Auto-deploy to production
+- ✅ **Push to `dev`**: Auto-deploy to staging
+- ✅ **Open PR**: Auto-deploy preview (unique URL)
+
+### Custom Domains
+
+```bash
+# Vercel dashboard:
+1. Go to Project Settings → Domains
+2. Add domain: nextphoton.com
+3. Add DNS records:
+   - A record: 76.76.21.21 (Vercel IP)
+   - CNAME: cname.vercel-dns.com
+4. Wait for SSL certificate (automatic via Let's Encrypt)
+```
+
+**SSL Certificate**:
+- ✅ **Automatic**: Vercel provisions SSL via Let's Encrypt
+- ✅ **Auto-renewal**: Every 90 days
+- ✅ **Wildcard support**: `*.nextphoton.com`
+
+---
+
+## 50.5 Backend Deployment (NestJS)
+
+### Docker Containerization
+
+**Dockerfile**:
+```dockerfile
+# backend/server_NestJS/Dockerfile
+FROM oven/bun:1.2.21 AS base
+WORKDIR /app
+
+# Install dependencies
+COPY package.json bun.lockb ./
+RUN bun install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build application
+RUN bun run build
+
+# Production image
+FROM oven/bun:1.2.21-slim
+WORKDIR /app
+
+# Copy built files
+COPY --from=base /app/dist ./dist
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/package.json ./
+
+# Expose port
+EXPOSE 3001
+
+# Start server
+CMD ["bun", "run", "start:prod"]
+```
+
+**Build & Run**:
+```bash
+# Build image
+docker build -t nextphoton-backend:latest .
+
+# Run container
+docker run -d \
+  --name nextphoton-backend \
+  -p 3001:3001 \
+  --env-file .env.production \
+  nextphoton-backend:latest
+```
+
+### Docker Compose (Local Dev)
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nextphoton_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend/server_NestJS
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./backend/server_NestJS/.env.local
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+```
+
+```bash
+# Start all services
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+```
+
+### Deploy to DigitalOcean
+
+```bash
+# 1. Create Droplet (Ubuntu 22.04, 2GB RAM)
+# 2. SSH into server
+ssh root@your-server-ip
+
+# 3. Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+# 4. Clone repo
+git clone https://github.com/your-org/NextPhoton.git
+cd NextPhoton/backend/server_NestJS
+
+# 5. Build & run
+docker build -t nextphoton-backend .
+docker run -d -p 3001:3001 --env-file .env.production nextphoton-backend
+
+# 6. Set up Nginx reverse proxy
+apt install nginx
+nano /etc/nginx/sites-available/nextphoton
+```
+
+**Nginx Config**:
+```nginx
+server {
+    listen 80;
+    server_name api.nextphoton.com;
+
+    location / {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+### PM2 (Process Management)
+
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start backend with PM2
+pm2 start dist/main.js --name nextphoton-backend
+
+# Auto-restart on crash
+pm2 startup
+pm2 save
+
+# Monitor logs
+pm2 logs nextphoton-backend
+
+# Restart after code update
+pm2 restart nextphoton-backend
+```
+
+---
+
+## 50.6 CI/CD Pipeline (GitHub Actions)
+
+**Workflow File**:
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy NextPhoton
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.2.21
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun test
+
+      - name: Build frontend
+        run: cd frontend/web && bun run build
+
+      - name: Build backend
+        run: cd backend/server_NestJS && bun run build
+
+  deploy-frontend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: frontend/web
+
+  deploy-backend:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          cd backend/server_NestJS
+          docker build -t nextphoton-backend:${{ github.sha }} .
+
+      - name: Push to Docker Hub
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push nextphoton-backend:${{ github.sha }}
+
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            docker pull nextphoton-backend:${{ github.sha }}
+            docker stop nextphoton-backend || true
+            docker rm nextphoton-backend || true
+            docker run -d --name nextphoton-backend -p 3001:3001 --env-file /root/.env.production nextphoton-backend:${{ github.sha }}
+```
+
+**GitHub Secrets** (Settings → Secrets):
+- `VERCEL_TOKEN`: Vercel API token
+- `VERCEL_ORG_ID`: Vercel org ID
+- `VERCEL_PROJECT_ID`: Vercel project ID
+- `DOCKER_USERNAME`: Docker Hub username
+- `DOCKER_PASSWORD`: Docker Hub password
+- `DO_HOST`: DigitalOcean droplet IP
+- `DO_USERNAME`: SSH username
+- `DO_SSH_KEY`: SSH private key
+
+---
+
+## 50.7 Monitoring & Logging
+
+### Error Tracking (Sentry)
+
+```bash
+# Install Sentry
+bun add @sentry/nextjs @sentry/node
+```
+
+```typescript
+// frontend/web/sentry.client.config.ts
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+  tracesSampleRate: 1.0, // 100% of transactions
+});
+```
+
+```typescript
+// backend/server_NestJS/src/main.ts
+import * as Sentry from '@sentry/node';
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV,
+});
+```
+
+**Sentry Features**:
+- ✅ **Error tracking**: Stack traces, user context
+- ✅ **Performance monitoring**: Slow API calls, page loads
+- ✅ **Alerts**: Email/Slack when errors spike
+- ✅ **Source maps**: Readable stack traces (unminified)
+
+### Logging (Winston)
+
+```typescript
+// backend/server_NestJS/src/logger/winston.logger.ts
+import { createLogger, format, transports } from 'winston';
+
+export const logger = createLogger({
+  level: 'info',
+  format: format.combine(
+    format.timestamp(),
+    format.errors({ stack: true }),
+    format.json()
+  ),
+  transports: [
+    new transports.File({ filename: 'error.log', level: 'error' }),
+    new transports.File({ filename: 'combined.log' }),
+  ],
+});
+
+// In production, log to external service
+if (process.env.NODE_ENV === 'production') {
+  logger.add(new transports.Console({
+    format: format.simple(),
+  }));
+}
+```
+
+**Log Levels**:
+- **error**: Critical errors (500 errors, crashes)
+- **warn**: Warnings (failed login, rate limit)
+- **info**: General info (user signup, API calls)
+- **debug**: Debugging info (SQL queries, cache hits)
+
+### Uptime Monitoring (UptimeRobot)
+
+```bash
+# Set up monitors at https://uptimerobot.com
+1. Add monitor: https://nextphoton.com (check every 5 min)
+2. Add monitor: https://api.nextphoton.com/health (check every 5 min)
+3. Set up alerts: Email/Slack when down
+```
+
+**Health Check Endpoint**:
+```typescript
+// backend/server_NestJS/src/health/health.controller.ts
+import { Controller, Get } from '@nestjs/common';
+import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
+
+@Controller('health')
+export class HealthController {
+  constructor(
+    private health: HealthCheckService,
+    private prismaHealth: PrismaHealthIndicator,
+  ) {}
+
+  @Get()
+  @HealthCheck()
+  check() {
+    return this.health.check([
+      () => this.prismaHealth.pingCheck('database'),
+    ]);
+  }
+}
+```
+
+---
+
+## 50.8 SSL Certificates (Let's Encrypt)
+
+### Certbot Setup
+
+```bash
+# Install Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Generate certificate
+sudo certbot --nginx -d nextphoton.com -d www.nextphoton.com
+
+# Certificates saved to:
+# /etc/letsencrypt/live/nextphoton.com/fullchain.pem
+# /etc/letsencrypt/live/nextphoton.com/privkey.pem
+```
+
+### Auto-Renewal
+
+```bash
+# Test auto-renewal
+sudo certbot renew --dry-run
+
+# Certbot auto-renewal (cron job runs twice daily)
+# Checks if certificate expires in <30 days, renews if needed
+```
+
+**Manual Renewal** (if needed):
+```bash
+sudo certbot renew
+sudo systemctl reload nginx
+```
+
+---
+
+## 50.9 CDN Setup (Cloudflare)
+
+**Why CDN**:
+- ✅ **Faster**: Cache static assets globally (images, CSS, JS)
+- ✅ **Cheaper**: Reduce bandwidth costs
+- ✅ **DDoS protection**: Block malicious traffic
+- ✅ **SSL**: Free SSL certificate
+
+**Setup**:
+1. Sign up at https://cloudflare.com
+2. Add site: nextphoton.com
+3. Update nameservers (at domain registrar):
+   - `ns1.cloudflare.com`
+   - `ns2.cloudflare.com`
+4. Enable settings:
+   - ✅ **Auto Minify**: JS, CSS, HTML
+   - ✅ **Brotli compression**: Compress responses
+   - ✅ **Always Use HTTPS**: Redirect HTTP
+   - ✅ **Cache Level**: Standard
+
+**Cache Rules**:
+```
+# Cache static assets for 1 year
+*.jpg, *.png, *.webp, *.svg, *.css, *.js
+Cache-Control: public, max-age=31536000, immutable
+
+# Don't cache API responses
+/api/*
+Cache-Control: no-cache
+```
+
+---
+
+## 50.10 Database Hosting
+
+### Supabase (Recommended)
+
+**Why Supabase**:
+- ✅ **Managed PostgreSQL**: No server maintenance
+- ✅ **Automatic backups**: Daily (retained 7 days)
+- ✅ **Connection pooling**: Built-in (handles 1000s of connections)
+- ✅ **Real-time**: WebSocket support (optional)
+- ✅ **Free tier**: 500MB database, 2GB bandwidth
+
+**Setup**:
+1. Sign up at https://supabase.com
+2. Create project: NextPhoton
+3. Get connection string:
+   ```
+   postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres
+   ```
+4. Add to `.env.production`:
+   ```bash
+   DATABASE_URL="postgresql://postgres:[password]@db.[project-id].supabase.co:5432/postgres"
+   ```
+
+### Connection Pooling
+
+```bash
+# .env.production (use connection pooler for serverless)
+DATABASE_URL="postgresql://postgres:[password]@db.[project-id].supabase.co:6543/postgres?pgbouncer=true"
+```
+
+**Why Connection Pooling**:
+- ✅ **Serverless-friendly**: Reuse connections (faster)
+- ✅ **Handle more requests**: Pool connections across requests
+- ✅ **Prevent "too many connections" error**
+
+### Read Replicas (Future Scaling)
+
+```bash
+# Primary database (write)
+DATABASE_URL_PRIMARY="postgresql://primary-db.supabase.co:5432/postgres"
+
+# Read replica (read-only, reduce load on primary)
+DATABASE_URL_REPLICA="postgresql://replica-db.supabase.co:5432/postgres"
+```
+
+```typescript
+// Use replica for read-only queries
+const learners = await prisma.$queryRaw`SELECT * FROM Learner`; // Read from replica
+```
+
+---
+
+## 50.11 Backup & Disaster Recovery
+
+### Daily Backups (Automated)
+
+```bash
+# Cron job (runs daily at 2 AM)
+0 2 * * * /usr/local/bin/backup-db.sh
+
+# backup-db.sh
+#!/bin/bash
+DATE=$(date +\%Y\%m\%d_\%H\%M\%S)
+BACKUP_DIR="/backups"
+DB_NAME="nextphoton_prod"
+
+# Dump database
+pg_dump -U postgres -d $DB_NAME | gzip > $BACKUP_DIR/backup_$DATE.sql.gz
+
+# Upload to S3
+aws s3 cp $BACKUP_DIR/backup_$DATE.sql.gz s3://nextphoton-backups/
+
+# Delete local backups older than 7 days
+find $BACKUP_DIR -name "backup_*.sql.gz" -mtime +7 -delete
+```
+
+### Offsite Backup Storage
+
+**Storage Locations**:
+1. **AWS S3** (us-east-1): Primary offsite backup
+2. **Google Cloud Storage** (us-central1): Secondary offsite backup
+3. **Local NAS**: Tertiary offline backup (air-gapped)
+
+**Retention Policy**:
+- ✅ **Daily backups**: 7 days
+- ✅ **Weekly backups**: 1 month (every Sunday)
+- ✅ **Monthly backups**: 1 year (first of month)
+
+### Recovery Testing
+
+```bash
+# Test restore every month (on staging)
+1. Download latest backup from S3
+2. Restore to staging database:
+   gunzip backup_20250106.sql.gz
+   psql -U postgres -d nextphoton_staging < backup_20250106.sql
+3. Run smoke tests (verify data integrity)
+4. Document restore time (aim for <15 min)
+```
+
+### RPO & RTO Targets
+
+- **RPO (Recovery Point Objective)**: 24 hours (max data loss = 1 day)
+- **RTO (Recovery Time Objective)**: 1 hour (max downtime = 1 hour)
+
+**Disaster Scenarios**:
+1. **Database corruption**: Restore from last backup (RPO: 24h, RTO: 15 min)
+2. **Server failure**: Spin up new server, restore backup (RTO: 30 min)
+3. **Data center outage**: Failover to backup region (RTO: 15 min)
+
+---
+
+## 50.12 Scaling Considerations
+
+### Horizontal vs Vertical Scaling
+
+**Vertical Scaling** (scale up):
+- ✅ **Pros**: Simple (just increase RAM/CPU)
+- ❌ **Cons**: Hardware limits (can't scale infinitely)
+- **When**: Early stage (<10k users)
+
+**Horizontal Scaling** (scale out):
+- ✅ **Pros**: Unlimited scaling (add more servers)
+- ❌ **Cons**: Complex (need load balancer, session management)
+- **When**: Growth stage (>50k users)
+
+### Load Balancing
+
+```nginx
+# Nginx load balancer
+upstream backend {
+    server backend1.nextphoton.com:3001;
+    server backend2.nextphoton.com:3001;
+    server backend3.nextphoton.com:3001;
+}
+
+server {
+    listen 80;
+    server_name api.nextphoton.com;
+
+    location / {
+        proxy_pass http://backend;
+    }
+}
+```
+
+**Load Balancing Strategies**:
+- **Round Robin**: Distribute evenly across servers
+- **Least Connections**: Send to server with fewest active connections
+- **IP Hash**: Same user always goes to same server (session affinity)
+
+### Database Sharding (Future)
+
+```typescript
+// Shard by user ID (user 1-1000 → DB1, 1001-2000 → DB2, etc.)
+function getShardedDB(userId: number) {
+  const shardId = Math.floor(userId / 1000);
+  return prismaClients[shardId]; // Array of Prisma clients
+}
+
+const learner = await getShardedDB(userId).learner.findUnique({ where: { id: userId } });
+```
+
+**When to Shard**: >1M users, >500GB database
+
+### Caching Layers (Redis)
+
+```typescript
+import { Redis } from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
+
+// Cache user data (5 min TTL)
+export async function getUser(userId: string) {
+  // Check cache first
+  const cached = await redis.get(`user:${userId}`);
+  if (cached) return JSON.parse(cached);
+
+  // Cache miss, fetch from database
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+
+  // Store in cache
+  await redis.set(`user:${userId}`, JSON.stringify(user), 'EX', 300); // 5 min
+
+  return user;
+}
+```
+
+**What to Cache**:
+- ✅ **User profiles**: 5 min TTL
+- ✅ **Course listings**: 10 min TTL
+- ✅ **Static content**: 1 hour TTL
+- ❌ **Don't cache**: Real-time data (live chat, notifications)
+
+---
+
+## 50.13 Cost Optimization
+
+### Monitor Cloud Costs
+
+**Tools**:
+- **Vercel**: Dashboard → Usage (bandwidth, function invocations)
+- **AWS**: Cost Explorer (S3, EC2, RDS costs)
+- **Supabase**: Dashboard → Billing (database size, queries)
+
+**Set Alerts**:
+```bash
+# AWS CloudWatch alert: Email if monthly cost > $100
+aws cloudwatch put-metric-alarm \
+  --alarm-name monthly-cost-alert \
+  --metric-name EstimatedCharges \
+  --threshold 100 \
+  --comparison-operator GreaterThanThreshold \
+  --alarm-actions arn:aws:sns:us-east-1:123456789:billing-alerts
+```
+
+### Auto-Scaling (Based on Traffic)
+
+```yaml
+# AWS Auto Scaling Group
+AutoScalingGroup:
+  MinSize: 2  # Minimum 2 servers (high availability)
+  MaxSize: 10 # Scale up to 10 servers (peak traffic)
+  TargetCPUUtilization: 70% # Scale when CPU > 70%
+```
+
+**Scaling Rules**:
+- **Scale up**: Add server when CPU > 70% for 5 min
+- **Scale down**: Remove server when CPU < 30% for 15 min
+
+### Reserved Instances (Predictable Workloads)
+
+**On-Demand** (pay per hour):
+- ✅ **Pros**: Flexible (no commitment)
+- ❌ **Cons**: Expensive (full price)
+
+**Reserved** (1-year or 3-year commitment):
+- ✅ **Pros**: 30-60% cheaper
+- ❌ **Cons**: Locked in (can't cancel)
+
+**NextPhoton Strategy**:
+- **Reserved**: 2 servers (always-on baseline)
+- **On-Demand**: Auto-scale additional servers (peak traffic)
+
+### Optimize Database Queries
+
+```typescript
+// ❌ Expensive: Fetch all fields, all users
+const users = await prisma.user.findMany();
+
+// ✅ Cheaper: Select only needed fields, add limit
+const users = await prisma.user.findMany({
+  select: { id: true, name: true, email: true },
+  take: 100, // Limit to 100 users
+});
+```
+
+**Query Optimization**:
+- ✅ **Select specific fields** (not `select: { * }`)
+- ✅ **Add limits** (`take: 100`)
+- ✅ **Use indexes** (faster queries)
+- ✅ **Cache frequent queries** (Redis)
+
+---
+
+## 50.14 Key Takeaways
+
+**Environments**:
+- ✅ **Development**: Local machine (.env.local)
+- ✅ **Staging**: Pre-production testing (.env.staging)
+- ✅ **Production**: Live users (.env.production)
+
+**Database**:
+- ✅ **Migrations**: `prisma migrate dev` → staging → production
+- ✅ **Backups**: Daily automated (retain 7 days, offsite S3)
+- ✅ **Rollback**: Restore from backup (<15 min)
+
+**Frontend (Next.js)**:
+- ✅ **Vercel**: Zero-config, auto-deploy on push
+- ✅ **Custom domain**: nextphoton.com (SSL automatic)
+- ✅ **Preview deployments**: Every PR gets unique URL
+
+**Backend (NestJS)**:
+- ✅ **Docker**: Containerize backend (`Dockerfile`)
+- ✅ **DigitalOcean/AWS**: Deploy Docker container
+- ✅ **PM2**: Process management (auto-restart on crash)
+
+**CI/CD**:
+- ✅ **GitHub Actions**: Automated tests + deployments
+- ✅ **Workflow**: Push → test → build → deploy
+- ✅ **Secrets**: Store in GitHub Secrets (never commit)
+
+**Monitoring**:
+- ✅ **Sentry**: Error tracking + alerts
+- ✅ **Winston**: Logging (error.log, combined.log)
+- ✅ **UptimeRobot**: Uptime monitoring (check every 5 min)
+
+**SSL**:
+- ✅ **Let's Encrypt**: Free SSL certificates
+- ✅ **Auto-renewal**: Every 90 days (Certbot cron job)
+
+**CDN**:
+- ✅ **Cloudflare**: Cache static assets, DDoS protection
+- ✅ **Cache rules**: 1 year for images/CSS/JS
+
+**Database Hosting**:
+- ✅ **Supabase**: Managed PostgreSQL (backups, pooling)
+- ✅ **Connection pooling**: Handle 1000s of connections
+- ✅ **Read replicas**: Scale reads (future)
+
+**Backups**:
+- ✅ **Daily backups**: 2 AM cron job (pg_dump)
+- ✅ **Offsite storage**: AWS S3, Google Cloud
+- ✅ **Recovery testing**: Monthly (verify restore works)
+- ✅ **RPO**: 24 hours (max data loss)
+- ✅ **RTO**: 1 hour (max downtime)
+
+**Scaling**:
+- ✅ **Vertical**: Increase RAM/CPU (<10k users)
+- ✅ **Horizontal**: Add more servers (>50k users)
+- ✅ **Load balancing**: Distribute traffic across servers
+- ✅ **Caching**: Redis for frequent queries
+
+**Cost Optimization**:
+- ✅ **Monitor costs**: AWS Cost Explorer, Vercel Usage
+- ✅ **Auto-scaling**: Scale up/down based on traffic
+- ✅ **Reserved instances**: 30-60% cheaper (predictable workloads)
+- ✅ **Optimize queries**: Select specific fields, add limits
+
+**Deployment Checklist**:
+1. ✅ Run tests (`bun test`)
+2. ✅ Run database migrations (`prisma migrate deploy`)
+3. ✅ Build frontend (`bun run build`)
+4. ✅ Build backend (`docker build`)
+5. ✅ Deploy to staging (test thoroughly)
+6. ✅ Deploy to production
+7. ✅ Verify health check (`/health`)
+8. ✅ Monitor logs (Sentry, Winston)
+9. ✅ Check performance (Vercel Analytics)
+10. ✅ Backup database (pg_dump)
+
+**Quick Deploy Commands**:
+```bash
+# Deploy frontend (Vercel)
+cd frontend/web && vercel --prod
+
+# Deploy backend (Docker)
+docker build -t nextphoton-backend:latest .
+docker run -d -p 3001:3001 --env-file .env.production nextphoton-backend:latest
+
+# Run migrations
+bun run prisma:migrate deploy
+
+# Check health
+curl https://api.nextphoton.com/health
+```
+
+**Next Up**: Chapter 51 - Debugging Techniques
+
+---
+
+## Chapter 51: Debugging Techniques
+
+**Learning Objectives**:
+- Master systematic debugging approaches
+- Use browser DevTools effectively
+- Debug React components and API calls
+- Troubleshoot common Next.js and NestJS errors
+- Implement error boundaries and logging
+
+**Time to Read**: 25-30 minutes
+
+---
+
+## 51.1 The Debugging Mindset
+
+**Debugging Is Not Trial and Error** - it's a systematic process.
+
+### The 5-Step Debugging Process
+
+1. **Reproduce**: Can you make the error happen again?
+2. **Isolate**: What's the smallest change that causes/fixes it?
+3. **Understand**: Why is this happening? (Root cause, not symptom)
+4. **Fix**: Make the minimal necessary change
+5. **Verify**: Confirm the fix works + didn't break anything else
+
+**Example Workflow**:
+```typescript
+// ❌ Wrong approach (trial and error)
+"Error in user list... Let me try random fixes!"
+// Try: Change useState → useEffect → useMemo → random code changes
+// Result: Waste 2 hours, still broken
+
+// ✅ Right approach (systematic)
+// 1. Reproduce: Open /dashboard/users → error appears
+// 2. Isolate: Console shows "Cannot read property 'name' of undefined"
+// 3. Understand: User data is null before API loads
+// 4. Fix: Add loading state or null check
+// 5. Verify: Error gone, users display correctly
+```
+
+---
+
+## 51.2 Browser DevTools Essentials
+
+### Console Tab
+
+**Basic Logging**:
+```typescript
+// Simple log
+console.log('User data:', userData);
+
+// Styled log (colored output)
+console.log('%c User loaded!', 'color: green; font-weight: bold;');
+
+// Table format (for arrays)
+console.table(users);
+
+// Error (red in console)
+console.error('Failed to load user:', error);
+
+// Warning (yellow in console)
+console.warn('Deprecated function used');
+
+// Group logs (collapsible)
+console.group('API Request');
+console.log('URL:', apiUrl);
+console.log('Headers:', headers);
+console.groupEnd();
+```
+
+**NextPhoton Example** (`frontend/web/src/app/dashboard/page.tsx`):
+```typescript
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export default function DashboardPage() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    console.group('🔄 Fetching Users');
+    console.log('Timestamp:', new Date().toISOString());
+
+    fetch('/api/users')
+      .then(res => {
+        console.log('Response status:', res.status);
+        return res.json();
+      })
+      .then(data => {
+        console.log('Users loaded:', data.length);
+        console.table(data); // Table view in console
+        setUsers(data);
+      })
+      .catch(error => {
+        console.error('❌ Fetch failed:', error);
+      })
+      .finally(() => {
+        console.groupEnd();
+      });
+  }, []);
+
+  return <div>Dashboard</div>;
+}
+```
+
+### Network Tab
+
+**Inspect API Calls**:
+1. Open DevTools → **Network** tab
+2. Filter by **Fetch/XHR** (API requests only)
+3. Click a request to see:
+   - **Headers** (Authorization token, Content-Type)
+   - **Payload** (request body)
+   - **Response** (status code, body)
+   - **Timing** (how long it took)
+
+**Common Issues to Check**:
+- ❌ **401 Unauthorized**: Token missing or expired (check Authorization header)
+- ❌ **404 Not Found**: Wrong API endpoint (check URL)
+- ❌ **500 Server Error**: Backend crash (check backend logs)
+- ❌ **CORS Error**: Backend CORS config missing (check NestJS CORS)
+
+**NextPhoton Example**:
+```
+Request:
+  URL: https://api.nextphoton.com/graphql
+  Method: POST
+  Headers:
+    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    Content-Type: application/json
+  Body:
+    {"query":"{ users { id name email } }"}
+
+Response:
+  Status: 200 OK
+  Body:
+    {"data":{"users":[{"id":1,"name":"John","email":"john@example.com"}]}}
+```
+
+### Sources Tab (Breakpoints)
+
+**Setting Breakpoints**:
+1. Open **Sources** tab
+2. Find your file (e.g., `app/dashboard/page.tsx`)
+3. Click line number to add breakpoint (blue marker)
+4. Trigger the code (e.g., click button)
+5. Execution pauses at breakpoint
+6. Hover over variables to see values
+7. Use controls: **Resume** (▶), **Step Over** (↷), **Step Into** (↓)
+
+**NextPhoton Example**:
+```typescript
+// Set breakpoint on line 15
+function handleSubmit(data: FormData) {
+  debugger; // 👈 Breakpoint (code pauses here)
+
+  const userId = data.userId; // Hover to see value
+  console.log('User ID:', userId);
+
+  // Step through each line
+  sendToBackend(userId);
+}
+```
+
+### React DevTools
+
+**Install**: Chrome extension "React Developer Tools"
+
+**Component Tree**:
+- View component hierarchy
+- See props passed to each component
+- See state (useState values)
+- See context values
+
+**Profiler**:
+- Measure render performance
+- Find slow components
+- See why component re-rendered
+
+**NextPhoton Example**:
+```
+React DevTools:
+  <AuthProvider>
+    props: { children: <App /> }
+    context: { user: { id: 1, email: "john@example.com" }, isAuthenticated: true }
+
+    <DashboardPage>
+      props: {}
+      state: { users: [...], loading: false }
+
+      <UserList>
+        props: { users: [...] }
+```
+
+### Apollo DevTools
+
+**Install**: Chrome extension "Apollo Client Devtools"
+
+**Features**:
+- View GraphQL queries + results
+- Inspect Apollo cache
+- Test queries in GraphiQL
+- See loading states
+
+**NextPhoton Example**:
+```
+Apollo DevTools → Queries:
+  ✅ GET_USERS (completed)
+     Variables: { limit: 10 }
+     Result: { users: [...] }
+     From cache: false
+     Duration: 123ms
+```
+
+---
+
+## 51.3 Debugging React Components
+
+### Console Log in Render
+
+```typescript
+'use client';
+
+import { useState, useEffect } from 'react';
+
+export default function UserProfile({ userId }: { userId: number }) {
+  const [user, setUser] = useState(null);
+
+  console.log('🔄 UserProfile render:', { userId, user }); // Every render
+
+  useEffect(() => {
+    console.log('🚀 useEffect triggered (fetching user)');
+    fetchUser(userId).then(data => {
+      console.log('✅ User loaded:', data);
+      setUser(data);
+    });
+  }, [userId]); // Re-run when userId changes
+
+  if (!user) {
+    console.log('⏳ Rendering loading state');
+    return <div>Loading...</div>;
+  }
+
+  console.log('✅ Rendering user:', user.name);
+  return <div>{user.name}</div>;
+}
+```
+
+**Console Output**:
+```
+🔄 UserProfile render: { userId: 1, user: null }
+⏳ Rendering loading state
+🚀 useEffect triggered (fetching user)
+✅ User loaded: { id: 1, name: "John" }
+🔄 UserProfile render: { userId: 1, user: { id: 1, name: "John" } }
+✅ Rendering user: John
+```
+
+### React DevTools Profiler
+
+**Steps**:
+1. Open React DevTools → **Profiler** tab
+2. Click **Record** (●)
+3. Interact with your app (click button, type in input)
+4. Click **Stop** (■)
+5. View **Flame Graph** (which components rendered + how long)
+
+**Interpreting Results**:
+- 🟢 **Green**: Fast (<10ms)
+- 🟡 **Yellow**: Moderate (10-50ms)
+- 🔴 **Red**: Slow (>50ms) ← Optimize these!
+
+**Common Fixes**:
+- ✅ **Memoize expensive calculations** (`useMemo`)
+- ✅ **Prevent unnecessary re-renders** (`React.memo`, `useCallback`)
+- ✅ **Split large components** (lazy load)
+
+### Debugging useEffect
+
+**Common Issue: Infinite Loop**:
+```typescript
+// ❌ Infinite loop (missing dependency array)
+useEffect(() => {
+  setCount(count + 1); // Re-renders → triggers useEffect → re-renders...
+});
+
+// ✅ Run once on mount
+useEffect(() => {
+  fetchData();
+}, []); // Empty array = run once
+
+// ✅ Run when userId changes
+useEffect(() => {
+  fetchUser(userId);
+}, [userId]); // Re-run only when userId changes
+```
+
+**Debugging Dependencies**:
+```typescript
+useEffect(() => {
+  console.log('useEffect triggered');
+  console.log('Dependencies:', { userId, filters });
+  fetchUsers(userId, filters);
+}, [userId, filters]); // If filters is an object, this may re-run every render!
+
+// ✅ Fix: Memoize object/array dependencies
+const filters = useMemo(() => ({ status: 'active' }), []); // Only create once
+```
+
+### State Not Updating (Closure Issue)
+
+```typescript
+// ❌ Stale state (closure captures old value)
+const [count, setCount] = useState(0);
+
+useEffect(() => {
+  setInterval(() => {
+    console.log('Count:', count); // Always logs 0 (stale closure)
+    setCount(count + 1); // Doesn't increment properly
+  }, 1000);
+}, []); // Empty array = captures initial count (0)
+
+// ✅ Fix: Use functional update
+useEffect(() => {
+  setInterval(() => {
+    setCount(prevCount => {
+      console.log('Count:', prevCount); // Logs current value
+      return prevCount + 1; // Increments correctly
+    });
+  }, 1000);
+}, []);
+```
+
+---
+
+## 51.4 Debugging API Calls
+
+### Network Tab Inspection
+
+**Step-by-Step**:
+1. Open DevTools → **Network** tab
+2. Filter by **Fetch/XHR**
+3. Trigger API call (e.g., click "Load Users" button)
+4. Click request in Network tab
+5. Check:
+   - **Request URL**: Correct endpoint?
+   - **Request Method**: GET/POST/PUT/DELETE?
+   - **Request Headers**: Authorization token present?
+   - **Request Body**: JSON formatted correctly?
+   - **Response Status**: 200 OK or 401/404/500?
+   - **Response Body**: Expected data?
+
+### Check Request Headers
+
+```typescript
+// ❌ Missing Authorization header
+fetch('/api/users'); // 401 Unauthorized
+
+// ✅ Include token
+const token = localStorage.getItem('token');
+fetch('/api/users', {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+});
+```
+
+### Check Request Body
+
+```typescript
+// ❌ Invalid JSON (missing quotes)
+fetch('/api/users', {
+  method: 'POST',
+  body: { name: John }, // ❌ Syntax error
+});
+
+// ✅ Stringify JSON
+fetch('/api/users', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'John' }), // ✅ Valid JSON
+});
+```
+
+### Check Response Status & Body
+
+```typescript
+fetch('/api/users')
+  .then(async res => {
+    console.log('Status:', res.status); // 200, 401, 404, 500?
+    console.log('OK:', res.ok); // true if 200-299, false otherwise
+
+    const text = await res.text(); // Get raw response
+    console.log('Raw response:', text);
+
+    if (!res.ok) {
+      console.error('Request failed:', res.status, text);
+      throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+
+    const data = JSON.parse(text); // Parse JSON
+    console.log('Parsed data:', data);
+    return data;
+  })
+  .catch(error => {
+    console.error('Fetch error:', error.message);
+  });
+```
+
+### CORS Errors
+
+**Error Message**:
+```
+Access to fetch at 'https://api.nextphoton.com/users' from origin 'http://localhost:3000'
+has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present.
+```
+
+**Fix** (in NestJS backend):
+```typescript
+// backend/server_NestJS/src/main.ts
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  // ✅ Enable CORS
+  app.enableCors({
+    origin: ['http://localhost:3000', 'https://nextphoton.com'],
+    credentials: true,
+  });
+
+  await app.listen(3001);
+}
+```
+
+---
+
+## 51.5 Debugging Next.js
+
+### Server vs Client Errors
+
+**Server Errors** (show in terminal):
+```typescript
+// app/page.tsx (Server Component)
+export default async function HomePage() {
+  console.log('This logs in TERMINAL (server)');
+  const data = await fetchData(); // Error shows in terminal
+  return <div>{data}</div>;
+}
+```
+
+**Client Errors** (show in browser console):
+```typescript
+'use client'; // Client Component
+
+export default function HomePage() {
+  console.log('This logs in BROWSER console');
+  const data = fetchData(); // Error shows in browser DevTools
+  return <div>{data}</div>;
+}
+```
+
+### Hydration Mismatches
+
+**Error**:
+```
+Hydration failed because the server rendered HTML didn't match the client.
+```
+
+**Cause**: Server HTML ≠ Client HTML
+
+**Common Causes**:
+```typescript
+// ❌ Using window/localStorage in Server Component
+export default function Page() {
+  const user = localStorage.getItem('user'); // ❌ localStorage only exists in browser
+  return <div>{user}</div>;
+}
+
+// ✅ Fix: Use 'use client'
+'use client';
+
+export default function Page() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    setUser(localStorage.getItem('user')); // ✅ Runs only in browser
+  }, []);
+
+  return <div>{user}</div>;
+}
+```
+
+```typescript
+// ❌ Different HTML on server vs client
+export default function Page() {
+  return <div>{Math.random()}</div>; // Random value = different on server vs client
+}
+
+// ✅ Fix: Same value on server and client
+export default function Page() {
+  return <div>Hello</div>; // Static = same everywhere
+}
+```
+
+### 'use client' Missing
+
+**Error**:
+```
+You're importing a component that needs useState. It only works in a Client Component
+but none of its parents are marked with "use client".
+```
+
+**Fix**:
+```typescript
+// ❌ Missing 'use client'
+import { useState } from 'react'; // Error: useState requires 'use client'
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+
+// ✅ Add 'use client'
+'use client';
+
+import { useState } from 'react';
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+### Module Not Found Errors
+
+**Error**:
+```
+Module not found: Can't resolve '@/lib/utils'
+```
+
+**Fixes**:
+1. **Check path alias** (`tsconfig.json`):
+```json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"] // ✅ Correct alias
+    }
+  }
+}
+```
+
+2. **Check file exists**:
+```bash
+# Does the file exist?
+ls src/lib/utils.ts # If not, create it
+```
+
+3. **Check import**:
+```typescript
+// ❌ Wrong import
+import { cn } from '@/lib/utils'; // File is utils.ts (singular)
+
+// ✅ Correct import
+import { cn } from '@/lib/utils'; // Match filename exactly
+```
+
+---
+
+## 51.6 Debugging Backend (NestJS)
+
+### Console Log in Services
+
+```typescript
+// backend/server_NestJS/src/users/users.service.ts
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class UsersService {
+  constructor(private prisma: PrismaService) {}
+
+  async findAll() {
+    console.log('🔍 UsersService.findAll called');
+
+    const users = await this.prisma.user.findMany();
+    console.log('✅ Users found:', users.length);
+    console.table(users); // Table format in terminal
+
+    return users;
+  }
+
+  async findOne(id: number) {
+    console.log('🔍 UsersService.findOne called:', { id });
+
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      console.error('❌ User not found:', id);
+      throw new Error(`User ${id} not found`);
+    }
+
+    console.log('✅ User found:', user.email);
+    return user;
+  }
+}
+```
+
+### NestJS Logger
+
+```typescript
+import { Injectable, Logger } from '@nestjs/common';
+
+@Injectable()
+export class UsersService {
+  private readonly logger = new Logger(UsersService.name); // ✅ Built-in logger
+
+  async findAll() {
+    this.logger.log('Fetching all users'); // Info
+    const users = await this.prisma.user.findMany();
+    this.logger.log(`Found ${users.length} users`);
+    return users;
+  }
+
+  async create(data: CreateUserDto) {
+    this.logger.debug('Creating user with data:', data); // Debug
+    try {
+      const user = await this.prisma.user.create({ data });
+      this.logger.log(`User created: ${user.id}`);
+      return user;
+    } catch (error) {
+      this.logger.error('Failed to create user:', error.stack); // Error
+      throw error;
+    }
+  }
+}
+```
+
+**Terminal Output**:
+```
+[Nest] 12345  - 2024-10-06 10:30:45   LOG [UsersService] Fetching all users
+[Nest] 12345  - 2024-10-06 10:30:46   LOG [UsersService] Found 10 users
+[Nest] 12345  - 2024-10-06 10:31:00 DEBUG [UsersService] Creating user with data: { email: "..." }
+[Nest] 12345  - 2024-10-06 10:31:01   LOG [UsersService] User created: 123
+```
+
+### Debug in VSCode
+
+**Create `.vscode/launch.json`**:
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug NestJS",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}/backend/server_NestJS",
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
+```
+
+**Usage**:
+1. Set breakpoint in `.ts` file (click line number)
+2. Press **F5** (start debugging)
+3. Trigger the code (e.g., API request)
+4. Execution pauses at breakpoint
+5. Hover over variables, step through code
+
+### Database Query Logging (Prisma)
+
+**Enable Prisma Logs** (`shared/db/index.ts`):
+```typescript
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'], // ✅ Log all queries
+});
+
+export default prisma;
+```
+
+**Terminal Output**:
+```
+prisma:query SELECT "User"."id", "User"."email" FROM "User" WHERE 1=1 LIMIT $1
+prisma:query SELECT "Session"."id", "Session"."userId" FROM "Session" WHERE "userId" = $1
+```
+
+**SQL Query Inspection**:
+```typescript
+const users = await prisma.$queryRaw`
+  SELECT * FROM "User" WHERE email = ${email}
+`;
+console.log('Raw SQL result:', users);
+```
+
+---
+
+## 51.7 Debugging Database Issues
+
+### Prisma Studio (Visual DB Browser)
+
+**Open Prisma Studio**:
+```bash
+cd /home/teamzenith/ZenCo/NextPhoton
+bun run prisma:studio
+```
+
+**Opens**: http://localhost:5555
+
+**Features**:
+- ✅ View all tables (User, Session, etc.)
+- ✅ Browse rows (click table to see data)
+- ✅ Edit data (click cell to edit)
+- ✅ Add new rows (click "Add record")
+- ✅ Delete rows (checkbox → Delete)
+
+### Check Prisma Logs
+
+```typescript
+// shared/db/test-connection.ts
+import prisma from './index';
+
+async function testConnection() {
+  try {
+    console.log('Testing database connection...');
+
+    const result = await prisma.$queryRaw`SELECT NOW()`;
+    console.log('✅ Database connected:', result);
+
+    const userCount = await prisma.user.count();
+    console.log('✅ User count:', userCount);
+
+  } catch (error) {
+    console.error('❌ Database connection failed:');
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Full error:', error);
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+testConnection();
+```
+
+**Run**:
+```bash
+bun run test:db
+```
+
+### Connection Errors
+
+**Error**:
+```
+P1001: Can't reach database server at `localhost:5432`
+```
+
+**Fixes**:
+1. **Check DATABASE_URL** (`.env`):
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/nextphoton?schema=public"
+```
+
+2. **Check PostgreSQL is running**:
+```bash
+# Check if PostgreSQL is running
+sudo systemctl status postgresql
+
+# Start PostgreSQL
+sudo systemctl start postgresql
+```
+
+3. **Test connection**:
+```bash
+# Connect with psql
+psql -h localhost -U user -d nextphoton
+```
+
+---
+
+## 51.8 Common Errors & Solutions
+
+### "Cannot read property of undefined"
+
+**Error**:
+```
+TypeError: Cannot read property 'name' of undefined
+```
+
+**Cause**: Accessing property on `null`/`undefined` object.
+
+**Fix**:
+```typescript
+// ❌ Error if user is null
+const userName = user.name; // TypeError: Cannot read property 'name' of undefined
+
+// ✅ Null check
+const userName = user?.name; // Optional chaining (returns undefined if user is null)
+
+// ✅ Default value
+const userName = user?.name || 'Anonymous';
+
+// ✅ Early return
+if (!user) {
+  return <div>Loading...</div>;
+}
+return <div>{user.name}</div>; // Safe: user exists
+```
+
+### "Objects are not valid as React child"
+
+**Error**:
+```
+Error: Objects are not valid as a React child (found: object with keys {id, name}).
+```
+
+**Cause**: Rendering an object directly in JSX.
+
+**Fix**:
+```typescript
+// ❌ Can't render object
+return <div>{user}</div>; // Error: user is { id: 1, name: "John" }
+
+// ✅ Render specific property
+return <div>{user.name}</div>;
+
+// ✅ Stringify for debugging
+return <div>{JSON.stringify(user)}</div>;
+```
+
+### "Too many re-renders"
+
+**Error**:
+```
+Error: Too many re-renders. React limits the number of renders to prevent an infinite loop.
+```
+
+**Cause**: State update in render (not in event handler or useEffect).
+
+**Fix**:
+```typescript
+// ❌ Infinite loop
+function Counter() {
+  const [count, setCount] = useState(0);
+  setCount(count + 1); // Called during render → triggers re-render → infinite loop
+  return <div>{count}</div>;
+}
+
+// ✅ Update in event handler
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      {count}
+    </button>
+  );
+}
+```
+
+### "CORS error"
+
+**Error**:
+```
+Access to fetch has been blocked by CORS policy
+```
+
+**Fix** (backend):
+```typescript
+// backend/server_NestJS/src/main.ts
+app.enableCors({
+  origin: ['http://localhost:3000', 'https://nextphoton.com'],
+  credentials: true,
+});
+```
+
+### "401 Unauthorized"
+
+**Error**:
+```
+Response status: 401 Unauthorized
+```
+
+**Causes**:
+1. **Token missing** (check Authorization header)
+2. **Token expired** (refresh or re-login)
+3. **Token invalid** (corrupted or wrong format)
+
+**Fix**:
+```typescript
+// Check token in localStorage
+const token = localStorage.getItem('token');
+console.log('Token:', token); // null = missing
+
+// Check token in request
+fetch('/api/users', {
+  headers: {
+    'Authorization': `Bearer ${token}`, // ✅ Include token
+  },
+});
+
+// Check token expiry
+import { jwtDecode } from 'jwt-decode';
+const decoded = jwtDecode(token);
+console.log('Token expires:', new Date(decoded.exp * 1000));
+```
+
+---
+
+## 51.9 Error Boundaries
+
+**Catch React Errors** (prevent white screen of death):
+
+```typescript
+// frontend/web/src/components/ErrorBoundary.tsx
+'use client';
+
+import React, { Component, ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    // Update state when error is thrown
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Log error to monitoring service (e.g., Sentry)
+    console.error('ErrorBoundary caught:', error, errorInfo);
+
+    // Send to Sentry
+    // Sentry.captureException(error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Display fallback UI
+      return this.props.fallback || (
+        <div className="p-4 bg-red-50 border border-red-200 rounded">
+          <h2 className="text-red-800 font-bold">Something went wrong</h2>
+          <p className="text-red-600">{this.state.error?.message}</p>
+          <button
+            onClick={() => this.setState({ hasError: false })}
+            className="mt-2 px-4 py-2 bg-red-600 text-white rounded"
+          >
+            Try again
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default ErrorBoundary;
+```
+
+**Usage**:
+```typescript
+// frontend/web/src/app/layout.tsx
+import ErrorBoundary from '@/components/ErrorBoundary';
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
+      </body>
+    </html>
+  );
+}
+```
+
+**Result**: If any component throws an error, show fallback UI instead of crashing the whole app.
+
+---
+
+## 51.10 Debugging Tools Summary
+
+### VSCode Debugger
+- ✅ **Breakpoints**: Pause execution at specific line
+- ✅ **Step through code**: Execute line-by-line
+- ✅ **Inspect variables**: Hover to see values
+- ✅ **Watch expressions**: Track specific variables
+
+### Chrome DevTools
+- ✅ **Console**: Log messages, errors, warnings
+- ✅ **Network**: Inspect API requests/responses
+- ✅ **Sources**: Breakpoints in browser code
+- ✅ **React DevTools**: Component tree, props, state
+- ✅ **Apollo DevTools**: GraphQL queries, cache
+
+### Postman (API Testing)
+- ✅ **Test API endpoints** (without frontend)
+- ✅ **Set headers** (Authorization, Content-Type)
+- ✅ **Send JSON body** (POST/PUT requests)
+- ✅ **View response** (status, headers, body)
+- ✅ **Save requests** (reusable collections)
+
+**Example**:
+```
+POST https://api.nextphoton.com/auth/login
+Headers:
+  Content-Type: application/json
+Body (raw JSON):
+  {
+    "email": "john@example.com",
+    "password": "password123"
+  }
+
+Response:
+  Status: 200 OK
+  Body:
+    {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "user": { "id": 1, "email": "john@example.com" }
+    }
+```
+
+### Prisma Studio
+- ✅ **Visual database browser** (no SQL needed)
+- ✅ **View all tables** (User, Session, etc.)
+- ✅ **Edit data** (click cell to edit)
+- ✅ **Add/delete rows**
+
+---
+
+## 51.11 Key Takeaways
+
+**Debugging Process**:
+1. ✅ **Reproduce**: Make the error happen consistently
+2. ✅ **Isolate**: Find the smallest code that triggers it
+3. ✅ **Understand**: Why is it happening? (root cause)
+4. ✅ **Fix**: Make minimal necessary change
+5. ✅ **Verify**: Confirm fix works + no side effects
+
+**Browser DevTools**:
+- ✅ **Console**: `console.log`, `console.error`, `console.table`
+- ✅ **Network**: Inspect API calls (headers, body, status)
+- ✅ **Sources**: Breakpoints (pause execution, inspect variables)
+- ✅ **React DevTools**: Component tree, props, state
+- ✅ **Apollo DevTools**: GraphQL queries, cache
+
+**React Debugging**:
+- ✅ **console.log in render**: See when component re-renders
+- ✅ **React DevTools Profiler**: Find slow components
+- ✅ **useEffect debugging**: Check dependencies, avoid infinite loops
+- ✅ **State closure issue**: Use functional updates
+
+**API Debugging**:
+- ✅ **Network tab**: Check request URL, headers, body, response
+- ✅ **Authorization**: Include `Bearer ${token}` header
+- ✅ **JSON format**: `JSON.stringify(body)`
+- ✅ **CORS**: Enable in backend (`app.enableCors()`)
+
+**Next.js Debugging**:
+- ✅ **Server errors**: Show in terminal
+- ✅ **Client errors**: Show in browser console
+- ✅ **Hydration mismatches**: Server HTML ≠ Client HTML (fix: use `'use client'`)
+- ✅ **'use client' missing**: Add when using hooks (useState, useEffect)
+
+**Backend Debugging**:
+- ✅ **console.log in services**: Track function calls
+- ✅ **NestJS logger**: `this.logger.log()`, `this.logger.error()`
+- ✅ **VSCode debugger**: Breakpoints in `.ts` files
+- ✅ **Prisma logs**: Log all database queries
+
+**Database Debugging**:
+- ✅ **Prisma Studio**: Visual database browser (http://localhost:5555)
+- ✅ **Prisma logs**: Enable query logging
+- ✅ **Connection test**: `bun run test:db`
+- ✅ **Check DATABASE_URL**: Verify connection string
+
+**Common Errors**:
+- ✅ **"Cannot read property of undefined"**: Use optional chaining (`user?.name`)
+- ✅ **"Objects are not valid as React child"**: Render specific property (`user.name`)
+- ✅ **"Too many re-renders"**: Move state updates to event handlers
+- ✅ **"CORS error"**: Enable CORS in backend
+- ✅ **"401 Unauthorized"**: Check Authorization header, token expiry
+
+**Error Boundaries**:
+- ✅ **Catch React errors**: Prevent white screen of death
+- ✅ **Display fallback UI**: Show error message + retry button
+- ✅ **Log to Sentry**: Track errors in production
+
+**Debugging Tools**:
+- ✅ **VSCode**: Breakpoints, step through code
+- ✅ **Chrome DevTools**: Console, Network, Sources
+- ✅ **Postman**: Test API endpoints (without frontend)
+- ✅ **Prisma Studio**: Visual database browser
+
+**Pro Tips**:
+- ✅ **Read error messages carefully** (they tell you exactly what's wrong)
+- ✅ **console.log everywhere** (track code execution)
+- ✅ **Isolate the problem** (comment out code until error disappears)
+- ✅ **Check the Network tab** (99% of API issues visible here)
+- ✅ **Use React DevTools** (see component state in real-time)
+
+**Next Up**: Chapter 52 - Future Enhancements & Scalability
+
+---
+
+## Chapter 52: Future Enhancements & Scalability
+
+**Learning Objectives**:
+- Understand NextPhoton's current state and planned features
+- Learn scalability roadmap (1K → 100K+ users)
+- Explore caching, microservices, database scaling
+- Plan for mobile apps, AI/ML features, internationalization
+
+**Time to Read**: 25-30 minutes
+
+---
+
+## 52.1 Current NextPhoton State (MVP)
+
+### What's Built (MVP Features Complete)
+
+**Authentication & Authorization**:
+- ✅ JWT authentication (login, signup, logout)
+- ✅ ABAC (Attribute-Based Access Control)
+- ✅ Multi-role system (Learner, Guardian, Educator, ECM, Admin)
+- ✅ Role-based dashboards
+
+**User Management**:
+- ✅ User profiles (view, edit)
+- ✅ Guardian-learner linking
+- ✅ Educator onboarding
+
+**Session Management**:
+- ✅ Session booking (Learner → Educator)
+- ✅ Session details (time, subject, status)
+- ✅ Session history
+
+**Task System**:
+- ✅ Task assignment (Educator → Learner)
+- ✅ Task submission (Learner → Educator)
+- ✅ Task review (Educator feedback)
+
+**Monitoring**:
+- ✅ Learner progress tracking
+- ✅ Guardian monitoring dashboard
+- ✅ ECM oversight tools
+
+**Tech Stack**:
+- ✅ Frontend: Next.js 15, React, Tailwind CSS v4
+- ✅ Backend: NestJS, GraphQL, REST APIs
+- ✅ Database: PostgreSQL + Prisma ORM
+- ✅ Deployment: Vercel (frontend), DigitalOcean (backend)
+
+### What's NOT Built Yet
+
+**Mobile Apps**:
+- ❌ iOS app (React Native)
+- ❌ Android app (React Native)
+
+**Desktop App**:
+- ❌ Electron app (Windows, Mac, Linux)
+
+**Advanced Features**:
+- ❌ Video session recording
+- ❌ AI-powered recommendations
+- ❌ Gamification (badges, points, leaderboards)
+- ❌ Community features (forums, groups)
+- ❌ Advanced analytics with ML
+
+**Scalability Enhancements**:
+- ❌ Caching layer (Redis)
+- ❌ Microservices architecture
+- ❌ Database sharding
+- ❌ Queue system (Bull/BullMQ)
+- ❌ Search engine (Elasticsearch)
+- ❌ Real-time features (WebSockets)
+
+---
+
+## 52.2 Planned Feature Enhancements
+
+### Mobile Apps (React Native)
+
+**Why**:
+- ✅ **Learners**: Study on-the-go (mobile-first)
+- ✅ **Guardians**: Monitor from anywhere (push notifications)
+- ✅ **Educators**: Update session notes on mobile
+
+**Tech Stack**:
+- **React Native**: Shared codebase (iOS + Android)
+- **Expo**: Fast development + deployment
+- **Shared GraphQL API**: Same backend as web app
+
+**Key Features**:
+- ✅ **Offline support**: Cache data locally (view tasks offline)
+- ✅ **Push notifications**: New task, session reminder
+- ✅ **Camera**: Scan homework, upload photos
+- ✅ **Biometric auth**: Fingerprint/Face ID login
+
+**File Structure**:
+```
+NextPhoton/
+├── frontend/
+│   ├── web/           # Next.js web app (existing)
+│   └── mobile/        # React Native app (new)
+│       ├── ios/       # iOS build files
+│       ├── android/   # Android build files
+│       ├── src/
+│       │   ├── screens/  # App screens (Dashboard, Tasks, etc.)
+│       │   ├── components/  # Shared components
+│       │   └── services/    # API calls (shared with web)
+│       └── package.json
+```
+
+### Desktop App (Electron)
+
+**Why**:
+- ✅ **Educators**: Full-featured desktop app (larger screen, better multitasking)
+- ✅ **Offline mode**: Work without internet (sync later)
+- ✅ **System integration**: File system access, notifications
+
+**Tech Stack**:
+- **Electron**: Wrap Next.js web app
+- **Electron Builder**: Package for Windows, Mac, Linux
+- **Auto-updater**: Push updates to users
+
+### AI-Powered Recommendations
+
+**Feature**: Suggest best educators for learners (based on past performance, subject, availability).
+
+**How It Works**:
+```typescript
+// backend/server_NestJS/src/ai/recommendations.service.ts
+import { Injectable } from '@nestjs/common';
+
+@Injectable()
+export class RecommendationsService {
+  async recommendEducators(learnerId: number) {
+    // 1. Get learner's weak subjects
+    const weakSubjects = await this.getWeakSubjects(learnerId);
+
+    // 2. Find educators who teach those subjects
+    const educators = await this.findEducators(weakSubjects);
+
+    // 3. Rank educators by:
+    //    - Success rate (past learners improved?)
+    //    - Availability (free slots)
+    //    - Rating (reviews)
+    const ranked = await this.rankEducators(educators, learnerId);
+
+    return ranked.slice(0, 5); // Top 5 recommendations
+  }
+}
+```
+
+**ML Model** (future):
+- **Collaborative filtering**: "Learners like you also booked Educator X"
+- **Content-based**: Match learner's learning style to educator's teaching style
+
+### Video Session Recording
+
+**Feature**: Record live sessions (for review later).
+
+**Tech Stack**:
+- **WebRTC**: Peer-to-peer video calls
+- **Cloud storage**: AWS S3 (store recordings)
+- **Transcription**: AWS Transcribe (convert speech to text)
+
+**Use Cases**:
+- ✅ **Learners**: Rewatch session (revision)
+- ✅ **Guardians**: Monitor session quality
+- ✅ **ECM**: Review educator performance
+
+### Advanced Analytics with ML
+
+**Feature**: Predict learner churn (likely to drop out).
+
+**Model**:
+```python
+# Python ML model (deployed as API)
+from sklearn.ensemble import RandomForestClassifier
+
+# Features: attendance, task completion, session frequency
+# Label: churned (1) or active (0)
+
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Predict churn risk for learner
+churn_risk = model.predict_proba([learner_features])[0][1]
+# 0.8 = 80% likely to churn → trigger intervention (ECM reaches out)
+```
+
+**Integration**:
+```typescript
+// backend/server_NestJS/src/analytics/churn.service.ts
+async predictChurn(learnerId: number) {
+  const features = await this.getLearnerFeatures(learnerId);
+
+  // Call Python ML API
+  const response = await fetch('http://ml-api:5000/predict-churn', {
+    method: 'POST',
+    body: JSON.stringify({ features }),
+  });
+
+  const { churnRisk } = await response.json();
+
+  if (churnRisk > 0.7) {
+    // High risk → notify ECM
+    await this.notifyECM(learnerId, churnRisk);
+  }
+
+  return churnRisk;
+}
+```
+
+### Gamification (Badges, Points, Leaderboards)
+
+**Feature**: Motivate learners with rewards.
+
+**Schema**:
+```prisma
+// shared/prisma/schema.prisma
+model Badge {
+  id          Int      @id @default(autoincrement())
+  name        String   // "5 Tasks Completed", "10 Sessions Attended"
+  icon        String   // URL to badge image
+  description String
+  users       User[]   @relation("UserBadges")
+}
+
+model UserBadge {
+  userId    Int
+  badgeId   Int
+  earnedAt  DateTime @default(now())
+  user      User     @relation("UserBadges", fields: [userId], references: [id])
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  @@id([userId, badgeId])
+}
+
+model Leaderboard {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  points    Int      // Earned from completing tasks, attending sessions
+  rank      Int      // 1st, 2nd, 3rd...
+  user      User     @relation(fields: [userId], references: [id])
+}
+```
+
+**Point System**:
+- ✅ **+10 points**: Complete task on time
+- ✅ **+5 points**: Attend session
+- ✅ **+20 points**: Get 90%+ on quiz
+- ✅ **Bonus points**: Streak (5 days in a row = +50 points)
+
+### Community Features (Forums, Groups)
+
+**Feature**: Learners can discuss topics, form study groups.
+
+**Schema**:
+```prisma
+model Forum {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  posts       Post[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  forumId   Int
+  userId    Int
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  forum     Forum    @relation(fields: [forumId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  replies   Reply[]
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  userId    Int
+  content   String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+```
+
+---
+
+## 52.3 Scalability Roadmap
+
+### Phase 1: 0-1,000 Users (Current Architecture)
+
+**Current Setup**:
+- ✅ **Frontend**: Vercel (serverless, auto-scales)
+- ✅ **Backend**: Single NestJS server (DigitalOcean droplet)
+- ✅ **Database**: Single PostgreSQL instance (Supabase)
+
+**Performance**:
+- ✅ **Response time**: <100ms (fast)
+- ✅ **Uptime**: 99.9% (Vercel + DigitalOcean)
+- ✅ **Cost**: ~$50/month (minimal)
+
+**No Changes Needed** (current architecture handles <1K users easily).
+
+### Phase 2: 1,000-10,000 Users (Add Caching)
+
+**Problem**: Database queries slow down (too many requests).
+
+**Solution**: Add **Redis caching layer**.
+
+**Architecture**:
+```
+User → Frontend (Vercel)
+         ↓
+       Backend (NestJS)
+         ↓
+       Redis Cache → PostgreSQL Database
+                      (only query DB if cache miss)
+```
+
+**What to Cache**:
+- ✅ **User profiles** (change rarely, read frequently)
+- ✅ **Educator list** (same data for all learners)
+- ✅ **Session details** (cache for 5 minutes)
+- ✅ **Leaderboard** (expensive query, update every hour)
+
+**Implementation**:
+```typescript
+// backend/server_NestJS/src/users/users.service.ts
+import { Injectable } from '@nestjs/common';
+import { RedisService } from '../redis/redis.service';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    private prisma: PrismaService,
+    private redis: RedisService,
+  ) {}
+
+  async findOne(id: number) {
+    const cacheKey = `user:${id}`;
+
+    // 1. Check Redis cache
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      console.log('✅ Cache hit:', cacheKey);
+      return JSON.parse(cached);
+    }
+
+    // 2. Cache miss → query database
+    console.log('❌ Cache miss → querying DB:', cacheKey);
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    // 3. Store in cache (expire in 1 hour)
+    await this.redis.set(cacheKey, JSON.stringify(user), 'EX', 3600);
+
+    return user;
+  }
+
+  async update(id: number, data: UpdateUserDto) {
+    const user = await this.prisma.user.update({ where: { id }, data });
+
+    // Invalidate cache (data changed)
+    await this.redis.del(`user:${id}`);
+
+    return user;
+  }
+}
+```
+
+**Performance Improvement**:
+- ✅ **Before**: 50ms (database query)
+- ✅ **After**: 5ms (Redis cache) → **10x faster**
+
+**Cost**:
+- ✅ **Redis**: ~$15/month (Upstash or AWS ElastiCache)
+- ✅ **Total**: ~$65/month
+
+### Phase 3: 10,000-100,000 Users (Microservices)
+
+**Problem**: Single backend server can't handle load (CPU/memory maxed out).
+
+**Solution**: Split into **microservices** (separate services for different features).
+
+**Architecture**:
+```
+                     API Gateway (Kong/NGINX)
+                             ↓
+        ┌────────────────────┼────────────────────┐
+        ↓                    ↓                    ↓
+  User Service       Session Service       Payment Service
+  (NestJS)           (NestJS)              (NestJS)
+        ↓                    ↓                    ↓
+  PostgreSQL         PostgreSQL            PostgreSQL
+  (separate DB)      (separate DB)         (separate DB)
+```
+
+**Services**:
+- **User Service**: Authentication, profiles, roles
+- **Session Service**: Session booking, history
+- **Payment Service**: Payments, refunds
+- **Notification Service**: Emails, SMS, push notifications
+- **Analytics Service**: Reporting, dashboards
+
+**Benefits**:
+- ✅ **Scalability**: Scale each service independently (e.g., scale Payment Service during peak hours)
+- ✅ **Reliability**: One service crashes → others still work
+- ✅ **Team autonomy**: Different teams own different services
+
+**Challenges**:
+- ❌ **Complexity**: More services = harder to manage
+- ❌ **Latency**: Service-to-service calls add overhead
+- ❌ **Debugging**: Errors span multiple services
+
+**Tech Stack**:
+- **API Gateway**: Kong or NGINX (route requests to services)
+- **Service Mesh**: Istio (handle service-to-service communication)
+- **Container Orchestration**: Kubernetes (manage microservices)
+
+### Phase 4: 100,000+ Users (Full Scale)
+
+**Architecture**:
+```
+Users
+  ↓
+CDN (Cloudflare) → Static Assets (images, CSS, JS)
+  ↓
+Load Balancer (AWS ALB)
+  ↓
+┌─────────────────────────┐
+│ Auto-Scaling Group      │
+│ (10-100 servers)        │
+│ - User Service (x10)    │
+│ - Session Service (x5)  │
+│ - Payment Service (x3)  │
+└─────────────────────────┘
+  ↓
+Redis Cluster (caching)
+  ↓
+PostgreSQL Cluster
+  ↓
+  ├─ Master (writes)
+  ├─ Replica 1 (reads)
+  ├─ Replica 2 (reads)
+  └─ Replica 3 (reads)
+```
+
+**Database Sharding**:
+- **Problem**: Single PostgreSQL instance can't handle 100K+ users
+- **Solution**: Split database into multiple shards (by user ID)
+
+**Example**:
+```
+Shard 1: Users 1-25,000   (PostgreSQL instance 1)
+Shard 2: Users 25,001-50,000  (PostgreSQL instance 2)
+Shard 3: Users 50,001-75,000  (PostgreSQL instance 3)
+Shard 4: Users 75,001-100,000 (PostgreSQL instance 4)
+```
+
+**Query Routing**:
+```typescript
+async findUser(userId: number) {
+  const shardId = userId % 4; // 0, 1, 2, or 3
+  const database = this.shards[shardId]; // Connect to correct shard
+  return database.user.findUnique({ where: { id: userId } });
+}
+```
+
+**Cost**:
+- ✅ **Servers**: ~$5,000/month (50 servers @ $100/month each)
+- ✅ **Database**: ~$2,000/month (4 shards + replicas)
+- ✅ **Redis**: ~$500/month (cluster)
+- ✅ **CDN**: ~$500/month (Cloudflare)
+- ✅ **Total**: ~$8,000/month (100K users = $0.08/user/month)
+
+---
+
+## 52.4 Caching Layer (Redis)
+
+### What to Cache
+
+**User Profiles**:
+```typescript
+// Cache key: user:123
+// TTL: 1 hour (3600 seconds)
+await redis.set('user:123', JSON.stringify(user), 'EX', 3600);
+```
+
+**Educator List**:
+```typescript
+// Cache key: educators:all
+// TTL: 10 minutes (600 seconds)
+await redis.set('educators:all', JSON.stringify(educators), 'EX', 600);
+```
+
+**Session Details**:
+```typescript
+// Cache key: session:456
+// TTL: 5 minutes (300 seconds)
+await redis.set('session:456', JSON.stringify(session), 'EX', 300);
+```
+
+**Leaderboard** (expensive query):
+```typescript
+// Cache key: leaderboard:top100
+// TTL: 1 hour (3600 seconds)
+const leaderboard = await prisma.user.findMany({
+  orderBy: { points: 'desc' },
+  take: 100,
+});
+await redis.set('leaderboard:top100', JSON.stringify(leaderboard), 'EX', 3600);
+```
+
+### Session Storage
+
+**Store user sessions in Redis** (instead of database):
+```typescript
+// After login, store session in Redis
+await redis.set(
+  `session:${sessionId}`,
+  JSON.stringify({ userId, email, role }),
+  'EX',
+  86400, // 24 hours
+);
+
+// Verify session
+const session = await redis.get(`session:${sessionId}`);
+if (!session) {
+  throw new Error('Session expired');
+}
+```
+
+**Benefits**:
+- ✅ **Faster**: Redis (in-memory) vs PostgreSQL (disk)
+- ✅ **Automatic expiry**: Sessions auto-delete after 24 hours
+
+### Real-Time Leaderboards
+
+**Use Redis Sorted Sets** (optimized for leaderboards):
+```typescript
+// Add user to leaderboard
+await redis.zadd('leaderboard', userId, points);
+
+// Get top 10 users
+const top10 = await redis.zrevrange('leaderboard', 0, 9, 'WITHSCORES');
+// Returns: [userId1, points1, userId2, points2, ...]
+
+// Get user's rank
+const rank = await redis.zrevrank('leaderboard', userId);
+// Returns: 0 (1st), 1 (2nd), 2 (3rd), ...
+```
+
+### Pub/Sub for Notifications
+
+**Real-time notifications** (without polling):
+```typescript
+// Backend: Publish notification
+await redis.publish('notifications', JSON.stringify({
+  userId: 123,
+  message: 'New task assigned',
+}));
+
+// Frontend: Subscribe to notifications
+redis.subscribe('notifications', (message) => {
+  const { userId, message } = JSON.parse(message);
+  if (userId === currentUserId) {
+    showNotification(message); // Display toast notification
+  }
+});
+```
+
+---
+
+## 52.5 Microservices Architecture
+
+### Splitting the Monolith
+
+**Current** (monolith):
+```
+backend/server_NestJS/
+  ├── src/
+  │   ├── users/         # User management
+  │   ├── sessions/      # Session booking
+  │   ├── payments/      # Payment processing
+  │   └── notifications/ # Email/SMS
+```
+
+**Future** (microservices):
+```
+backend/
+  ├── user-service/      # NestJS app (users only)
+  ├── session-service/   # NestJS app (sessions only)
+  ├── payment-service/   # NestJS app (payments only)
+  └── notification-service/ # NestJS app (notifications only)
+```
+
+### Service Communication
+
+**REST API** (simple):
+```typescript
+// User Service calls Session Service
+const response = await fetch('http://session-service:3002/sessions/123');
+const session = await response.json();
+```
+
+**gRPC** (faster, binary protocol):
+```typescript
+// Define protocol buffer
+// session.proto
+service SessionService {
+  rpc GetSession (SessionRequest) returns (SessionResponse);
+}
+
+// User Service calls Session Service
+const client = new SessionServiceClient('session-service:50051');
+const session = await client.getSession({ sessionId: 123 });
+```
+
+**Message Queue** (asynchronous):
+```typescript
+// User Service publishes event
+await queue.publish('user.created', { userId: 123, email: 'john@example.com' });
+
+// Notification Service subscribes to event
+queue.subscribe('user.created', async (data) => {
+  await sendWelcomeEmail(data.email);
+});
+```
+
+### API Gateway
+
+**Routes requests to correct service**:
+```nginx
+# Kong/NGINX configuration
+location /api/users {
+  proxy_pass http://user-service:3001;
+}
+
+location /api/sessions {
+  proxy_pass http://session-service:3002;
+}
+
+location /api/payments {
+  proxy_pass http://payment-service:3003;
+}
+```
+
+**Benefits**:
+- ✅ **Single entry point**: Clients only know gateway URL
+- ✅ **Load balancing**: Gateway distributes requests
+- ✅ **Rate limiting**: Prevent abuse (max 100 requests/minute)
+- ✅ **Authentication**: Verify JWT token (before forwarding to services)
+
+---
+
+## 52.6 Database Scaling
+
+### Read Replicas
+
+**Problem**: Database bottleneck (too many read queries).
+
+**Solution**: **Read replicas** (separate databases for reads).
+
+**Architecture**:
+```
+Backend
+  ↓
+  ├─ Writes → Master Database (PostgreSQL)
+  │                 ↓
+  │           Replication (sync data)
+  │                 ↓
+  └─ Reads → Replica 1, Replica 2, Replica 3
+```
+
+**Implementation** (Prisma):
+```typescript
+// Configure read replicas in Prisma
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL, // Master (writes)
+    },
+  },
+});
+
+// Create read-only client (replica)
+const prismaRead = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_READ_URL, // Replica (reads)
+    },
+  },
+});
+
+// Write to master
+await prisma.user.create({ data: { email: 'john@example.com' } });
+
+// Read from replica (faster, offloads master)
+const users = await prismaRead.user.findMany();
+```
+
+**Benefits**:
+- ✅ **Scalability**: Add more replicas as needed
+- ✅ **Performance**: Reads don't block writes
+- ✅ **Reliability**: If master crashes, promote replica to master
+
+### Database Sharding
+
+**Problem**: Single database can't store all data (100M+ users).
+
+**Solution**: **Sharding** (split data across multiple databases).
+
+**Shard Key** (how to split):
+- **By user ID**: Users 1-25K in Shard 1, 25K-50K in Shard 2, etc.
+- **By geography**: US users in Shard 1, EU users in Shard 2, etc.
+
+**Query Routing**:
+```typescript
+class ShardedPrisma {
+  private shards: PrismaClient[];
+
+  constructor() {
+    this.shards = [
+      new PrismaClient({ datasources: { db: { url: SHARD_1_URL } } }),
+      new PrismaClient({ datasources: { db: { url: SHARD_2_URL } } }),
+      new PrismaClient({ datasources: { db: { url: SHARD_3_URL } } }),
+      new PrismaClient({ datasources: { db: { url: SHARD_4_URL } } }),
+    ];
+  }
+
+  getShard(userId: number): PrismaClient {
+    const shardId = userId % this.shards.length; // 0, 1, 2, or 3
+    return this.shards[shardId];
+  }
+
+  async findUser(userId: number) {
+    const shard = this.getShard(userId);
+    return shard.user.findUnique({ where: { id: userId } });
+  }
+}
+```
+
+**Challenges**:
+- ❌ **Cross-shard queries**: Can't easily join data across shards
+- ❌ **Rebalancing**: Adding/removing shards requires data migration
+- ❌ **Complexity**: More databases = harder to manage
+
+### Separate Read/Write Databases
+
+**Master-slave replication**:
+- **Master**: All writes (INSERT, UPDATE, DELETE)
+- **Slave(s)**: All reads (SELECT)
+
+**Benefits**:
+- ✅ **Read scalability**: Add more slaves for more read capacity
+- ✅ **Write performance**: Master only handles writes (not slowed by reads)
+
+### NoSQL for Specific Use Cases
+
+**PostgreSQL** (relational):
+- ✅ **Use for**: Structured data (users, sessions)
+- ✅ **ACID guarantees**: Transactions, consistency
+
+**MongoDB** (NoSQL):
+- ✅ **Use for**: Unstructured data (logs, analytics events)
+- ✅ **Flexible schema**: No migrations needed
+
+**Example**:
+```typescript
+// Store analytics events in MongoDB (not PostgreSQL)
+await mongodb.collection('events').insertOne({
+  userId: 123,
+  event: 'page_view',
+  page: '/dashboard',
+  timestamp: new Date(),
+});
+```
+
+---
+
+## 52.7 Queue System (Bull/BullMQ)
+
+### Background Jobs
+
+**Problem**: Slow operations block API responses (e.g., sending 100 emails).
+
+**Solution**: **Queue system** (process jobs asynchronously).
+
+**Example** (email sending):
+```typescript
+// ❌ Blocking (API response waits for emails to send)
+app.post('/api/notify-users', async (req, res) => {
+  const users = await prisma.user.findMany();
+
+  for (const user of users) {
+    await sendEmail(user.email, 'Notification'); // Takes 1 second per email
+  }
+
+  res.json({ success: true }); // Response after 100 seconds (if 100 users)
+});
+
+// ✅ Non-blocking (queue job, respond immediately)
+app.post('/api/notify-users', async (req, res) => {
+  const users = await prisma.user.findMany();
+
+  for (const user of users) {
+    await emailQueue.add('send-email', { email: user.email, subject: 'Notification' });
+  }
+
+  res.json({ success: true }); // Response immediately
+});
+
+// Worker processes jobs in background
+emailQueue.process('send-email', async (job) => {
+  const { email, subject } = job.data;
+  await sendEmail(email, subject);
+});
+```
+
+**Benefits**:
+- ✅ **Faster API responses**: Offload slow tasks to background
+- ✅ **Retry logic**: Retry failed jobs (e.g., email send failed → retry 3 times)
+- ✅ **Rate limiting**: Process 10 jobs/second (don't overload email service)
+
+### Task Scheduling
+
+**Cron jobs** (recurring tasks):
+```typescript
+import { Queue, Worker } from 'bullmq';
+
+// Add recurring job (every day at 2 AM)
+await backupQueue.add(
+  'backup-database',
+  {},
+  {
+    repeat: {
+      cron: '0 2 * * *', // Every day at 2 AM
+    },
+  },
+);
+
+// Worker
+const worker = new Worker('backup-queue', async (job) => {
+  console.log('Running database backup...');
+  await runBackup();
+  console.log('Backup complete!');
+});
+```
+
+**Use Cases**:
+- ✅ **Daily backups**: 2 AM every day
+- ✅ **Weekly reports**: Send report every Monday
+- ✅ **Clean up old data**: Delete sessions older than 30 days
+
+### Retry Logic
+
+**Auto-retry failed jobs**:
+```typescript
+await queue.add(
+  'send-email',
+  { email: 'john@example.com' },
+  {
+    attempts: 3, // Retry up to 3 times
+    backoff: {
+      type: 'exponential', // Wait 1s, then 2s, then 4s
+      delay: 1000,
+    },
+  },
+);
+```
+
+---
+
+## 52.8 Search Functionality (Elasticsearch)
+
+### Full-Text Search
+
+**Problem**: PostgreSQL `LIKE` queries are slow for large datasets.
+
+**Solution**: **Elasticsearch** (optimized for search).
+
+**Example** (search educators):
+```typescript
+// ❌ Slow (PostgreSQL LIKE query)
+const educators = await prisma.educator.findMany({
+  where: {
+    name: { contains: 'john' }, // Case-sensitive, slow
+  },
+});
+
+// ✅ Fast (Elasticsearch)
+const educators = await elasticsearch.search({
+  index: 'educators',
+  body: {
+    query: {
+      match: { name: 'john' }, // Case-insensitive, fuzzy, fast
+    },
+  },
+});
+```
+
+### Autocomplete
+
+**As user types, show suggestions**:
+```typescript
+// User types "joh" → show ["John", "Johnny", "Johnson"]
+const suggestions = await elasticsearch.search({
+  index: 'educators',
+  body: {
+    query: {
+      prefix: { name: 'joh' }, // Match names starting with "joh"
+    },
+  },
+});
+```
+
+### Fuzzy Matching
+
+**Handle typos** ("jhon" → "john"):
+```typescript
+const educators = await elasticsearch.search({
+  index: 'educators',
+  body: {
+    query: {
+      fuzzy: {
+        name: {
+          value: 'jhon', // Typo
+          fuzziness: 'AUTO', // Allow 1-2 character differences
+        },
+      },
+    },
+  },
+});
+// Returns: [{ name: "John" }]
+```
+
+---
+
+## 52.9 Real-Time Features (WebSockets)
+
+### Live Chat
+
+**Problem**: HTTP polling is inefficient (client requests every 1 second).
+
+**Solution**: **WebSockets** (persistent connection, server pushes updates).
+
+**Implementation** (NestJS + Socket.IO):
+```typescript
+// backend/server_NestJS/src/chat/chat.gateway.ts
+import { WebSocketGateway, WebSocketServer, SubscribeMessage } from '@nestjs/websockets';
+import { Server, Socket } from 'socket.io';
+
+@WebSocketGateway()
+export class ChatGateway {
+  @WebSocketServer()
+  server: Server;
+
+  @SubscribeMessage('send-message')
+  handleMessage(client: Socket, payload: { room: string; message: string }) {
+    // Broadcast message to all users in room
+    this.server.to(payload.room).emit('new-message', {
+      userId: client.id,
+      message: payload.message,
+    });
+  }
+}
+```
+
+**Frontend** (React):
+```typescript
+'use client';
+
+import { useEffect, useState } from 'react';
+import io from 'socket.io-client';
+
+export default function Chat() {
+  const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    const newSocket = io('http://localhost:3001');
+    setSocket(newSocket);
+
+    newSocket.on('new-message', (data) => {
+      setMessages((prev) => [...prev, data.message]);
+    });
+
+    return () => newSocket.close();
+  }, []);
+
+  const sendMessage = (message: string) => {
+    socket.emit('send-message', { room: 'general', message });
+  };
+
+  return (
+    <div>
+      <div>{messages.map((msg, i) => <p key={i}>{msg}</p>)}</div>
+      <input onKeyDown={(e) => e.key === 'Enter' && sendMessage(e.target.value)} />
+    </div>
+  );
+}
+```
+
+### Real-Time Notifications
+
+**Push notifications to user** (without polling):
+```typescript
+// Backend: Send notification
+io.to(userId).emit('notification', {
+  title: 'New Task',
+  message: 'You have a new task assigned',
+});
+
+// Frontend: Listen for notifications
+socket.on('notification', (data) => {
+  toast.success(data.message); // Show toast
+});
+```
+
+### Live Session Updates
+
+**Update session status in real-time**:
+```typescript
+// Educator marks session as complete
+await prisma.session.update({ where: { id }, data: { status: 'completed' } });
+
+// Notify learner (via WebSocket)
+io.to(learnerId).emit('session-updated', { sessionId: id, status: 'completed' });
+
+// Learner's frontend updates UI automatically
+```
+
+### Collaborative Whiteboard
+
+**Real-time drawing** (multiple users draw on same canvas):
+```typescript
+// User draws → send coordinates to server
+socket.emit('draw', { x: 100, y: 200, color: 'red' });
+
+// Server broadcasts to all users in session
+socket.on('draw', (data) => {
+  ctx.fillStyle = data.color;
+  ctx.fillRect(data.x, data.y, 5, 5); // Draw on canvas
+});
+```
+
+---
+
+## 52.10 AI/ML Features
+
+### Personalized Learning Paths
+
+**Suggest next topics based on learner's progress**:
+```typescript
+// ML model predicts next best topic
+const nextTopic = await mlAPI.predictNextTopic({
+  learnerId: 123,
+  completedTopics: ['Algebra', 'Geometry'],
+  weakAreas: ['Trigonometry'],
+});
+// Returns: "Trigonometry Basics" (focus on weak area)
+```
+
+### Educator Recommendations
+
+**Suggest best educators for learner**:
+```typescript
+const recommendations = await mlAPI.recommendEducators({
+  learnerId: 123,
+  subject: 'Math',
+  preferredTime: 'evening',
+});
+// Returns: [Educator A (95% match), Educator B (90% match), ...]
+```
+
+### Churn Prediction
+
+**Predict which learners are likely to drop out**:
+```typescript
+const churnRisk = await mlAPI.predictChurn({
+  learnerId: 123,
+  features: {
+    attendance: 0.6, // 60% attendance
+    taskCompletion: 0.4, // 40% completion
+    sessionFrequency: 1.2, // 1.2 sessions/week
+  },
+});
+// Returns: 0.85 (85% likely to churn)
+
+if (churnRisk > 0.7) {
+  // High risk → notify ECM
+  await notifyECM(learnerId, churnRisk);
+}
+```
+
+### Automated Intervention Triggers
+
+**Auto-assign tasks when learner is struggling**:
+```typescript
+if (learner.mathScore < 50) {
+  // Assign extra practice tasks
+  await prisma.task.create({
+    data: {
+      learnerId: learner.id,
+      title: 'Math Practice (Algebra)',
+      description: 'Complete 10 algebra problems',
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week
+    },
+  });
+}
+```
+
+---
+
+## 52.11 Mobile App Considerations
+
+### React Native for iOS/Android
+
+**Shared Codebase**:
+```
+frontend/
+  ├── web/        # Next.js (web)
+  └── mobile/     # React Native (iOS + Android)
+      ├── src/
+      │   ├── screens/  # Dashboard, Tasks, etc.
+      │   ├── components/  # Shared UI components
+      │   └── services/    # API calls (same as web)
+```
+
+**Shared Code**:
+```typescript
+// Shared API service (used by both web and mobile)
+// frontend/shared/services/api.ts
+export async function fetchUsers() {
+  const response = await fetch('https://api.nextphoton.com/users');
+  return response.json();
+}
+
+// Web (Next.js)
+import { fetchUsers } from '@/shared/services/api';
+
+// Mobile (React Native)
+import { fetchUsers } from '../shared/services/api';
+```
+
+### Offline Support
+
+**Cache data locally** (view tasks offline):
+```typescript
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Save data to local storage
+await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+
+// Load data from local storage (if offline)
+const cachedTasks = await AsyncStorage.getItem('tasks');
+if (cachedTasks) {
+  setTasks(JSON.parse(cachedTasks));
+}
+```
+
+### Push Notifications
+
+**Send notifications to mobile app**:
+```typescript
+// Backend: Send push notification
+import { getMessaging } from 'firebase-admin/messaging';
+
+await getMessaging().send({
+  token: userDeviceToken,
+  notification: {
+    title: 'New Task',
+    body: 'You have a new task assigned',
+  },
+});
+
+// Mobile: Receive notification
+import messaging from '@react-native-firebase/messaging';
+
+messaging().onMessage(async (remoteMessage) => {
+  Alert.alert(remoteMessage.notification.title, remoteMessage.notification.body);
+});
+```
+
+---
+
+## 52.12 Internationalization (i18n)
+
+### Multi-Language Support
+
+**Translate UI text**:
+```typescript
+// frontend/web/src/locales/en.json
+{
+  "dashboard.title": "Dashboard",
+  "dashboard.welcome": "Welcome, {{name}}!"
+}
+
+// frontend/web/src/locales/es.json (Spanish)
+{
+  "dashboard.title": "Panel de control",
+  "dashboard.welcome": "¡Bienvenido, {{name}}!"
+}
+```
+
+**Usage**:
+```typescript
+import { useTranslation } from 'react-i18next';
+
+export default function Dashboard() {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <h1>{t('dashboard.title')}</h1>
+      <p>{t('dashboard.welcome', { name: user.name })}</p>
+    </div>
+  );
+}
+```
+
+### Currency Conversion
+
+**Display prices in local currency**:
+```typescript
+const price = 1000; // INR (base currency)
+const currency = user.country === 'US' ? 'USD' : 'INR';
+const rate = currency === 'USD' ? 0.012 : 1; // 1 INR = 0.012 USD
+
+const displayPrice = (price * rate).toFixed(2);
+// India: ₹1000
+// US: $12.00
+```
+
+### Regional Pricing
+
+**Different pricing for different countries**:
+```typescript
+const pricing = {
+  IN: { session: 500 }, // ₹500 per session
+  US: { session: 10 },  // $10 per session
+  EU: { session: 8 },   // €8 per session
+};
+
+const price = pricing[user.country].session;
+```
+
+---
+
+## 52.13 Multi-Tenancy
+
+### White-Label Solution
+
+**Allow schools to use NextPhoton with their branding**:
+```
+https://nextphoton.com/school-abc  # School ABC's portal
+https://nextphoton.com/school-xyz  # School XYZ's portal
+```
+
+**Schema**:
+```prisma
+model Organization {
+  id          Int      @id @default(autoincrement())
+  name        String   // "School ABC"
+  subdomain   String   @unique // "school-abc"
+  logo        String   // URL to logo
+  primaryColor String  // "#FF0000" (custom theme color)
+  users       User[]
+}
+
+model User {
+  id             Int          @id @default(autoincrement())
+  email          String
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+}
+```
+
+**Custom Branding**:
+```typescript
+// Load organization based on subdomain
+const subdomain = req.hostname.split('.')[0]; // "school-abc"
+const org = await prisma.organization.findUnique({ where: { subdomain } });
+
+// Apply custom branding
+return (
+  <div style={{ '--primary-color': org.primaryColor }}>
+    <img src={org.logo} alt="Logo" />
+    <h1>{org.name}</h1>
+  </div>
+);
+```
+
+### Organization Isolation
+
+**Ensure data isolation** (School ABC can't see School XYZ's data):
+```typescript
+// Always filter by organizationId
+const users = await prisma.user.findMany({
+  where: { organizationId: currentOrg.id },
+});
+```
+
+---
+
+## 52.14 Key Takeaways
+
+**Current State**:
+- ✅ **MVP complete**: Authentication, multi-role system, sessions, tasks, monitoring
+- ✅ **Tech stack**: Next.js 15, NestJS, PostgreSQL, Prisma, GraphQL
+- ✅ **Deployment**: Vercel (frontend), DigitalOcean (backend)
+
+**Planned Features**:
+- ✅ **Mobile apps**: React Native (iOS + Android)
+- ✅ **Desktop app**: Electron (Windows, Mac, Linux)
+- ✅ **AI recommendations**: Suggest educators, predict churn
+- ✅ **Video recording**: Record sessions for review
+- ✅ **Gamification**: Badges, points, leaderboards
+- ✅ **Community**: Forums, study groups
+
+**Scalability Roadmap**:
+- ✅ **Phase 1 (0-1K users)**: Current architecture (no changes)
+- ✅ **Phase 2 (1K-10K)**: Add Redis caching
+- ✅ **Phase 3 (10K-100K)**: Microservices architecture
+- ✅ **Phase 4 (100K+)**: Database sharding, load balancing, auto-scaling
+
+**Caching (Redis)**:
+- ✅ **Cache frequently accessed data** (user profiles, educator lists)
+- ✅ **Session storage** (faster than database)
+- ✅ **Leaderboards** (Redis sorted sets)
+- ✅ **Pub/sub** (real-time notifications)
+
+**Microservices**:
+- ✅ **Split monolith**: User Service, Session Service, Payment Service
+- ✅ **API Gateway**: Route requests to correct service
+- ✅ **Service communication**: REST, gRPC, or message queues
+- ✅ **Benefits**: Scalability, reliability, team autonomy
+
+**Database Scaling**:
+- ✅ **Read replicas**: Offload reads to separate databases
+- ✅ **Database sharding**: Split data across multiple databases
+- ✅ **Separate read/write**: Master for writes, slaves for reads
+- ✅ **NoSQL**: Use MongoDB for unstructured data (logs, analytics)
+
+**Queue System (Bull/BullMQ)**:
+- ✅ **Background jobs**: Send emails, generate reports (async)
+- ✅ **Task scheduling**: Cron jobs (daily backups, weekly reports)
+- ✅ **Retry logic**: Auto-retry failed jobs
+
+**Search (Elasticsearch)**:
+- ✅ **Full-text search**: Fast search (better than PostgreSQL LIKE)
+- ✅ **Autocomplete**: Suggestions as user types
+- ✅ **Fuzzy matching**: Handle typos ("jhon" → "john")
+
+**Real-Time (WebSockets)**:
+- ✅ **Live chat**: Real-time messaging
+- ✅ **Real-time notifications**: Push updates to users
+- ✅ **Live session updates**: Update UI when data changes
+- ✅ **Collaborative whiteboard**: Multiple users draw on same canvas
+
+**AI/ML Features**:
+- ✅ **Personalized learning paths**: Suggest next topics
+- ✅ **Educator recommendations**: Match learners with best educators
+- ✅ **Churn prediction**: Predict which learners will drop out
+- ✅ **Automated interventions**: Auto-assign tasks for struggling learners
+
+**Mobile App**:
+- ✅ **React Native**: Shared codebase (iOS + Android)
+- ✅ **Offline support**: Cache data locally (AsyncStorage)
+- ✅ **Push notifications**: Firebase Cloud Messaging
+
+**Internationalization**:
+- ✅ **Multi-language**: Translate UI (react-i18next)
+- ✅ **Currency conversion**: Display local currency
+- ✅ **Regional pricing**: Different prices per country
+
+**Multi-Tenancy**:
+- ✅ **White-label**: Schools use NextPhoton with their branding
+- ✅ **Organization isolation**: Data separation (School A ≠ School B)
+- ✅ **Custom branding**: Logo, colors per organization
+
+**Cost Estimates**:
+- ✅ **Phase 1 (0-1K)**: ~$50/month
+- ✅ **Phase 2 (1K-10K)**: ~$65/month (+ Redis)
+- ✅ **Phase 3 (10K-100K)**: ~$500/month (microservices)
+- ✅ **Phase 4 (100K+)**: ~$8,000/month (full scale)
+
+---
+
+# Part V Summary
+
+**Chapters 43-52**: Advanced Concepts
+
+**What You Learned**:
+
+**Apollo Client (Ch. 43)**:
+- ✅ GraphQL on frontend (queries, mutations)
+- ✅ Apollo Client setup (cache, queries)
+- ✅ useQuery, useMutation hooks
+
+**Optimistic Updates (Ch. 44)**:
+- ✅ Update UI before server responds (instant feedback)
+- ✅ Cache management (Apollo InMemoryCache)
+- ✅ Refetch queries after mutations
+
+**Server-Side Rendering (Ch. 45)**:
+- ✅ SSR vs CSR vs SSG
+- ✅ Next.js rendering strategies
+- ✅ Data fetching (fetch in Server Components)
+
+**API Routes (Ch. 46)**:
+- ✅ Backend endpoints in Next.js
+- ✅ Route handlers (GET, POST, PUT, DELETE)
+- ✅ Middleware for auth
+
+**Middleware & Route Protection (Ch. 47)**:
+- ✅ Next.js middleware (run before page loads)
+- ✅ JWT token verification
+- ✅ Role-based access control (ABAC)
+
+**Performance Optimization (Ch. 48)**:
+- ✅ Code splitting (dynamic imports)
+- ✅ Image optimization (Next.js Image)
+- ✅ Lazy loading (React.lazy, Suspense)
+- ✅ Memoization (useMemo, React.memo)
+
+**Security Best Practices (Ch. 49)**:
+- ✅ Authentication (JWT, bcrypt)
+- ✅ Authorization (ABAC, route protection)
+- ✅ Input validation (Zod, class-validator)
+- ✅ SQL injection prevention (Prisma)
+- ✅ XSS protection (sanitize HTML)
+- ✅ CSRF protection (CSRF tokens)
+
+**Deployment & DevOps (Ch. 50)**:
+- ✅ Environments (dev, staging, production)
+- ✅ Database migrations (Prisma)
+- ✅ Frontend deployment (Vercel)
+- ✅ Backend deployment (Docker, DigitalOcean)
+- ✅ CI/CD (GitHub Actions)
+- ✅ Monitoring (Sentry, Winston, UptimeRobot)
+- ✅ Backups (pg_dump, S3)
+
+**Debugging Techniques (Ch. 51)**:
+- ✅ Debugging mindset (reproduce, isolate, fix, verify)
+- ✅ Browser DevTools (Console, Network, Sources)
+- ✅ React DevTools (component tree, props, state)
+- ✅ Debugging React (useEffect, closures)
+- ✅ Debugging API calls (Network tab, CORS errors)
+- ✅ Debugging Next.js (hydration, 'use client')
+- ✅ Debugging backend (console.log, NestJS logger)
+- ✅ Error boundaries (catch React errors)
+
+**Future Enhancements & Scalability (Ch. 52)**:
+- ✅ Planned features (mobile apps, AI, gamification)
+- ✅ Scalability roadmap (1K → 100K+ users)
+- ✅ Caching (Redis)
+- ✅ Microservices architecture
+- ✅ Database scaling (replicas, sharding)
+- ✅ Queue system (Bull/BullMQ)
+- ✅ Search (Elasticsearch)
+- ✅ Real-time (WebSockets)
+- ✅ AI/ML features
+- ✅ Mobile app (React Native)
+- ✅ Internationalization (i18n)
+- ✅ Multi-tenancy (white-label)
+
+**You've Mastered**:
+- ✅ **Production-ready patterns**: Authentication, authorization, deployment
+- ✅ **Performance optimization**: Code splitting, caching, lazy loading
+- ✅ **Security best practices**: JWT, input validation, CSRF protection
+- ✅ **Debugging techniques**: Browser DevTools, React DevTools, error boundaries
+- ✅ **Scalability strategies**: Caching, microservices, database scaling, queues
+
+**Next Up**: Appendices - Reference Materials (Glossary, Code Style Guide, Common Errors, Resource Links)
+
+---
+
+# APPENDICES
+
+# Appendix A: Complete Technology Glossary
+
+**Purpose**: Alphabetical reference of all technical terms used throughout this guide.
+
+---
+
+## A
+
+**ABAC (Attribute-Based Access Control)**:
+- **Definition**: Authorization model that grants access based on user attributes (role, department, etc.) rather than just role names.
+- **Usage in NextPhoton**: Controls which routes users can access based on role, tenancy, and permissions.
+- **Related**: RBAC, Authorization, Permission
+
+**API (Application Programming Interface)**:
+- **Definition**: Set of rules that allow different software applications to communicate with each other.
+- **Usage in NextPhoton**: Backend exposes GraphQL APIs consumed by frontend; REST API routes in Next.js for specific operations.
+- **Related**: REST, GraphQL, Endpoint
+
+**Apollo Client**:
+- **Definition**: JavaScript library for managing GraphQL state in frontend applications.
+- **Usage in NextPhoton**: Fetches data from NestJS GraphQL backend; manages cache and optimistic updates.
+- **Related**: GraphQL, Query, Mutation, Cache
+
+**Authentication**:
+- **Definition**: Process of verifying who a user is (login with email/password).
+- **Usage in NextPhoton**: JWT-based authentication in NestJS backend; tokens stored in httpOnly cookies.
+- **Related**: Authorization, JWT, Login, Session
+
+**Authorization**:
+- **Definition**: Process of verifying what a user can access (permissions).
+- **Usage in NextPhoton**: ABAC system checks user role and attributes before granting route/resource access.
+- **Related**: Authentication, ABAC, Permission, Role
+
+**Async/Await**:
+- **Definition**: JavaScript syntax for handling asynchronous operations (promises) in a synchronous-looking way.
+- **Usage in NextPhoton**: Used in all API calls, database queries, and async operations.
+- **Related**: Promise, Callback, Asynchronous
+
+---
+
+## B
+
+**Bcrypt**:
+- **Definition**: Library for hashing passwords securely using salted hashing algorithm.
+- **Usage in NextPhoton**: Hashes user passwords before storing in database; verifies passwords during login.
+- **Related**: Hash, Salt, Authentication, Security
+
+**Better-auth**:
+- **Definition**: Modern authentication library for Next.js applications.
+- **Usage in NextPhoton**: Alternative to custom JWT implementation; provides session management.
+- **Related**: Authentication, JWT, Session
+
+**Bull / BullMQ**:
+- **Definition**: Redis-based queue system for handling background jobs in Node.js.
+- **Usage in NextPhoton**: Planned for email sending, report generation, scheduled tasks.
+- **Related**: Queue, Redis, Background Job, Cron
+
+**Bun**:
+- **Definition**: Fast JavaScript runtime and package manager (alternative to Node.js and npm/yarn).
+- **Usage in NextPhoton**: Primary package manager for monorepo; runs development servers.
+- **Related**: npm, yarn, pnpm, Package Manager
+
+**Bundle**:
+- **Definition**: Combined JavaScript file created by bundler (Webpack, Vite, Turbopack).
+- **Usage in NextPhoton**: Next.js bundles frontend code; code splitting creates smaller bundles.
+- **Related**: Code Splitting, Tree Shaking, Webpack
+
+---
+
+## C
+
+**Cache**:
+- **Definition**: Temporary storage for frequently accessed data to reduce load times.
+- **Usage in NextPhoton**: Apollo Client caches GraphQL queries; Redis caches database results; Next.js caches pages.
+- **Related**: Redis, Apollo Client, Performance
+
+**CORS (Cross-Origin Resource Sharing)**:
+- **Definition**: Security feature that controls which origins can access your API.
+- **Usage in NextPhoton**: NestJS backend allows requests from Next.js frontend origin.
+- **Related**: Security, API, HTTP Headers
+
+**CSRF (Cross-Site Request Forgery)**:
+- **Definition**: Attack where malicious site tricks user into performing unwanted actions on trusted site.
+- **Usage in NextPhoton**: Protected by CSRF tokens and httpOnly cookies.
+- **Related**: Security, XSS, Cookie
+
+**CSS (Cascading Style Sheets)**:
+- **Definition**: Language for styling HTML elements.
+- **Usage in NextPhoton**: Tailwind CSS v4 generates utility classes; CSS modules for component styles.
+- **Related**: Tailwind, Styling, CSS-in-JS
+
+**CSR (Client-Side Rendering)**:
+- **Definition**: Page rendered in browser using JavaScript (vs. server).
+- **Usage in NextPhoton**: Interactive components use CSR; pages with auth often use CSR.
+- **Related**: SSR, SSG, Rendering, Hydration
+
+**Component**:
+- **Definition**: Reusable piece of UI in React (function that returns JSX).
+- **Usage in NextPhoton**: Everything is a component (Button, Form, Layout, Page).
+- **Related**: React, JSX, Props, State
+
+---
+
+## D
+
+**DTO (Data Transfer Object)**:
+- **Definition**: Object that defines the shape of data transferred between layers (API request/response).
+- **Usage in NextPhoton**: NestJS uses DTOs with class-validator to validate incoming requests.
+- **Related**: Validation, class-validator, API
+
+**Database**:
+- **Definition**: Structured storage for application data.
+- **Usage in NextPhoton**: PostgreSQL stores users, sessions, educators, learners; accessed via Prisma ORM.
+- **Related**: PostgreSQL, Prisma, SQL, Schema
+
+**Docker**:
+- **Definition**: Platform for containerizing applications (package app + dependencies into portable container).
+- **Usage in NextPhoton**: Used for backend deployment; isolates environment.
+- **Related**: Container, Deployment, DevOps
+
+**DOMPurify**:
+- **Definition**: Library for sanitizing HTML to prevent XSS attacks.
+- **Usage in NextPhoton**: Cleans user-generated HTML before rendering (notes, comments).
+- **Related**: XSS, Security, Sanitization
+
+**Dependency Injection**:
+- **Definition**: Design pattern where dependencies are provided to a class rather than created inside it.
+- **Usage in NextPhoton**: NestJS core pattern; services injected into controllers via constructor.
+- **Related**: NestJS, Service, Provider
+
+---
+
+## E
+
+**ECM (EduCare Manager)**:
+- **Definition**: Role in NextPhoton responsible for managing educators, monitoring sessions, handling issues.
+- **Usage in NextPhoton**: Key micromanagement role; assigns educators to learners, reviews session notes.
+- **Related**: Role, Educator, Guardian, Learner
+
+**Educator**:
+- **Definition**: Teacher/tutor role in NextPhoton who conducts sessions with learners.
+- **Usage in NextPhoton**: Main service provider; tracked by ECMs, booked by guardians.
+- **Related**: Learner, ECM, Session, Guardian
+
+**Electron**:
+- **Definition**: Framework for building desktop apps using web technologies (HTML, CSS, JavaScript).
+- **Usage in NextPhoton**: Planned for desktop application.
+- **Related**: Desktop, Cross-Platform
+
+**Enum (Enumeration)**:
+- **Definition**: Type that represents a set of named constants (e.g., Role: ADMIN, USER, GUEST).
+- **Usage in NextPhoton**: Defines roles, session statuses, notification types in Prisma schema.
+- **Related**: TypeScript, Prisma, Type
+
+**Environment Variable**:
+- **Definition**: Configuration value stored outside code (e.g., DATABASE_URL, JWT_SECRET).
+- **Usage in NextPhoton**: Stored in .env files; different values for dev/staging/production.
+- **Related**: .env, Configuration, Deployment
+
+---
+
+## F
+
+**FCP (First Contentful Paint)**:
+- **Definition**: Performance metric measuring when first content appears on screen.
+- **Usage in NextPhoton**: Optimized via SSR, image optimization, code splitting.
+- **Related**: Performance, LCP, TTI
+
+**FID (First Input Delay)**:
+- **Definition**: Performance metric measuring delay between user interaction and browser response.
+- **Usage in NextPhoton**: Optimized via lazy loading, code splitting, memoization.
+- **Related**: Performance, Interaction, UX
+
+**Fetch**:
+- **Definition**: Modern API for making HTTP requests in JavaScript (replaces XMLHttpRequest).
+- **Usage in NextPhoton**: Used in Server Components and API routes to fetch data from backend.
+- **Related**: API, HTTP, Request, Response
+
+**Foreign Key**:
+- **Definition**: Database column referencing primary key in another table (establishes relationship).
+- **Usage in NextPhoton**: userId in Session table references id in User table.
+- **Related**: Prisma, Relation, Database
+
+---
+
+## G
+
+**GraphQL**:
+- **Definition**: Query language for APIs where client specifies exactly what data it needs.
+- **Usage in NextPhoton**: NestJS backend exposes GraphQL API; Apollo Client queries it from frontend.
+- **Related**: API, Query, Mutation, Apollo Client
+
+**Guardian**:
+- **Definition**: Role in NextPhoton (parent/caretaker) who manages learner's education and books sessions.
+- **Usage in NextPhoton**: Books educators, monitors progress, receives alerts about learner.
+- **Related**: Learner, Educator, Role
+
+**gRPC**:
+- **Definition**: High-performance RPC framework for microservices communication.
+- **Usage in NextPhoton**: Planned for microservices communication in scalability phase.
+- **Related**: Microservices, API, REST
+
+**Guard**:
+- **Definition**: NestJS class that determines if request should be handled (authorization logic).
+- **Usage in NextPhoton**: JwtAuthGuard verifies JWT token; RolesGuard checks user role.
+- **Related**: NestJS, Authorization, Middleware
+
+---
+
+## H
+
+**HTTP (HyperText Transfer Protocol)**:
+- **Definition**: Protocol for transmitting data over the web.
+- **Usage in NextPhoton**: All API communication uses HTTP/HTTPS.
+- **Related**: HTTPS, API, Request, Response
+
+**HTTPS (HTTP Secure)**:
+- **Definition**: Encrypted version of HTTP using TLS/SSL.
+- **Usage in NextPhoton**: All production traffic uses HTTPS; enforced by Vercel and deployment platforms.
+- **Related**: HTTP, Security, TLS, SSL
+
+**Hook**:
+- **Definition**: React function starting with "use" that adds functionality to components (useState, useEffect).
+- **Usage in NextPhoton**: Custom hooks for auth (useAuth), forms (useForm), queries (useQuery).
+- **Related**: React, useState, useEffect, Custom Hook
+
+**Hydration**:
+- **Definition**: Process of attaching React event handlers to server-rendered HTML.
+- **Usage in NextPhoton**: Next.js hydrates SSR pages; hydration mismatch errors occur when HTML differs.
+- **Related**: SSR, Next.js, React, Rendering
+
+**Hash**:
+- **Definition**: One-way cryptographic function that converts input into fixed-length string.
+- **Usage in NextPhoton**: Passwords hashed with bcrypt before storing in database.
+- **Related**: Bcrypt, Security, Encryption, Salt
+
+---
+
+## I
+
+**ISR (Incremental Static Regeneration)**:
+- **Definition**: Next.js feature that regenerates static pages at runtime (hybrid SSG + SSR).
+- **Usage in NextPhoton**: Potential use for educator profiles (static, but update periodically).
+- **Related**: SSG, SSR, Next.js, Rendering
+
+**Idempotency**:
+- **Definition**: Property where performing operation multiple times produces same result as once.
+- **Usage in NextPhoton**: API endpoints designed to be idempotent (re-booking session doesn't duplicate).
+- **Related**: API, REST, Safety
+
+**Internationalization (i18n)**:
+- **Definition**: Process of adapting software for different languages and regions.
+- **Usage in NextPhoton**: Planned feature for multi-language support (react-i18next).
+- **Related**: Localization, Translation, Multi-language
+
+**Interface**:
+- **Definition**: TypeScript contract defining shape of an object (property names and types).
+- **Usage in NextPhoton**: Define props interfaces, API response shapes, data models.
+- **Related**: TypeScript, Type, Props
+
+---
+
+## J
+
+**JWT (JSON Web Token)**:
+- **Definition**: Compact token format for securely transmitting information between parties (auth tokens).
+- **Usage in NextPhoton**: Generated on login; stored in httpOnly cookie; verified on each request.
+- **Related**: Authentication, Authorization, Token, Security
+
+**Jest**:
+- **Definition**: JavaScript testing framework for unit and integration tests.
+- **Usage in NextPhoton**: Tests NestJS services, controllers, utilities.
+- **Related**: Testing, Unit Test, Mock
+
+**JSON (JavaScript Object Notation)**:
+- **Definition**: Lightweight data format for transmitting structured data.
+- **Usage in NextPhoton**: API requests/responses, configuration files, data storage.
+- **Related**: API, Data, Serialization
+
+**JSX (JavaScript XML)**:
+- **Definition**: Syntax extension allowing HTML-like code in JavaScript (React's templating).
+- **Usage in NextPhoton**: All React components written in JSX/TSX.
+- **Related**: React, TypeScript, Component
+
+---
+
+## K
+
+**Kubernetes (K8s)**:
+- **Definition**: Container orchestration platform for managing containerized applications at scale.
+- **Usage in NextPhoton**: Potential use in Phase 4 scaling (100K+ users).
+- **Related**: Docker, Deployment, Scalability, DevOps
+
+**Key-Value Store**:
+- **Definition**: NoSQL database storing data as key-value pairs (Redis, DynamoDB).
+- **Usage in NextPhoton**: Redis used for caching, session storage, rate limiting.
+- **Related**: Redis, Cache, NoSQL
+
+---
+
+## L
+
+**LCP (Largest Contentful Paint)**:
+- **Definition**: Performance metric measuring when largest content element appears on screen.
+- **Usage in NextPhoton**: Optimized via image optimization, lazy loading, SSR.
+- **Related**: Performance, FCP, Core Web Vitals
+
+**Learner**:
+- **Definition**: Student role in NextPhoton who receives education from educators.
+- **Usage in NextPhoton**: Central role; managed by guardians, taught by educators, monitored by ECMs.
+- **Related**: Guardian, Educator, Session, Role
+
+**Layout**:
+- **Definition**: React component that wraps pages and provides consistent structure (header, footer, sidebar).
+- **Usage in NextPhoton**: Next.js App Router uses layout.tsx for nested layouts.
+- **Related**: Next.js, Component, Routing
+
+**LocalStorage**:
+- **Definition**: Browser API for storing key-value data persistently in user's browser.
+- **Usage in NextPhoton**: Stores non-sensitive preferences; JWT tokens stored in httpOnly cookies instead.
+- **Related**: SessionStorage, Cookie, Browser API
+
+**Lazy Loading**:
+- **Definition**: Technique of loading resources only when needed (images, components, routes).
+- **Usage in NextPhoton**: React.lazy() for code splitting; Next.js Image lazy loads images.
+- **Related**: Performance, Code Splitting, Dynamic Import
+
+---
+
+## M
+
+**Middleware**:
+- **Definition**: Function that runs before request reaches route handler (intercepts requests).
+- **Usage in NextPhoton**: Next.js middleware verifies JWT; NestJS middleware logs requests.
+- **Related**: Next.js, NestJS, Authentication, Logging
+
+**Migration**:
+- **Definition**: Database schema change tracked in version control (add table, modify column).
+- **Usage in NextPhoton**: Prisma migrations track schema changes; applied via `prisma migrate deploy`.
+- **Related**: Prisma, Database, Schema, Deployment
+
+**Monorepo**:
+- **Definition**: Single repository containing multiple projects (frontend, backend, shared).
+- **Usage in NextPhoton**: Root repo contains web frontend, NestJS backend, shared Prisma schema.
+- **Related**: Workspace, Bun, Turbo, Architecture
+
+**Mutation**:
+- **Definition**: GraphQL operation that modifies data (create, update, delete).
+- **Usage in NextPhoton**: useMutation hook sends mutations to NestJS backend (createSession, updateUser).
+- **Related**: GraphQL, Apollo Client, Query
+
+**Memoization**:
+- **Definition**: Optimization technique that caches function results to avoid re-computation.
+- **Usage in NextPhoton**: useMemo caches expensive calculations; React.memo prevents re-renders.
+- **Related**: Performance, useMemo, React.memo
+
+---
+
+## N
+
+**NestJS**:
+- **Definition**: Progressive Node.js framework for building server-side applications (inspired by Angular).
+- **Usage in NextPhoton**: Backend framework; handles GraphQL API, authentication, business logic.
+- **Related**: Backend, Node.js, TypeScript, Framework
+
+**Next.js**:
+- **Definition**: React framework with SSR, routing, API routes, image optimization.
+- **Usage in NextPhoton**: Frontend framework; App Router for routing, Server Components for SSR.
+- **Related**: React, Frontend, SSR, Framework
+
+**Node.js**:
+- **Definition**: JavaScript runtime for executing JavaScript outside browser (server-side).
+- **Usage in NextPhoton**: Runs NestJS backend; Bun is alternative runtime used in dev.
+- **Related**: JavaScript, Backend, Runtime
+
+**Notification**:
+- **Definition**: Message sent to user about events (session reminder, new message, alert).
+- **Usage in NextPhoton**: Planned feature using WebSockets or SSE for real-time notifications.
+- **Related**: WebSocket, SSE, Real-time
+
+**NoSQL**:
+- **Definition**: Non-relational database (MongoDB, Redis, DynamoDB).
+- **Usage in NextPhoton**: Redis for caching; potential MongoDB for logs/analytics.
+- **Related**: MongoDB, Redis, Database
+
+---
+
+## O
+
+**OAuth**:
+- **Definition**: Open standard for authorization (login with Google, GitHub, Facebook).
+- **Usage in NextPhoton**: Potential future feature for social login.
+- **Related**: Authentication, SSO, Third-Party Login
+
+**ORM (Object-Relational Mapping)**:
+- **Definition**: Library that maps database tables to JavaScript objects (Prisma, TypeORM).
+- **Usage in NextPhoton**: Prisma ORM generates type-safe database client from schema.
+- **Related**: Prisma, Database, TypeScript
+
+**Optimistic Update**:
+- **Definition**: UI pattern that updates UI immediately (optimistically) before server confirms.
+- **Usage in NextPhoton**: Apollo Client optimistically updates cache during mutations.
+- **Related**: Apollo Client, UX, Performance
+
+**Origin**:
+- **Definition**: Combination of protocol + domain + port (https://example.com:443).
+- **Usage in NextPhoton**: CORS checks origin; same-origin policy enforced by browsers.
+- **Related**: CORS, Security, Browser
+
+---
+
+## P
+
+**PM2**:
+- **Definition**: Production process manager for Node.js applications (auto-restart, clustering, logging).
+- **Usage in NextPhoton**: Potential use for backend deployment on VPS.
+- **Related**: Node.js, Deployment, Process Manager
+
+**Prisma**:
+- **Definition**: Next-generation ORM for Node.js/TypeScript with type-safe database client.
+- **Usage in NextPhoton**: Centralized schema at `shared/prisma/schema.prisma`; generates client for frontend/backend.
+- **Related**: ORM, Database, PostgreSQL, TypeScript
+
+**Props (Properties)**:
+- **Definition**: Data passed from parent component to child component in React.
+- **Usage in NextPhoton**: Every component receives props (Button receives onClick, label).
+- **Related**: React, Component, State
+
+**Pub/Sub (Publish-Subscribe)**:
+- **Definition**: Messaging pattern where publishers send messages to topic; subscribers receive them.
+- **Usage in NextPhoton**: Potential use with Redis for real-time notifications.
+- **Related**: Redis, Real-time, Event-Driven
+
+**PostgreSQL**:
+- **Definition**: Open-source relational database (SQL) with advanced features.
+- **Usage in NextPhoton**: Primary database; stores all application data.
+- **Related**: Database, SQL, Prisma
+
+---
+
+## Q
+
+**Query**:
+- **Definition**: GraphQL operation that fetches data (read-only); also SQL SELECT statement.
+- **Usage in NextPhoton**: useQuery hook fetches data from NestJS GraphQL API.
+- **Related**: GraphQL, Apollo Client, Mutation, SQL
+
+**Queue**:
+- **Definition**: Data structure for processing jobs in order (first-in-first-out).
+- **Usage in NextPhoton**: Bull/BullMQ queue for background jobs (emails, reports).
+- **Related**: Bull, Redis, Background Job
+
+**Query String**:
+- **Definition**: Parameters appended to URL (?key=value&foo=bar).
+- **Usage in NextPhoton**: Next.js routing reads query params via useSearchParams().
+- **Related**: URL, Routing, Next.js
+
+---
+
+## R
+
+**RBAC (Role-Based Access Control)**:
+- **Definition**: Authorization model that grants access based on user's role.
+- **Usage in NextPhoton**: Uses ABAC (attribute-based) which is more flexible than RBAC.
+- **Related**: ABAC, Authorization, Permission
+
+**REST (Representational State Transfer)**:
+- **Definition**: Architectural style for APIs using HTTP methods (GET, POST, PUT, DELETE).
+- **Usage in NextPhoton**: Some Next.js API routes use REST; main API is GraphQL.
+- **Related**: API, HTTP, GraphQL
+
+**React**:
+- **Definition**: JavaScript library for building user interfaces using components.
+- **Usage in NextPhoton**: Frontend built with React; Next.js is React framework.
+- **Related**: Component, JSX, Next.js, Frontend
+
+**Redis**:
+- **Definition**: In-memory key-value store used for caching, sessions, queues.
+- **Usage in NextPhoton**: Planned for Phase 2 scaling (caching, rate limiting).
+- **Related**: Cache, Queue, NoSQL
+
+**Reducer**:
+- **Definition**: Function that takes current state and action, returns new state (Redux, useReducer).
+- **Usage in NextPhoton**: useReducer for complex state; Zustand replaces Redux.
+- **Related**: State Management, useReducer, Zustand
+
+**Refetch**:
+- **Definition**: Re-run query to get fresh data from server.
+- **Usage in NextPhoton**: Apollo Client refetches queries after mutations to update cache.
+- **Related**: Apollo Client, Query, Cache
+
+---
+
+## S
+
+**SSR (Server-Side Rendering)**:
+- **Definition**: Page HTML generated on server for each request (vs. browser).
+- **Usage in NextPhoton**: Next.js App Router uses SSR by default; Server Components render on server.
+- **Related**: CSR, SSG, ISR, Next.js
+
+**SSE (Server-Sent Events)**:
+- **Definition**: HTTP connection where server pushes updates to client (one-way real-time).
+- **Usage in NextPhoton**: Potential use for notifications (alternative to WebSockets).
+- **Related**: WebSocket, Real-time, HTTP
+
+**SQL (Structured Query Language)**:
+- **Definition**: Language for querying relational databases (SELECT, INSERT, UPDATE, DELETE).
+- **Usage in NextPhoton**: Prisma generates SQL queries; raw SQL possible via `$queryRaw`.
+- **Related**: Database, PostgreSQL, Prisma
+
+**Schema**:
+- **Definition**: Structure/blueprint of database (tables, columns, types, relations).
+- **Usage in NextPhoton**: Prisma schema defines all models; single source of truth.
+- **Related**: Prisma, Database, Model
+
+**Supabase**:
+- **Definition**: Open-source Firebase alternative (PostgreSQL + auth + realtime + storage).
+- **Usage in NextPhoton**: Alternative to custom backend; not currently used.
+- **Related**: Backend, PostgreSQL, BaaS
+
+**Sanitization**:
+- **Definition**: Process of cleaning user input to prevent security vulnerabilities (XSS, SQL injection).
+- **Usage in NextPhoton**: DOMPurify sanitizes HTML; Prisma prevents SQL injection.
+- **Related**: Security, XSS, DOMPurify
+
+**Session**:
+- **Definition**: Server-side storage of user state across requests; also education session in NextPhoton.
+- **Usage in NextPhoton**: JWT stateless sessions for auth; Session model for educator-learner meetings.
+- **Related**: Authentication, JWT, Cookie
+
+---
+
+## T
+
+**TLS (Transport Layer Security)**:
+- **Definition**: Cryptographic protocol for securing network communication (successor to SSL).
+- **Usage in NextPhoton**: HTTPS uses TLS; enforced in production.
+- **Related**: HTTPS, SSL, Security
+
+**TTI (Time to Interactive)**:
+- **Definition**: Performance metric measuring when page becomes fully interactive.
+- **Usage in NextPhoton**: Optimized via code splitting, lazy loading, minimal JavaScript.
+- **Related**: Performance, FCP, LCP
+
+**Tailwind CSS**:
+- **Definition**: Utility-first CSS framework with pre-defined classes (text-center, bg-blue-500).
+- **Usage in NextPhoton**: Primary styling solution; v4 with dark mode support.
+- **Related**: CSS, Styling, Utility Classes
+
+**Transaction**:
+- **Definition**: Database operation grouping multiple queries (all succeed or all fail).
+- **Usage in NextPhoton**: Prisma transactions ensure data consistency (charge payment + create session).
+- **Related**: Prisma, Database, ACID
+
+**TypeScript**:
+- **Definition**: Superset of JavaScript adding static types.
+- **Usage in NextPhoton**: Entire codebase in TypeScript; strict mode enabled.
+- **Related**: JavaScript, Type Safety, Compilation
+
+**Token**:
+- **Definition**: String representing authentication/authorization (JWT, OAuth token).
+- **Usage in NextPhoton**: JWT tokens issued on login; stored in httpOnly cookies.
+- **Related**: JWT, Authentication, Cookie
+
+---
+
+## U
+
+**UI (User Interface)**:
+- **Definition**: Visual elements users interact with (buttons, forms, menus).
+- **Usage in NextPhoton**: Built with React components, Radix UI primitives, Tailwind CSS.
+- **Related**: UX, Component, Design
+
+**UX (User Experience)**:
+- **Definition**: Overall experience and satisfaction user has with application.
+- **Usage in NextPhoton**: Optimized via fast loading, intuitive navigation, clear feedback.
+- **Related**: UI, Performance, Design
+
+**UUID (Universally Unique Identifier)**:
+- **Definition**: 128-bit unique identifier (e.g., 550e8400-e29b-41d4-a716-446655440000).
+- **Usage in NextPhoton**: Prisma uses UUID for primary keys (@default(uuid())).
+- **Related**: Prisma, Database, Primary Key
+
+**useEffect**:
+- **Definition**: React hook for side effects (data fetching, subscriptions, DOM manipulation).
+- **Usage in NextPhoton**: Fetch data on mount, subscribe to events, cleanup on unmount.
+- **Related**: React, Hook, Side Effect
+
+**useState**:
+- **Definition**: React hook for adding state to functional components.
+- **Usage in NextPhoton**: Manage form inputs, UI state, toggles.
+- **Related**: React, Hook, State
+
+**useMemo**:
+- **Definition**: React hook for memoizing expensive computations (caches result).
+- **Usage in NextPhoton**: Optimize performance by avoiding re-computation on every render.
+- **Related**: React, Hook, Performance, Memoization
+
+---
+
+## V
+
+**Validation**:
+- **Definition**: Process of checking if data meets requirements (email format, password length).
+- **Usage in NextPhoton**: Zod validates frontend forms; class-validator validates backend DTOs.
+- **Related**: Zod, class-validator, Security
+
+**Vercel**:
+- **Definition**: Cloud platform for deploying Next.js applications (serverless, edge network).
+- **Usage in NextPhoton**: Frontend deployed on Vercel; automatic deployments from GitHub.
+- **Related**: Deployment, Next.js, Hosting
+
+**Virtualization**:
+- **Definition**: Rendering only visible items in long lists (improves performance).
+- **Usage in NextPhoton**: Planned for large lists (100+ educators, sessions).
+- **Related**: Performance, react-window, react-virtualized
+
+**Variable**:
+- **Definition**: Named storage location for data in programming.
+- **Usage in NextPhoton**: TypeScript variables with explicit types; const for immutable, let for mutable.
+- **Related**: TypeScript, Constant, Let
+
+---
+
+## W
+
+**WebSocket**:
+- **Definition**: Protocol for full-duplex communication over single TCP connection (real-time).
+- **Usage in NextPhoton**: Planned for real-time notifications, live chat, collaborative features.
+- **Related**: Real-time, Socket.io, SSE
+
+**Webhook**:
+- **Definition**: HTTP callback triggered by event (Stripe payment → notify your server).
+- **Usage in NextPhoton**: Planned for payment processing (Stripe webhooks).
+- **Related**: API, Event, HTTP
+
+**Whitelist**:
+- **Definition**: List of allowed items (origins, IPs, users).
+- **Usage in NextPhoton**: CORS whitelist for allowed origins; rate limiting whitelist.
+- **Related**: Security, CORS, Authorization
+
+**Workspace**:
+- **Definition**: Monorepo sub-project with own package.json (frontend, backend, shared).
+- **Usage in NextPhoton**: Bun workspaces manage dependencies across all workspaces.
+- **Related**: Monorepo, Bun, Package Manager
+
+---
+
+## X
+
+**XSS (Cross-Site Scripting)**:
+- **Definition**: Security vulnerability where attacker injects malicious scripts into web pages.
+- **Usage in NextPhoton**: Prevented by sanitizing HTML (DOMPurify), escaping user input.
+- **Related**: Security, DOMPurify, Sanitization
+
+**XML (eXtensible Markup Language)**:
+- **Definition**: Markup language for encoding documents (similar to HTML but stricter).
+- **Usage in NextPhoton**: JSX is JavaScript XML syntax for React components.
+- **Related**: JSX, HTML, Markup
+
+---
+
+## Y
+
+**YAML (YAML Ain't Markup Language)**:
+- **Definition**: Human-readable data serialization format (used in config files).
+- **Usage in NextPhoton**: GitHub Actions workflows, Docker Compose files.
+- **Related**: Configuration, DevOps, CI/CD
+
+**Yarn**:
+- **Definition**: JavaScript package manager (alternative to npm).
+- **Usage in NextPhoton**: Not used; Bun is primary package manager.
+- **Related**: npm, Bun, Package Manager
+
+---
+
+## Z
+
+**Zod**:
+- **Definition**: TypeScript-first schema validation library.
+- **Usage in NextPhoton**: Validates form inputs; generates TypeScript types from schemas.
+- **Related**: Validation, TypeScript, React Hook Form
+
+**Zustand**:
+- **Definition**: Small, fast state management library for React.
+- **Usage in NextPhoton**: Global state store for auth, user data, UI state.
+- **Related**: State Management, Redux, React Context
+
+**Zero-downtime Deployment**:
+- **Definition**: Deployment strategy that keeps application running during updates.
+- **Usage in NextPhoton**: Vercel provides zero-downtime deployments; Docker blue-green deployments.
+- **Related**: Deployment, DevOps, High Availability
+
+---
+
+# Appendix B: Code Style Guide
+
+**Purpose**: Standardized coding conventions for NextPhoton project.
+
+---
+
+## 1. TypeScript Conventions
+
+### Naming Conventions
+
+**Variables & Functions**:
+```typescript
+// ✅ CORRECT: camelCase for variables and functions
+const userEmail = "john@example.com";
+const sessionCount = 5;
+
+function calculateTotalPrice(items: Item[]): number {
+  return items.reduce((sum, item) => sum + item.price, 0);
+}
+
+// ❌ WRONG: PascalCase or snake_case for variables
+const UserEmail = "john@example.com"; // ❌
+const session_count = 5; // ❌
+```
+
+**Components & Classes**:
+```typescript
+// ✅ CORRECT: PascalCase for components and classes
+function UserProfile({ userId }: { userId: string }) {
+  return <div>Profile</div>;
+}
+
+class UserService {
+  async findById(id: string) {
+    return prisma.user.findUnique({ where: { id } });
+  }
+}
+
+// ❌ WRONG: camelCase for components
+function userProfile() {} // ❌
+class userService {} // ❌
+```
+
+**Interfaces & Types**:
+```typescript
+// ✅ CORRECT: PascalCase for interfaces and types
+interface UserData {
+  id: string;
+  email: string;
+}
+
+type SessionStatus = "SCHEDULED" | "COMPLETED" | "CANCELLED";
+
+// ❌ WRONG: Prefixing with "I" or using camelCase
+interface IUserData {} // ❌ (no "I" prefix)
+type sessionStatus = "SCHEDULED"; // ❌
+```
+
+**Constants**:
+```typescript
+// ✅ CORRECT: UPPER_SNAKE_CASE for true constants
+const MAX_SESSION_DURATION = 120; // minutes
+const API_BASE_URL = "https://api.nextphoton.com";
+const DEFAULT_TIMEOUT = 5000;
+
+// ❌ WRONG: camelCase for constants
+const maxSessionDuration = 120; // ❌
+```
+
+### Type Annotations
+
+**Explicit Return Types**:
+```typescript
+// ✅ CORRECT: Explicit return type
+function getUserById(id: string): Promise<User | null> {
+  return prisma.user.findUnique({ where: { id } });
+}
+
+// ✅ CORRECT: Explicit void for no return
+function logMessage(message: string): void {
+  console.log(message);
+}
+
+// ❌ WRONG: Inferred return type for exported functions
+export function getUserById(id: string) { // ❌ Missing return type
+  return prisma.user.findUnique({ where: { id } });
+}
+```
+
+**Avoid `any` Type**:
+```typescript
+// ✅ CORRECT: Use specific types
+function processData(data: UserData): ProcessedData {
+  return { ...data, processed: true };
+}
+
+// ✅ CORRECT: Use unknown for truly unknown types
+function parseJSON(json: string): unknown {
+  return JSON.parse(json);
+}
+
+// ❌ WRONG: Using any
+function processData(data: any) { // ❌
+  return data;
+}
+```
+
+**Use Interfaces for Object Shapes**:
+```typescript
+// ✅ CORRECT: Interface for object shape
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+function Button({ label, onClick, disabled = false }: ButtonProps) {
+  return <button onClick={onClick} disabled={disabled}>{label}</button>;
+}
+
+// ❌ WRONG: Inline types for complex shapes
+function Button({ label, onClick }: { label: string; onClick: () => void }) {} // ❌
+```
+
+---
+
+## 2. React Conventions
+
+### Functional Components Only
+
+```typescript
+// ✅ CORRECT: Functional component
+interface UserCardProps {
+  user: User;
+}
+
+function UserCard({ user }: UserCardProps) {
+  return (
+    <div>
+      <h3>{user.name}</h3>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+
+// ❌ WRONG: Class component (deprecated)
+class UserCard extends React.Component<UserCardProps> { // ❌
+  render() {
+    return <div>{this.props.user.name}</div>;
+  }
+}
+```
+
+### Props Interface Above Component
+
+```typescript
+// ✅ CORRECT: Props interface defined above component
+interface SessionCardProps {
+  session: Session;
+  onCancel: (sessionId: string) => void;
+}
+
+function SessionCard({ session, onCancel }: SessionCardProps) {
+  return <div>{session.title}</div>;
+}
+
+// ❌ WRONG: No props interface
+function SessionCard({ session, onCancel }) { // ❌ Missing types
+  return <div>{session.title}</div>;
+}
+```
+
+### Custom Hooks Start with "use"
+
+```typescript
+// ✅ CORRECT: Hook name starts with "use"
+function useAuth() {
+  const [user, setUser] = useState<User | null>(null);
+  // ...
+  return { user, login, logout };
+}
+
+// ❌ WRONG: Hook doesn't start with "use"
+function authHook() { // ❌
+  const [user, setUser] = useState<User | null>(null);
+  return { user };
+}
+```
+
+### Event Handlers Prefixed with "handle"
+
+```typescript
+// ✅ CORRECT: Event handlers prefixed with "handle"
+function LoginForm() {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    // Submit logic
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input onChange={handleInputChange} />
+    </form>
+  );
+}
+
+// ❌ WRONG: Inconsistent event handler naming
+function LoginForm() {
+  const submit = () => {}; // ❌
+  const onInputChange = () => {}; // ❌
+}
+```
+
+### Destructure Props
+
+```typescript
+// ✅ CORRECT: Destructure props in parameter
+function UserProfile({ name, email, role }: UserProfileProps) {
+  return <div>{name} - {email}</div>;
+}
+
+// ❌ WRONG: Access via props object
+function UserProfile(props: UserProfileProps) { // ❌
+  return <div>{props.name} - {props.email}</div>;
+}
+```
+
+---
+
+## 3. File Organization
+
+### One Component Per File
+
+```
+// ✅ CORRECT: One component per file
+components/
+  Button.tsx          // Default export: Button
+  UserCard.tsx        // Default export: UserCard
+  SessionList.tsx     // Default export: SessionList
+
+// ❌ WRONG: Multiple components in one file
+components/
+  Components.tsx      // ❌ Exports Button, UserCard, SessionList
+```
+
+### Co-locate Tests
+
+```
+// ✅ CORRECT: Tests next to source files
+lib/
+  auth-utils.ts
+  auth-utils.spec.ts       // Test for auth-utils
+  validation.ts
+  validation.spec.ts       // Test for validation
+
+// ❌ WRONG: Separate test directory
+lib/
+  auth-utils.ts
+  validation.ts
+tests/                     // ❌ Separate test folder
+  auth-utils.test.ts
+  validation.test.ts
+```
+
+### Index Files for Clean Imports
+
+```typescript
+// ✅ CORRECT: Index file re-exports
+// components/index.ts
+export { Button } from './Button';
+export { UserCard } from './UserCard';
+export { SessionList } from './SessionList';
+
+// Usage
+import { Button, UserCard } from '@/components';
+
+// ❌ WRONG: No index file
+import { Button } from '@/components/Button';
+import { UserCard } from '@/components/UserCard';
+```
+
+### File Naming
+
+```
+// ✅ CORRECT: Component files in PascalCase
+UserProfile.tsx
+SessionCard.tsx
+EduCareManagerDashboard.tsx
+
+// ✅ CORRECT: Utility files in kebab-case
+auth-utils.ts
+form-validation.ts
+date-formatter.ts
+
+// ❌ WRONG: Inconsistent naming
+user-profile.tsx      // ❌ Should be UserProfile.tsx
+AuthUtils.ts          // ❌ Should be auth-utils.ts
+```
+
+---
+
+## 4. Import Order
+
+```typescript
+// ✅ CORRECT: Organized imports
+// 1. React/Next.js imports
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+
+// 2. Third-party libraries
+import { useQuery } from '@apollo/client';
+import { z } from 'zod';
+
+// 3. Local imports (components, utils, types)
+import { Button } from '@/components/Button';
+import { useAuth } from '@/hooks/useAuth';
+import type { User } from '@/types/user';
+
+// 4. CSS imports (last)
+import styles from './LoginPage.module.css';
+
+// ❌ WRONG: Unorganized imports
+import styles from './LoginPage.module.css'; // ❌ CSS should be last
+import { Button } from '@/components/Button';
+import { useState } from 'react';
+import { z } from 'zod';
+```
+
+---
+
+## 5. Naming Conventions Summary
+
+| Item | Convention | Example |
+|------|-----------|---------|
+| **Variables** | camelCase | `userEmail`, `sessionCount` |
+| **Functions** | camelCase | `calculateTotal`, `fetchUser` |
+| **Components** | PascalCase | `UserCard`, `SessionList` |
+| **Classes** | PascalCase | `UserService`, `AuthGuard` |
+| **Interfaces** | PascalCase | `UserData`, `SessionProps` |
+| **Types** | PascalCase | `SessionStatus`, `Role` |
+| **Enums** | PascalCase | `UserRole`, `SessionStatus` |
+| **Constants** | UPPER_SNAKE_CASE | `MAX_RETRIES`, `API_URL` |
+| **Hooks** | camelCase (use*) | `useAuth`, `useForm` |
+| **Event Handlers** | camelCase (handle*) | `handleSubmit`, `handleClick` |
+| **Component Files** | PascalCase | `UserCard.tsx`, `Button.tsx` |
+| **Utility Files** | kebab-case | `auth-utils.ts`, `date-formatter.ts` |
+| **Database Models** | PascalCase | `User`, `Session`, `Educator` |
+
+---
+
+## 6. Comment Guidelines
+
+### Document WHY, Not WHAT
+
+```typescript
+// ✅ CORRECT: Explain why, not what
+// Hash password before storing to prevent plaintext exposure in case of DB breach
+const hashedPassword = await bcrypt.hash(password, 10);
+
+// ❌ WRONG: Stating the obvious
+// Hash the password
+const hashedPassword = await bcrypt.hash(password, 10); // ❌
+```
+
+### JSDoc for Public APIs
+
+```typescript
+// ✅ CORRECT: JSDoc for exported functions
+/**
+ * Fetches user by ID from database.
+ * @param id - User's unique identifier
+ * @returns Promise resolving to User or null if not found
+ * @throws DatabaseError if connection fails
+ */
+export async function getUserById(id: string): Promise<User | null> {
+  return prisma.user.findUnique({ where: { id } });
+}
+
+// ❌ WRONG: No documentation for exported function
+export async function getUserById(id: string): Promise<User | null> { // ❌
+  return prisma.user.findUnique({ where: { id } });
+}
+```
+
+### Inline Comments Sparingly
+
+```typescript
+// ✅ CORRECT: Comment for non-obvious logic
+function calculateDiscount(price: number, userRole: Role): number {
+  // Educators get 20% discount as company policy to encourage education
+  if (userRole === 'EDUCATOR') {
+    return price * 0.8;
+  }
+  return price;
+}
+
+// ❌ WRONG: Over-commenting obvious code
+function add(a: number, b: number): number {
+  // Add a and b together ❌
+  const result = a + b;
+  // Return the result ❌
+  return result;
+}
+```
+
+### TODO Comments Format
+
+```typescript
+// ✅ CORRECT: TODO with context
+// TODO: Add rate limiting to prevent brute force attacks (Jira-123)
+async function login(email: string, password: string) {
+  // ...
+}
+
+// ❌ WRONG: Vague TODO
+// TODO: Fix this ❌
+async function login(email: string, password: string) {
+  // ...
+}
+```
+
+---
+
+## 7. Formatting (Prettier)
+
+### Indentation
+
+```typescript
+// ✅ CORRECT: 2-space indentation
+function example() {
+  if (condition) {
+    return true;
+  }
+  return false;
+}
+
+// ❌ WRONG: 4-space or tab indentation
+function example() {
+    if (condition) { // ❌ 4 spaces
+        return true;
+    }
+}
+```
+
+### Max Line Length: 100
+
+```typescript
+// ✅ CORRECT: Break long lines at 100 characters
+const user = await prisma.user.findUnique({
+  where: { id: userId },
+  include: { sessions: true, guardian: true },
+});
+
+// ❌ WRONG: Long line exceeding 100 characters
+const user = await prisma.user.findUnique({ where: { id: userId }, include: { sessions: true, guardian: true } }); // ❌
+```
+
+### Trailing Commas
+
+```typescript
+// ✅ CORRECT: Trailing commas in multi-line
+const config = {
+  name: "NextPhoton",
+  version: "1.0.0",
+  author: "Team Zenith", // ✅ Trailing comma
+};
+
+// ❌ WRONG: No trailing comma
+const config = {
+  name: "NextPhoton",
+  version: "1.0.0",
+  author: "Team Zenith" // ❌ Missing trailing comma
+};
+```
+
+### Single Quotes
+
+```typescript
+// ✅ CORRECT: Single quotes for strings
+const message = 'Hello, world!';
+const name = 'John Doe';
+
+// ❌ WRONG: Double quotes (unless needed for escaping)
+const message = "Hello, world!"; // ❌
+```
+
+### Semicolons
+
+```typescript
+// ✅ CORRECT: Semicolons at end of statements
+const name = 'John';
+const age = 30;
+
+// ❌ WRONG: No semicolons
+const name = 'John' // ❌
+const age = 30 // ❌
+```
+
+---
+
+## 8. Best Practices Summary
+
+### Do's:
+- ✅ Use TypeScript strict mode
+- ✅ Explicit return types for functions
+- ✅ Destructure props in components
+- ✅ Prefix event handlers with "handle"
+- ✅ Prefix custom hooks with "use"
+- ✅ Use PascalCase for components, camelCase for functions
+- ✅ One component per file
+- ✅ Co-locate tests with source files
+- ✅ Organize imports (React → third-party → local → CSS)
+- ✅ Use JSDoc for public APIs
+- ✅ Comment WHY, not WHAT
+- ✅ Use Prettier for formatting
+
+### Don'ts:
+- ❌ Don't use `any` type
+- ❌ Don't use class components
+- ❌ Don't prefix interfaces with "I"
+- ❌ Don't put multiple components in one file
+- ❌ Don't separate tests into separate directory
+- ❌ Don't comment obvious code
+- ❌ Don't exceed 100 characters per line
+- ❌ Don't use inconsistent naming conventions
+
+---
+
+# Appendix C: Common Errors and Solutions
+
+**Purpose**: Troubleshooting guide for frequently encountered errors.
+
+---
+
+## 1. Next.js Errors
+
+### Error: Hydration Mismatch
+
+**Error Message**:
+```
+Error: Text content does not match server-rendered HTML.
+Warning: Expected server HTML to contain a matching <div> in <div>.
+```
+
+**Common Causes**:
+- Using browser-only APIs (localStorage, window) during SSR
+- Rendering different content on server vs. client
+- Using Date.now() or Math.random() in component render
+
+**Solution**:
+```typescript
+// ❌ WRONG: Using localStorage directly (not available on server)
+function UserGreeting() {
+  const name = localStorage.getItem('name'); // ❌ Hydration error
+  return <div>Hello, {name}</div>;
+}
+
+// ✅ CORRECT: Use useEffect to access browser APIs
+function UserGreeting() {
+  const [name, setName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setName(localStorage.getItem('name'));
+  }, []);
+
+  return <div>Hello, {name || 'Guest'}</div>;
+}
+```
+
+**Prevention**:
+- Use `useEffect` for browser-only code
+- Ensure same content rendered on server and client
+- Add `'use client'` directive if component is purely client-side
+
+---
+
+### Error: Module Not Found
+
+**Error Message**:
+```
+Module not found: Can't resolve '@/components/Button'
+```
+
+**Common Causes**:
+- Incorrect import path
+- Missing tsconfig paths configuration
+- File doesn't exist at expected location
+
+**Solution**:
+```typescript
+// ❌ WRONG: Incorrect path
+import { Button } from '@/component/Button'; // ❌ Typo: "component" vs "components"
+
+// ✅ CORRECT: Verify path in tsconfig.json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+
+// ✅ CORRECT: Use correct path
+import { Button } from '@/components/Button';
+```
+
+**Prevention**:
+- Double-check file paths and spelling
+- Use IDE auto-import features
+- Verify tsconfig.json paths configuration
+
+---
+
+### Error: 'use client' Directive Missing
+
+**Error Message**:
+```
+Error: useState only works in Client Components.
+Add the "use client" directive at the top of the file.
+```
+
+**Common Causes**:
+- Using React hooks (useState, useEffect) in Server Component
+- Using browser APIs without 'use client'
+
+**Solution**:
+```typescript
+// ❌ WRONG: Missing 'use client' directive
+import { useState } from 'react';
+
+function Counter() { // ❌ Server Component using useState
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+
+// ✅ CORRECT: Add 'use client' directive
+'use client';
+
+import { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+**Prevention**:
+- Add `'use client'` at top of file for interactive components
+- Use Server Components for static content
+- Check if component truly needs client-side interactivity
+
+---
+
+### Error: Image Optimization Failed
+
+**Error Message**:
+```
+Error: Invalid src prop on `next/image`.
+Hostname "example.com" is not configured under images in next.config.js
+```
+
+**Common Causes**:
+- External image URL not whitelisted in next.config.js
+- Invalid image src format
+
+**Solution**:
+```javascript
+// ❌ WRONG: External image without configuration
+<Image src="https://example.com/avatar.jpg" /> // ❌
+
+// ✅ CORRECT: Configure in next.config.js
+// next.config.js
+module.exports = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
+    ],
+  },
+};
+
+// ✅ CORRECT: Now external image works
+<Image
+  src="https://example.com/avatar.jpg"
+  width={100}
+  height={100}
+  alt="User avatar"
+/>
+```
+
+**Prevention**:
+- Whitelist external image domains in next.config.js
+- Always provide width, height, and alt props
+- Use local images in `/public` folder when possible
+
+---
+
+### Error: Font Optimization Failed
+
+**Error Message**:
+```
+Error: Failed to download `https://fonts.googleapis.com/css2?family=Inter`
+```
+
+**Common Causes**:
+- Network issue blocking font download
+- Incorrect font URL
+
+**Solution**:
+```typescript
+// ❌ WRONG: Manual font import (not optimized)
+import '@fontsource/inter'; // ❌
+
+// ✅ CORRECT: Use next/font for automatic optimization
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={inter.className}>
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+**Prevention**:
+- Use `next/font` for Google Fonts
+- Download fonts to `/public` if Google Fonts unavailable
+- Check network connectivity during build
+
+---
+
+## 2. React Errors
+
+### Error: Cannot Read Property of Undefined
+
+**Error Message**:
+```
+TypeError: Cannot read property 'name' of undefined
+```
+
+**Common Causes**:
+- Accessing property on undefined/null object
+- Data not loaded yet (async)
+
+**Solution**:
+```typescript
+// ❌ WRONG: No null check
+function UserProfile({ user }) {
+  return <div>{user.name}</div>; // ❌ Crashes if user is undefined
+}
+
+// ✅ CORRECT: Optional chaining
+function UserProfile({ user }) {
+  return <div>{user?.name ?? 'Unknown'}</div>;
+}
+
+// ✅ CORRECT: Early return
+function UserProfile({ user }) {
+  if (!user) return <div>Loading...</div>;
+  return <div>{user.name}</div>;
+}
+```
+
+**Prevention**:
+- Use optional chaining (`user?.name`)
+- Provide fallback values (`user?.name ?? 'Unknown'`)
+- Add loading states for async data
+
+---
+
+### Error: Objects Not Valid as React Child
+
+**Error Message**:
+```
+Error: Objects are not valid as a React child.
+If you meant to render a collection of children, use an array instead.
+```
+
+**Common Causes**:
+- Trying to render object directly in JSX
+- Forgetting to extract value from object
+
+**Solution**:
+```typescript
+// ❌ WRONG: Rendering object directly
+function UserCard({ user }) {
+  return <div>{user}</div>; // ❌ Can't render { id: '1', name: 'John' }
+}
+
+// ✅ CORRECT: Render specific properties
+function UserCard({ user }) {
+  return <div>{user.name}</div>;
+}
+
+// ✅ CORRECT: Use JSON.stringify for debugging
+function UserCard({ user }) {
+  return <pre>{JSON.stringify(user, null, 2)}</pre>;
+}
+```
+
+**Prevention**:
+- Render primitive values (string, number) only
+- Extract specific properties from objects
+- Use `.map()` for arrays
+
+---
+
+### Error: Too Many Re-renders
+
+**Error Message**:
+```
+Error: Too many re-renders. React limits the number of renders to prevent an infinite loop.
+```
+
+**Common Causes**:
+- Calling setState directly in render (causes infinite loop)
+- Incorrect useEffect dependencies
+
+**Solution**:
+```typescript
+// ❌ WRONG: Calling setState in render
+function Counter() {
+  const [count, setCount] = useState(0);
+  setCount(count + 1); // ❌ Infinite loop: render → setState → render → ...
+  return <div>{count}</div>;
+}
+
+// ✅ CORRECT: Use event handler
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>{count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+    </div>
+  );
+}
+
+// ❌ WRONG: useEffect with missing dependencies
+function UserFetcher({ userId }) {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }); // ❌ Missing dependency array → runs on every render
+}
+
+// ✅ CORRECT: Add dependency array
+function UserFetcher({ userId }) {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]); // ✅ Runs only when userId changes
+}
+```
+
+**Prevention**:
+- Never call setState directly in component body
+- Always provide dependency array to useEffect
+- Use event handlers for state updates
+
+---
+
+### Error: Invalid Hook Call
+
+**Error Message**:
+```
+Error: Invalid hook call. Hooks can only be called inside of the body of a function component.
+```
+
+**Common Causes**:
+- Calling hooks outside component or custom hook
+- Calling hooks conditionally or in loops
+
+**Solution**:
+```typescript
+// ❌ WRONG: Hook called outside component
+const data = useState(null); // ❌ Outside component
+
+function MyComponent() {
+  return <div>Hello</div>;
+}
+
+// ✅ CORRECT: Hook called inside component
+function MyComponent() {
+  const [data, setData] = useState(null); // ✅ Inside component
+  return <div>Hello</div>;
+}
+
+// ❌ WRONG: Conditional hook call
+function MyComponent({ shouldFetch }) {
+  if (shouldFetch) {
+    const [data, setData] = useState(null); // ❌ Conditional
+  }
+}
+
+// ✅ CORRECT: Hook always called
+function MyComponent({ shouldFetch }) {
+  const [data, setData] = useState(null); // ✅ Always called
+  if (shouldFetch) {
+    // Use data here
+  }
+}
+```
+
+**Prevention**:
+- Call hooks at top level of component (not in conditions/loops)
+- Only call hooks in function components or custom hooks
+- Follow Rules of Hooks
+
+---
+
+### Error: Cannot Update Component During Render
+
+**Error Message**:
+```
+Warning: Cannot update a component from inside the function body of a different component.
+```
+
+**Common Causes**:
+- Updating parent state during child render
+- Calling setState in render method
+
+**Solution**:
+```typescript
+// ❌ WRONG: Updating parent state during render
+function Child({ setParentState }) {
+  setParentState('new value'); // ❌ Called during render
+  return <div>Child</div>;
+}
+
+// ✅ CORRECT: Update in useEffect
+function Child({ setParentState }) {
+  useEffect(() => {
+    setParentState('new value'); // ✅ Called after render
+  }, [setParentState]);
+  return <div>Child</div>;
+}
+
+// ✅ CORRECT: Update via event handler
+function Child({ setParentState }) {
+  return (
+    <button onClick={() => setParentState('new value')}>
+      Update Parent
+    </button>
+  );
+}
+```
+
+**Prevention**:
+- Use useEffect for side effects
+- Use event handlers for user-triggered updates
+- Avoid calling setState during render
+
+---
+
+## 3. TypeScript Errors
+
+### Error: Property Does Not Exist on Type
+
+**Error Message**:
+```
+Property 'email' does not exist on type 'User'.
+```
+
+**Common Causes**:
+- Accessing property not defined in interface/type
+- Typo in property name
+- Type mismatch
+
+**Solution**:
+```typescript
+// ❌ WRONG: Property not in interface
+interface User {
+  id: string;
+  name: string;
+}
+
+function printEmail(user: User) {
+  console.log(user.email); // ❌ 'email' doesn't exist on User
+}
+
+// ✅ CORRECT: Add property to interface
+interface User {
+  id: string;
+  name: string;
+  email: string; // ✅ Added email
+}
+
+function printEmail(user: User) {
+  console.log(user.email); // ✅ Works now
+}
+```
+
+**Prevention**:
+- Verify interface/type definitions
+- Use IDE autocomplete to avoid typos
+- Update types when API changes
+
+---
+
+### Error: Type 'X' Not Assignable to Type 'Y'
+
+**Error Message**:
+```
+Type 'string | null' is not assignable to type 'string'.
+Type 'null' is not assignable to type 'string'.
+```
+
+**Common Causes**:
+- Type mismatch (expecting string, got string | null)
+- Missing null check
+
+**Solution**:
+```typescript
+// ❌ WRONG: Passing nullable value to non-nullable parameter
+function greet(name: string) {
+  console.log(`Hello, ${name}`);
+}
+
+const userName: string | null = getUserName();
+greet(userName); // ❌ string | null not assignable to string
+
+// ✅ CORRECT: Add null check
+const userName: string | null = getUserName();
+if (userName) {
+  greet(userName); // ✅ TypeScript knows userName is string here
+}
+
+// ✅ CORRECT: Provide fallback
+const userName: string | null = getUserName();
+greet(userName ?? 'Guest'); // ✅ Always string
+```
+
+**Prevention**:
+- Add null/undefined checks
+- Use optional chaining and nullish coalescing
+- Match function parameter types with argument types
+
+---
+
+### Error: Argument of Type 'X' Not Assignable
+
+**Error Message**:
+```
+Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
+**Common Causes**:
+- Passing wrong type to function
+- Missing type conversion
+
+**Solution**:
+```typescript
+// ❌ WRONG: Passing number to string parameter
+function printMessage(message: string) {
+  console.log(message);
+}
+
+printMessage(123); // ❌ number not assignable to string
+
+// ✅ CORRECT: Convert to string
+printMessage(String(123)); // ✅
+printMessage(123.toString()); // ✅
+printMessage(`${123}`); // ✅
+```
+
+**Prevention**:
+- Check function parameter types
+- Use explicit type conversions
+- Leverage IDE type hints
+
+---
+
+### Error: Object Is Possibly 'null' or 'undefined'
+
+**Error Message**:
+```
+Object is possibly 'null'.
+```
+
+**Common Causes**:
+- Accessing property on potentially null value
+- TypeScript strict null checks enabled
+
+**Solution**:
+```typescript
+// ❌ WRONG: No null check
+function getUserEmail(userId: string) {
+  const user = findUser(userId); // Returns User | null
+  return user.email; // ❌ Object is possibly 'null'
+}
+
+// ✅ CORRECT: Optional chaining
+function getUserEmail(userId: string) {
+  const user = findUser(userId);
+  return user?.email; // ✅ Returns string | undefined
+}
+
+// ✅ CORRECT: Null check
+function getUserEmail(userId: string) {
+  const user = findUser(userId);
+  if (!user) return null;
+  return user.email; // ✅ TypeScript knows user is not null
+}
+
+// ✅ CORRECT: Non-null assertion (use cautiously)
+function getUserEmail(userId: string) {
+  const user = findUser(userId);
+  return user!.email; // ✅ Asserts user is not null (risky)
+}
+```
+
+**Prevention**:
+- Use optional chaining (`?.`)
+- Add explicit null checks
+- Use nullish coalescing (`??`)
+- Only use non-null assertion (`!`) when certain value exists
+
+---
+
+## 4. Database Errors (Prisma)
+
+### Error: P2002 - Unique Constraint Failed
+
+**Error Message**:
+```
+PrismaClientKnownRequestError: Unique constraint failed on the fields: (`email`)
+```
+
+**Common Causes**:
+- Trying to create record with duplicate unique field (email, username)
+
+**Solution**:
+```typescript
+// ❌ WRONG: No duplicate check
+async function createUser(email: string, name: string) {
+  return await prisma.user.create({
+    data: { email, name },
+  }); // ❌ Fails if email already exists
+}
+
+// ✅ CORRECT: Check for existing user first
+async function createUser(email: string, name: string) {
+  const existing = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existing) {
+    throw new Error('User with this email already exists');
+  }
+
+  return await prisma.user.create({
+    data: { email, name },
+  });
+}
+
+// ✅ CORRECT: Use upsert (update or insert)
+async function createOrUpdateUser(email: string, name: string) {
+  return await prisma.user.upsert({
+    where: { email },
+    update: { name },
+    create: { email, name },
+  });
+}
+```
+
+**Prevention**:
+- Check for duplicates before creating
+- Use `upsert` for create-or-update logic
+- Handle P2002 error gracefully in try-catch
+
+---
+
+### Error: P2025 - Record Not Found
+
+**Error Message**:
+```
+PrismaClientKnownRequestError: Record to update not found.
+```
+
+**Common Causes**:
+- Trying to update/delete non-existent record
+
+**Solution**:
+```typescript
+// ❌ WRONG: No existence check
+async function updateUser(id: string, name: string) {
+  return await prisma.user.update({
+    where: { id },
+    data: { name },
+  }); // ❌ Fails if user doesn't exist
+}
+
+// ✅ CORRECT: Check if record exists first
+async function updateUser(id: string, name: string) {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return await prisma.user.update({
+    where: { id },
+    data: { name },
+  });
+}
+
+// ✅ CORRECT: Use updateMany (doesn't throw if not found)
+async function updateUser(id: string, name: string) {
+  const result = await prisma.user.updateMany({
+    where: { id },
+    data: { name },
+  });
+
+  if (result.count === 0) {
+    throw new Error('User not found');
+  }
+
+  return result;
+}
+```
+
+**Prevention**:
+- Check record exists before update/delete
+- Use `findUnique` to verify existence
+- Use `updateMany` which doesn't throw on missing record
+
+---
+
+### Error: P2003 - Foreign Key Constraint Failed
+
+**Error Message**:
+```
+PrismaClientKnownRequestError: Foreign key constraint failed on the field: `userId`
+```
+
+**Common Causes**:
+- Trying to create record with non-existent foreign key reference
+- Deleting parent record with existing child records
+
+**Solution**:
+```typescript
+// ❌ WRONG: Creating session with invalid userId
+async function createSession(userId: string, educatorId: string) {
+  return await prisma.session.create({
+    data: { userId, educatorId, date: new Date() },
+  }); // ❌ Fails if userId doesn't exist in User table
+}
+
+// ✅ CORRECT: Verify foreign key exists
+async function createSession(userId: string, educatorId: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return await prisma.session.create({
+    data: { userId, educatorId, date: new Date() },
+  });
+}
+
+// ❌ WRONG: Deleting user with existing sessions
+async function deleteUser(userId: string) {
+  return await prisma.user.delete({
+    where: { id: userId },
+  }); // ❌ Fails if user has sessions
+}
+
+// ✅ CORRECT: Delete related records first or use cascade
+async function deleteUser(userId: string) {
+  // Option 1: Delete related records first
+  await prisma.session.deleteMany({ where: { userId } });
+  return await prisma.user.delete({ where: { id: userId } });
+
+  // Option 2: Use cascade delete in schema
+  // model User {
+  //   sessions Session[] @relation(onDelete: Cascade)
+  // }
+}
+```
+
+**Prevention**:
+- Verify foreign key references exist
+- Use cascade deletes in schema when appropriate
+- Delete child records before parent
+
+---
+
+### Error: Connection Timeout
+
+**Error Message**:
+```
+PrismaClientInitializationError: Can't reach database server at `localhost:5432`
+```
+
+**Common Causes**:
+- Database not running
+- Incorrect DATABASE_URL in .env
+- Network/firewall blocking connection
+
+**Solution**:
+```bash
+# ✅ CORRECT: Verify database is running
+docker ps # Check if PostgreSQL container is running
+psql -U postgres -h localhost # Test connection manually
+
+# ✅ CORRECT: Check .env configuration
+# .env
+DATABASE_URL="postgresql://user:password@localhost:5432/nextphoton?schema=public"
+
+# ✅ CORRECT: Test Prisma connection
+bun run test:db
+```
+
+**Prevention**:
+- Ensure database is running before starting app
+- Verify DATABASE_URL is correct
+- Check firewall/network settings
+- Use connection pooling for production
+
+---
+
+### Error: Too Many Connections
+
+**Error Message**:
+```
+PrismaClientInitializationError: Too many connections
+```
+
+**Common Causes**:
+- Not closing Prisma connections properly
+- Too many concurrent requests
+- Connection pool too small
+
+**Solution**:
+```typescript
+// ❌ WRONG: Creating new Prisma client on every request
+import { PrismaClient } from '@prisma/client';
+
+export async function GET() {
+  const prisma = new PrismaClient(); // ❌ New client each time
+  const users = await prisma.user.findMany();
+  return Response.json(users);
+}
+
+// ✅ CORRECT: Use singleton Prisma client
+// shared/db/index.ts
+import { PrismaClient } from '@prisma/client';
+
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
+
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient({
+    log: ['query', 'error', 'warn'],
+  });
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+// ✅ CORRECT: Import singleton
+import { prisma } from '@/shared/db';
+
+export async function GET() {
+  const users = await prisma.user.findMany();
+  return Response.json(users);
+}
+```
+
+**Prevention**:
+- Use singleton Prisma client
+- Configure connection pool size in DATABASE_URL
+- Close connections in serverless functions
+- Use connection pooling service (PgBouncer) for high traffic
+
+---
+
+## 5. Authentication Errors
+
+### Error: 401 Unauthorized
+
+**Error Message**:
+```
+HTTP 401 Unauthorized
+```
+
+**Common Causes**:
+- Missing or invalid JWT token
+- Token expired
+- Token not sent in request
+
+**Solution**:
+```typescript
+// ❌ WRONG: Not sending token
+async function fetchUserData() {
+  const response = await fetch('/api/user');
+  return response.json(); // ❌ No auth header
+}
+
+// ✅ CORRECT: Include JWT token in header
+async function fetchUserData() {
+  const token = getAuthToken(); // Get from cookie or storage
+  const response = await fetch('/api/user', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.json();
+}
+
+// ✅ CORRECT: Handle 401 and redirect to login
+async function fetchUserData() {
+  const token = getAuthToken();
+  const response = await fetch('/api/user', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (response.status === 401) {
+    // Token invalid or expired
+    redirectToLogin();
+    return null;
+  }
+
+  return response.json();
+}
+```
+
+**Prevention**:
+- Always send JWT token with requests
+- Handle 401 errors gracefully (redirect to login)
+- Refresh token before expiration
+
+---
+
+### Error: 403 Forbidden
+
+**Error Message**:
+```
+HTTP 403 Forbidden - Insufficient permissions
+```
+
+**Common Causes**:
+- User authenticated but lacks required permission/role
+- ABAC rules deny access
+
+**Solution**:
+```typescript
+// ❌ WRONG: No permission check on frontend
+function AdminPanel() {
+  return <div>Admin Controls</div>; // ❌ Anyone can see this
+}
+
+// ✅ CORRECT: Check user role before rendering
+function AdminPanel() {
+  const { user } = useAuth();
+
+  if (user?.role !== 'ADMIN') {
+    return <div>Access denied</div>;
+  }
+
+  return <div>Admin Controls</div>;
+}
+
+// ✅ CORRECT: Backend enforces permission
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+@Get('/admin/users')
+async getUsers() {
+  return this.userService.findAll();
+}
+```
+
+**Prevention**:
+- Implement role-based access control (RBAC/ABAC)
+- Check permissions on both frontend and backend
+- Show appropriate error message to user
+
+---
+
+### Error: Token Expired
+
+**Error Message**:
+```
+JsonWebTokenError: jwt expired
+```
+
+**Common Causes**:
+- JWT token has passed expiration time
+- Not refreshing token before expiry
+
+**Solution**:
+```typescript
+// ❌ WRONG: No token refresh logic
+async function fetchData() {
+  const token = getAuthToken();
+  const response = await fetch('/api/data', {
+    headers: { Authorization: `Bearer ${token}` },
+  }); // ❌ Fails if token expired
+}
+
+// ✅ CORRECT: Refresh token if expired
+async function fetchData() {
+  let token = getAuthToken();
+
+  // Check if token is expired
+  if (isTokenExpired(token)) {
+    token = await refreshAuthToken();
+  }
+
+  const response = await fetch('/api/data', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.json();
+}
+
+// ✅ CORRECT: Automatic token refresh with interceptor
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Try refreshing token
+      const newToken = await refreshAuthToken();
+      // Retry original request with new token
+      error.config.headers.Authorization = `Bearer ${newToken}`;
+      return axios(error.config);
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+**Prevention**:
+- Implement token refresh logic
+- Set reasonable token expiration time (15 min access, 7 days refresh)
+- Use refresh tokens to obtain new access tokens
+
+---
+
+### Error: Invalid Credentials
+
+**Error Message**:
+```
+Error: Invalid email or password
+```
+
+**Common Causes**:
+- Incorrect email/password
+- Password not hashed when comparing
+- Typo in credentials
+
+**Solution**:
+```typescript
+// ❌ WRONG: Comparing plaintext passwords
+async function login(email: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || user.password !== password) { // ❌ Plaintext comparison
+    throw new Error('Invalid credentials');
+  }
+  return generateToken(user);
+}
+
+// ✅ CORRECT: Use bcrypt to compare hashed passwords
+async function login(email: string, password: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    throw new Error('Invalid credentials');
+  }
+
+  const isValid = await bcrypt.compare(password, user.password);
+  if (!isValid) {
+    throw new Error('Invalid credentials');
+  }
+
+  return generateToken(user);
+}
+```
+
+**Prevention**:
+- Always hash passwords with bcrypt
+- Use bcrypt.compare() for verification
+- Don't reveal whether email or password is wrong (security)
+
+---
+
+### Error: CORS Error
+
+**Error Message**:
+```
+Access to fetch at 'http://localhost:3001/api' from origin 'http://localhost:3000' has been blocked by CORS policy
+```
+
+**Common Causes**:
+- Backend doesn't allow frontend origin
+- Missing CORS configuration
+
+**Solution**:
+```typescript
+// ❌ WRONG: No CORS configuration
+const app = express();
+app.get('/api/data', (req, res) => {
+  res.json({ data: 'Hello' });
+}); // ❌ CORS not configured
+
+// ✅ CORRECT: Configure CORS in NestJS
+// main.ts
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  app.enableCors({
+    origin: 'http://localhost:3000', // Frontend URL
+    credentials: true,
+  });
+
+  await app.listen(3001);
+}
+bootstrap();
+
+// ✅ CORRECT: Configure CORS in Express
+import cors from 'cors';
+
+const app = express();
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+```
+
+**Prevention**:
+- Configure CORS to allow frontend origin
+- Use environment variables for allowed origins
+- Enable credentials if using cookies
+
+---
+
+## 6. API Errors
+
+### Error: 400 Bad Request
+
+**Error Message**:
+```
+HTTP 400 Bad Request - Invalid input data
+```
+
+**Common Causes**:
+- Missing required fields
+- Invalid data format (email, date, etc.)
+- Validation failed
+
+**Solution**:
+```typescript
+// ❌ WRONG: No validation
+async function createUser(data: any) {
+  return await prisma.user.create({ data }); // ❌ No validation
+}
+
+// ✅ CORRECT: Validate with Zod
+import { z } from 'zod';
+
+const CreateUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2),
+  password: z.string().min(8),
+});
+
+async function createUser(data: unknown) {
+  const validated = CreateUserSchema.parse(data); // Throws if invalid
+  return await prisma.user.create({ data: validated });
+}
+
+// ✅ CORRECT: Return user-friendly error
+async function createUser(data: unknown) {
+  const result = CreateUserSchema.safeParse(data);
+  if (!result.success) {
+    throw new Error(`Invalid data: ${result.error.message}`);
+  }
+  return await prisma.user.create({ data: result.data });
+}
+```
+
+**Prevention**:
+- Validate all input data (Zod on frontend, class-validator on backend)
+- Return clear error messages
+- Check required fields before processing
+
+---
+
+### Error: 404 Not Found
+
+**Error Message**:
+```
+HTTP 404 Not Found - Resource not found
+```
+
+**Common Causes**:
+- Incorrect API endpoint URL
+- Resource doesn't exist (user, session, etc.)
+
+**Solution**:
+```typescript
+// ❌ WRONG: Typo in URL
+fetch('/api/usres'); // ❌ Typo: "usres" instead of "users"
+
+// ✅ CORRECT: Verify URL
+fetch('/api/users'); // ✅ Correct endpoint
+
+// ❌ WRONG: No null check
+async function getUser(id: string) {
+  const user = await prisma.user.findUnique({ where: { id } });
+  return user; // ❌ Returns null if not found
+}
+
+// ✅ CORRECT: Throw 404 if not found
+async function getUser(id: string) {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+  return user;
+}
+```
+
+**Prevention**:
+- Double-check API endpoint URLs
+- Verify resource exists before accessing
+- Return 404 with clear message
+
+---
+
+### Error: 500 Internal Server Error
+
+**Error Message**:
+```
+HTTP 500 Internal Server Error
+```
+
+**Common Causes**:
+- Unhandled exception in backend
+- Database connection error
+- Unexpected error in code
+
+**Solution**:
+```typescript
+// ❌ WRONG: No error handling
+async function getUsers() {
+  return await prisma.user.findMany(); // ❌ Crashes if DB down
+}
+
+// ✅ CORRECT: Try-catch with logging
+async function getUsers() {
+  try {
+    return await prisma.user.findMany();
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+    throw new InternalServerErrorException('Failed to fetch users');
+  }
+}
+
+// ✅ CORRECT: Global exception filter (NestJS)
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+
+    console.error('Unhandled exception:', exception);
+
+    response.status(500).json({
+      statusCode: 500,
+      message: 'Internal server error',
+    });
+  }
+}
+```
+
+**Prevention**:
+- Add try-catch blocks for critical operations
+- Log errors for debugging
+- Use global exception handlers
+- Monitor errors with Sentry
+
+---
+
+### Error: Network Error
+
+**Error Message**:
+```
+Network Error - Failed to fetch
+```
+
+**Common Causes**:
+- Backend server not running
+- Incorrect API URL
+- Network/internet disconnected
+
+**Solution**:
+```typescript
+// ❌ WRONG: No error handling
+async function fetchData() {
+  const response = await fetch('/api/data');
+  return response.json(); // ❌ Crashes if network fails
+}
+
+// ✅ CORRECT: Handle network errors
+async function fetchData() {
+  try {
+    const response = await fetch('/api/data');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    if (error instanceof TypeError) {
+      // Network error (fetch failed)
+      console.error('Network error:', error);
+      throw new Error('Failed to connect to server. Please check your connection.');
+    }
+    throw error;
+  }
+}
+```
+
+**Prevention**:
+- Wrap fetch in try-catch
+- Verify backend is running
+- Check API URL configuration
+- Show user-friendly error message
+
+---
+
+### Error: Request Timeout
+
+**Error Message**:
+```
+Error: Request timeout exceeded
+```
+
+**Common Causes**:
+- Slow API response
+- Database query taking too long
+- No timeout configured
+
+**Solution**:
+```typescript
+// ❌ WRONG: No timeout
+async function fetchData() {
+  const response = await fetch('/api/data'); // ❌ Waits forever
+  return response.json();
+}
+
+// ✅ CORRECT: Add timeout with AbortController
+async function fetchData(timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch('/api/data', {
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return await response.json();
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout');
+    }
+    throw error;
+  }
+}
+```
+
+**Prevention**:
+- Set reasonable timeouts for requests
+- Optimize slow database queries
+- Use caching for frequent requests
+
+---
+
+**Summary**: This appendix covers 40+ common errors with solutions. Always check error messages carefully, understand the root cause, and apply appropriate fixes. Refer to specific error codes (P2002, 401, etc.) for quick troubleshooting.
+
+---
+
+# Appendix D: Resource Links
+
+**Purpose**: Curated list of official documentation, learning resources, tools, and community links.
+
+---
+
+## 1. Official Documentation
+
+### Frontend Frameworks
+
+**Next.js**:
+- Official Docs: https://nextjs.org/docs
+- App Router Guide: https://nextjs.org/docs/app
+- API Reference: https://nextjs.org/docs/api-reference
+- Learn Next.js (Interactive): https://nextjs.org/learn
+
+**React**:
+- Official Docs: https://react.dev
+- React Hooks Reference: https://react.dev/reference/react
+- React DevTools: https://react.dev/learn/react-developer-tools
+- Legacy Docs (Class Components): https://legacy.reactjs.org
+
+**TypeScript**:
+- Official Handbook: https://www.typescriptlang.org/docs/handbook/intro.html
+- TypeScript Playground: https://www.typescriptlang.org/play
+- Type Challenges: https://github.com/type-challenges/type-challenges
+- TypeScript Deep Dive: https://basarat.gitbook.io/typescript
+
+### Backend Frameworks
+
+**NestJS**:
+- Official Docs: https://docs.nestjs.com
+- GraphQL Module: https://docs.nestjs.com/graphql/quick-start
+- Authentication: https://docs.nestjs.com/security/authentication
+- Testing: https://docs.nestjs.com/fundamentals/testing
+
+**Node.js**:
+- Official Docs: https://nodejs.org/en/docs
+- API Reference: https://nodejs.org/api
+- Best Practices: https://github.com/goldbergyoni/nodebestpractices
+
+**Express**:
+- Official Docs: https://expressjs.com
+- API Reference: https://expressjs.com/en/4x/api.html
+- Middleware Guide: https://expressjs.com/en/guide/using-middleware.html
+
+### Database & ORM
+
+**Prisma**:
+- Official Docs: https://www.prisma.io/docs
+- Schema Reference: https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference
+- Client API: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference
+- Data Guide: https://www.prisma.io/dataguide
+
+**PostgreSQL**:
+- Official Docs: https://www.postgresql.org/docs
+- Tutorial: https://www.postgresql.org/docs/current/tutorial.html
+- SQL Commands: https://www.postgresql.org/docs/current/sql-commands.html
+- Performance Tips: https://wiki.postgresql.org/wiki/Performance_Optimization
+
+### Styling
+
+**Tailwind CSS**:
+- Official Docs: https://tailwindcss.com/docs
+- v4 Alpha Docs: https://tailwindcss.com/docs/v4-beta
+- Playground: https://play.tailwindcss.com
+- UI Components: https://tailwindui.com
+
+**Radix UI**:
+- Official Docs: https://www.radix-ui.com/primitives/docs/overview/introduction
+- Components: https://www.radix-ui.com/primitives/docs/components
+- Themes: https://www.radix-ui.com/themes/docs/overview/getting-started
+
+**Shadcn/ui**:
+- Official Docs: https://ui.shadcn.com
+- Components: https://ui.shadcn.com/docs/components
+- Themes: https://ui.shadcn.com/themes
+
+### GraphQL
+
+**Apollo Client**:
+- Official Docs: https://www.apollographql.com/docs/react
+- Caching: https://www.apollographql.com/docs/react/caching/overview
+- Queries & Mutations: https://www.apollographql.com/docs/react/data/queries
+
+**GraphQL**:
+- Official Docs: https://graphql.org/learn
+- Schema & Types: https://graphql.org/learn/schema
+- Best Practices: https://graphql.org/learn/best-practices
+
+### Validation
+
+**Zod**:
+- Official Docs: https://zod.dev
+- API Reference: https://zod.dev/README
+- Error Handling: https://zod.dev/ERROR_HANDLING
+
+**React Hook Form**:
+- Official Docs: https://react-hook-form.com
+- API Reference: https://react-hook-form.com/api
+- Examples: https://react-hook-form.com/form-builder
+
+---
+
+## 2. Learning Resources
+
+### Interactive Tutorials
+
+**freeCodeCamp**:
+- Responsive Web Design: https://www.freecodecamp.org/learn/2022/responsive-web-design
+- JavaScript Algorithms: https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8
+- Front End Development: https://www.freecodecamp.org/learn/front-end-development-libraries
+- React: https://www.freecodecamp.org/learn/front-end-development-libraries/#react
+
+**Codecademy**:
+- Learn React: https://www.codecademy.com/learn/react-101
+- Learn TypeScript: https://www.codecademy.com/learn/learn-typescript
+- Learn SQL: https://www.codecademy.com/learn/learn-sql
+
+**Frontend Masters**:
+- Complete Intro to React: https://frontendmasters.com/courses/complete-react-v8
+- TypeScript Fundamentals: https://frontendmasters.com/courses/typescript-v3
+- Full Stack for Front-End: https://frontendmasters.com/courses/fullstack-v3
+
+### Video Courses
+
+**Udemy**:
+- Next.js 14 & React: https://www.udemy.com/course/nextjs-react-the-complete-guide
+- NestJS Zero to Hero: https://www.udemy.com/course/nestjs-zero-to-hero
+- TypeScript Course: https://www.udemy.com/course/understanding-typescript
+- PostgreSQL Bootcamp: https://www.udemy.com/course/the-complete-python-postgresql-developer-course
+
+**YouTube Channels**:
+- Traversy Media: https://www.youtube.com/@TraversyMedia
+- Web Dev Simplified: https://www.youtube.com/@WebDevSimplified
+- Fireship: https://www.youtube.com/@Fireship
+- Academind: https://www.youtube.com/@academind
+- Net Ninja: https://www.youtube.com/@NetNinja
+- Theo (t3.gg): https://www.youtube.com/@t3dotgg
+- Lee Robinson (Vercel): https://www.youtube.com/@leerob
+
+### Books
+
+**React & Next.js**:
+- "Learning React" by Alex Banks & Eve Porcello (O'Reilly)
+- "Fullstack React" by Accomazzo, Murray, et al.
+- "Next.js Quick Start Guide" by Kirill Konshin
+
+**TypeScript**:
+- "Programming TypeScript" by Boris Cherny (O'Reilly)
+- "Effective TypeScript" by Dan Vanderkam (O'Reilly)
+
+**Node.js & Backend**:
+- "Node.js Design Patterns" by Mario Casciaro (Packt)
+- "You Don't Know JS" series by Kyle Simpson (free online)
+
+**Databases**:
+- "Designing Data-Intensive Applications" by Martin Kleppmann (O'Reilly)
+- "PostgreSQL: Up and Running" by Regina Obe & Leo Hsu (O'Reilly)
+
+### Blogs & Articles
+
+**Official Blogs**:
+- Vercel Blog: https://vercel.com/blog
+- Next.js Blog: https://nextjs.org/blog
+- Prisma Blog: https://www.prisma.io/blog
+- React Blog: https://react.dev/blog
+
+**Community Blogs**:
+- DEV Community: https://dev.to
+- Medium (JavaScript): https://medium.com/tag/javascript
+- CSS-Tricks: https://css-tricks.com
+- Smashing Magazine: https://www.smashingmagazine.com
+
+---
+
+## 3. Tools & Extensions
+
+### Visual Studio Code Extensions
+
+**Essential**:
+- ESLint: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
+- Prettier: https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode
+- Tailwind CSS IntelliSense: https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
+- Prisma: https://marketplace.visualstudio.com/items?itemName=Prisma.prisma
+
+**React & TypeScript**:
+- ES7+ React Snippets: https://marketplace.visualstudio.com/items?itemName=dsznajder.es7-react-js-snippets
+- TypeScript Importer: https://marketplace.visualstudio.com/items?itemName=pmneo.tsimporter
+- Auto Rename Tag: https://marketplace.visualstudio.com/items?itemName=formulahendry.auto-rename-tag
+
+**Git & GitHub**:
+- GitLens: https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens
+- GitHub Copilot: https://marketplace.visualstudio.com/items?itemName=GitHub.copilot
+
+**Other**:
+- Error Lens: https://marketplace.visualstudio.com/items?itemName=usernamehw.errorlens
+- Import Cost: https://marketplace.visualstudio.com/items?itemName=wix.vscode-import-cost
+- Thunder Client: https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client
+
+### Browser Tools
+
+**Chrome DevTools**:
+- Official Guide: https://developer.chrome.com/docs/devtools
+- Performance Profiling: https://developer.chrome.com/docs/devtools/performance
+- Network Panel: https://developer.chrome.com/docs/devtools/network
+
+**React DevTools**:
+- Chrome Extension: https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi
+- Firefox Extension: https://addons.mozilla.org/en-US/firefox/addon/react-devtools
+
+**Apollo Client DevTools**:
+- Chrome Extension: https://chrome.google.com/webstore/detail/apollo-client-devtools/jdkknkkbebbapilgoeccciglkfbmbnfm
+
+**Other Extensions**:
+- Lighthouse: https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk
+- JSON Viewer: https://chrome.google.com/webstore/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh
+- Wappalyzer: https://chrome.google.com/webstore/detail/wappalyzer/gppongmhjkpfnbhagpmjfkannfbllamg
+
+### API Testing
+
+**Postman**:
+- Download: https://www.postman.com/downloads
+- Learning Center: https://learning.postman.com
+- Public API Network: https://www.postman.com/explore
+
+**Insomnia**:
+- Download: https://insomnia.rest/download
+- Docs: https://docs.insomnia.rest
+
+**Thunder Client** (VSCode):
+- Extension: https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client
+
+### Design Tools
+
+**Figma**:
+- Official Site: https://www.figma.com
+- Learn Figma: https://www.figma.com/resources/learn-design
+- Community Files: https://www.figma.com/community
+
+**Excalidraw** (Diagrams):
+- Web App: https://excalidraw.com
+- VSCode Extension: https://marketplace.visualstudio.com/items?itemName=pomdtr.excalidraw-editor
+
+**Color Tools**:
+- Coolors (Palette Generator): https://coolors.co
+- Tailwind Color Shades: https://www.tailwindshades.com
+- ColorBox: https://colorbox.io
+
+### Git Tools
+
+**GitHub Desktop**:
+- Download: https://desktop.github.com
+
+**GitKraken**:
+- Download: https://www.gitkraken.com
+
+**Lazygit** (Terminal UI):
+- GitHub: https://github.com/jesseduffield/lazygit
+
+---
+
+## 4. Libraries Used in NextPhoton
+
+### Frontend
+
+**UI Components**:
+- Radix UI: https://www.radix-ui.com
+- Shadcn/ui: https://ui.shadcn.com
+- Headless UI: https://headlessui.com
+- React Icons: https://react-icons.github.io/react-icons
+
+**State Management**:
+- Zustand: https://zustand-demo.pmnd.rs
+- Apollo Client: https://www.apollographql.com/docs/react
+
+**Forms & Validation**:
+- React Hook Form: https://react-hook-form.com
+- Zod: https://zod.dev
+
+**Animation**:
+- Framer Motion: https://www.framer.com/motion
+- Auto Animate: https://auto-animate.formkit.com
+
+**Charts & Data Visualization**:
+- Recharts: https://recharts.org
+- Chart.js: https://www.chartjs.org
+- React Chart.js 2: https://react-chartjs-2.js.org
+
+**Date Handling**:
+- date-fns: https://date-fns.org
+- Day.js: https://day.js.org
+
+**Utilities**:
+- clsx (Classnames): https://github.com/lukeed/clsx
+- DOMPurify (Sanitization): https://github.com/cure53/DOMPurify
+- react-hot-toast (Notifications): https://react-hot-toast.com
+
+### Backend
+
+**Framework**:
+- NestJS: https://docs.nestjs.com
+- Express: https://expressjs.com
+
+**Authentication**:
+- Passport: http://www.passportjs.org
+- jsonwebtoken: https://github.com/auth0/node-jsonwebtoken
+- bcrypt: https://github.com/kelektiv/node.bcrypt.js
+
+**Validation**:
+- class-validator: https://github.com/typestack/class-validator
+- class-transformer: https://github.com/typestack/class-transformer
+
+**GraphQL**:
+- @nestjs/graphql: https://docs.nestjs.com/graphql/quick-start
+- Apollo Server: https://www.apollographql.com/docs/apollo-server
+
+**Utilities**:
+- Winston (Logging): https://github.com/winstonjs/winston
+- dotenv: https://github.com/motdotla/dotenv
+
+### Database
+
+**ORM**:
+- Prisma: https://www.prisma.io
+
+**Database**:
+- PostgreSQL: https://www.postgresql.org
+- Redis (planned): https://redis.io
+
+---
+
+## 5. Deployment & DevOps
+
+### Hosting Platforms
+
+**Vercel** (Frontend):
+- Official Site: https://vercel.com
+- Docs: https://vercel.com/docs
+- Pricing: https://vercel.com/pricing
+- CLI: https://vercel.com/docs/cli
+
+**Railway** (Backend):
+- Official Site: https://railway.app
+- Docs: https://docs.railway.app
+- Templates: https://railway.app/templates
+
+**DigitalOcean** (VPS):
+- Official Site: https://www.digitalocean.com
+- Tutorials: https://www.digitalocean.com/community/tutorials
+- App Platform: https://www.digitalocean.com/products/app-platform
+
+**Render**:
+- Official Site: https://render.com
+- Docs: https://render.com/docs
+
+**Fly.io**:
+- Official Site: https://fly.io
+- Docs: https://fly.io/docs
+
+### Database Hosting
+
+**Supabase**:
+- Official Site: https://supabase.com
+- Docs: https://supabase.com/docs
+- Pricing: https://supabase.com/pricing
+
+**Neon** (Serverless Postgres):
+- Official Site: https://neon.tech
+- Docs: https://neon.tech/docs
+
+**PlanetScale** (MySQL):
+- Official Site: https://planetscale.com
+- Docs: https://planetscale.com/docs
+
+**AWS RDS**:
+- Official Site: https://aws.amazon.com/rds
+- Docs: https://docs.aws.amazon.com/rds
+
+### CI/CD
+
+**GitHub Actions**:
+- Docs: https://docs.github.com/en/actions
+- Marketplace: https://github.com/marketplace?type=actions
+- Starter Workflows: https://github.com/actions/starter-workflows
+
+**Docker**:
+- Official Site: https://www.docker.com
+- Docs: https://docs.docker.com
+- Hub: https://hub.docker.com
+
+**Docker Compose**:
+- Docs: https://docs.docker.com/compose
+
+### Monitoring & Logging
+
+**Sentry** (Error Tracking):
+- Official Site: https://sentry.io
+- Docs: https://docs.sentry.io
+- Next.js Integration: https://docs.sentry.io/platforms/javascript/guides/nextjs
+
+**LogRocket** (Session Replay):
+- Official Site: https://logrocket.com
+- Docs: https://docs.logrocket.com
+
+**UptimeRobot** (Uptime Monitoring):
+- Official Site: https://uptimerobot.com
+- Docs: https://uptimerobot.com/api
+
+**Better Stack** (Logging):
+- Official Site: https://betterstack.com
+- Docs: https://betterstack.com/docs
+
+### Performance
+
+**Lighthouse**:
+- Chrome Extension: https://chrome.google.com/webstore/detail/lighthouse/blipmdconlkpinefehnmjammfjpmpbjk
+- CI Integration: https://github.com/GoogleChrome/lighthouse-ci
+
+**PageSpeed Insights**:
+- Tool: https://pagespeed.web.dev
+
+**WebPageTest**:
+- Tool: https://www.webpagetest.org
+
+### CDN & Assets
+
+**Cloudflare**:
+- Official Site: https://www.cloudflare.com
+- Docs: https://developers.cloudflare.com
+
+**Cloudinary** (Images):
+- Official Site: https://cloudinary.com
+- Docs: https://cloudinary.com/documentation
+
+**AWS S3**:
+- Docs: https://docs.aws.amazon.com/s3
+
+---
+
+## 6. Community & Support
+
+### Forums & Q&A
+
+**Stack Overflow**:
+- Next.js Tag: https://stackoverflow.com/questions/tagged/next.js
+- React Tag: https://stackoverflow.com/questions/tagged/reactjs
+- NestJS Tag: https://stackoverflow.com/questions/tagged/nestjs
+- TypeScript Tag: https://stackoverflow.com/questions/tagged/typescript
+
+**GitHub Discussions**:
+- Next.js: https://github.com/vercel/next.js/discussions
+- React: https://github.com/facebook/react/discussions
+- Prisma: https://github.com/prisma/prisma/discussions
+
+**Reddit**:
+- r/reactjs: https://www.reddit.com/r/reactjs
+- r/nextjs: https://www.reddit.com/r/nextjs
+- r/typescript: https://www.reddit.com/r/typescript
+- r/webdev: https://www.reddit.com/r/webdev
+
+### Discord Servers
+
+**Official Servers**:
+- Next.js Discord: https://nextjs.org/discord
+- Prisma Discord: https://pris.ly/discord
+- Reactiflux (React): https://www.reactiflux.com
+
+**Community Servers**:
+- Theo (t3.gg): https://t3.gg/discord
+- Fireship: https://fireship.io/discord
+- Developer DAO: https://www.developerdao.com
+
+### Twitter/X Accounts to Follow
+
+**Framework Creators**:
+- @vercel (Vercel/Next.js)
+- @reactjs (React)
+- @nestframework (NestJS)
+- @PrismaData (Prisma)
+- @typescriptlang (TypeScript)
+
+**Developers & Educators**:
+- @leeerob (Lee Robinson - Vercel VP)
+- @shadcn (shadcn/ui creator)
+- @t3dotgg (Theo - YouTuber)
+- @wesbos (Wes Bos - Educator)
+- @kentcdodds (Kent C. Dodds - React educator)
+- @swyx (Shawn Wang - DX)
+- @rauchg (Guillermo Rauch - Vercel CEO)
+
+### Newsletters
+
+**JavaScript & Web Dev**:
+- JavaScript Weekly: https://javascriptweekly.com
+- React Status: https://react.statuscode.com
+- Node Weekly: https://nodeweekly.com
+- Frontend Focus: https://frontendfoc.us
+- Bytes (ui.dev): https://bytes.dev
+
+**Backend & DevOps**:
+- Postgres Weekly: https://postgresweekly.com
+- DevOps Weekly: https://www.devopsweekly.com
+
+---
+
+## 7. Cheat Sheets & Quick References
+
+**React**:
+- React Cheat Sheet: https://react-cheatsheet.com
+- Hooks Cheat Sheet: https://react-hooks-cheatsheet.com
+
+**TypeScript**:
+- TypeScript Cheat Sheet: https://www.typescriptlang.org/cheatsheets
+- React TypeScript Cheat Sheet: https://react-typescript-cheatsheet.netlify.app
+
+**Next.js**:
+- Next.js Cheat Sheet: https://nextjs.org/learn/basics/create-nextjs-app
+
+**Git**:
+- Git Cheat Sheet: https://education.github.com/git-cheat-sheet-education.pdf
+- Interactive Git Cheat Sheet: https://ndpsoftware.com/git-cheatsheet.html
+
+**PostgreSQL**:
+- PostgreSQL Cheat Sheet: https://www.postgresqltutorial.com/postgresql-cheat-sheet
+
+**Tailwind CSS**:
+- Tailwind Cheat Sheet: https://nerdcave.com/tailwind-cheat-sheet
+
+---
+
+**End of Appendix D**: These resources provide comprehensive learning paths, tools, and community support for mastering NextPhoton technologies.
+
+---
+
+# Conclusion
+
+**Congratulations!** You've reached the end of this 1200+ page comprehensive guide to NextPhoton.
+
+## Your Journey
+
+You started from the **Foundation** (Parts I-II):
+- Understanding core concepts: JavaScript, TypeScript, React fundamentals
+- Setting up your environment: Tools, Git, project structure
+- Learning database design: Prisma schema, relations, migrations
+
+You progressed through the **Frontend** (Part III):
+- Building UI components: Buttons, forms, cards, layouts
+- Implementing routing: Next.js App Router, navigation, layouts
+- Managing state: Zustand, React hooks, context
+- Handling forms: React Hook Form, Zod validation
+- Styling applications: Tailwind CSS, dark mode, responsive design
+
+You mastered the **Backend** (Part IV):
+- Creating APIs: NestJS controllers, services, GraphQL resolvers
+- Implementing authentication: JWT tokens, Passport strategies, guards
+- Database operations: Prisma queries, relations, transactions
+- Testing: Unit tests, integration tests, mocking
+
+You explored **Advanced Concepts** (Part V):
+- GraphQL integration: Apollo Client, queries, mutations, cache
+- Server-side rendering: SSR, SSG, ISR strategies
+- Performance optimization: Code splitting, lazy loading, memoization
+- Security best practices: Input validation, CSRF protection, XSS prevention
+- Deployment & DevOps: CI/CD pipelines, monitoring, scaling strategies
+
+Finally, you accessed **Reference Materials** (Appendices):
+- Technology glossary: 100+ terms defined
+- Code style guide: Naming conventions, formatting rules
+- Error troubleshooting: 40+ common errors with solutions
+- Resource links: Official docs, learning resources, tools, community
+
+## What You've Achieved
+
+**You now possess**:
+- Full-stack development skills in modern JavaScript/TypeScript ecosystem
+- Production-ready knowledge of Next.js, React, NestJS, PostgreSQL, Prisma
+- Real-world experience from building NextPhoton features (auth, CRUD, real-time)
+- Security awareness to build safe applications
+- Scalability understanding to handle growth from 100 to 100,000+ users
+- Debugging expertise to solve problems independently
+
+**You can now**:
+- Build full-stack web applications from scratch
+- Design database schemas for complex domains
+- Implement secure authentication and authorization
+- Create responsive, accessible user interfaces
+- Deploy applications to production (Vercel, Railway, DigitalOcean)
+- Debug issues using browser DevTools and logging
+- Collaborate on teams using Git and GitHub
+- Read and contribute to open-source projects
+
+## NextPhoton as Your Template
+
+**NextPhoton is production-ready**:
+- Proven architecture: Monorepo with shared Prisma schema
+- Modern tech stack: Next.js 15, NestJS, PostgreSQL, Tailwind v4
+- Security built-in: JWT authentication, ABAC authorization, input validation
+- Scalable foundation: Redis caching, microservices-ready, database optimization
+- Developer experience: TypeScript strict mode, ESLint, Prettier, comprehensive docs
+
+**Use NextPhoton to build**:
+- Education platforms (tutoring, courses, learning management)
+- Healthcare apps (telemedicine, patient tracking, scheduling)
+- Business tools (CRM, project management, team collaboration)
+- E-commerce sites (multi-vendor, subscriptions, analytics)
+- Creative platforms (portfolios, freelance marketplaces, design tools)
+
+**Simply**:
+1. Clone NextPhoton repository
+2. Update Prisma schema for your domain
+3. Customize roles and permissions (ABAC)
+4. Build your feature-specific UI components
+5. Add your business logic in NestJS services
+6. Deploy to production
+
+## Continue Your Learning
+
+**Next Steps**:
+- Build projects: Create 3-5 projects from scratch to solidify learning
+- Deepen knowledge: Read "Designing Data-Intensive Applications", "Effective TypeScript"
+- Contribute to open-source: Find beginner-friendly issues on GitHub
+- Join communities: Discord servers, Twitter, local meetups
+- Watch advanced courses: Frontend Masters, Egghead, Udemy
+- Write blog posts: Teach what you learned (best way to learn)
+- Take on challenges: LeetCode, Advent of Code, building in public
+
+**Resources to revisit**:
+- **Appendix A**: Glossary when encountering unfamiliar terms
+- **Appendix B**: Code Style Guide before starting new projects
+- **Appendix C**: Common Errors when debugging issues
+- **Appendix D**: Resource Links for official docs and community help
+
+**Stay updated**:
+- Follow Next.js, React, Prisma release notes
+- Subscribe to JavaScript Weekly, React Status newsletters
+- Follow framework creators on Twitter/X
+- Watch conference talks (React Summit, Next.js Conf, JSConf)
+
+## Final Words
+
+Learning full-stack development is a **journey, not a destination**. Technologies evolve, best practices change, and new tools emerge. What matters is:
+
+- Understanding fundamentals (JavaScript, HTTP, databases, security)
+- Learning how to learn (reading docs, debugging, asking questions)
+- Building real projects (theory without practice is useless)
+- Staying curious (explore new technologies, but master the basics first)
+- Helping others (teach, contribute, collaborate)
+
+**You are ready**. You have the knowledge, the skills, and the reference materials. Go build something amazing.
+
+**Thank you** for dedicating time to learn NextPhoton. Whether you're building the next unicorn startup, contributing to open-source, or creating tools for your community, you now have the foundation to succeed.
+
+**Good luck, and happy coding!**
+
+---
+
+**- The NextPhoton Team**
+
+**Version**: 1.0.0
+**Last Updated**: October 2025
+**Total Pages**: 1,260
+**Total Chapters**: 52 + 4 Appendices
+**Total Lines of Code Examples**: 15,000+
+
+---
+
+**© 2025 Team Zenith. NextPhoton is open-source under MIT License.**
+
+---
+
+**END OF GUIDE**
