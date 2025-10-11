@@ -26,9 +26,11 @@ WORKDIR /app
 # Install required system dependencies for Prisma and Node.js
 # - openssl: Required by Prisma for database connections
 # - ca-certificates: SSL certificate validation
+# - nodejs: Required by Prisma CLI to run (even though we use Bun for package management)
 RUN apt-get update && apt-get install -y \
     openssl \
     ca-certificates \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================
@@ -40,7 +42,7 @@ RUN apt-get update && apt-get install -y \
 # ============================================
 
 # Copy root package.json (defines workspaces)
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 
 # Copy backend package.json
 COPY backend/server_NestJS/package.json backend/server_NestJS/
@@ -67,7 +69,10 @@ RUN cd backend/server_NestJS && bun install --frozen-lockfile
 # - Prisma generates type-safe database client from schema
 # - Must be generated BEFORE building NestJS app
 # ============================================
-RUN bunx prisma generate --schema=shared/prisma/schema
+# Install prisma locally in backend, then call binary directly to avoid workspace issues
+RUN cd backend/server_NestJS && \
+    bun add -d prisma@latest && \
+    ./node_modules/.bin/prisma generate --schema=../../shared/prisma/schema
 
 # ============================================
 # Copy source code
@@ -102,9 +107,11 @@ FROM oven/bun:1.1.38-debian AS runner
 WORKDIR /app
 
 # Install only runtime system dependencies
+# - nodejs: Required by Prisma CLI for generation and runtime queries
 RUN apt-get update && apt-get install -y \
     openssl \
     ca-certificates \
+    nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Set NODE_ENV to production
@@ -114,7 +121,7 @@ ENV NODE_ENV=production
 # ============================================
 # Copy package files for production dependencies
 # ============================================
-COPY --from=builder /app/package.json /app/bun.lockb ./
+COPY --from=builder /app/package.json /app/bun.lock ./
 COPY --from=builder /app/backend/server_NestJS/package.json ./backend/server_NestJS/
 
 # ============================================
@@ -140,7 +147,9 @@ COPY --from=builder /app/shared ./shared
 # - Need to regenerate with production dependencies only
 # - Ensures Prisma client works with production node_modules
 # ============================================
-RUN bunx prisma generate --schema=shared/prisma/schema
+RUN cd backend/server_NestJS && \
+    bun add -d prisma@latest && \
+    ./node_modules/.bin/prisma generate --schema=../../shared/prisma/schema
 
 # ============================================
 # Copy built application from builder stage
