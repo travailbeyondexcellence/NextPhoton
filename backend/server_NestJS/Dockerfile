@@ -26,11 +26,15 @@ WORKDIR /app
 # Install required system dependencies for Prisma and Node.js
 # - openssl: Required by Prisma for database connections
 # - ca-certificates: SSL certificate validation
+# - curl: Required to download Node.js
 # - nodejs: Required by Prisma CLI to run (even though we use Bun for package management)
 RUN apt-get update && apt-get install -y \
     openssl \
     ca-certificates \
-    nodejs \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # ============================================
@@ -41,15 +45,14 @@ RUN apt-get update && apt-get install -y \
 #   it won't reinstall dependencies (saves time on rebuilds)
 # ============================================
 
-# Copy root package.json (defines workspaces)
-COPY package.json bun.lock ./
-
-# Copy backend package.json
-COPY backend/server_NestJS/package.json backend/server_NestJS/
+# Copy backend package.json and root bun.lock to working directory
+# Note: We need the lock file for reproducible builds
+COPY backend/server_NestJS/package.json ./
+COPY bun.lock* ./
 
 # Copy shared folder (contains Prisma schema - required for backend build)
 # Note: Backend imports from @shared/* via TypeScript path mapping
-COPY shared ./shared
+COPY shared ../shared
 
 # ============================================
 # Install ALL dependencies (including devDependencies)
@@ -59,7 +62,7 @@ COPY shared ./shared
 # - TypeScript compilation requires typescript (devDependency)
 # - We'll remove these in the production stage
 # ============================================
-RUN cd backend/server_NestJS && bun install --frozen-lockfile
+RUN bun install
 
 # ============================================
 # Generate Prisma Client
@@ -69,10 +72,11 @@ RUN cd backend/server_NestJS && bun install --frozen-lockfile
 # - Prisma generates type-safe database client from schema
 # - Must be generated BEFORE building NestJS app
 # ============================================
-# Install prisma locally in backend, then call binary directly to avoid workspace issues
-RUN cd backend/server_NestJS && \
-    bun add -d prisma@latest && \
-    ./node_modules/.bin/prisma generate --schema=../../shared/prisma/schema
+# Install prisma and @prisma/client, then generate client
+# Note: Prisma 6.7.0+ supports multi-file schemas - all .prisma files in the schema directory are loaded
+RUN bun add -d prisma@latest && \
+    bun add @prisma/client@latest && \
+    bunx prisma generate --schema=../shared/prisma/schema
 
 # ============================================
 # Copy source code
@@ -82,15 +86,16 @@ RUN cd backend/server_NestJS && \
 # - By copying after install, we leverage Docker cache
 # - If only source changed (not package.json), Docker reuses cached dependencies
 # ============================================
-COPY backend/server_NestJS ./backend/server_NestJS
+COPY backend/server_NestJS/src ./src
+COPY backend/server_NestJS/tsconfig*.json ./
+COPY backend/server_NestJS/nest-cli.json* ./
 
 # ============================================
 # Build NestJS Application
 # ============================================
 # This compiles TypeScript to JavaScript in the dist/ folder
-# Output: dist/backend/server_NestJS/src/main.js
 # ============================================
-RUN cd backend/server_NestJS && bun run build
+RUN bun run build
 
 # ============================================
 # Stage 2: Production Runner
@@ -111,7 +116,10 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     openssl \
     ca-certificates \
-    nodejs \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Set NODE_ENV to production
@@ -121,8 +129,8 @@ ENV NODE_ENV=production
 # ============================================
 # Copy package files for production dependencies
 # ============================================
-COPY --from=builder /app/package.json /app/bun.lock ./
-COPY --from=builder /app/backend/server_NestJS/package.json ./backend/server_NestJS/
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/bun.lock* ./
 
 # ============================================
 # Install ONLY production dependencies
@@ -132,12 +140,12 @@ COPY --from=builder /app/backend/server_NestJS/package.json ./backend/server_Nes
 # - Results in smaller node_modules folder
 # - Faster container startup
 # ============================================
-RUN cd backend/server_NestJS && bun install --production --frozen-lockfile
+RUN bun install --production
 
 # ============================================
 # Copy shared Prisma schema (required for runtime)
 # ============================================
-COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/../shared ../shared
 
 # ============================================
 # Generate Prisma Client in production stage
@@ -147,9 +155,9 @@ COPY --from=builder /app/shared ./shared
 # - Need to regenerate with production dependencies only
 # - Ensures Prisma client works with production node_modules
 # ============================================
-RUN cd backend/server_NestJS && \
-    bun add -d prisma@latest && \
-    ./node_modules/.bin/prisma generate --schema=../../shared/prisma/schema
+RUN bun add -d prisma@latest && \
+    bun add @prisma/client@latest && \
+    bunx prisma generate --schema=../shared/prisma/schema
 
 # ============================================
 # Copy built application from builder stage
@@ -157,7 +165,7 @@ RUN cd backend/server_NestJS && \
 # This copies the compiled JavaScript from the builder stage
 # We DON'T copy the entire backend folder (would include src/, tests/, etc.)
 # ============================================
-COPY --from=builder /app/backend/server_NestJS/dist ./backend/server_NestJS/dist
+COPY --from=builder /app/dist ./dist
 
 # ============================================
 # Expose Port 8080
@@ -185,7 +193,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # ============================================
 # Why this command?
 # - Uses Node.js to run compiled JavaScript (faster startup than bun for NestJS)
-# - Runs from dist/backend/server_NestJS/src/main.js (compiled entry point)
+# - Runs from dist/main.js (compiled entry point from src/main.ts)
 # - Your main.ts binds to 0.0.0.0:${PORT} (Fly.io will set PORT=8080)
 # ============================================
-CMD ["node", "backend/server_NestJS/dist/backend/server_NestJS/src/main.js"]
+CMD ["node", "dist/main.js"]
