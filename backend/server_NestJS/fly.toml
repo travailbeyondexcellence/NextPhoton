@@ -339,7 +339,7 @@ primary_region = 'sin'
 # - on-failure: Only restart if exit code != 0
 # - no: Never restart automatically
 # ============================================
-[restart]
+[[restart]]
   policy = "always"
 
 # ============================================
