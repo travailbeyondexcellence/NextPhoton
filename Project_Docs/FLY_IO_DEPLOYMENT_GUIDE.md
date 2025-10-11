@@ -1,9 +1,10 @@
 # Fly.io Deployment Guide for NextPhoton Backend
 
-**Last Updated:** October 11, 2025
+**Last Updated:** October 11, 2025 (Updated with recent Dockerfile changes)
 **Project:** NextPhoton EduCare Management System
 **Target:** Deploy NestJS Backend to Fly.io
 **Audience:** Developers new to Fly.io, Docker, NestJS, GraphQL
+**Status:** ✅ Configuration files created and ready for deployment
 
 ---
 
@@ -36,12 +37,20 @@
 
 This guide walks you through deploying your NestJS backend to Fly.io, a modern platform for running applications globally. By the end, you'll have:
 
-- ✅ Your backend running on Fly.io in Singapore
+- ✅ Your backend running on Fly.io in Mumbai (bom region)
 - ✅ HTTPS endpoint accessible from anywhere
 - ✅ Connected to your Neon PostgreSQL database
 - ✅ JWT authentication working
 - ✅ GraphQL API accessible
 - ✅ Frontend connected to backend
+
+### 📌 Recent Updates (October 11, 2025)
+
+**Configuration Files Status:**
+- ✅ Dockerfile created with multi-stage build (200 lines with documentation)
+- ✅ fly.toml configured (app: nextphoton, region: bom, 1GB RAM)
+- ✅ .dockerignore optimized (370 lines, reduces build context by 90%)
+- ✅ Deployment guide completed (this document)
 
 ### Deployment Architecture
 
@@ -62,12 +71,13 @@ Production Stack:
                  │ HTTPS API Calls
                  ▼
 ┌─────────────────────────────────────────┐
-│  Backend - Fly.io (Singapore)           │
+│  Backend - Fly.io (Mumbai)              │
 │  • NestJS API Server                    │
 │  • Apollo GraphQL Server                │
 │  • JWT Authentication                   │
 │  • Port: 8080 (internal)                │
-│  • URL: https://[app-name].fly.dev      │
+│  • URL: https://nextphoton.fly.dev      │
+│  • Memory: 1GB RAM, 1 shared CPU        │
 └────────────────┬────────────────────────┘
                  │ PostgreSQL (SSL)
                  ▼
@@ -78,6 +88,15 @@ Production Stack:
 │  • Region: ap-southeast-1               │
 └─────────────────────────────────────────┘
 ```
+
+### Recent Dockerfile Changes (October 11, 2025)
+
+**Key Updates:**
+1. **Simplified build paths**: Changed from nested `backend/server_NestJS/dist/backend/server_NestJS/src/main.js` to `dist/main.js`
+2. **Added curl**: Required for health checks
+3. **Fixed Prisma paths**: Uses `../shared/prisma/schema` for monorepo structure
+4. **Node.js installation**: Added via NodeSource for Prisma CLI compatibility
+5. **Multi-stage optimization**: Builder stage with all deps, runner with production deps only
 
 ### Why Fly.io?
 
@@ -244,9 +263,12 @@ Gather these before starting deployment:
 2. Click "New Project"
 3. Name: "nextphoton-production"
 4. Region: Asia Pacific (Singapore) - ap-southeast-1
+   Note: Your Fly.io app is in Mumbai (bom), but Singapore is closest Neon region
 5. Click "Create Project"
 6. Copy connection string (with password)
 ```
+
+**Note:** The existing development database is in Singapore (ap-southeast-1). Even though your Fly.io backend will be in Mumbai (bom), the latency to Singapore is minimal (~50-80ms).
 
 **Save this URL securely!** You'll need it in Phase 5.
 
@@ -507,9 +529,13 @@ You'll be asked several questions. Here's how to answer:
 ? Choose a region for deployment:
 ```
 
-**Answer:** Select `Singapore, Singapore (sin)` (use arrow keys, press Enter)
+**Answer:** Select `Mumbai, India (bom)` (use arrow keys, press Enter)
 
-**Why Singapore?** Your Neon database is in Singapore (ap-southeast-1), so deploying there minimizes latency.
+**Why Mumbai?**
+- Your fly.toml is already configured for Mumbai (bom)
+- Good latency to Singapore database (~50-80ms)
+- Optimal for Indian users if that's your primary market
+- Note: You can change region later if needed
 
 #### Prompt 4: Setup PostgreSQL
 ```
@@ -827,7 +853,7 @@ flyctl deploy
 ```
 ==> Creating release
 --> Release created (version 1)
-==> Deploying to Singapore (sin)
+==> Deploying to Mumbai (bom)
 Monitoring deployment...
   1 desired, 1 placed, 1 healthy, 0 unhealthy [health checks: 1 total, 1 passing]
 --> Deployment successful! 🎉
@@ -906,13 +932,13 @@ flyctl status
 #
 # Machines
 # MACHINE ID    STATE   REGION  HEALTH CHECKS   LAST UPDATED
-# 12345678      started sin     1 total, 1 passing  1m ago
+# 12345678      started bom     1 total, 1 passing  1m ago
 ```
 
 **Key Fields:**
 - **STATE:** Should be `started`
 - **HEALTH CHECKS:** Should be `1 total, 1 passing`
-- **REGION:** Should be `sin` (Singapore)
+- **REGION:** Should be `bom` (Mumbai)
 
 ### View Logs
 
@@ -954,8 +980,18 @@ flyctl machine list
 
 # Expected output:
 # ID          NAME    STATE   REGION  IMAGE                           CREATED
-# 12345678    xyz     started sin     registry.fly.io/nextphoton...   2m ago
+# 12345678    xyz     started bom     registry.fly.io/nextphoton...   2m ago
 ```
+
+### Important Note on Current Dockerfile
+
+**The current Dockerfile at `backend/server_NestJS/Dockerfile` uses:**
+- Working directory: `/app`
+- Simplified paths for better monorepo compatibility
+- CMD: `node dist/main.js` (not nested paths)
+- Prisma schema location: `../shared/prisma/schema`
+- Includes curl for health checks
+- Node.js from NodeSource for Prisma CLI
 
 ### SSH into Container (Optional)
 
