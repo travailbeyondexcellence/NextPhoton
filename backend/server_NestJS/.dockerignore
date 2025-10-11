@@ -1,0 +1,370 @@
+# ============================================
+# .dockerignore for NestJS Backend
+# ============================================
+# This file tells Docker which files/folders to EXCLUDE when building the image
+#
+# Why this matters:
+# - Smaller Docker context = faster builds
+# - Smaller image size = faster deployments
+# - Better security = no sensitive files in image
+# - Cleaner builds = no dev artifacts
+#
+# How it works:
+# When you run `docker build`, Docker first collects all files in the directory
+# (called the "build context"). Files matching patterns here are excluded.
+# ============================================
+
+# ============================================
+# 1. Node.js Dependencies
+# ============================================
+# Why exclude node_modules?
+# - Will be reinstalled fresh in the container
+# - Local node_modules may have platform-specific binaries (macOS vs Linux)
+# - Reduces build context size by ~500MB-1GB
+# ============================================
+node_modules/
+**/node_modules/
+
+# npm/yarn/pnpm cache and lock files (we use bun.lockb instead)
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.yarn/
+.pnp.*
+
+# ============================================
+# 2. Build Outputs
+# ============================================
+# Why exclude dist?
+# - Will be rebuilt inside the container
+# - Local build may have wrong target (different Node version)
+# - Ensures fresh, clean production build
+# ============================================
+dist/
+build/
+out/
+.next/
+.turbo/
+
+# NestJS build cache
+.nest/
+
+# ============================================
+# 3. Environment Variables (CRITICAL - SECURITY)
+# ============================================
+# ⚠️ NEVER include .env files in Docker images!
+# Why?
+# - Contains sensitive secrets (DATABASE_URL, JWT_SECRET, API keys)
+# - Anyone with access to image can extract these files
+# - Production secrets should ONLY be set via Fly.io secrets
+# ============================================
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env*.local
+*.env
+**/.env
+
+# ============================================
+# 4. Git Files
+# ============================================
+# Why exclude .git?
+# - Not needed to run the application
+# - Can be very large (full repository history)
+# - Reduces image size by ~100MB+
+# ============================================
+.git/
+.gitignore
+.gitattributes
+.github/
+.gitlab-ci.yml
+
+# ============================================
+# 5. IDE and Editor Files
+# ============================================
+# Why exclude IDE files?
+# - Personal preferences, not needed to run app
+# - May contain local paths or settings
+# - Reduces clutter
+# ============================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# 6. Test Files and Coverage
+# ============================================
+# Why exclude tests?
+# - Not needed in production
+# - Tests run in CI/CD, not in production container
+# - Reduces image size
+# ============================================
+
+# Test files
+**/*.test.ts
+**/*.test.js
+**/*.spec.ts
+**/*.spec.js
+**/__tests__/
+**/__mocks__/
+test/
+tests/
+e2e/
+
+# Coverage reports
+coverage/
+.nyc_output/
+*.lcov
+.coverage/
+htmlcov/
+
+# Jest cache
+.jest/
+
+# ============================================
+# 7. Logs
+# ============================================
+# Why exclude logs?
+# - Development logs not needed in production
+# - Production logs should go to stdout (captured by Fly.io)
+# - Prevents bloating image with old logs
+# ============================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# ============================================
+# 8. Temporary Files
+# ============================================
+# Why exclude temp files?
+# - Created during development, not needed for runtime
+# - May contain sensitive data
+# - Reduces clutter
+# ============================================
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/
+.parcel-cache/
+
+# OS temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================================
+# 9. Documentation
+# ============================================
+# Why exclude docs?
+# - Nice to have, but not needed to run the app
+# - Can be large (images, diagrams)
+# - Access docs from Git repo, not container
+# ============================================
+docs/
+doc/
+*.md
+README.md
+CHANGELOG.md
+LICENSE
+CONTRIBUTING.md
+
+# Exclude Project_Docs (large documentation folder)
+Project_Docs/
+**/Project_Docs/
+
+# ============================================
+# 10. Configuration Files
+# ============================================
+# Why exclude some config files?
+# - Development-only configs (prettier, eslint)
+# - Not needed at runtime
+# - Keeps image lean
+# ============================================
+
+# Linting and formatting
+.eslintrc
+.eslintrc.js
+.eslintrc.json
+.eslintignore
+.prettierrc
+.prettierrc.js
+.prettierrc.json
+.prettierignore
+.editorconfig
+
+# TypeScript config (already used during build)
+# Note: tsconfig.json IS needed for build in Dockerfile, so we keep it
+# But if you have multiple tsconfig files, exclude the unnecessary ones:
+tsconfig.*.json
+
+# ============================================
+# 11. CI/CD Files
+# ============================================
+# Why exclude CI/CD files?
+# - Only needed for CI/CD pipelines
+# - Not needed in production container
+# ============================================
+.travis.yml
+.circleci/
+.gitlab-ci.yml
+azure-pipelines.yml
+.github/
+Jenkinsfile
+
+# ============================================
+# 12. Docker Files
+# ============================================
+# Why exclude Docker files?
+# - docker-compose is for local development
+# - Dockerfile itself is not needed inside the image
+# - .dockerignore is not needed inside the image
+# ============================================
+docker-compose*.yml
+docker-compose*.yaml
+Dockerfile*
+.dockerignore
+
+# ============================================
+# 13. Package Manager Files (Partially)
+# ============================================
+# Keep: package.json, bun.lockb (needed for install)
+# Exclude: Other package manager files
+# ============================================
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# 14. Misc Development Files
+# ============================================
+# Why exclude misc files?
+# - Development tools, not needed in production
+# - Reduces clutter and potential security issues
+# ============================================
+
+# Storybook
+.storybook/
+storybook-static/
+
+# Husky (Git hooks)
+.husky/
+
+# GraphQL code generation
+codegen.yml
+codegen.json
+
+# Prisma migrations (handle separately via CLI)
+# Note: We DO need the schema file, but migrations can be excluded
+# Migrations should be run via `flyctl secrets` or init script
+**/migrations/
+
+# Seed data files
+**/seeds/
+seed.ts
+seed.js
+
+# ============================================
+# 15. Monorepo-Specific Exclusions
+# ============================================
+# Why exclude other workspace folders?
+# - Your backend doesn't need frontend code
+# - Dramatically reduces build context size
+# ============================================
+
+# Exclude frontend (not needed for backend build)
+../../frontend/
+/frontend/
+frontend/
+
+# Exclude desktop/mobile (if exists)
+../../desktop/
+../../mobile/
+/desktop/
+/mobile/
+
+# Turbo config (monorepo tool, not needed in container)
+turbo.json
+.turbo/
+
+# ============================================
+# 16. Security and Sensitive Files
+# ============================================
+# Why exclude security files?
+# - May contain secrets or sensitive information
+# - Better safe than sorry
+# ============================================
+
+# SSH keys
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+.ssh/
+
+# SSL certificates
+*.crt
+*.cer
+*.der
+
+# Database dumps
+*.sql
+*.dump
+*.backup
+
+# Credentials
+credentials.json
+service-account.json
+secrets.json
+
+# ============================================
+# IMPORTANT NOTES
+# ============================================
+# Files that ARE included (not ignored):
+# ✅ src/ - Your source code
+# ✅ package.json - Needed for dependency installation
+# ✅ bun.lockb - Ensures consistent dependency versions
+# ✅ tsconfig.json - Needed for TypeScript compilation
+# ✅ nest-cli.json - NestJS CLI configuration
+#
+# When in doubt:
+# - If it's needed to BUILD the app → Include it
+# - If it's needed to RUN the app → Include it
+# - If it's only for DEVELOPMENT → Exclude it
+# - If it contains SECRETS → Definitely exclude it
+# ============================================
