@@ -35,7 +35,8 @@
       "Bash(export NODE_ENV=production)",
       "Bash(export NEXT_PUBLIC_USE_MOCK_DATA=true)",
       "Bash(export SKIP_ENV_VALIDATION=true)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(pandoc:*)"
     ],
     "deny": [],
     "ask": []
