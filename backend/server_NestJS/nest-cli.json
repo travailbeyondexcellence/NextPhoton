@@ -5,7 +5,9 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "tsConfigPath": "./tsconfig.json",
-    "webpack": false
+    "webpack": false,
+    "assets": []
   },
-  "entryFile": "main"
+  "entryFile": "main",
+  "root": "."
 }
