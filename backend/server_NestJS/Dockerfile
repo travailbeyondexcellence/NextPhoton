@@ -146,6 +146,15 @@ COPY --from=builder /app/bun.lock* ./
 RUN bun install --production
 
 # ============================================
+# Copy built application from builder stage FIRST
+# ============================================
+# IMPORTANT: Copy dist BEFORE Prisma operations to prevent overwrites
+# This copies the compiled JavaScript from the builder stage
+# We DON'T copy the entire backend folder (would include src/, tests/, etc.)
+# ============================================
+COPY --from=builder /app/dist ./dist
+
+# ============================================
 # Copy shared Prisma schema (required for runtime)
 # ============================================
 COPY --from=builder /app/../shared ../shared
@@ -164,14 +173,6 @@ RUN echo '{"name":"workspace","private":true}' > /package.json
 RUN bun add -d prisma@latest && \
     bun add @prisma/client@latest && \
     bunx prisma generate --schema=../shared/prisma/schema
-
-# ============================================
-# Copy built application from builder stage
-# ============================================
-# This copies the compiled JavaScript from the builder stage
-# We DON'T copy the entire backend folder (would include src/, tests/, etc.)
-# ============================================
-COPY --from=builder /app/dist ./dist
 
 # ============================================
 # Expose Port 8080
