@@ -98,8 +98,10 @@ COPY backend/server_NestJS/nest-cli.json* ./
 # Build NestJS Application
 # ============================================
 # This compiles TypeScript to JavaScript in the dist/ folder
+# Cache buster: 2025-10-13-v3
 # ============================================
-RUN bun run build && \
+RUN echo "Build starting at: $(date)" && \
+    bun run build && \
     echo "=== Listing dist directory structure ===" && \
     ls -la dist/ && \
     find dist -type f -name "*.js" | head -20
@@ -140,21 +142,43 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/bun.lock* ./
 
 # ============================================
-# Install ONLY production dependencies
+# Copy shared Prisma schema FIRST (required for Prisma install)
+# ============================================
+COPY --from=builder /app/../shared ../shared
+
+# ============================================
+# Install ONLY production dependencies + Prisma
 # ============================================
 # Why --production flag?
 # - Skips devDependencies (typescript, @nestjs/cli, etc.)
 # - Results in smaller node_modules folder
 # - Faster container startup
 # ============================================
-RUN bun install --production
+# Create minimal package.json at root to satisfy Prisma's project root detection
+RUN echo '{"name":"workspace","private":true}' > /package.json
+
+# Install production deps with Prisma packages
+RUN bun install --production && \
+    bun add @prisma/client@latest && \
+    bun add -d prisma@latest
+
+# Generate Prisma Client BEFORE copying dist
+# This ensures the generated client is available when the app starts
+RUN bunx prisma generate --schema=../shared/prisma/schema
 
 # ============================================
-# Copy built application from builder stage FIRST
+# Copy generated Prisma client from builder
 # ============================================
-# IMPORTANT: Copy dist BEFORE Prisma operations to prevent overwrites
+# This ensures we have the exact same generated client that was used during build
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# ============================================
+# Copy built application from builder stage
+# ============================================
 # This copies the compiled JavaScript from the builder stage
 # We DON'T copy the entire backend folder (would include src/, tests/, etc.)
+# Cache buster: 2025-10-13-v4
 # ============================================
 COPY --from=builder /app/dist ./dist
 
@@ -163,27 +187,9 @@ RUN echo "=== DIST FOLDER CONTENTS AFTER COPY ===" && \
     ls -laR /app/dist/ 2>&1 | tee /tmp/dist-debug.log && \
     echo "=== SEARCHING FOR main.js ===" && \
     find /app -name "main.js" -type f 2>&1 | tee -a /tmp/dist-debug.log && \
+    echo "=== CHECKING PRISMA CLIENT ===" && \
+    ls -la /app/node_modules/.prisma/client/ 2>&1 | tee -a /tmp/dist-debug.log && \
     echo "=== DEBUG OUTPUT ===" && cat /tmp/dist-debug.log
-
-# ============================================
-# Copy shared Prisma schema (required for runtime)
-# ============================================
-COPY --from=builder /app/../shared ../shared
-
-# ============================================
-# Generate Prisma Client in production stage
-# ============================================
-# Why generate again?
-# - Prisma client was generated in builder with ALL dependencies
-# - Need to regenerate with production dependencies only
-# - Ensures Prisma client works with production node_modules
-# ============================================
-# Create minimal package.json at root to satisfy Prisma's project root detection
-RUN echo '{"name":"workspace","private":true}' > /package.json
-
-RUN bun add -d prisma@latest && \
-    bun add @prisma/client@latest && \
-    bunx prisma generate --schema=../shared/prisma/schema
 
 # ============================================
 # Expose Port 8080
@@ -211,7 +217,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # ============================================
 # Why this command?
 # - Uses Node.js to run compiled JavaScript (faster startup than bun for NestJS)
-# - Runs from dist/backend/server_NestJS/src/main.js (monorepo structure includes shared)
+# - Runs from dist/app/src/main.js (TypeScript compiles to this path)
 # - Your main.ts binds to 0.0.0.0:${PORT} (Fly.io will set PORT=8080)
 # ============================================
-CMD ["node", "dist/backend/server_NestJS/src/main.js"]
+CMD ["node", "dist/app/src/main.js"]
