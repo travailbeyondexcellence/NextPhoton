@@ -2,6 +2,7 @@
 # Multi-Stage Dockerfile for NestJS Backend
 # ============================================
 # This Dockerfile builds the NextPhoton NestJS backend for deployment on Fly.io
+# CACHE BUSTER: 2025-10-13-v2
 #
 # Architecture:
 # - Stage 1 (builder): Install dependencies, generate Prisma client, build NestJS app
@@ -157,6 +158,13 @@ RUN bun install --production
 # ============================================
 COPY --from=builder /app/dist ./dist
 
+# Debug: Verify what was actually copied
+RUN echo "=== DIST FOLDER CONTENTS AFTER COPY ===" && \
+    ls -laR /app/dist/ 2>&1 | tee /tmp/dist-debug.log && \
+    echo "=== SEARCHING FOR main.js ===" && \
+    find /app -name "main.js" -type f 2>&1 | tee -a /tmp/dist-debug.log && \
+    echo "=== DEBUG OUTPUT ===" && cat /tmp/dist-debug.log
+
 # ============================================
 # Copy shared Prisma schema (required for runtime)
 # ============================================
@@ -203,7 +211,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # ============================================
 # Why this command?
 # - Uses Node.js to run compiled JavaScript (faster startup than bun for NestJS)
-# - Runs from dist/backend/server_NestJS/src/main.js (monorepo structure)
+# - Runs from dist/backend/server_NestJS/src/main.js (monorepo structure includes shared)
 # - Your main.ts binds to 0.0.0.0:${PORT} (Fly.io will set PORT=8080)
 # ============================================
 CMD ["node", "dist/backend/server_NestJS/src/main.js"]
