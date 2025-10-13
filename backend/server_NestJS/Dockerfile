@@ -162,34 +162,27 @@ RUN bun install --production && \
     bun add @prisma/client@latest && \
     bun add -d prisma@latest
 
-# Generate Prisma Client BEFORE copying dist
-# This ensures the generated client is available when the app starts
-RUN bunx prisma generate --schema=../shared/prisma/schema
-
-# ============================================
-# Copy generated Prisma client from builder
-# ============================================
-# This ensures we have the exact same generated client that was used during build
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-
 # ============================================
 # Copy built application from builder stage
 # ============================================
 # This copies the compiled JavaScript from the builder stage
 # We DON'T copy the entire backend folder (would include src/, tests/, etc.)
-# Cache buster: 2025-10-13-v4
+# Cache buster: 2025-10-13-v5
 # ============================================
 COPY --from=builder /app/dist ./dist
 
-# Debug: Verify what was actually copied
-RUN echo "=== DIST FOLDER CONTENTS AFTER COPY ===" && \
-    ls -laR /app/dist/ 2>&1 | tee /tmp/dist-debug.log && \
-    echo "=== SEARCHING FOR main.js ===" && \
-    find /app -name "main.js" -type f 2>&1 | tee -a /tmp/dist-debug.log && \
-    echo "=== CHECKING PRISMA CLIENT ===" && \
-    ls -la /app/node_modules/.prisma/client/ 2>&1 | tee -a /tmp/dist-debug.log && \
-    echo "=== DEBUG OUTPUT ===" && cat /tmp/dist-debug.log
+# ============================================
+# Generate Prisma Client AFTER copying dist
+# ============================================
+# This ensures the generated client matches the production environment
+RUN echo "=== Generating Prisma Client ===" && \
+    bunx prisma generate --schema=../shared/prisma/schema && \
+    echo "=== Verifying Prisma Client ===" && \
+    ls -la /app/node_modules/.prisma/client/ && \
+    echo "=== Checking node_modules structure ===" && \
+    ls -la /app/node_modules/@prisma/ && \
+    echo "=== Verifying imports will work ===" && \
+    node -e "const { PrismaClient } = require('@prisma/client'); console.log('✅ Prisma Client loaded successfully')"
 
 # ============================================
 # Expose Port 8080
