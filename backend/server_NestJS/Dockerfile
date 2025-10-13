@@ -98,7 +98,10 @@ COPY backend/server_NestJS/nest-cli.json* ./
 # ============================================
 # This compiles TypeScript to JavaScript in the dist/ folder
 # ============================================
-RUN bun run build
+RUN bun run build && \
+    echo "=== Listing dist directory structure ===" && \
+    ls -la dist/ && \
+    find dist -type f -name "*.js" | head -20
 
 # ============================================
 # Stage 2: Production Runner
@@ -200,7 +203,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # ============================================
 # Why this command?
 # - Uses Node.js to run compiled JavaScript (faster startup than bun for NestJS)
-# - Runs from dist/main.js (compiled entry point from src/main.ts)
+# - Runs from dist/backend/server_NestJS/src/main.js (monorepo structure)
 # - Your main.ts binds to 0.0.0.0:${PORT} (Fly.io will set PORT=8080)
 # ============================================
-CMD ["node", "dist/main.js"]
+CMD ["node", "dist/backend/server_NestJS/src/main.js"]
