@@ -72,6 +72,9 @@ RUN bun install
 # - Prisma generates type-safe database client from schema
 # - Must be generated BEFORE building NestJS app
 # ============================================
+# Create minimal package.json at root to satisfy Prisma's project root detection
+RUN echo '{"name":"workspace","private":true}' > /package.json
+
 # Install prisma and @prisma/client, then generate client
 # Note: Prisma 6.7.0+ supports multi-file schemas - all .prisma files in the schema directory are loaded
 RUN bun add -d prisma@latest && \
@@ -155,6 +158,9 @@ COPY --from=builder /app/../shared ../shared
 # - Need to regenerate with production dependencies only
 # - Ensures Prisma client works with production node_modules
 # ============================================
+# Create minimal package.json at root to satisfy Prisma's project root detection
+RUN echo '{"name":"workspace","private":true}' > /package.json
+
 RUN bun add -d prisma@latest && \
     bun add @prisma/client@latest && \
     bunx prisma generate --schema=../shared/prisma/schema
