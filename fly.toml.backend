@@ -9,6 +9,9 @@ primary_region = 'bom'
 [build]
   dockerfile = "backend/server_NestJS/Dockerfile"
 
+[env]
+  PORT = "8080"
+
 [http_service]
   internal_port = 8080
   force_https = true
