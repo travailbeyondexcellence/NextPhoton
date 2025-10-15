@@ -55,6 +55,9 @@ COPY bun.lock* ./
 # Note: Backend imports from @shared/* via TypeScript path mapping
 COPY shared ../shared
 
+# Create symlink so /shared can access /app/node_modules for module resolution
+RUN ln -s /app/node_modules /shared/node_modules
+
 # ============================================
 # Install ALL dependencies (including devDependencies)
 # ============================================
@@ -146,6 +149,10 @@ COPY --from=builder /app/bun.lock* ./
 # ============================================
 COPY --from=builder /app/../shared ../shared
 
+# Create symlink so /shared can access /app/node_modules for module resolution
+# Remove existing symlink if it exists from the builder stage
+RUN rm -f /shared/node_modules && ln -s /app/node_modules /shared/node_modules
+
 # ============================================
 # Install ONLY production dependencies + Prisma
 # ============================================
@@ -210,7 +217,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 # ============================================
 # Why this command?
 # - Uses Node.js to run compiled JavaScript (faster startup than bun for NestJS)
-# - Runs from dist/app/src/main.js (TypeScript compiles to this path)
+# - Runs from dist/app/src/main.js (TypeScript compiles to this path in Docker)
 # - Your main.ts binds to 0.0.0.0:${PORT} (Fly.io will set PORT=8080)
 # ============================================
 CMD ["node", "dist/app/src/main.js"]
