@@ -10,7 +10,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { MinimalisticLoader } from '@/components/MinimalisticLoader';
+import { MinimalisticLoader } from '@/components/loaders/MinimalisticLoader';
 
 interface TemplateProps {
   children: React.ReactNode;

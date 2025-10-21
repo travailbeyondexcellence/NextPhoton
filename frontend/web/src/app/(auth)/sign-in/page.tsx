@@ -11,11 +11,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthProviderWithLoading';
-import { ThemeSelector } from '@/components/ThemeSelector';
-import { LogoComponent } from '@/components/LogoComponent';
+import { ThemeSelector } from '@/components/theme/ThemeSelector';
+import { LogoComponent } from '@/components/utilities/LogoComponent';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { AsyncButton } from '@/components/LoadingButton';
+import { AsyncButton } from '@/components/loaders/LoadingButton';
 
 export default function SignInPage() {
   const [email, setEmail] = useState('');

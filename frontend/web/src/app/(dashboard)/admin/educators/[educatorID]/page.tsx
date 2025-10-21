@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useParams } from 'next/navigation'
-import EducatorProfile_forAdmin from '@/components/EducatorProfile_forAdmin'
+import EducatorProfile_forAdmin from '@/components/admin/educators/EducatorProfile_forAdmin'
 
 const EduCatorProfilePage = () => {
   const params = useParams();

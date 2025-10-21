@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CreateEducatorForm from '@/components/CreateEducatorForm';
+import CreateEducatorForm from '@/components/forms/CreateEducatorForm';
 import { ArrowLeft, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

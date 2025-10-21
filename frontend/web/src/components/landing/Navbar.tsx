@@ -27,8 +27,8 @@ import {
   FileCheck
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ThemeSelector } from "@/components/ThemeSelector";
-import { LogoComponent } from "@/components/LogoComponent";
+import { ThemeSelector } from "@/components/theme/ThemeSelector";
+import { LogoComponent } from "@/components/utilities/LogoComponent";
 
 /**
  * Navigation structure for the landing pages

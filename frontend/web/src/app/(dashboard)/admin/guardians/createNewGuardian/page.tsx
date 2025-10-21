@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CreateGuardianForm from '@/components/CreateGuardianForm';
+import CreateGuardianForm from '@/components/forms/CreateGuardianForm';
 import { ArrowLeft, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
