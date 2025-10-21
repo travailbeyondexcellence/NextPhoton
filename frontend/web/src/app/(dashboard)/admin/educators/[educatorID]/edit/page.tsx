@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@apollo/client';
 import { GET_EDUCATOR } from '@/lib/apollo';
-import EditEducatorForm from '@/components/EditEducatorForm';
+import EditEducatorForm from '@/components/form-variants/EditEducatorForm';
 import { Loader2, ArrowLeft } from 'lucide-react';
 
 export default function EditEducatorPage() {

@@ -1,9 +1,9 @@
 "use client";
 
 import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
-import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { DashboardNavbar } from "@/components/DashboardNavbar";
-import { SecondarySidebarDrawer } from "@/components/SecondarySidebarDrawer";
+import { DashboardSidebar } from "@/components/dashboard-navigation/DashboardSidebar";
+import { DashboardNavbar } from "@/components/dashboard-navigation/DashboardNavbar";
+import { SecondarySidebarDrawer } from "@/components/dashboard-navigation/SecondarySidebarDrawer";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 

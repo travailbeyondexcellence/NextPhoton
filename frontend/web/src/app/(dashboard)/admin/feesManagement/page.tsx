@@ -24,8 +24,8 @@ import {
   CreditCard
 } from 'lucide-react';
 import { useAsyncAction } from '@/hooks/useAsyncAction';
-import { LoadingButton, AsyncButton } from '@/components/LoadingButton';
-import { SkeletonLoader } from '@/components/GlobalLoader';
+import { LoadingButton, AsyncButton } from '@/components/loaders/LoadingButton';
+import { SkeletonLoader } from '@/components/loaders/GlobalLoader';
 
 interface FeeRecord {
   id: string;

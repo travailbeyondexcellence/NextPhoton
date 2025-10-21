@@ -10,8 +10,8 @@
 import React, { useState } from 'react';
 import { useLoading } from '@/contexts/LoadingContext';
 import { useAsyncAction } from '@/hooks/useAsyncAction';
-import { LoadingButton, AsyncButton } from '@/components/LoadingButton';
-import { MinimalisticLoader } from '@/components/MinimalisticLoader';
+import { LoadingButton, AsyncButton } from '@/components/loaders/LoadingButton';
+import { MinimalisticLoader } from '@/components/loaders/MinimalisticLoader';
 
 export default function TestLoaderPage() {
   const { startLoading, stopLoading, withLoading, isLoading } = useLoading();

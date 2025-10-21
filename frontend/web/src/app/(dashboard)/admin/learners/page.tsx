@@ -3,8 +3,8 @@
 import React from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from "react";
-import LearnersCardsView_forAdmin from "@/components/LearnersCardsView_forAdmin";
-import LearnersList_forAdmin from "@/components/LearnersList_forAdmin";
+import LearnersCardsView_forAdmin from "@/components/admin/learners/LearnersCardsView_forAdmin";
+import LearnersList_forAdmin from "@/components/admin/learners/LearnersList_forAdmin";
 import { LayoutGrid, List, UserPlus, GraduationCap } from "lucide-react";
 
 const Learners = () => {

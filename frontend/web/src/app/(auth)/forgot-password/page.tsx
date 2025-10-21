@@ -6,8 +6,8 @@ import { motion } from "framer-motion";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LogoComponent } from "@/components/LogoComponent";
-import { ThemeSelector } from "@/components/ThemeSelector";
+import { LogoComponent } from "@/components/utilities/LogoComponent";
+import { ThemeSelector } from "@/components/theme/ThemeSelector";
 import { Mail, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 

@@ -5,11 +5,11 @@ import React from "react";
 import { useRouter, usePathname } from 'next/navigation';
 
 import { useState } from "react";
-import EducatorsCardsView_forAdmin from "@/components/EducatorsCardsView_forAdmin";
-import EducatorsList_forAdmin from "@/components/EducatorsList_forAdmin";
+import EducatorsCardsView_forAdmin from "@/components/admin/educators/EducatorsCardsView_forAdmin";
+import EducatorsList_forAdmin from "@/components/admin/educators/EducatorsList_forAdmin";
 import { LayoutGrid, List, UserPlus } from "lucide-react";
 
-import EducatorCard_forAdmin from "@/components/EducatorCard_forAdmin";
+import EducatorCard_forAdmin from "@/components/admin/educators/EducatorCard_forAdmin";
 
 const Educators = () => {
 

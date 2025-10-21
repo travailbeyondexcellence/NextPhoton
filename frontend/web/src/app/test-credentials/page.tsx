@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { Copy, CheckCircle2, KeyRound, Users } from "lucide-react";
 import { useState } from "react";
-import { ThemeSelector } from "@/components/ThemeSelector";
-import { LogoComponent } from "@/components/LogoComponent";
+import { ThemeSelector } from "@/components/theme/ThemeSelector";
+import { LogoComponent } from "@/components/utilities/LogoComponent";
 import Link from "next/link";
 import { toast } from "sonner";
 

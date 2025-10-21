@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CreateLearnerForm from '@/components/CreateLearnerForm';
+import CreateLearnerForm from '@/components/forms/CreateLearnerForm';
 import { ArrowLeft, GraduationCap } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 

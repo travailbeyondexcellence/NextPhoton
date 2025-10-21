@@ -16,8 +16,8 @@ import { useForm } from "react-hook-form";
 import { formSchema } from "@/lib/auth-schema";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/hooks/use-toast";
-import { ThemeSelector } from '@/components/ThemeSelector';
-import { LogoComponent } from '@/components/LogoComponent';
+import { ThemeSelector } from '@/components/theme/ThemeSelector';
+import { LogoComponent } from '@/components/utilities/LogoComponent';
 
 export default function SignUp() {
 

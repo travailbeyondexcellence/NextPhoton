@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "sonner";
 import { AuthProviderInner as AuthProvider } from "@/contexts/AuthProviderWithLoading";
 import { LoadingProvider } from "@/contexts/LoadingContext";
-import { GlobalLoader } from "@/components/GlobalLoader";
+import { GlobalLoader } from "@/components/loaders/GlobalLoader";
 import { ApolloProvider } from "@/lib/apollo";
 import ThemeScript from "./theme-script";
 
