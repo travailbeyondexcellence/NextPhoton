@@ -17,7 +17,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLoading } from '@/contexts/LoadingContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MinimalisticLoader } from '@/components/MinimalisticLoader';
+import { MinimalisticLoader } from './MinimalisticLoader';
 
 interface GlobalLoaderProps {
   // Optional: Override default loader style

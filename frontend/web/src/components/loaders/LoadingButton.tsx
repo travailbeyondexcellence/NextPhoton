@@ -8,7 +8,7 @@
 'use client';
 
 import React from 'react';
-import { ButtonLoader } from '@/components/MinimalisticLoader';
+import { ButtonLoader } from './MinimalisticLoader';
 import { cn } from '@/lib/utils';
 
 interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

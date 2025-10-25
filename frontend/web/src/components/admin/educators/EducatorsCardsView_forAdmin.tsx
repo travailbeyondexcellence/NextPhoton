@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import EducatorCard_forAdmin from './EducatorCard_forAdmin';
-import educatorsData from '../../mock-data/educators.json';
+import educatorsData from '../../mockData/educators.json';
 
 const educatorsArr = educatorsData.data;
 

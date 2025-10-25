@@ -2,7 +2,6 @@
 
 import { ThemeSelector } from "@/components/theme/ThemeSelector"
 import { ProfileDropdown } from "@/components/utilities/ProfileDropdown"
-import { GlassNavbar } from "@/components/glass"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 
 export function DashboardNavbar() {

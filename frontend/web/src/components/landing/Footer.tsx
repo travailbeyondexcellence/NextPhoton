@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { LogoComponent } from "../LogoComponent";
+import { LogoComponent } from "../utilities/LogoComponent";
 import { 
   Facebook, 
   Twitter, 

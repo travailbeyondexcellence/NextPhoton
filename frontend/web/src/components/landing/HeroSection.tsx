@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FadeIn } from "../animations/FadeIn";
 import { StaggerChildren, StaggerItem } from "../animations/StaggerChildren";
 import { ArrowRight, Play, Star, Users, BookOpen, TrendingUp } from "lucide-react";
-import { LogoComponent } from "../LogoComponent";
+import { LogoComponent } from "../utilities/LogoComponent";
 
 /**
  * Hero section for the landing page
