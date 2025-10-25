@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image";
-import { LogoComponent } from "./LogoComponent";
+import { LogoComponent } from "@/components/utilities/LogoComponent";
 
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"

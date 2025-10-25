@@ -37,7 +37,11 @@
       "Bash(export SKIP_ENV_VALIDATION=true)",
       "Bash(git fetch:*)",
       "Bash(pandoc:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Read(//home/**)",
+      "Read(///**)",
+      "Bash(xargs cat:*)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []
