@@ -15,8 +15,9 @@ import * as path from 'path';
  * - Proper connection management
  */
 
-// Load environment variables from root .env file  
-const dotenvPath = path.resolve(process.cwd(), '.env');
+// Load environment variables from root .env file
+// Go up from shared/db to root directory
+const dotenvPath = path.resolve(__dirname, '../../.env');
 dotenv.config({ path: dotenvPath });
 
 // Global type augmentation for singleton pattern

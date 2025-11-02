@@ -1,5 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load environment variables from root .env file FIRST
+const rootDir = path.resolve(__dirname, '../../../');
+const dotenvPath = path.join(rootDir, '.env');
+dotenv.config({ path: dotenvPath });
+console.log('📄 Loading .env from:', dotenvPath);
+console.log('🔍 DATABASE_URL configured:', !!process.env.DATABASE_URL);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
