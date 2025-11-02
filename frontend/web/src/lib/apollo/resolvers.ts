@@ -619,6 +619,71 @@ export const resolvers = {
   },
 
   Mutation: {
+    // Auth mutations - proxy to Go backend
+    login: async (_: any, { input }: { input: any }) => {
+      const response = await fetch('http://localhost:3963/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `
+            mutation Login($input: LoginInput!) {
+              login(input: $input) {
+                accessToken
+                user {
+                  id
+                  name
+                  email
+                }
+              }
+            }
+          `,
+          variables: { input },
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message);
+      }
+
+      return result.data.login;
+    },
+
+    register: async (_: any, { input }: { input: any }) => {
+      const response = await fetch('http://localhost:3963/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `
+            mutation Register($input: RegisterInput!) {
+              register(input: $input) {
+                user {
+                  id
+                  name
+                  email
+                }
+                message
+              }
+            }
+          `,
+          variables: { input },
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message);
+      }
+
+      return result.data.register;
+    },
+
     // Educator mutations
     createEducator: async (_: any, { input }: { input: any }) => {
       const newEducator = await mockDb.create('educators', {
