@@ -1,0 +1,33 @@
+---
+# User Service
+# Internal service for user management
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: nextphoton
+  labels:
+    app: user-service
+    component: user
+    tier: backend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  selector:
+    app: user-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  sessionAffinity: None

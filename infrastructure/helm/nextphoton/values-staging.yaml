@@ -1,0 +1,337 @@
+# =============================================================================
+# NextPhoton EduCare Platform - Staging Environment Values
+# =============================================================================
+# This file contains configuration overrides for the staging environment.
+# Mirrors production as closely as possible for realistic testing.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Global Configuration - Staging
+# -----------------------------------------------------------------------------
+global:
+  environment: staging
+  imageRegistry: ghcr.io/nextphoton
+  imagePullPolicy: IfNotPresent
+  namespace: nextphoton-staging
+  domain: staging.nextphoton.io
+
+  tls:
+    enabled: true
+    secretName: nextphoton-staging-tls
+
+  monitoring:
+    enabled: true
+    prometheus:
+      scrape: true
+
+  tracing:
+    enabled: true
+    samplingRate: 0.5  # 50% sampling for staging
+
+  logging:
+    level: info
+    format: json
+
+# -----------------------------------------------------------------------------
+# Infrastructure Services - Staging
+# -----------------------------------------------------------------------------
+nats:
+  enabled: true
+  cluster:
+    enabled: true
+    replicas: 3
+  jetstream:
+    enabled: true
+    memoryStore:
+      size: 512Mi
+    fileStore:
+      size: 5Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 400m
+      memory: 768Mi
+
+redis:
+  enabled: true
+  architecture: replication
+  auth:
+    enabled: true
+  master:
+    persistence:
+      size: 4Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 400m
+        memory: 384Mi
+  replica:
+    replicaCount: 1
+
+postgresql:
+  enabled: false  # Use NeonDB staging branch
+
+# -----------------------------------------------------------------------------
+# Ingress Configuration - Staging
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: api.staging.nextphoton.io
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api-gateway
+          port: 8080
+  tls:
+    - secretName: nextphoton-staging-api-tls
+      hosts:
+        - api.staging.nextphoton.io
+
+# -----------------------------------------------------------------------------
+# API Gateway - Staging
+# -----------------------------------------------------------------------------
+api-gateway:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: LOG_LEVEL
+      value: "info"
+    - name: RATE_LIMIT_ENABLED
+      value: "true"
+    - name: RATE_LIMIT_REQUESTS
+      value: "200"
+
+# -----------------------------------------------------------------------------
+# Auth Service - Staging
+# -----------------------------------------------------------------------------
+auth-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 75m
+      memory: 96Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# User Service - Staging
+# -----------------------------------------------------------------------------
+user-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 75m
+      memory: 96Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Session Service - Staging
+# -----------------------------------------------------------------------------
+session-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 75m
+      memory: 96Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Payment Service - Staging
+# -----------------------------------------------------------------------------
+payment-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 60
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: PAYMENT_PROVIDER
+      value: "stripe"
+    - name: STRIPE_MODE
+      value: "test"
+
+# -----------------------------------------------------------------------------
+# Analytics Service - Staging
+# -----------------------------------------------------------------------------
+analytics-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 384Mi
+    limits:
+      cpu: 750m
+      memory: 1536Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Notification Service - Staging
+# -----------------------------------------------------------------------------
+notification-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 75m
+      memory: 96Mi
+    limits:
+      cpu: 375m
+      memory: 384Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: EMAIL_PROVIDER
+      value: "sendgrid"
+    - name: SMS_ENABLED
+      value: "false"
+
+# -----------------------------------------------------------------------------
+# Media Service - Staging
+# -----------------------------------------------------------------------------
+media-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: STORAGE_PROVIDER
+      value: "cloudflare-r2"
+    - name: MAX_UPLOAD_SIZE
+      value: "100MB"
+
+# -----------------------------------------------------------------------------
+# ConfigMap Settings - Staging
+# -----------------------------------------------------------------------------
+configMap:
+  common:
+    NATS_URL: "nats://nats:4222"
+    REDIS_URL: "redis://redis-master:6379"
+    ENVIRONMENT: "staging"
+
+# -----------------------------------------------------------------------------
+# Network Policies - Staging
+# -----------------------------------------------------------------------------
+networkPolicies:
+  enabled: true
+  defaultDeny: true
+
+# -----------------------------------------------------------------------------
+# Migration Job - Staging
+# -----------------------------------------------------------------------------
+migrations:
+  enabled: true
+  image:
+    tag: "1.0.0"

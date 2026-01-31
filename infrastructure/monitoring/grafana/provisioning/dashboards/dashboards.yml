@@ -1,0 +1,44 @@
+# Grafana Dashboard Provisioning Configuration
+# This file configures automatic dashboard provisioning from the filesystem
+
+apiVersion: 1
+
+providers:
+  # NextPhoton Core Dashboards
+  - name: 'NextPhoton - Core'
+    orgId: 1
+    folder: 'NextPhoton'
+    folderUid: 'nextphoton'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false
+
+  # Infrastructure Dashboards (if stored separately)
+  - name: 'NextPhoton - Infrastructure'
+    orgId: 1
+    folder: 'Infrastructure'
+    folderUid: 'infrastructure'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/infrastructure
+      foldersFromFilesStructure: false
+
+  # SLO Dashboards
+  - name: 'NextPhoton - SLOs'
+    orgId: 1
+    folder: 'SLOs'
+    folderUid: 'slos'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/slos
+      foldersFromFilesStructure: false

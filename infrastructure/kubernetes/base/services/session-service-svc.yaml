@@ -1,0 +1,40 @@
+---
+# Session Service
+# Internal service for session management with WebSocket support
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-service
+  namespace: nextphoton
+  labels:
+    app: session-service
+    component: session
+    tier: backend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  selector:
+    app: session-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+    - name: websocket
+      port: 8443
+      targetPort: 8443
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600

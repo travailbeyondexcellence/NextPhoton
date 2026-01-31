@@ -1,0 +1,181 @@
+# Grafana Datasources Configuration for NextPhoton EduCare Platform
+# This file provisions all data sources automatically on Grafana startup
+
+apiVersion: 1
+
+# Delete datasources that are not defined in this file
+deleteDatasources:
+  - name: Prometheus-Old
+    orgId: 1
+  - name: Loki-Old
+    orgId: 1
+
+# List of datasources to provision
+datasources:
+  # Prometheus - Primary metrics datasource
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    uid: prometheus
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.50.0
+      cacheLevel: 'Low'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+      exemplarTraceIdDestinations:
+        - name: traceID
+          datasourceUid: jaeger
+          urlDisplayLabel: View Trace
+
+  # Loki - Log aggregation datasource
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    uid: loki
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - name: TraceID
+          matcherRegex: '"trace_id":"([a-f0-9]+)"'
+          url: '$${__value.raw}'
+          datasourceUid: jaeger
+          urlDisplayLabel: View Trace
+        - name: ServiceName
+          matcherRegex: '"service":"([a-zA-Z-]+)"'
+          url: ''
+
+  # Jaeger - Distributed tracing datasource
+  - name: Jaeger
+    type: jaeger
+    access: proxy
+    url: http://jaeger:16686
+    uid: jaeger
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      tracesToLogs:
+        datasourceUid: loki
+        filterByTraceID: true
+        filterBySpanID: false
+        mapTagNamesEnabled: true
+        mappedTags:
+          - key: service.name
+            value: service
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+      tracesToMetrics:
+        datasourceUid: prometheus
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags:
+          - key: service.name
+            value: service
+        queries:
+          - name: Request Rate
+            query: 'sum(rate(nextphoton_requests_total{service="$${__tags.service}"}[5m]))'
+          - name: Error Rate
+            query: 'sum(rate(nextphoton_requests_total{service="$${__tags.service}",status=~"5.."}[5m]))'
+          - name: P95 Latency
+            query: 'histogram_quantile(0.95, sum(rate(nextphoton_request_duration_seconds_bucket{service="$${__tags.service}"}[5m])) by (le))'
+      nodeGraph:
+        enabled: true
+
+  # Alertmanager - Alert management datasource
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://alertmanager:9093
+    uid: alertmanager
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      implementation: prometheus
+      handleGrafanaManagedAlerts: false
+
+  # PostgreSQL - Direct database access for business dashboards
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    url: postgres:5432
+    uid: postgresql
+    orgId: 1
+    version: 1
+    editable: false
+    secureJsonData:
+      password: ${POSTGRES_PASSWORD}
+    jsonData:
+      database: nextphoton
+      user: grafana_readonly
+      sslmode: require
+      maxOpenConns: 10
+      maxIdleConns: 5
+      connMaxLifetime: 14400
+      postgresVersion: 1500
+      timescaledb: false
+
+  # Tempo - Alternative tracing backend (if using Tempo instead of Jaeger)
+  - name: Tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    uid: tempo
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: loki
+        filterByTraceID: true
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags:
+          - key: service.name
+            value: service
+        mappedTags:
+          - key: service.name
+            value: service
+      tracesToMetrics:
+        datasourceUid: prometheus
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        tags:
+          - key: service.name
+            value: service
+        queries:
+          - name: Request Rate
+            query: 'sum(rate(nextphoton_requests_total{service="$${__tags.service}"}[5m]))'
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      lokiSearch:
+        datasourceUid: loki
+
+  # CloudWatch - AWS metrics (if using AWS infrastructure)
+  - name: CloudWatch
+    type: cloudwatch
+    access: proxy
+    uid: cloudwatch
+    orgId: 1
+    version: 1
+    editable: false
+    jsonData:
+      authType: default
+      defaultRegion: ap-south-1
+      customMetricsNamespaces: NextPhoton
+    # Note: AWS credentials should be provided via IAM roles or environment variables

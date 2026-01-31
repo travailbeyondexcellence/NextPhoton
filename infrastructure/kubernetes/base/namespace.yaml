@@ -1,0 +1,167 @@
+---
+# NextPhoton Namespace
+# Base namespace for all application resources
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nextphoton
+  labels:
+    name: nextphoton
+    app: nextphoton
+    environment: production
+    istio-injection: disabled
+  annotations:
+    description: "NextPhoton EduCare Platform - Production Environment"
+---
+# Resource Quota for Namespace
+# Prevents runaway resource consumption
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: nextphoton-quota
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    pods: "100"
+    services: "20"
+    secrets: "50"
+    configmaps: "50"
+    persistentvolumeclaims: "10"
+    replicationcontrollers: "0"
+---
+# Limit Range for Namespace
+# Sets default resource limits for containers
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: nextphoton-limits
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+spec:
+  limits:
+    # Default limits for containers without specified resources
+    - type: Container
+      default:
+        cpu: 500m
+        memory: 512Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+      min:
+        cpu: 10m
+        memory: 32Mi
+      max:
+        cpu: 4
+        memory: 8Gi
+    # Pod-level limits
+    - type: Pod
+      max:
+        cpu: 8
+        memory: 16Gi
+    # PVC limits
+    - type: PersistentVolumeClaim
+      min:
+        storage: 1Gi
+      max:
+        storage: 100Gi
+---
+# Network Policy - Default Deny All
+# Start with deny-all, then explicitly allow needed traffic
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# Network Policy - Allow DNS
+# All pods need DNS resolution
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Network Policy - Allow Internal Communication
+# Services within the namespace can communicate
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-internal
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}
+  egress:
+    - to:
+        - podSelector: {}
+---
+# Network Policy - Allow External Services
+# Allow egress to external services (NeonDB, NATS, Redis, etc.)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-external-services
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    # Allow HTTPS to external APIs
+    - ports:
+        - protocol: TCP
+          port: 443
+    # Allow PostgreSQL (NeonDB)
+    - ports:
+        - protocol: TCP
+          port: 5432
+    # Allow Redis
+    - ports:
+        - protocol: TCP
+          port: 6379
+    # Allow NATS
+    - ports:
+        - protocol: TCP
+          port: 4222
+        - protocol: TCP
+          port: 8222

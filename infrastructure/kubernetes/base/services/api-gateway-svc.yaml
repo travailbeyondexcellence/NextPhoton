@@ -1,0 +1,29 @@
+---
+# API Gateway Service
+# Exposes the API Gateway deployment to the cluster and ingress
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway
+  namespace: nextphoton
+  labels:
+    app: api-gateway
+    component: gateway
+    tier: frontend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  selector:
+    app: api-gateway
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  sessionAffinity: None

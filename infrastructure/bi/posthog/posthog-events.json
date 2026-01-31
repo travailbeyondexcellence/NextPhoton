@@ -1,0 +1,423 @@
+{
+  "_comment": "NextPhoton PostHog Event Definitions and Cohort Configurations",
+  "version": "1.0.0",
+  "last_updated": "2026-01-31",
+
+  "events": {
+    "authentication": [
+      {
+        "name": "user_signed_up",
+        "description": "User completed registration",
+        "properties": {
+          "role": "string - User role (learner, guardian, educator, ecm, admin)",
+          "referral_source": "string - How user found NextPhoton",
+          "signup_method": "string - email, google, apple",
+          "organization_id": "string - Optional organization ID"
+        }
+      },
+      {
+        "name": "user_logged_in",
+        "description": "User successfully logged in",
+        "properties": {
+          "method": "string - password, google, apple, magic_link",
+          "device_type": "string - web, mobile, desktop",
+          "is_first_login_today": "boolean"
+        }
+      },
+      {
+        "name": "user_logged_out",
+        "description": "User logged out",
+        "properties": {
+          "session_duration_minutes": "number"
+        }
+      },
+      {
+        "name": "password_reset_requested",
+        "description": "User requested password reset",
+        "properties": {}
+      }
+    ],
+
+    "sessions": [
+      {
+        "name": "session_booked",
+        "description": "Learning session was booked",
+        "properties": {
+          "session_id": "string",
+          "educator_id": "string",
+          "subject": "string",
+          "session_type": "string - one_on_one, group, workshop",
+          "duration_minutes": "number",
+          "scheduled_time": "datetime",
+          "booking_lead_time_hours": "number - Hours between booking and session"
+        }
+      },
+      {
+        "name": "session_started",
+        "description": "Learning session started",
+        "properties": {
+          "session_id": "string",
+          "is_on_time": "boolean",
+          "delay_minutes": "number",
+          "participants_count": "number"
+        }
+      },
+      {
+        "name": "session_completed",
+        "description": "Learning session completed",
+        "properties": {
+          "session_id": "string",
+          "actual_duration_minutes": "number",
+          "rating": "number - 1-5 scale",
+          "feedback_provided": "boolean"
+        }
+      },
+      {
+        "name": "session_cancelled",
+        "description": "Learning session was cancelled",
+        "properties": {
+          "session_id": "string",
+          "cancelled_by": "string - learner, educator, system",
+          "cancellation_reason": "string",
+          "notice_hours": "number - Hours before scheduled time"
+        }
+      },
+      {
+        "name": "session_rescheduled",
+        "description": "Learning session was rescheduled",
+        "properties": {
+          "session_id": "string",
+          "rescheduled_by": "string",
+          "original_time": "datetime",
+          "new_time": "datetime"
+        }
+      }
+    ],
+
+    "assignments": [
+      {
+        "name": "assignment_created",
+        "description": "Educator created an assignment",
+        "properties": {
+          "assignment_id": "string",
+          "subject": "string",
+          "due_in_days": "number",
+          "learner_count": "number"
+        }
+      },
+      {
+        "name": "assignment_submitted",
+        "description": "Learner submitted an assignment",
+        "properties": {
+          "assignment_id": "string",
+          "is_late": "boolean",
+          "submission_type": "string - file, text, link"
+        }
+      },
+      {
+        "name": "assignment_graded",
+        "description": "Educator graded an assignment",
+        "properties": {
+          "assignment_id": "string",
+          "score_percentage": "number",
+          "grading_time_hours": "number"
+        }
+      }
+    ],
+
+    "payments": [
+      {
+        "name": "payment_initiated",
+        "description": "Payment process started",
+        "properties": {
+          "amount": "number",
+          "currency": "string",
+          "payment_type": "string - session, subscription, credit_pack",
+          "gateway": "string - stripe, razorpay"
+        }
+      },
+      {
+        "name": "payment_completed",
+        "description": "Payment successfully processed",
+        "properties": {
+          "amount": "number",
+          "currency": "string",
+          "payment_type": "string",
+          "gateway": "string",
+          "transaction_id": "string"
+        }
+      },
+      {
+        "name": "payment_failed",
+        "description": "Payment processing failed",
+        "properties": {
+          "amount": "number",
+          "failure_reason": "string",
+          "gateway": "string"
+        }
+      },
+      {
+        "name": "subscription_started",
+        "description": "User started a subscription",
+        "properties": {
+          "plan": "string",
+          "billing_period": "string - monthly, annual",
+          "amount": "number"
+        }
+      },
+      {
+        "name": "subscription_cancelled",
+        "description": "User cancelled subscription",
+        "properties": {
+          "plan": "string",
+          "reason": "string",
+          "tenure_months": "number"
+        }
+      }
+    ],
+
+    "ecm_activities": [
+      {
+        "name": "ecm_learner_assigned",
+        "description": "Learner assigned to ECM",
+        "properties": {
+          "ecm_id": "string",
+          "learner_id": "string"
+        }
+      },
+      {
+        "name": "ecm_progress_review",
+        "description": "ECM reviewed learner progress",
+        "properties": {
+          "ecm_id": "string",
+          "learner_id": "string",
+          "review_type": "string - weekly, monthly, intervention"
+        }
+      },
+      {
+        "name": "ecm_intervention_triggered",
+        "description": "ECM intervention was triggered",
+        "properties": {
+          "ecm_id": "string",
+          "learner_id": "string",
+          "intervention_type": "string",
+          "trigger_reason": "string"
+        }
+      },
+      {
+        "name": "ecm_guardian_contacted",
+        "description": "ECM contacted guardian",
+        "properties": {
+          "ecm_id": "string",
+          "guardian_id": "string",
+          "contact_method": "string - call, email, message",
+          "reason": "string"
+        }
+      }
+    ],
+
+    "feature_usage": [
+      {
+        "name": "feature_accessed",
+        "description": "User accessed a feature",
+        "properties": {
+          "feature_name": "string",
+          "feature_category": "string"
+        }
+      },
+      {
+        "name": "search_performed",
+        "description": "User performed a search",
+        "properties": {
+          "search_type": "string - educator, subject, session",
+          "query": "string",
+          "results_count": "number"
+        }
+      },
+      {
+        "name": "notification_clicked",
+        "description": "User clicked on notification",
+        "properties": {
+          "notification_type": "string",
+          "notification_id": "string"
+        }
+      }
+    ]
+  },
+
+  "cohorts": {
+    "user_segments": [
+      {
+        "name": "Active Learners",
+        "description": "Learners with at least 1 session in the last 7 days",
+        "filter": {
+          "event": "session_completed",
+          "timeframe": "last_7_days",
+          "count_operator": "gte",
+          "count_value": 1
+        }
+      },
+      {
+        "name": "Power Users",
+        "description": "Users with 10+ sessions in the last 30 days",
+        "filter": {
+          "event": "session_completed",
+          "timeframe": "last_30_days",
+          "count_operator": "gte",
+          "count_value": 10
+        }
+      },
+      {
+        "name": "At-Risk Learners",
+        "description": "Learners with no activity in 14+ days who were previously active",
+        "filter": {
+          "events": [
+            {
+              "event": "session_completed",
+              "timeframe": "30_to_60_days_ago",
+              "count_operator": "gte",
+              "count_value": 1
+            },
+            {
+              "event": "any",
+              "timeframe": "last_14_days",
+              "count_operator": "eq",
+              "count_value": 0
+            }
+          ],
+          "operator": "AND"
+        }
+      },
+      {
+        "name": "New Users (Last 7 Days)",
+        "description": "Users who signed up in the last 7 days",
+        "filter": {
+          "event": "user_signed_up",
+          "timeframe": "last_7_days",
+          "count_operator": "gte",
+          "count_value": 1
+        }
+      },
+      {
+        "name": "Premium Subscribers",
+        "description": "Users with active premium subscription",
+        "filter": {
+          "property": "subscription_plan",
+          "operator": "eq",
+          "value": "premium"
+        }
+      },
+      {
+        "name": "High-Rated Educators",
+        "description": "Educators with average rating >= 4.5",
+        "filter": {
+          "property": "average_rating",
+          "operator": "gte",
+          "value": 4.5,
+          "user_property": "role",
+          "user_property_value": "educator"
+        }
+      },
+      {
+        "name": "Churned Users",
+        "description": "Users who cancelled subscription or haven't logged in for 30+ days",
+        "filter": {
+          "events": [
+            {
+              "event": "subscription_cancelled",
+              "timeframe": "last_30_days"
+            }
+          ],
+          "OR": {
+            "event": "user_logged_in",
+            "timeframe": "last_30_days",
+            "count_operator": "eq",
+            "count_value": 0
+          }
+        }
+      }
+    ],
+
+    "behavioral_cohorts": [
+      {
+        "name": "Session Bookers Not Completers",
+        "description": "Users who book sessions but have high cancellation rate",
+        "filter": {
+          "calculated_property": "cancellation_rate",
+          "operator": "gte",
+          "value": 0.3,
+          "event": "session_booked",
+          "timeframe": "last_30_days",
+          "count_operator": "gte",
+          "count_value": 3
+        }
+      },
+      {
+        "name": "Payment Abandoners",
+        "description": "Users who initiated but didn't complete payment",
+        "filter": {
+          "sequence": [
+            {
+              "event": "payment_initiated",
+              "timeframe": "last_7_days"
+            },
+            {
+              "event": "payment_completed",
+              "timeframe": "last_7_days",
+              "negated": true
+            }
+          ]
+        }
+      }
+    ]
+  },
+
+  "feature_flags": {
+    "flags": [
+      {
+        "key": "new_booking_flow",
+        "name": "New Booking Flow",
+        "description": "Redesigned session booking experience",
+        "type": "gradual_rollout",
+        "rollout_percentage": 25,
+        "conditions": []
+      },
+      {
+        "key": "ai_recommendations",
+        "name": "AI Educator Recommendations",
+        "description": "AI-powered educator matching",
+        "type": "experiment",
+        "variants": ["control", "ai_v1", "ai_v2"],
+        "conditions": [
+          {
+            "property": "user_role",
+            "operator": "eq",
+            "value": "guardian"
+          }
+        ]
+      },
+      {
+        "key": "dark_mode",
+        "name": "Dark Mode",
+        "description": "Dark mode UI option",
+        "type": "release",
+        "enabled": true,
+        "conditions": []
+      },
+      {
+        "key": "ecm_dashboard_v2",
+        "name": "ECM Dashboard V2",
+        "description": "New ECM management dashboard",
+        "type": "gradual_rollout",
+        "rollout_percentage": 50,
+        "conditions": [
+          {
+            "property": "user_role",
+            "operator": "eq",
+            "value": "ecm"
+          }
+        ]
+      }
+    ]
+  }
+}
