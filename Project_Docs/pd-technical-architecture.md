@@ -1,323 +1,700 @@
 # NextPhoton Technical Architecture
 
-## Architecture Overview
+## Document Version
+- **Version**: 2.0.0
+- **Last Updated**: January 2026
+- **Status**: Canonical Reference
 
-NextPhoton follows a **microservices-oriented monorepo architecture** designed for scalability, maintainability, and multi-platform support.
+---
 
-## Repository Structure
+## 1. Architecture Overview
+
+NextPhoton follows a **microservices-based monorepo architecture** designed for scalability, maintainability, and multi-platform support across web, mobile (Android/iOS/iPadOS), and desktop platforms.
+
+### 1.1 Architecture Principles
+
+| Principle | Application |
+|-----------|-------------|
+| **Single Responsibility (S)** | Each module/class has one reason to change |
+| **Open/Closed (O)** | Entities open for extension, closed for modification |
+| **Liskov Substitution (L)** | Subtypes substitutable for base types |
+| **Interface Segregation (I)** | Many specific interfaces over one general interface |
+| **Dependency Inversion (D)** | Depend on abstractions, not concretions |
+| **Clean Architecture** | Domain → Application → Infrastructure → Presentation |
+| **MVVM Pattern** | Model-View-ViewModel for all mobile/desktop apps |
+
+### 1.2 High-Level System Architecture
 
 ```
-/root/ZenTech/NextPhoton/
-├── client/                 # Next.js 15 Web Application
-├── server/                 # NestJS Backend API
-├── mobile/                 # Flutter Mobile Application (planned)
-├── video-client/           # Separate Video Session Client (planned)
-├── shared/                 # Shared utilities, types, database
-├── project-documentation/  # Comprehensive project docs
-└── brainstorming/         # Schema and architecture planning
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              CLIENTS                                      │
+├─────────────┬─────────────┬─────────────┬─────────────┬─────────────────┤
+│   Next.js   │   Tauri     │   Android   │    iOS      │    iPadOS       │
+│   Web App   │   Desktop   │   (Kotlin)  │   (Swift)   │    (Swift)      │
+│   (React)   │   (Rust)    │   Compose   │   SwiftUI   │    SwiftUI      │
+└──────┬──────┴──────┬──────┴──────┬──────┴──────┬──────┴────────┬────────┘
+       │             │             │             │               │
+       └─────────────┴─────────────┼─────────────┴───────────────┘
+                                   │
+                          ┌────────▼────────┐
+                          │  Cloudflare CDN │
+                          │  + Workers      │
+                          └────────┬────────┘
+                                   │
+                          ┌────────▼────────┐
+                          │   API Gateway   │
+                          │   (Go + Chi)    │
+                          └────────┬────────┘
+                                   │
+       ┌───────────────────────────┼───────────────────────────┐
+       │                   NATS Message Bus                     │
+       └───────────────────────────┼───────────────────────────┘
+                                   │
+    ┌──────────┬──────────┬────────┴────────┬──────────┬──────────┐
+    │          │          │                 │          │          │
+┌───▼───┐ ┌───▼───┐ ┌────▼────┐ ┌─────────▼┐ ┌──────▼───┐ ┌────▼────┐
+│ Auth  │ │ User  │ │ Session │ │Curriculum│ │Notification│ │ Media   │
+│Service│ │Service│ │ Service │ │ Service  │ │  Service   │ │ Service │
+└───┬───┘ └───┬───┘ └────┬────┘ └────┬─────┘ └─────┬─────┘ └────┬────┘
+    │         │          │           │             │            │
+    └─────────┴──────────┴───────────┴─────────────┴────────────┘
+                                   │
+                    ┌──────────────┴──────────────┐
+                    │                             │
+               ┌────▼────┐                  ┌─────▼─────┐
+               │PostgreSQL│                  │   Redis   │
+               │ (NeonDB) │                  │  Cache    │
+               └──────────┘                  └───────────┘
 ```
 
-## Technology Stack
+---
 
-### Frontend Technologies
-- **Web Client**: Next.js 15 with App Router
-- **Mobile Client**: Flutter (planned)
-- **Video Client**: Separate Next.js app for live sessions (planned)
-- **UI Framework**: Radix UI + ShadCN components
-- **Styling**: Tailwind CSS v4 with dark mode support
-- **State Management**: Zustand for global state
-- **Form Handling**: React Hook Form with Zod validation
+## 2. Repository Structure
 
-### Backend Technologies
-- **API Framework**: NestJS with Express
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Better-auth with session management
-- **Real-time**: WebSocket support for live features
-- **File Storage**: Google Drive API integration
-- **Caching**: Redis for session and data caching
-
-### Infrastructure & DevOps
-- **Containerization**: Docker for all services
-- **Orchestration**: Docker Compose for local development
-- **Cloud Provider**: Multi-cloud strategy (primary + fallback)
-- **CI/CD**: GitHub Actions for automated deployments
-- **Monitoring**: Application and infrastructure monitoring
-- **Analytics**: Custom analytics service + third-party integrations
-
-## Database Architecture
-
-### Prisma Schema Design
-Located at: `shared/prisma/schema.prisma`
-
-#### Core Design Principles
-1. **Separation of Concerns**: Better-auth models isolated from business logic
-2. **Multi-tenancy**: Organization-based data isolation
-3. **ABAC Support**: Role-based permissions with individual overrides
-4. **Audit Trail**: Created/updated timestamps on all models
-5. **Soft Deletes**: `isActive` flags for data preservation
-
-#### Key Model Categories
-```prisma
-// Authentication (Better-auth)
-User, Session, Account, Verification
-
-// Role Management
-enum Role { LEARNER, GUARDIAN, EDUCATOR, EMPLOYEE, INTERN, ADMIN }
-UserRoles, RolePermissions
-
-// User Profiles (one per role type)
-LearnerProfile, GuardianProfile, EducatorProfile
-EmployeeProfile, InternProfile, AdminProfile
-
-// Relationships
-GuardianLearnerRelation
-
-// Multi-tenancy
-Organization
-
-// Curriculum & Learning (future)
-Exam, Curriculum, Subject, Topic
-Session, Task, Assignment, Assessment
+```
+nextphoton/
+│
+├── frontend/
+│   ├── web/                          # Next.js 16 Application
+│   │   ├── src/
+│   │   │   ├── app/                  # App Router pages
+│   │   │   ├── components/           # React components
+│   │   │   ├── core/                 # Interfaces, Entities, Use Cases
+│   │   │   ├── infrastructure/       # Repository implementations
+│   │   │   ├── di/                   # Dependency Injection container
+│   │   │   ├── presentation/         # Components, Hooks, Providers
+│   │   │   └── shared/               # Constants, Utils, Types, Schemas
+│   │   ├── package.json
+│   │   └── next.config.ts
+│   │
+│   ├── desktop/                      # Rust + Tauri 2.x Application
+│   │   ├── src-tauri/                # Rust backend
+│   │   │   ├── src/
+│   │   │   │   ├── domain/           # Entities, Repository Traits
+│   │   │   │   ├── infrastructure/   # Persistence, Network
+│   │   │   │   ├── application/      # Commands, State
+│   │   │   │   └── di/               # Dependency Injection
+│   │   │   └── Cargo.toml
+│   │   ├── src/                      # Shared React frontend
+│   │   └── package.json
+│   │
+│   └── mobile/
+│       ├── android/                  # Kotlin + Jetpack Compose
+│       │   ├── app/src/main/
+│       │   │   ├── domain/           # Entities, Repository Interfaces
+│       │   │   ├── data/             # Repository Implementations
+│       │   │   ├── presentation/     # Screens, ViewModels
+│       │   │   └── core/di/          # Koin Modules
+│       │   └── build.gradle.kts
+│       │
+│       ├── ios/                      # Swift + SwiftUI (iPhone)
+│       │   ├── Domain/               # Entities, Repository Protocols
+│       │   ├── Data/                 # Repository Implementations
+│       │   ├── Presentation/         # Views, ViewModels
+│       │   ├── Core/DI/              # Factory Containers
+│       │   └── Package.swift
+│       │
+│       └── ipados/                   # Swift + SwiftUI (iPad)
+│           ├── Domain/
+│           ├── Data/
+│           ├── Presentation/
+│           ├── Core/DI/
+│           └── Package.swift
+│
+├── backend/
+│   ├── api-gateway/                  # Go API Gateway
+│   │   ├── cmd/server/
+│   │   ├── internal/
+│   │   │   ├── middleware/
+│   │   │   ├── routes/
+│   │   │   └── handlers/
+│   │   └── go.mod
+│   │
+│   ├── services/                     # Go Microservices
+│   │   ├── auth-service/
+│   │   │   ├── cmd/server/main.go
+│   │   │   ├── config/
+│   │   │   ├── domain/               # Entities, Repository Interfaces
+│   │   │   ├── application/          # Commands, Queries, DTOs
+│   │   │   ├── infrastructure/       # Persistence, Messaging
+│   │   │   ├── interfaces/           # GraphQL Resolvers, NATS Handlers
+│   │   │   ├── ent/                  # Ent ORM schemas
+│   │   │   ├── graph/                # GraphQL schema & resolvers
+│   │   │   └── go.mod
+│   │   │
+│   │   ├── user-service/
+│   │   ├── session-service/
+│   │   ├── curriculum-service/
+│   │   ├── notification-service/
+│   │   ├── payment-service/
+│   │   ├── analytics-service/
+│   │   └── media-service/
+│   │
+│   ├── shared/                       # Shared Go Libraries
+│   │   ├── pkg/
+│   │   │   ├── nats/                 # NATS client utilities
+│   │   │   ├── postgres/             # Database utilities
+│   │   │   ├── middleware/           # Common middleware
+│   │   │   └── errors/               # Error handling
+│   │   └── go.mod
+│   │
+│   └── graphql/                      # Federated GraphQL Schema
+│       ├── schema/
+│       └── federation/
+│
+├── infrastructure/
+│   ├── terraform/                    # Infrastructure as Code
+│   │   ├── modules/
+│   │   │   ├── kubernetes/
+│   │   │   ├── neondb/
+│   │   │   ├── redis/
+│   │   │   └── cloudflare/
+│   │   ├── environments/
+│   │   │   ├── dev/
+│   │   │   ├── staging/
+│   │   │   └── prod/
+│   │   └── terragrunt.hcl
+│   │
+│   ├── kubernetes/                   # K8s Manifests + KEDA
+│   │   ├── base/
+│   │   │   ├── deployments/
+│   │   │   ├── services/
+│   │   │   ├── configmaps/
+│   │   │   └── secrets/
+│   │   ├── overlays/
+│   │   │   ├── dev/
+│   │   │   ├── staging/
+│   │   │   └── prod/
+│   │   ├── keda/                     # KEDA ScaledObjects
+│   │   └── kustomization.yaml
+│   │
+│   ├── helm/                         # Helm Charts
+│   │   ├── nextphoton/
+│   │   │   ├── charts/
+│   │   │   ├── templates/
+│   │   │   ├── values.yaml
+│   │   │   └── Chart.yaml
+│   │   └── dependencies/
+│   │
+│   ├── argocd/                       # GitOps
+│   │   ├── applications/
+│   │   ├── projects/
+│   │   └── applicationsets/
+│   │
+│   ├── cloudflare/                   # Workers + R2
+│   │   ├── workers/
+│   │   └── r2/
+│   │
+│   └── monitoring/                   # Grafana, Prometheus, etc.
+│       ├── prometheus/
+│       ├── grafana/
+│       ├── loki/
+│       └── jaeger/
+│
+├── project_docs/                     # Documentation (this folder)
+│
+├── .github/                          # CI/CD Workflows
+│   └── workflows/
+│       ├── ci.yml
+│       ├── cd.yml
+│       └── security.yml
+│
+├── .gitignore
+├── README.md
+└── Makefile
 ```
 
-#### Permission System Architecture
-- **Hierarchical Permissions**: Role defaults + individual overrides
-- **Inheritance Model**: Profile permissions override role permissions
-- **JSON Storage**: Flexible permission structures
-- **Multi-role Support**: Users can have multiple simultaneous roles
+---
 
-## API Architecture
+## 3. Backend Architecture - Go Microservices
 
-### NestJS Backend Structure
+### 3.1 Core Technologies
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Language** | Go | 1.22.x | Primary Language |
+| **GraphQL** | gqlgen | 0.17.x | GraphQL Server |
+| **Router** | chi | 5.0.x | HTTP Router |
+| **DI** | wire | 0.6.x | Compile-Time DI |
+| **ORM** | ent | 0.13.x | Type-Safe ORM |
+
+### 3.2 Data & Messaging
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **PostgreSQL (NeonDB)** | 16.x | Primary Database |
+| **pgx** | 5.5.x | PostgreSQL Driver |
+| **sqlc** | 1.25.x | Type-Safe SQL |
+| **golang-migrate** | 4.17.x | Database Migrations |
+| **NATS** | 2.10.x | Message Queue |
+| **Redis** | 7.2.x | Caching |
+
+### 3.3 Observability
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **zap** | 1.27.x | Structured Logging |
+| **OpenTelemetry** | 1.24.x | Distributed Tracing |
+| **Prometheus Client** | 1.19.x | Metrics Export |
+
+### 3.4 Microservices Architecture
+
 ```
-server/src/
-├── auth/           # Authentication & authorization
-├── users/          # User management across all roles
-├── learners/       # Learner-specific operations
-├── educators/      # Educator management & onboarding
-├── sessions/       # Session booking & management  
-├── progress/       # Learning progress tracking
-├── tasks/          # Task assignment & completion
-├── curriculum/     # Curriculum & exam management
-├── payments/       # Payment processing
-├── analytics/      # Data analytics & reporting
-├── notifications/  # Real-time notifications
-├── files/          # File upload & Google Drive integration
-└── common/         # Shared services, guards, interceptors
+┌─────────────────────────────────────────────────────────────────┐
+│                        API GATEWAY (Go + Chi)                     │
+│  • JWT Validation  • Rate Limiting  • Request Routing             │
+│  • CORS Handling   • Request Logging  • Load Balancing            │
+└─────────────────────────────────┬───────────────────────────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │      NATS Message Bus      │
+                    │  • Pub/Sub  • Request/Reply│
+                    └─────────────┬─────────────┘
+                                  │
+    ┌──────────────┬──────────────┼──────────────┬──────────────┐
+    │              │              │              │              │
+┌───▼────┐    ┌───▼────┐    ┌────▼───┐    ┌────▼───┐    ┌─────▼────┐
+│  AUTH  │    │  USER  │    │SESSION │    │PAYMENT │    │ANALYTICS │
+│SERVICE │    │SERVICE │    │SERVICE │    │SERVICE │    │ SERVICE  │
+├────────┤    ├────────┤    ├────────┤    ├────────┤    ├──────────┤
+│• Login │    │• CRUD  │    │• Book  │    │• UPI   │    │• Events  │
+│• Regis │    │• Roles │    │• Track │    │• Stripe│    │• Metrics │
+│• JWT   │    │• ABAC  │    │• ECM   │    │• Refund│    │• Reports │
+│• OAuth │    │• Orgs  │    │• Attend│    │• Invoice│   │• BI      │
+└───┬────┘    └───┬────┘    └───┬────┘    └───┬────┘    └────┬─────┘
+    │             │             │             │              │
+    └─────────────┴─────────────┴─────────────┴──────────────┘
+                                │
+                     ┌──────────┴──────────┐
+                     │   PostgreSQL (NeonDB)│
+                     │   + Redis Cache      │
+                     └─────────────────────┘
 ```
 
-### API Design Principles
-1. **RESTful Design**: Standard HTTP methods and status codes
-2. **Role-based Endpoints**: Different endpoints for different user types
-3. **Permission Guards**: Every endpoint protected by role/permission checks
-4. **Data Validation**: Zod schemas for request/response validation
-5. **Error Handling**: Consistent error response format
-6. **Rate Limiting**: API abuse prevention
-7. **Audit Logging**: All actions logged for security and analytics
+### 3.5 Service Communication Patterns
 
-## Authentication & Security
+| Pattern | Technology | Use Case |
+|---------|-----------|----------|
+| **Synchronous** | GraphQL via gqlgen | Client-facing API |
+| **Async Events** | NATS Pub/Sub | Event broadcasting (user.created, session.completed) |
+| **Request/Reply** | NATS Request | Service-to-service queries |
+| **Internal RPC** | gRPC (optional) | High-performance internal calls |
 
-### Better-auth Integration
-- **Session-based Authentication**: Secure session management
-- **Database Sessions**: Sessions stored in PostgreSQL
-- **Multi-factor Authentication**: Email verification + optional 2FA
-- **Password Security**: Bcrypt hashing with salt
-- **Session Security**: Secure cookies, CSRF protection
+### 3.6 Clean Architecture per Service
 
-### Authorization Architecture
-```typescript
+```
+service/
+├── cmd/server/main.go              # Entry point
+├── config/config.go                # Configuration
+├── domain/                         # Core Business Logic
+│   ├── entities/                   # Domain entities
+│   ├── repositories/               # Repository interfaces
+│   ├── services/                   # Service interfaces
+│   └── events/                     # Domain events
+├── application/                    # Use Cases
+│   ├── commands/                   # Write operations
+│   ├── queries/                    # Read operations
+│   └── dto/                        # Data transfer objects
+├── infrastructure/                 # External Concerns
+│   ├── persistence/                # Database implementations
+│   ├── messaging/                  # NATS implementations
+│   └── external/                   # External API clients
+├── interfaces/                     # Input Adapters
+│   ├── graphql/                    # GraphQL resolvers
+│   └── nats/                       # NATS handlers
+├── ent/                            # Ent ORM (generated)
+└── graph/                          # gqlgen (generated)
+```
+
+---
+
+## 4. Frontend Architecture - Web (Next.js 16)
+
+### 4.1 Core Technologies
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Framework** | Next.js | 16.x | React Framework (App Router) |
+| **Language** | TypeScript | 5.4.x | Type Safety |
+| **Runtime** | React | 19.x | UI Library |
+| **Package Manager** | Bun | 1.1.x | Fast Package Manager & Runtime |
+| **Styling** | Tailwind CSS | 4.x | Utility-First CSS |
+
+### 4.2 State & Data Management
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **TanStack Query** | 5.x | Server State Management |
+| **Zod** | 3.23.x | Schema Validation |
+| **React Hook Form** | 7.51.x | Form Management |
+| **GraphQL Request** | 7.x | GraphQL Client |
+| **@graphql-codegen** | 5.x | Type Generation |
+
+### 4.3 Testing Stack
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Vitest** | 2.x | Unit & Integration Testing |
+| **Playwright** | 1.43.x | E2E Testing |
+| **Testing Library** | 16.x | Component Testing |
+| **MSW** | 2.x | API Mocking |
+| **@faker-js/faker** | 8.x | Test Data Generation |
+
+### 4.4 Clean Architecture Layers
+
+| Layer | Responsibility |
+|-------|---------------|
+| `core/` | Interfaces, Entities, Use Cases (Abstractions) |
+| `infrastructure/` | Repository & Service Implementations |
+| `di/` | Manual Dependency Injection Container |
+| `presentation/` | Components, Hooks, Providers |
+| `shared/` | Constants, Utils, Types, Schemas |
+
+---
+
+## 5. Frontend Architecture - Desktop (Tauri 2.x)
+
+### 5.1 Core Technologies
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Framework** | Tauri | 2.x | Desktop Framework |
+| **Backend Language** | Rust | 1.76.x | Native Backend |
+| **Frontend** | React + TypeScript | 19.x / 5.4.x | UI (shared with web) |
+| **Build Tool** | Vite | 5.x | Frontend Bundler |
+
+### 5.2 Rust Backend Libraries
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **Tokio** | 1.36.x | Async Runtime |
+| **Serde** | 1.0.x | Serialization |
+| **SQLx** | 0.7.x | Database (SQLite) |
+| **reqwest** | 0.12.x | HTTP Client |
+| **graphql_client** | 0.14.x | GraphQL Client |
+| **tauri-plugin-store** | 2.x | Local Storage |
+| **tauri-plugin-sql** | 2.x | SQLite Plugin |
+
+### 5.3 Architecture Pattern (Clean Architecture)
+
+| Layer | Responsibility |
+|-------|---------------|
+| `domain/` | Entities, Repository Traits (Interfaces) |
+| `infrastructure/` | Persistence, Network Implementations |
+| `application/` | Commands, State Management |
+| `di/` | Dependency Injection Container |
+
+---
+
+## 6. Frontend Architecture - Mobile Android
+
+### 6.1 Core Technologies
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Language** | Kotlin | 2.0.x | Primary Language |
+| **UI Framework** | Jetpack Compose | 1.6.x | Declarative UI |
+| **Compose BOM** | 2024.02.x | Version Management |
+| **Build Tool** | Gradle (Kotlin DSL) | 8.6.x | Build System |
+
+### 6.2 Libraries
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **HTTP Client** | Ktor | 2.3.x | Network Requests |
+| **DI** | Koin | 3.5.x | Dependency Injection |
+| **Database** | Room | 2.6.x | Local Persistence |
+| **GraphQL** | Apollo Kotlin | 4.0.x | GraphQL Client |
+| **Async** | Kotlin Coroutines | 1.8.x | Concurrency |
+| **Serialization** | Kotlin Serialization | 1.6.x | JSON Parsing |
+| **Image Loading** | Coil | 2.6.x | Image Loading |
+| **Navigation** | Navigation Compose | 2.7.x | Screen Navigation |
+| **Preferences** | DataStore | 1.0.x | Key-Value Storage |
+
+### 6.3 Testing Stack
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **JUnit 5** | 5.10.x | Unit Testing Framework |
+| **MockK** | 1.13.x | Kotlin Mocking |
+| **Turbine** | 1.1.x | Flow Testing |
+| **Robolectric** | 4.11.x | Android Unit Tests |
+| **Espresso** | 3.5.x | UI Testing |
+| **Compose Test** | 1.6.x | Compose UI Testing |
+| **Kaspresso** | 1.5.x | E2E Testing |
+
+### 6.4 Architecture Pattern (Clean Architecture + MVVM)
+
+| Layer | Responsibility |
+|-------|---------------|
+| `domain/` | Entities, Repository Interfaces, Use Cases |
+| `data/` | Repository Implementations, DTOs, DAOs |
+| `presentation/` | Screens, ViewModels, States, UI Components |
+| `core/di/` | Koin Modules |
+
+---
+
+## 7. Frontend Architecture - Mobile iOS
+
+### 7.1 Core Technologies
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Language** | Swift | 5.10+ | Primary Language |
+| **UI Framework** | SwiftUI | 5.x | Declarative UI |
+| **Min Target** | iOS | 17.0+ | Minimum iOS Version |
+| **Package Manager** | Swift Package Manager | - | Dependencies |
+
+### 7.2 Libraries
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **GraphQL** | Apollo iOS | 1.9.x | GraphQL Client |
+| **Persistence** | SwiftData | 1.x | Local Database |
+| **Keychain** | KeychainAccess | 4.2.x | Secure Storage |
+| **Image Loading** | Kingfisher | 7.11.x | Image Loading |
+| **DI** | Factory | 2.3.x | Dependency Injection |
+| **Networking** | URLSession | - | Native HTTP Client |
+| **Reactive** | Combine | - | Reactive Streams |
+
+### 7.3 Testing Stack
+
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| **XCTest** | - | Unit Testing Framework |
+| **Quick** | 7.x | BDD Testing |
+| **Nimble** | 13.x | Matcher Framework |
+| **ViewInspector** | 0.9.x | SwiftUI Testing |
+| **OHHTTPStubs** | 9.x | Network Mocking |
+| **XCUITest** | - | UI Testing |
+| **SnapshotTesting** | 1.15.x | Snapshot Testing |
+
+### 7.4 Architecture Pattern (Clean Architecture + MVVM)
+
+| Layer | Responsibility |
+|-------|---------------|
+| `Domain/` | Entities, Repository Protocols, Use Cases |
+| `Data/` | Repository Implementations, DTOs, APIs |
+| `Presentation/` | Views, ViewModels, States, Components |
+| `Core/DI/` | Factory Containers |
+
+---
+
+## 8. Frontend Architecture - iPadOS
+
+### 8.1 Core Technologies
+
+Same as iOS with iPad-specific enhancements:
+
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Language** | Swift | 5.10+ | Primary Language |
+| **UI Framework** | SwiftUI | 5.x | Declarative UI |
+| **Min Target** | iPadOS | 17.0+ | Minimum iPadOS Version |
+
+### 8.2 iPad-Specific Features
+
+| Feature | Technology | Purpose |
+|---------|-----------|---------|
+| **Multitasking** | SwiftUI Scenes | Split View, Slide Over |
+| **Sidebar Navigation** | NavigationSplitView | Three-Column Layout |
+| **Keyboard Support** | FocusState, KeyboardShortcut | Hardware Keyboard |
+| **Pencil Support** | PencilKit | Apple Pencil Integration |
+| **Stage Manager** | WindowGroup | Multi-Window Support |
+
+---
+
+## 9. Database Architecture
+
+### 9.1 Primary Database - PostgreSQL (NeonDB)
+
+**Connection**: Serverless PostgreSQL via NeonDB
+**Driver**: pgx v5.5.x (Go)
+
+### 9.2 Schema Organization
+
+The database schema is organized into modular domains:
+
+| Schema File | Models | Purpose |
+|------------|--------|---------|
+| `auth.prisma` | User, Session, Account, Verification | Authentication |
+| `user-profiles.prisma` | 7 role profiles | User management |
+| `roles-permissions.prisma` | UserRole, RolePermissions | ABAC system |
+| `academic-system.prisma` | Exam, Curriculum, Subject, Topic | Curriculum |
+| `session-management.prisma` | LearningSession, Booking, Assignment | Sessions |
+| `monitoring-progress.prisma` | ProgressRecord, Milestone, Intervention | ECM tracking |
+| `financial-system.prisma` | Transaction, Invoice, Payment | Payments |
+| `communication.prisma` | Message, Notification, Announcement | Messaging |
+| `analytics-reporting.prisma` | AnalyticsEvent, Metrics, Reports | Analytics |
+
+### 9.3 Caching Layer - Redis
+
+| Use Case | TTL | Purpose |
+|----------|-----|---------|
+| Session tokens | 7 days | Authentication |
+| User permissions | 1 hour | ABAC caching |
+| Rate limiting | 1 minute | API protection |
+| GraphQL responses | 5 minutes | Query caching |
+
+---
+
+## 10. Message Queue Architecture - NATS
+
+### 10.1 Subject Naming Convention
+
+```
+nextphoton.<domain>.<action>.<version>
+
+Examples:
+- nextphoton.user.created.v1
+- nextphoton.session.completed.v1
+- nextphoton.payment.processed.v1
+- nextphoton.notification.send.v1
+```
+
+### 10.2 Event Types
+
+| Event | Publisher | Subscribers |
+|-------|-----------|-------------|
+| `user.created` | auth-service | user-service, notification-service |
+| `session.booked` | session-service | notification-service, payment-service |
+| `session.completed` | session-service | analytics-service, payment-service |
+| `payment.processed` | payment-service | notification-service, user-service |
+| `progress.updated` | session-service | analytics-service, notification-service |
+
+---
+
+## 11. API Gateway
+
+### 11.1 Responsibilities
+
+- **Authentication**: JWT token validation
+- **Authorization**: Permission checking via auth-service
+- **Rate Limiting**: Request throttling per user/IP
+- **Request Routing**: Route to appropriate microservice
+- **CORS Handling**: Cross-origin request handling
+- **Request Logging**: Structured logging with correlation IDs
+- **Load Balancing**: Distribute requests across service instances
+
+### 11.2 GraphQL Federation
+
+The API Gateway implements GraphQL Federation to compose schemas from all microservices:
+
+```graphql
+# Gateway composes schemas from:
+# - auth-service (User, Session, Auth mutations)
+# - user-service (Profiles, Roles, Permissions)
+# - session-service (Sessions, Bookings, Assignments)
+# - payment-service (Transactions, Invoices)
+# - analytics-service (Metrics, Reports)
+```
+
+---
+
+## 12. Security Architecture
+
+### 12.1 Authentication Flow
+
+```
+1. User submits credentials
+2. Auth-service validates and generates JWT
+3. JWT contains: userId, roles[], permissions[]
+4. Client stores JWT securely
+5. Each request includes JWT in Authorization header
+6. API Gateway validates JWT signature
+7. Services extract user context from validated JWT
+```
+
+### 12.2 ABAC Implementation
+
+```go
 // Permission checking flow
-1. Extract user session from request
-2. Load user roles from UserRoles table
-3. Load role-based permissions from RolePermissions
-4. Apply individual permission overrides from user profile
-5. Check if required permission exists in final permission set
-6. Allow/deny access based on permission check
+func CheckPermission(ctx context.Context, resource, action string) bool {
+    user := GetUserFromContext(ctx)
+
+    // 1. Load role-based permissions
+    rolePerms := LoadRolePermissions(user.Roles)
+
+    // 2. Apply individual overrides
+    userPerms := LoadUserPermissions(user.ID)
+
+    // 3. Merge (user overrides take precedence)
+    finalPerms := MergePermissions(rolePerms, userPerms)
+
+    // 4. Check permission
+    return finalPerms.Has(resource, action)
+}
 ```
 
-### Security Features
-- **ABAC Implementation**: Fine-grained access control
-- **Organization Isolation**: Multi-tenant data security
-- **Input Validation**: All inputs validated and sanitized
-- **SQL Injection Prevention**: Prisma ORM parameterized queries
-- **XSS Protection**: Content Security Policy headers
-- **Rate Limiting**: API endpoint protection
-- **Audit Logging**: Security event tracking
+### 12.3 Security Tools
 
-## Real-time Features
+| Tool | Version | Purpose |
+|------|---------|---------|
+| **Vault** | 1.15.x | Secrets Management |
+| **SOPS** | 3.8.x | Encrypted Secrets |
+| **Falco** | 0.37.x | Runtime Security |
+| **OPA/Gatekeeper** | 3.15.x | Policy Enforcement |
+| **Cert-Manager** | 1.14.x | TLS Certificate Management |
 
-### WebSocket Architecture
-- **Socket.io Integration**: Real-time bidirectional communication
-- **Room-based Organization**: Users join rooms based on roles/relationships
-- **Authentication**: Socket connections authenticated via session
-- **Event Types**: Notifications, progress updates, chat messages, session alerts
+---
 
-### Real-time Use Cases
-1. **Instant Notifications**: Task assignments, session reminders, announcements
-2. **Live Progress Updates**: Real-time homework completion, session attendance
-3. **Chat System**: ECM-Guardian-Learner communication
-4. **Session Alerts**: Live session notifications, technical issues
-5. **Dashboard Updates**: Real-time analytics and metrics
+## 13. Environment Configuration
 
-## Video Integration Architecture
+| Environment | Purpose | Infrastructure |
+|-------------|---------|----------------|
+| `local` | Developer Machine | Docker Compose |
+| `dev` | Development Testing | Shared K8s Namespace |
+| `staging` | Pre-Production | Isolated K8s Cluster |
+| `prod` | Production | Production K8s Cluster |
 
-### Video Platform Hierarchy
-1. **Primary**: Custom WebRTC solution
-2. **Fallback 1**: Google Meet API integration
-3. **Fallback 2**: Zoom API integration
+---
 
-### Video Client Separation
-- **Separate Repository**: `video-client/` for live session management
-- **Independent Scaling**: Video services can scale separately
-- **Specialized Features**: Screen sharing, recording, whiteboard
-- **Integration Points**: Session booking triggers video room creation
+## 14. Key Configuration Files
 
-### Video Features
-- **One-on-One Sessions**: Educator-Learner private sessions
-- **Small Batch Sessions**: Multiple learners with one educator
-- **Recording Capability**: Session recording for later review
-- **Screen Sharing**: Educator screen sharing for demonstrations
-- **Interactive Whiteboard**: Collaborative learning tools
+| Platform | Key Files |
+|----------|-----------|
+| **Next.js** | `next.config.ts`, `tailwind.config.ts`, `tsconfig.json`, `bunfig.toml`, `vitest.config.ts`, `playwright.config.ts` |
+| **Tauri** | `Cargo.toml`, `tauri.conf.json`, `vite.config.ts` |
+| **Android** | `build.gradle.kts`, `libs.versions.toml`, `AndroidManifest.xml` |
+| **iOS/iPadOS** | `Package.swift`, `Info.plist`, `*.xcodeproj` |
+| **Go Backend** | `go.mod`, `wire.go`, `gqlgen.yml`, `sqlc.yaml` |
+| **Infrastructure** | `terraform.tfvars`, `kustomization.yaml`, `Chart.yaml`, `prometheus.yml` |
 
-## Payment Integration
+---
 
-### Payment Gateway Hierarchy
+## 15. Related PRD Documents
 
-#### Domestic (India)
-1. **Primary**: UPI integration (direct bank transfers)
-2. **Fallback 1**: Razorpay (cards, wallets, UPI)
-3. **Fallback 2**: Paytm (mobile payments, wallets)
+| Document | Description |
+|----------|-------------|
+| `pd-infrastructure.md` | Terraform, Kubernetes, KEDA, Helm, ArgoCD |
+| `pd-mobile-architecture.md` | Detailed Android and iOS/iPadOS architecture |
+| `pd-desktop-architecture.md` | Tauri desktop application details |
+| `pd-testing-strategy.md` | Comprehensive testing across all platforms |
+| `pd-monitoring-observability.md` | Prometheus, Grafana, Jaeger, Loki |
+| `pd-business-intelligence.md` | PostHog, Metabase, analytics tools |
+| `pd-roles-permissions.md` | ABAC system and role specifications |
+| `pd-workflows.md` | User journeys for all roles |
 
-#### International
-1. **Primary**: Stripe (global card processing)
-2. **Fallback**: PayPal (alternative international payment)
-
-### Payment Architecture
-```typescript
-// Payment processing flow
-1. Guardian initiates payment (session/course)
-2. System calculates total cost and educator allocation
-3. Primary payment gateway attempted
-4. Fallback to secondary gateway if primary fails
-5. Success: Educator fee allocated, platform commission calculated
-6. Failure: User notified, transaction logged for retry
-```
-
-### Financial Features
-- **Automated Commission Calculation**: Platform profit margin automatic
-- **Educator Payment Processing**: Automated educator compensation
-- **ECM Hour Tracking**: Time-based compensation calculation
-- **Refund Management**: Automated refund processing
-- **Financial Analytics**: Real-time revenue and cost tracking
-
-## File Storage & Management
-
-### Google Drive Integration
-- **Primary Storage**: Google Drive API for all file uploads
-- **Organized Structure**: Folder hierarchy by user type and organization
-- **Access Control**: Drive permissions sync with platform permissions
-- **File Types**: Qualifications, assignments, resources, recordings
-
-### File Categories
-```
-Google Drive Structure:
-├── Organizations/
-│   ├── {org-id}/
-│   │   ├── Educators/
-│   │   │   ├── Qualifications/
-│   │   │   └── Demo-Videos/
-│   │   ├── Learners/
-│   │   │   ├── Assignments/
-│   │   │   └── Progress-Reports/
-│   │   └── Content/
-│   │       ├── Curriculum/
-│   │       └── Resources/
-```
-
-## Mobile Architecture (Flutter)
-
-### Flutter App Structure
-```
-mobile/
-├── lib/
-│   ├── core/           # Core utilities, constants
-│   ├── data/           # Data layer, API clients
-│   ├── domain/         # Business logic, entities
-│   ├── presentation/   # UI layer, screens, widgets
-│   ├── shared/         # Shared widgets, utilities
-│   └── main.dart
-```
-
-### Mobile-Specific Features
-- **Offline Capability**: Local data caching for limited connectivity
-- **Push Notifications**: Firebase integration for real-time alerts
-- **Biometric Authentication**: Fingerprint/face recognition
-- **Deep Linking**: Direct navigation to specific content
-- **Performance Optimization**: Efficient list rendering, image caching
-
-## Analytics Architecture
-
-### Data Collection Strategy
-- **Event Tracking**: User interactions, session data, performance metrics
-- **Real-time Analytics**: Live dashboard updates, instant insights
-- **Batch Processing**: Daily/weekly/monthly aggregate calculations
-- **Multi-dimensional Analysis**: User, organization, time-based analytics
-
-### Analytics Data Flow
-```
-1. Frontend Events → Analytics API
-2. Database Operations → Audit Logs
-3. Real-time Processing → Live Dashboards  
-4. Batch Processing → Historical Reports
-5. Machine Learning → Predictive Insights
-```
-
-## Scalability Considerations
-
-### Horizontal Scaling
-- **Database Partitioning**: Organization-based data partitioning
-- **Service Separation**: Independent scaling of video, analytics, core API
-- **CDN Integration**: Global content delivery for static assets
-- **Load Balancing**: Multi-instance API deployment
-
-### Performance Optimization
-- **Database Indexing**: Optimized queries for common operations
-- **Caching Strategy**: Redis for session, API response caching
-- **API Optimization**: Efficient data fetching, pagination
-- **Frontend Performance**: Code splitting, lazy loading, image optimization
-
-### Monitoring & Observability
-- **Application Monitoring**: Performance metrics, error tracking
-- **Infrastructure Monitoring**: Server health, resource utilization
-- **User Experience Monitoring**: Page load times, user interaction tracking
-- **Security Monitoring**: Authentication attempts, permission violations
-
-## Development Workflow
-
-### Local Development
-```bash
-# Start all services
-npm run start:all
-
-# Database operations
-npm run prisma:push
-npm run prisma:studio
-
-# Individual service development
-cd client && npm run dev
-cd server && npm run dev
-```
-
-### Testing Strategy
-- **Unit Tests**: Individual component/service testing
-- **Integration Tests**: API endpoint testing
-- **E2E Tests**: User workflow testing
-- **Performance Tests**: Load testing for scalability validation
-
-### Deployment Pipeline
-1. **Development**: Local development and testing
-2. **Staging**: Production-like environment testing
-3. **Production**: Blue-green deployment strategy
-4. **Monitoring**: Post-deployment health checks
+---
 
 This architecture provides a robust, scalable foundation for NextPhoton's comprehensive educational platform while maintaining flexibility for future enhancements and integrations.
