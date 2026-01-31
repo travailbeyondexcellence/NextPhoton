@@ -1,0 +1,487 @@
+# =============================================================================
+# NextPhoton EduCare Platform - Production Environment Values
+# =============================================================================
+# This file contains configuration overrides for the production environment.
+# Optimized for high availability, performance, and security.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Global Configuration - Production
+# -----------------------------------------------------------------------------
+global:
+  environment: production
+  imageRegistry: ghcr.io/nextphoton
+  imagePullPolicy: IfNotPresent
+  namespace: nextphoton-prod
+  domain: nextphoton.io
+
+  tls:
+    enabled: true
+    secretName: nextphoton-prod-tls
+
+  monitoring:
+    enabled: true
+    prometheus:
+      scrape: true
+
+  tracing:
+    enabled: true
+    samplingRate: 0.1  # 10% sampling for production
+
+  logging:
+    level: info
+    format: json
+
+  # Enhanced security context for production
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+# -----------------------------------------------------------------------------
+# Infrastructure Services - Production
+# -----------------------------------------------------------------------------
+nats:
+  enabled: true
+  cluster:
+    enabled: true
+    replicas: 3
+  jetstream:
+    enabled: true
+    memoryStore:
+      size: 2Gi
+    fileStore:
+      size: 20Gi
+      storageClassName: premium-rwo
+  auth:
+    enabled: true
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: nats
+          topologyKey: kubernetes.io/hostname
+
+redis:
+  enabled: true
+  architecture: replication
+  auth:
+    enabled: true
+  master:
+    persistence:
+      size: 16Gi
+      storageClassName: premium-rwo
+    resources:
+      requests:
+        cpu: 200m
+        memory: 256Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+  replica:
+    replicaCount: 3
+    persistence:
+      size: 16Gi
+      storageClassName: premium-rwo
+    resources:
+      requests:
+        cpu: 200m
+        memory: 256Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+  sentinel:
+    enabled: true
+
+postgresql:
+  enabled: false  # Use NeonDB production
+
+# -----------------------------------------------------------------------------
+# Ingress Configuration - Production
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains";
+  hosts:
+    - host: api.nextphoton.io
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api-gateway
+          port: 8080
+  tls:
+    - secretName: nextphoton-prod-api-tls
+      hosts:
+        - api.nextphoton.io
+
+# -----------------------------------------------------------------------------
+# API Gateway - Production
+# -----------------------------------------------------------------------------
+api-gateway:
+  enabled: true
+  replicaCount: 3
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 300m
+      memory: 384Mi
+    limits:
+      cpu: 1500m
+      memory: 1536Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 20
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+    behavior:
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        policies:
+          - type: Percent
+            value: 10
+            periodSeconds: 60
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        policies:
+          - type: Percent
+            value: 100
+            periodSeconds: 15
+          - type: Pods
+            value: 4
+            periodSeconds: 15
+        selectPolicy: Max
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  env:
+    - name: LOG_LEVEL
+      value: "info"
+    - name: RATE_LIMIT_ENABLED
+      value: "true"
+    - name: RATE_LIMIT_REQUESTS
+      value: "100"
+    - name: RATE_LIMIT_WINDOW
+      value: "60s"
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: api-gateway
+
+# -----------------------------------------------------------------------------
+# Auth Service - Production
+# -----------------------------------------------------------------------------
+auth-service:
+  enabled: true
+  replicaCount: 3
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 15
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  env:
+    - name: JWT_EXPIRY
+      value: "24h"
+    - name: REFRESH_TOKEN_EXPIRY
+      value: "7d"
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: auth-service
+
+# -----------------------------------------------------------------------------
+# User Service - Production
+# -----------------------------------------------------------------------------
+user-service:
+  enabled: true
+  replicaCount: 3
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 12
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: user-service
+
+# -----------------------------------------------------------------------------
+# Session Service - Production
+# -----------------------------------------------------------------------------
+session-service:
+  enabled: true
+  replicaCount: 3
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 12
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: session-service
+
+# -----------------------------------------------------------------------------
+# Payment Service - Production
+# -----------------------------------------------------------------------------
+payment-service:
+  enabled: true
+  replicaCount: 3
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 300m
+      memory: 384Mi
+    limits:
+      cpu: 1500m
+      memory: 1536Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 60
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  env:
+    - name: PAYMENT_PROVIDER
+      value: "stripe"
+    - name: STRIPE_MODE
+      value: "live"
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: payment-service
+
+# -----------------------------------------------------------------------------
+# Analytics Service - Production
+# -----------------------------------------------------------------------------
+analytics-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 300m
+      memory: 768Mi
+    limits:
+      cpu: 1500m
+      memory: 3Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Notification Service - Production
+# -----------------------------------------------------------------------------
+notification-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 15
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: EMAIL_PROVIDER
+      value: "sendgrid"
+    - name: SMS_PROVIDER
+      value: "twilio"
+    - name: SMS_ENABLED
+      value: "true"
+
+# -----------------------------------------------------------------------------
+# Media Service - Production
+# -----------------------------------------------------------------------------
+media-service:
+  enabled: true
+  replicaCount: 3
+  image:
+    tag: "1.0.0"
+  resources:
+    requests:
+      cpu: 300m
+      memory: 384Mi
+    limits:
+      cpu: 1500m
+      memory: 1536Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 12
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 2
+  env:
+    - name: STORAGE_PROVIDER
+      value: "cloudflare-r2"
+    - name: MAX_UPLOAD_SIZE
+      value: "100MB"
+    - name: CDN_ENABLED
+      value: "true"
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: media-service
+
+# -----------------------------------------------------------------------------
+# ConfigMap Settings - Production
+# -----------------------------------------------------------------------------
+configMap:
+  common:
+    NATS_URL: "nats://nats:4222"
+    REDIS_URL: "redis://redis-master:6379"
+    ENVIRONMENT: "production"
+    ENABLE_PROFILING: "false"
+
+# -----------------------------------------------------------------------------
+# External Secrets - Production
+# -----------------------------------------------------------------------------
+externalSecrets:
+  enabled: true
+  refreshInterval: 1h
+  secretStore:
+    name: vault-backend
+    kind: ClusterSecretStore
+
+# -----------------------------------------------------------------------------
+# Network Policies - Production
+# -----------------------------------------------------------------------------
+networkPolicies:
+  enabled: true
+  defaultDeny: true
+
+# -----------------------------------------------------------------------------
+# Priority Class - Production
+# -----------------------------------------------------------------------------
+priorityClassName: high-priority
+
+# -----------------------------------------------------------------------------
+# Node Affinity - Production
+# -----------------------------------------------------------------------------
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-type
+              operator: In
+              values:
+                - application
+
+# -----------------------------------------------------------------------------
+# Migration Job - Production
+# -----------------------------------------------------------------------------
+migrations:
+  enabled: true
+  image:
+    tag: "1.0.0"
+  backoffLimit: 5
+  activeDeadlineSeconds: 600

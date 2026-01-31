@@ -1,0 +1,83 @@
+# NextPhoton Services Static Targets
+# This file defines static scrape targets for NextPhoton services
+# Used when Kubernetes service discovery is not available (e.g., docker-compose)
+
+# Authentication Service
+- targets:
+    - auth-service:9090
+  labels:
+    service: auth-service
+    team: platform
+    environment: production
+
+# User Service
+- targets:
+    - user-service:9090
+  labels:
+    service: user-service
+    team: platform
+    environment: production
+
+# Session Service
+- targets:
+    - session-service:9090
+  labels:
+    service: session-service
+    team: platform
+    environment: production
+
+# Payment Service
+- targets:
+    - payment-service:9090
+  labels:
+    service: payment-service
+    team: platform
+    environment: production
+
+# Analytics Service
+- targets:
+    - analytics-service:9090
+  labels:
+    service: analytics-service
+    team: platform
+    environment: production
+
+# Notification Service
+- targets:
+    - notification-service:9090
+  labels:
+    service: notification-service
+    team: platform
+    environment: production
+
+# Scheduling Service
+- targets:
+    - scheduling-service:9090
+  labels:
+    service: scheduling-service
+    team: platform
+    environment: production
+
+# Content Service
+- targets:
+    - content-service:9090
+  labels:
+    service: content-service
+    team: platform
+    environment: production
+
+# Search Service
+- targets:
+    - search-service:9090
+  labels:
+    service: search-service
+    team: platform
+    environment: production
+
+# Gateway/BFF Service
+- targets:
+    - gateway-service:9090
+  labels:
+    service: gateway-service
+    team: platform
+    environment: production

@@ -1,0 +1,92 @@
+# Base Kustomization for NextPhoton Kubernetes Resources
+# This kustomization file defines all base resources
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: nextphoton-base
+  annotations:
+    description: "Base Kubernetes resources for NextPhoton EduCare Platform"
+
+# Namespace for all resources
+namespace: nextphoton
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: nextphoton
+  app.kubernetes.io/part-of: nextphoton-platform
+  app.kubernetes.io/managed-by: kustomize
+
+# Common annotations
+commonAnnotations:
+  app.kubernetes.io/version: "1.0.0"
+
+# Resources to include
+resources:
+  # Namespace and quotas
+  - namespace.yaml
+
+  # Deployments
+  - deployments/api-gateway.yaml
+  - deployments/auth-service.yaml
+  - deployments/user-service.yaml
+  - deployments/session-service.yaml
+  - deployments/payment-service.yaml
+  - deployments/notification-service.yaml
+  - deployments/analytics-service.yaml
+  - deployments/media-service.yaml
+
+  # Services
+  - services/api-gateway-svc.yaml
+  - services/auth-service-svc.yaml
+  - services/user-service-svc.yaml
+  - services/session-service-svc.yaml
+  - services/payment-service-svc.yaml
+  - services/notification-service-svc.yaml
+  - services/analytics-service-svc.yaml
+  - services/media-service-svc.yaml
+
+  # ConfigMaps
+  - configmaps/app-config.yaml
+
+  # Secrets (templates - use External Secrets in production)
+  - secrets/app-secrets.yaml
+  - secrets/external-secrets.yaml
+
+  # Ingress
+  - ingress/ingress.yaml
+
+# Images that can be overridden in overlays
+images:
+  - name: ghcr.io/nextphoton/api-gateway
+    newTag: latest
+  - name: ghcr.io/nextphoton/auth-service
+    newTag: latest
+  - name: ghcr.io/nextphoton/user-service
+    newTag: latest
+  - name: ghcr.io/nextphoton/session-service
+    newTag: latest
+  - name: ghcr.io/nextphoton/payment-service
+    newTag: latest
+  - name: ghcr.io/nextphoton/notification-service
+    newTag: latest
+  - name: ghcr.io/nextphoton/analytics-service
+    newTag: latest
+  - name: ghcr.io/nextphoton/media-service
+    newTag: latest
+
+# Config Map Generator (alternative to static configmaps)
+# Uncomment if you prefer generated configmaps
+# configMapGenerator:
+#   - name: app-config
+#     behavior: merge
+#     literals:
+#       - environment=production
+
+# Secret Generator
+# Uncomment for development only - use External Secrets in production
+# secretGenerator:
+#   - name: app-secrets
+#     behavior: merge
+#     literals:
+#       - jwt-secret=dev-only-secret

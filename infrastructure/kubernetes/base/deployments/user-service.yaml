@@ -1,0 +1,228 @@
+---
+# User Service Deployment
+# Manages user profiles, roles, permissions (ABAC)
+# Handles Learner, Guardian, Educator, ECM, Employee, Intern, Admin profiles
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: nextphoton
+  labels:
+    app: user-service
+    component: user
+    tier: backend
+    version: v1
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: user-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: user-service
+        component: user
+        tier: backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: user-service
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: user-service
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: user-service
+          image: ghcr.io/nextphoton/user-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            - containerPort: 50051
+              name: grpc
+              protocol: TCP
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: environment
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: log-level
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: database-url
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: nats-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: redis-url
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: otel-endpoint
+            - name: CLOUDFLARE_R2_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: r2-endpoint
+            - name: CLOUDFLARE_R2_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-secrets
+                  key: r2-access-key
+            - name: CLOUDFLARE_R2_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-secrets
+                  key: r2-secret-key
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      imagePullSecrets:
+        - name: ghcr-credentials
+---
+# Pod Disruption Budget for User Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: user-service-pdb
+  namespace: nextphoton
+  labels:
+    app: user-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: user-service
+---
+# Horizontal Pod Autoscaler for User Service
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-service-hpa
+  namespace: nextphoton
+  labels:
+    app: user-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-service
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
+---
+# Service Account for User Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: user-service
+  namespace: nextphoton
+  labels:
+    app: user-service

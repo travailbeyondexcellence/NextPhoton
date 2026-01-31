@@ -1,0 +1,327 @@
+# =============================================================================
+# NextPhoton EduCare Platform - Development Environment Values
+# =============================================================================
+# This file contains configuration overrides for the development environment.
+# Optimized for rapid iteration, debugging, and minimal resource usage.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Global Configuration - Development
+# -----------------------------------------------------------------------------
+global:
+  environment: development
+  imageRegistry: ghcr.io/nextphoton
+  imagePullPolicy: Always
+  namespace: nextphoton-dev
+  domain: dev.nextphoton.io
+
+  tls:
+    enabled: true
+    secretName: nextphoton-dev-tls
+
+  monitoring:
+    enabled: true
+    prometheus:
+      scrape: true
+
+  tracing:
+    enabled: true
+    samplingRate: 1.0  # Full tracing in dev
+
+  logging:
+    level: debug
+    format: json
+
+# -----------------------------------------------------------------------------
+# Infrastructure Services - Development
+# -----------------------------------------------------------------------------
+nats:
+  enabled: true
+  cluster:
+    enabled: false  # Single node for dev
+    replicas: 1
+  jetstream:
+    enabled: true
+    memoryStore:
+      size: 256Mi
+    fileStore:
+      size: 1Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+
+redis:
+  enabled: true
+  architecture: standalone  # No replication for dev
+  auth:
+    enabled: true
+  master:
+    persistence:
+      size: 1Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+  replica:
+    replicaCount: 0
+
+postgresql:
+  enabled: false  # Use NeonDB dev branch
+
+# -----------------------------------------------------------------------------
+# Ingress Configuration - Development
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-staging  # Use staging certs
+  hosts:
+    - host: api.dev.nextphoton.io
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api-gateway
+          port: 8080
+  tls:
+    - secretName: nextphoton-dev-api-tls
+      hosts:
+        - api.dev.nextphoton.io
+
+# -----------------------------------------------------------------------------
+# API Gateway - Development
+# -----------------------------------------------------------------------------
+api-gateway:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  env:
+    - name: LOG_LEVEL
+      value: "debug"
+    - name: RATE_LIMIT_ENABLED
+      value: "false"
+    - name: DEBUG_MODE
+      value: "true"
+
+# -----------------------------------------------------------------------------
+# Auth Service - Development
+# -----------------------------------------------------------------------------
+auth-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  env:
+    - name: JWT_EXPIRY
+      value: "72h"  # Longer expiry for dev convenience
+    - name: LOG_LEVEL
+      value: "debug"
+
+# -----------------------------------------------------------------------------
+# User Service - Development
+# -----------------------------------------------------------------------------
+user-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+
+# -----------------------------------------------------------------------------
+# Session Service - Development
+# -----------------------------------------------------------------------------
+session-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+
+# -----------------------------------------------------------------------------
+# Payment Service - Development
+# -----------------------------------------------------------------------------
+payment-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  env:
+    - name: PAYMENT_PROVIDER
+      value: "stripe"
+    - name: STRIPE_MODE
+      value: "test"
+
+# -----------------------------------------------------------------------------
+# Analytics Service - Development
+# -----------------------------------------------------------------------------
+analytics-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+
+# -----------------------------------------------------------------------------
+# Notification Service - Development
+# -----------------------------------------------------------------------------
+notification-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  env:
+    - name: EMAIL_PROVIDER
+      value: "mailhog"  # Local mail testing
+    - name: SMS_ENABLED
+      value: "false"
+
+# -----------------------------------------------------------------------------
+# Media Service - Development
+# -----------------------------------------------------------------------------
+media-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: false
+  podDisruptionBudget:
+    enabled: false
+  env:
+    - name: STORAGE_PROVIDER
+      value: "local"  # Local storage for dev
+    - name: MAX_UPLOAD_SIZE
+      value: "50MB"
+
+# -----------------------------------------------------------------------------
+# ConfigMap Settings - Development
+# -----------------------------------------------------------------------------
+configMap:
+  common:
+    NATS_URL: "nats://nats:4222"
+    REDIS_URL: "redis://redis-master:6379"
+    ENVIRONMENT: "development"
+    DEBUG: "true"
+
+# -----------------------------------------------------------------------------
+# External Secrets - Development
+# -----------------------------------------------------------------------------
+externalSecrets:
+  enabled: true
+  refreshInterval: 5m  # More frequent refresh for dev
+  secretStore:
+    name: vault-backend
+    kind: ClusterSecretStore
+
+# -----------------------------------------------------------------------------
+# Network Policies - Development
+# -----------------------------------------------------------------------------
+networkPolicies:
+  enabled: false  # Disabled for easier debugging
+
+# -----------------------------------------------------------------------------
+# Migration Job - Development
+# -----------------------------------------------------------------------------
+migrations:
+  enabled: true
+  image:
+    tag: "latest"
