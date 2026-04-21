@@ -11,8 +11,8 @@ export function useSession() {
             try {
                 const currentSession = await authClient.getSession();
                 console.log(currentSession);
-                setSession(currentSession.data?.session);
-             
+                setSession((currentSession as any).data?.session);
+
             } catch (error) {
                 setSession(undefined);
             } finally {

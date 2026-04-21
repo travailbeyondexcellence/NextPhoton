@@ -17,6 +17,37 @@ export const typeDefs = gql`
   scalar DateTime
   scalar JSON
 
+  # Auth types
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+    emailVerified: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type LoginResponse {
+    accessToken: String!
+    user: User!
+  }
+
+  type RegisterResponse {
+    user: User!
+    message: String!
+  }
+
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
+  input RegisterInput {
+    name: String!
+    email: String!
+    password: String!
+  }
+
   # Enum for user roles in the system
   enum UserRole {
     LEARNER
@@ -631,6 +662,10 @@ export const typeDefs = gql`
 
   # Mutation root type
   type Mutation {
+    # Auth mutations
+    login(input: LoginInput!): LoginResponse!
+    register(input: RegisterInput!): RegisterResponse!
+
     # Educator mutations
     createEducator(input: CreateEducatorInput!): Educator!
     updateEducator(id: ID!, input: UpdateEducatorInput!): Educator!

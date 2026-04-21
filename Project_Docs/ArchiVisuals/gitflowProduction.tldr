@@ -36,9 +36,9 @@
 		{
 			"id": "pointer:pointer",
 			"typeName": "pointer",
-			"x": 1367.1609562336344,
-			"y": -235.95784965073585,
-			"lastActivityTimestamp": 1759410383210,
+			"x": 1221.9928880936172,
+			"y": -998.9787155822609,
+			"lastActivityTimestamp": 1759419122622,
 			"meta": {}
 		},
 		{
@@ -268,9 +268,9 @@
 			"typeName": "shape"
 		},
 		{
-			"x": 552.1548313630232,
-			"y": 1674.1227829761986,
-			"z": 0.31521649741524466,
+			"x": 448.28256455078235,
+			"y": 1842.339810402912,
+			"z": 0.2644274366811108,
 			"meta": {},
 			"id": "camera:page:page",
 			"typeName": "camera"
@@ -576,6 +576,57 @@
 			"typeName": "shape"
 		},
 		{
+			"x": 547.5798422063087,
+			"y": -648.5237014206418,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:tU7r33MVSEtnLMzEcynAH",
+			"type": "text",
+			"props": {
+				"color": "red",
+				"size": "xl",
+				"w": 185.54389572345713,
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": false,
+				"scale": 1,
+				"richText": {
+					"type": "doc",
+					"content": [
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "Fly"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "Prod"
+								}
+							]
+						}
+					]
+				}
+			},
+			"parentId": "page:page",
+			"index": "ao1ElNIV",
+			"typeName": "shape"
+		},
+		{
 			"x": 1883.8135174828467,
 			"y": -1380.571747934642,
 			"rotation": 0,
@@ -778,10 +829,10 @@
 			"typeName": "shape"
 		},
 		{
-			"editingShapeId": null,
+			"editingShapeId": "shape:FBz7WM_SN5_LkpHczeeIr",
 			"croppingShapeId": null,
 			"selectedShapeIds": [
-				"shape:6YJP6oz7ICxMieMVO6Hcs"
+				"shape:FBz7WM_SN5_LkpHczeeIr"
 			],
 			"hoveredShapeId": null,
 			"erasingShapeIds": [],
@@ -1519,6 +1570,69 @@
 			"typeName": "shape"
 		},
 		{
+			"x": 456.200807468673,
+			"y": -1385.6436147723018,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:FBz7WM_SN5_LkpHczeeIr",
+			"type": "text",
+			"props": {
+				"color": "green",
+				"size": "xl",
+				"w": 119.22916412353516,
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": true,
+				"scale": 1,
+				"richText": {
+					"type": "doc",
+					"content": [
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "Neon"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "PG"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "Prod"
+								}
+							]
+						}
+					]
+				}
+			},
+			"parentId": "page:page",
+			"index": "apGaNDdV",
+			"typeName": "shape"
+		},
+		{
 			"x": 359.3459839052455,
 			"y": -277.40300101929324,
 			"rotation": 0,
@@ -1877,6 +1991,57 @@
 			"typeName": "binding"
 		},
 		{
+			"x": 1221.9928880936168,
+			"y": -662.3605560226588,
+			"rotation": 0,
+			"isLocked": false,
+			"opacity": 1,
+			"meta": {},
+			"id": "shape:3RlmyJu6NRD16usqp-3u0",
+			"type": "text",
+			"props": {
+				"color": "red",
+				"size": "l",
+				"w": 185.54389572345713,
+				"font": "draw",
+				"textAlign": "start",
+				"autoSize": false,
+				"scale": 1.0340696643867788,
+				"richText": {
+					"type": "doc",
+					"content": [
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "Fly"
+								}
+							]
+						},
+						{
+							"type": "paragraph",
+							"attrs": {
+								"dir": "auto"
+							},
+							"content": [
+								{
+									"type": "text",
+									"text": "Stagedev"
+								}
+							]
+						}
+					]
+				}
+			},
+			"parentId": "page:page",
+			"index": "aniUi3sl",
+			"typeName": "shape"
+		},
+		{
 			"meta": {},
 			"id": "binding:92AqFg5VbkcvtEC9ib-l4",
 			"type": "arrow",
@@ -1970,12 +2135,13 @@
 			"followingUserId": null,
 			"opacityForNextShape": 1,
 			"stylesForNextShape": {
-				"tldraw:size": "xl"
+				"tldraw:color": "red",
+				"tldraw:size": "l"
 			},
 			"brush": null,
 			"scribbles": [],
 			"cursor": {
-				"type": "move",
+				"type": "default",
 				"rotation": 0
 			},
 			"isFocusMode": false,
@@ -1985,7 +2151,7 @@
 			"screenBounds": {
 				"x": 0,
 				"y": 0,
-				"w": 1310.833251953125,
+				"w": 1170,
 				"h": 859.1666259765625
 			},
 			"insets": [

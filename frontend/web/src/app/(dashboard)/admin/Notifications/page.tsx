@@ -41,6 +41,9 @@ const extendedNotifications: ExtendedNotification[] = [
     deliveryStatus: "delivered",
     targetRoles: ["learner", "educator", "admin"],
     sentAt: "2024-05-15T08:00:00.000Z",
+    timestamp: "2024-05-15T08:00:00.000Z",
+    recipientCount: 200,
+    channel: "email",
     sender: {
       id: "system",
       name: "System Administrator",
@@ -60,6 +63,9 @@ const extendedNotifications: ExtendedNotification[] = [
     deliveryStatus: "delivered",
     targetRoles: ["learner"],
     sentAt: "2024-05-20T10:30:00.000Z",
+    timestamp: "2024-05-20T10:30:00.000Z",
+    recipientCount: 45,
+    channel: "email",
     sender: {
       id: "edu001",
       name: "John Smith",
@@ -86,6 +92,9 @@ const extendedNotifications: ExtendedNotification[] = [
     deliveryStatus: "delivered",
     targetRoles: ["guardian", "educator"],
     sentAt: "2024-05-22T14:00:00.000Z",
+    timestamp: "2024-05-22T14:00:00.000Z",
+    recipientCount: 30,
+    channel: "email",
     sender: {
       id: "admin001",
       name: "School Admin",
@@ -105,6 +114,9 @@ const extendedNotifications: ExtendedNotification[] = [
     deliveryStatus: "scheduled",
     targetRoles: ["learner"],
     sentAt: "2024-05-24T18:00:00.000Z",
+    timestamp: "2024-05-24T18:00:00.000Z",
+    recipientCount: 25,
+    channel: "push",
     scheduledFor: "2024-05-25T08:00:00.000Z",
     sender: {
       id: "edu002",
@@ -244,8 +256,9 @@ export default function NotificationsPage() {
 
   const getPriorityColor = (priority: ExtendedNotification['priority']) => {
     switch (priority) {
+      case 'urgent': return 'text-red-600'
       case 'high': return 'text-red-400'
-      case 'medium': return 'text-yellow-400'
+      case 'normal': return 'text-yellow-400'
       case 'low': return 'text-green-400'
       default: return 'text-gray-400'
     }
@@ -256,7 +269,6 @@ export default function NotificationsPage() {
       case 'sent': return 'text-blue-400'
       case 'delivered': return 'text-green-400'
       case 'failed': return 'text-red-400'
-      case 'pending': return 'text-yellow-400'
       case 'scheduled': return 'text-purple-400'
       default: return 'text-gray-400'
     }
@@ -267,8 +279,6 @@ export default function NotificationsPage() {
       case 'email': return <Mail className="h-3 w-3" />
       case 'sms': return <Smartphone className="h-3 w-3" />
       case 'push': return <Bell className="h-3 w-3" />
-      case 'in-app': return <Monitor className="h-3 w-3" />
-      case 'all': return <Users className="h-3 w-3" />
       default: return <MessageSquare className="h-3 w-3" />
     }
   }

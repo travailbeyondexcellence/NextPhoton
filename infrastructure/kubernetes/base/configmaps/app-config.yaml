@@ -1,0 +1,76 @@
+---
+# Application Configuration ConfigMap
+# Contains non-sensitive configuration values for all services
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+    component: config
+data:
+  # Environment
+  environment: "production"
+  log-level: "info"
+
+  # NATS Configuration
+  nats-url: "nats://nats.nextphoton.svc.cluster.local:4222"
+  nats-cluster-id: "nextphoton-cluster"
+
+  # Service Discovery
+  service-discovery-type: "kubernetes"
+
+  # JWT Configuration
+  jwt-access-expiry: "15m"
+  jwt-refresh-expiry: "7d"
+  jwt-issuer: "nextphoton"
+  jwt-audience: "nextphoton-api"
+
+  # Observability
+  otel-endpoint: "http://jaeger-collector.monitoring.svc.cluster.local:4317"
+  otel-service-name-prefix: "nextphoton"
+  metrics-enabled: "true"
+  tracing-enabled: "true"
+  tracing-sample-rate: "0.1"
+
+  # Cloudflare R2 Configuration
+  r2-endpoint: "https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com"
+  r2-bucket-uploads: "nextphoton-uploads"
+  r2-bucket-media: "nextphoton-media"
+  r2-bucket-recordings: "nextphoton-recordings"
+  r2-region: "auto"
+
+  # WebRTC Configuration
+  webrtc-stun-servers: "stun:stun.l.google.com:19302,stun:stun1.l.google.com:19302"
+  webrtc-turn-server: "turn:turn.nextphoton.com:3478"
+
+  # Stripe Configuration (Public Key Only)
+  stripe-publishable-key: "pk_live_XXXXXXXXXXXXXXXXXXXXX"
+
+  # Email Configuration
+  email-provider: "resend"
+  email-from-address: "noreply@nextphoton.com"
+  email-from-name: "NextPhoton EduCare"
+
+  # Firebase Configuration
+  firebase-project-id: "nextphoton-prod"
+
+  # Rate Limiting
+  rate-limit-requests-per-minute: "100"
+  rate-limit-burst: "20"
+
+  # Pagination
+  default-page-size: "20"
+  max-page-size: "100"
+
+  # Feature Flags
+  feature-video-sessions: "true"
+  feature-screen-recording: "true"
+  feature-ai-insights: "false"
+  feature-guardian-dashboard: "true"
+
+  # Analytics Configuration
+  clickhouse-host: "clickhouse.nextphoton.svc.cluster.local"
+  clickhouse-database: "nextphoton_analytics"
+  clickhouse-port: "9000"

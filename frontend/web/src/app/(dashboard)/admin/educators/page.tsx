@@ -3,8 +3,8 @@
 import React from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from "react";
-import EducatorsCardsView_forAdmin from "@/components/EducatorsCardsView_forAdmin";
-import EducatorsList_forAdmin from "@/components/EducatorsList_forAdmin";
+import EducatorsCardsView_forAdmin from "@/components/admin/educators/EducatorsCardsView_forAdmin";
+import EducatorsList_forAdmin from "@/components/admin/educators/EducatorsList_forAdmin";
 import { LayoutGrid, List, UserPlus, User } from "lucide-react";
 
 const Educators = () => {
@@ -47,7 +47,7 @@ const Educators = () => {
         {/* View Toggle */}
         <div>
           {view === "list" ? (
-            <EducatorsList_forAdmin initialView="table" />
+            <EducatorsList_forAdmin />
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               <EducatorsCardsView_forAdmin />

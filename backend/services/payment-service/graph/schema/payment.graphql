@@ -1,0 +1,69 @@
+type Transaction {
+  id: ID!
+  userId: String!
+  type: String!
+  amount: Float!
+  currency: String!
+  status: String!
+  description: String
+  referenceId: String
+  referenceType: String
+  paymentGateway: String
+  gatewayTxnId: String
+  platformFee: Float!
+  educatorEarning: Float!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type Invoice {
+  id: ID!
+  userId: String!
+  invoiceNo: String!
+  amount: Float!
+  tax: Float!
+  totalAmount: Float!
+  status: String!
+  dueDate: Time!
+  paidAt: Time
+  createdAt: Time!
+}
+
+type TransactionList {
+  transactions: [Transaction!]!
+  totalCount: Int!
+}
+
+type InvoiceList {
+  invoices: [Invoice!]!
+  totalCount: Int!
+}
+
+input CreateTransactionInput {
+  type: String!
+  amount: Float!
+  currency: String!
+  description: String
+  referenceId: String
+  referenceType: String
+}
+
+input CreateInvoiceInput {
+  amount: Float!
+  tax: Float!
+  dueDate: Time!
+}
+
+type Query {
+  transaction(id: ID!): Transaction
+  myTransactions(limit: Int, offset: Int): TransactionList!
+  myInvoices(limit: Int, offset: Int): InvoiceList!
+}
+
+type Mutation {
+  createTransaction(input: CreateTransactionInput!): Transaction!
+  updateTransactionStatus(id: ID!, status: String!): Transaction!
+  createInvoice(input: CreateInvoiceInput!): Invoice!
+}
+
+scalar Time

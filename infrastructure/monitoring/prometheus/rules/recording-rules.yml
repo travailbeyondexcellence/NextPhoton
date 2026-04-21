@@ -1,0 +1,341 @@
+# Recording Rules for NextPhoton EduCare Platform
+# Pre-computed metrics for efficient querying and dashboards
+# These rules aggregate raw metrics into useful summaries
+
+groups:
+  # Request Rate Recording Rules
+  - name: nextphoton-request-rates
+    interval: 30s
+    rules:
+      # Total request rate per service
+      - record: nextphoton:request_rate:by_service
+        expr: sum(rate(nextphoton_requests_total[5m])) by (service)
+
+      # Total request rate per service and method
+      - record: nextphoton:request_rate:by_service_method
+        expr: sum(rate(nextphoton_requests_total[5m])) by (service, method)
+
+      # Total request rate per service and endpoint
+      - record: nextphoton:request_rate:by_service_endpoint
+        expr: sum(rate(nextphoton_requests_total[5m])) by (service, endpoint)
+
+      # Total request rate per status code
+      - record: nextphoton:request_rate:by_status
+        expr: sum(rate(nextphoton_requests_total[5m])) by (service, status)
+
+      # Overall platform request rate
+      - record: nextphoton:request_rate:total
+        expr: sum(rate(nextphoton_requests_total[5m]))
+
+  # Error Rate Recording Rules
+  - name: nextphoton-error-rates
+    interval: 30s
+    rules:
+      # Error rate per service (5xx responses)
+      - record: nextphoton:error_rate:by_service
+        expr: |
+          sum(rate(nextphoton_requests_total{status=~"5.."}[5m])) by (service)
+          /
+          sum(rate(nextphoton_requests_total[5m])) by (service)
+
+      # Client error rate per service (4xx responses)
+      - record: nextphoton:client_error_rate:by_service
+        expr: |
+          sum(rate(nextphoton_requests_total{status=~"4.."}[5m])) by (service)
+          /
+          sum(rate(nextphoton_requests_total[5m])) by (service)
+
+      # Error rate by error type
+      - record: nextphoton:error_rate:by_type
+        expr: sum(rate(nextphoton_errors_total[5m])) by (service, error_type)
+
+      # Overall platform error rate
+      - record: nextphoton:error_rate:total
+        expr: |
+          sum(rate(nextphoton_requests_total{status=~"5.."}[5m]))
+          /
+          sum(rate(nextphoton_requests_total[5m]))
+
+  # Latency Recording Rules
+  - name: nextphoton-latencies
+    interval: 30s
+    rules:
+      # P50 latency per service
+      - record: nextphoton:latency_p50:by_service
+        expr: |
+          histogram_quantile(0.50,
+            sum(rate(nextphoton_request_duration_seconds_bucket[5m])) by (le, service)
+          )
+
+      # P90 latency per service
+      - record: nextphoton:latency_p90:by_service
+        expr: |
+          histogram_quantile(0.90,
+            sum(rate(nextphoton_request_duration_seconds_bucket[5m])) by (le, service)
+          )
+
+      # P95 latency per service
+      - record: nextphoton:latency_p95:by_service
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(nextphoton_request_duration_seconds_bucket[5m])) by (le, service)
+          )
+
+      # P99 latency per service
+      - record: nextphoton:latency_p99:by_service
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(nextphoton_request_duration_seconds_bucket[5m])) by (le, service)
+          )
+
+      # Average latency per service
+      - record: nextphoton:latency_avg:by_service
+        expr: |
+          sum(rate(nextphoton_request_duration_seconds_sum[5m])) by (service)
+          /
+          sum(rate(nextphoton_request_duration_seconds_count[5m])) by (service)
+
+      # P95 latency by endpoint
+      - record: nextphoton:latency_p95:by_endpoint
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(nextphoton_request_duration_seconds_bucket[5m])) by (le, service, endpoint)
+          )
+
+  # SLO Recording Rules
+  - name: nextphoton-slo-metrics
+    interval: 1m
+    rules:
+      # Availability SLI (successful requests / total requests)
+      - record: nextphoton:slo:availability
+        expr: |
+          1 - (
+            sum(rate(nextphoton_requests_total{status=~"5.."}[5m])) by (service)
+            /
+            sum(rate(nextphoton_requests_total[5m])) by (service)
+          )
+
+      # Availability over 30 days (for SLO tracking)
+      - record: nextphoton:slo:availability_30d
+        expr: |
+          1 - (
+            sum(increase(nextphoton_requests_total{status=~"5.."}[30d])) by (service)
+            /
+            sum(increase(nextphoton_requests_total[30d])) by (service)
+          )
+
+      # Latency SLI (requests under 500ms / total requests)
+      - record: nextphoton:slo:latency
+        expr: |
+          sum(rate(nextphoton_request_duration_seconds_bucket{le="0.5"}[5m])) by (service)
+          /
+          sum(rate(nextphoton_request_duration_seconds_count[5m])) by (service)
+
+      # Error budget remaining (assuming 99.9% SLO)
+      - record: nextphoton:slo:error_budget_remaining
+        expr: |
+          1 - (
+            (1 - nextphoton:slo:availability_30d)
+            /
+            (1 - 0.999)
+          )
+
+      # Error budget burn rate (how fast we're consuming error budget)
+      - record: nextphoton:slo:error_budget_burn_rate
+        expr: |
+          (
+            sum(rate(nextphoton_requests_total{status=~"5.."}[1h])) by (service)
+            /
+            sum(rate(nextphoton_requests_total[1h])) by (service)
+          )
+          /
+          0.001
+
+  # Business Metrics Recording Rules
+  - name: nextphoton-business-metrics
+    interval: 1m
+    rules:
+      # Active sessions count
+      - record: nextphoton:business:active_sessions
+        expr: nextphoton_active_sessions
+
+      # Session booking rate
+      - record: nextphoton:business:session_booking_rate
+        expr: sum(rate(nextphoton_session_bookings_total[1h])) by (type, status)
+
+      # Successful bookings per hour
+      - record: nextphoton:business:successful_bookings_per_hour
+        expr: sum(increase(nextphoton_session_bookings_total{status="success"}[1h]))
+
+      # Payment success rate
+      - record: nextphoton:business:payment_success_rate
+        expr: |
+          sum(rate(nextphoton_payment_transactions_total{status="success"}[1h]))
+          /
+          sum(rate(nextphoton_payment_transactions_total[1h]))
+
+      # Payment volume per gateway
+      - record: nextphoton:business:payment_volume_per_gateway
+        expr: sum(rate(nextphoton_payment_transactions_total[1h])) by (gateway)
+
+      # Average payment amount
+      - record: nextphoton:business:avg_payment_amount
+        expr: |
+          sum(rate(nextphoton_payment_amount_sum[1h])) by (gateway, currency)
+          /
+          sum(rate(nextphoton_payment_amount_count[1h])) by (gateway, currency)
+
+      # User registration rate
+      - record: nextphoton:business:user_registration_rate
+        expr: sum(rate(nextphoton_user_registrations_total[1h])) by (role)
+
+      # Active users (users with activity in last 24h)
+      - record: nextphoton:business:active_users_24h
+        expr: nextphoton_active_users_gauge
+
+  # Database Performance Recording Rules
+  - name: nextphoton-database-performance
+    interval: 30s
+    rules:
+      # Connection pool utilization
+      - record: nextphoton:db:pool_utilization
+        expr: |
+          nextphoton_db_pool_connections_used
+          /
+          nextphoton_db_pool_connections_max
+
+      # Query rate per service
+      - record: nextphoton:db:query_rate
+        expr: sum(rate(nextphoton_db_queries_total[5m])) by (service, operation)
+
+      # Average query duration
+      - record: nextphoton:db:query_duration_avg
+        expr: |
+          sum(rate(nextphoton_db_query_duration_seconds_sum[5m])) by (service)
+          /
+          sum(rate(nextphoton_db_query_duration_seconds_count[5m])) by (service)
+
+      # P95 query duration
+      - record: nextphoton:db:query_duration_p95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(nextphoton_db_query_duration_seconds_bucket[5m])) by (le, service)
+          )
+
+      # Transaction rate
+      - record: nextphoton:db:transaction_rate
+        expr: sum(rate(nextphoton_db_transactions_total[5m])) by (service, status)
+
+  # NATS Queue Performance Recording Rules
+  - name: nextphoton-queue-performance
+    interval: 30s
+    rules:
+      # Message publish rate
+      - record: nextphoton:nats:publish_rate
+        expr: sum(rate(nats_jetstream_publish_total[5m])) by (stream)
+
+      # Message consume rate
+      - record: nextphoton:nats:consume_rate
+        expr: sum(rate(nats_jetstream_consumer_num_ack_pending[5m])) by (stream, consumer)
+
+      # Queue depth
+      - record: nextphoton:nats:queue_depth
+        expr: sum(nats_jetstream_consumer_num_pending) by (stream, consumer)
+
+      # Consumer lag (pending acknowledgments)
+      - record: nextphoton:nats:consumer_lag
+        expr: sum(nats_jetstream_consumer_num_ack_pending) by (stream, consumer)
+
+      # Stream message count
+      - record: nextphoton:nats:stream_messages
+        expr: nats_jetstream_stream_state_messages
+
+  # Infrastructure Recording Rules
+  - name: nextphoton-infrastructure
+    interval: 30s
+    rules:
+      # CPU utilization per pod
+      - record: nextphoton:infra:cpu_utilization
+        expr: |
+          sum(rate(container_cpu_usage_seconds_total{namespace="nextphoton"}[5m])) by (pod)
+          /
+          sum(kube_pod_container_resource_limits{resource="cpu", namespace="nextphoton"}) by (pod)
+
+      # Memory utilization per pod
+      - record: nextphoton:infra:memory_utilization
+        expr: |
+          sum(container_memory_working_set_bytes{namespace="nextphoton"}) by (pod)
+          /
+          sum(kube_pod_container_resource_limits{resource="memory", namespace="nextphoton"}) by (pod)
+
+      # Network receive rate per pod
+      - record: nextphoton:infra:network_receive_rate
+        expr: sum(rate(container_network_receive_bytes_total{namespace="nextphoton"}[5m])) by (pod)
+
+      # Network transmit rate per pod
+      - record: nextphoton:infra:network_transmit_rate
+        expr: sum(rate(container_network_transmit_bytes_total{namespace="nextphoton"}[5m])) by (pod)
+
+      # Disk usage per PVC
+      - record: nextphoton:infra:disk_usage
+        expr: |
+          kubelet_volume_stats_used_bytes{namespace="nextphoton"}
+          /
+          kubelet_volume_stats_capacity_bytes{namespace="nextphoton"}
+
+      # Pod restart count
+      - record: nextphoton:infra:pod_restarts
+        expr: sum(increase(kube_pod_container_status_restarts_total{namespace="nextphoton"}[1h])) by (pod)
+
+  # API Gateway Recording Rules
+  - name: nextphoton-gateway
+    interval: 30s
+    rules:
+      # Gateway request rate
+      - record: nextphoton:gateway:request_rate
+        expr: sum(rate(traefik_service_requests_total[5m])) by (service)
+
+      # Gateway error rate
+      - record: nextphoton:gateway:error_rate
+        expr: |
+          sum(rate(traefik_service_requests_total{code=~"5.."}[5m])) by (service)
+          /
+          sum(rate(traefik_service_requests_total[5m])) by (service)
+
+      # Gateway latency P95
+      - record: nextphoton:gateway:latency_p95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(traefik_service_request_duration_seconds_bucket[5m])) by (le, service)
+          )
+
+      # Gateway open connections
+      - record: nextphoton:gateway:open_connections
+        expr: sum(traefik_service_open_connections) by (service)
+
+      # Rate limited requests
+      - record: nextphoton:gateway:rate_limited
+        expr: sum(rate(traefik_service_requests_total{code="429"}[5m]))
+
+  # Redis Performance Recording Rules
+  - name: nextphoton-redis
+    interval: 30s
+    rules:
+      # Redis operations rate
+      - record: nextphoton:redis:ops_rate
+        expr: sum(rate(redis_commands_processed_total[5m]))
+
+      # Redis memory utilization
+      - record: nextphoton:redis:memory_utilization
+        expr: redis_memory_used_bytes / redis_memory_max_bytes
+
+      # Redis hit rate
+      - record: nextphoton:redis:hit_rate
+        expr: |
+          rate(redis_keyspace_hits_total[5m])
+          /
+          (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m]))
+
+      # Redis connected clients
+      - record: nextphoton:redis:connected_clients
+        expr: redis_connected_clients

@@ -1,0 +1,246 @@
+---
+# Session Service Deployment
+# Manages tutoring sessions between Educators and Learners
+# Handles scheduling, real-time session state, WebRTC signaling
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-service
+  namespace: nextphoton
+  labels:
+    app: session-service
+    component: session
+    tier: backend
+    version: v1
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: session-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: session-service
+        component: session
+        tier: backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: session-service
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: session-service
+                topologyKey: kubernetes.io/hostname
+      containers:
+        - name: session-service
+          image: ghcr.io/nextphoton/session-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            - containerPort: 50051
+              name: grpc
+              protocol: TCP
+            - containerPort: 8443
+              name: websocket
+              protocol: TCP
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: environment
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: log-level
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: database-url
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: nats-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: redis-url
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: otel-endpoint
+            - name: WEBRTC_STUN_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: webrtc-stun-servers
+            - name: WEBRTC_TURN_SERVER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: webrtc-turn-server
+            - name: WEBRTC_TURN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: webrtc-secrets
+                  key: turn-username
+                  optional: true
+            - name: WEBRTC_TURN_CREDENTIAL
+              valueFrom:
+                secretKeyRef:
+                  name: webrtc-secrets
+                  key: turn-credential
+                  optional: true
+          resources:
+            requests:
+              cpu: 150m
+              memory: 256Mi
+            limits:
+              cpu: 750m
+              memory: 768Mi
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      imagePullSecrets:
+        - name: ghcr-credentials
+---
+# Pod Disruption Budget for Session Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: session-service-pdb
+  namespace: nextphoton
+  labels:
+    app: session-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: session-service
+---
+# Horizontal Pod Autoscaler for Session Service
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: session-service-hpa
+  namespace: nextphoton
+  labels:
+    app: session-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: session-service
+  minReplicas: 2
+  maxReplicas: 8
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    # Custom metric for active sessions
+    - type: Pods
+      pods:
+        metric:
+          name: active_sessions_count
+        target:
+          type: AverageValue
+          averageValue: "50"
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
+---
+# Service Account for Session Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: session-service
+  namespace: nextphoton
+  labels:
+    app: session-service

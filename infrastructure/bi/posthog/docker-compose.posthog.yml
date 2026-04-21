@@ -1,0 +1,265 @@
+# NextPhoton PostHog Self-Hosted Configuration
+# Product Analytics, Feature Flags, Session Recording, and A/B Testing
+#
+# Usage:
+#   docker-compose -f docker-compose.posthog.yml up -d
+#
+# Environment Variables Required:
+#   - POSTHOG_SECRET: Secret key for encryption (generate with: openssl rand -hex 32)
+#   - POSTHOG_POSTGRES_PASSWORD: PostgreSQL password
+#   - POSTHOG_REDIS_PASSWORD: Redis password (optional)
+#
+# Access PostHog at: http://localhost:8000
+# Default first user becomes admin
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # PostHog Application Server
+  # =============================================================================
+  posthog:
+    image: posthog/posthog:release-1.43.0
+    container_name: nextphoton-posthog
+    restart: unless-stopped
+    depends_on:
+      - posthog-db
+      - posthog-redis
+      - posthog-clickhouse
+      - posthog-kafka
+      - posthog-zookeeper
+    ports:
+      - "8000:8000"
+    environment:
+      # Database Configuration
+      DATABASE_URL: postgres://posthog:${POSTHOG_POSTGRES_PASSWORD:-posthog}@posthog-db:5432/posthog
+      REDIS_URL: redis://posthog-redis:6379
+      CLICKHOUSE_HOST: posthog-clickhouse
+      CLICKHOUSE_DATABASE: posthog
+      KAFKA_HOSTS: posthog-kafka:9092
+
+      # Security
+      SECRET_KEY: ${POSTHOG_SECRET:-this_is_a_dev_secret_key_change_in_production}
+
+      # Site Configuration
+      SITE_URL: ${POSTHOG_SITE_URL:-http://localhost:8000}
+      JS_URL: ${POSTHOG_JS_URL:-http://localhost:8000}
+
+      # Feature Flags
+      POSTHOG_FEATURE_FLAGS_ENABLED: "true"
+
+      # Session Recording
+      SESSION_RECORDING_ENABLED: "true"
+
+      # Email Configuration (optional)
+      EMAIL_HOST: ${EMAIL_HOST:-}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_HOST_USER: ${EMAIL_HOST_USER:-}
+      EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
+      EMAIL_USE_TLS: "true"
+      DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-noreply@nextphoton.com}
+
+      # Performance
+      ASYNC_EVENT_CONSUMER_WORKERS: 4
+      WORKER_CONCURRENCY: 4
+
+      # Debug (disable in production)
+      DEBUG: ${DEBUG:-false}
+
+    volumes:
+      - posthog_data:/var/lib/posthog
+    networks:
+      - nextphoton-bi
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/_health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # =============================================================================
+  # PostHog Worker (Background Jobs)
+  # =============================================================================
+  posthog-worker:
+    image: posthog/posthog:release-1.43.0
+    container_name: nextphoton-posthog-worker
+    restart: unless-stopped
+    depends_on:
+      - posthog-db
+      - posthog-redis
+      - posthog-clickhouse
+      - posthog-kafka
+    command: ./bin/docker-worker-celery --with-scheduler
+    environment:
+      DATABASE_URL: postgres://posthog:${POSTHOG_POSTGRES_PASSWORD:-posthog}@posthog-db:5432/posthog
+      REDIS_URL: redis://posthog-redis:6379
+      CLICKHOUSE_HOST: posthog-clickhouse
+      CLICKHOUSE_DATABASE: posthog
+      KAFKA_HOSTS: posthog-kafka:9092
+      SECRET_KEY: ${POSTHOG_SECRET:-this_is_a_dev_secret_key_change_in_production}
+      WORKER_CONCURRENCY: 2
+    networks:
+      - nextphoton-bi
+
+  # =============================================================================
+  # PostHog Plugin Server (Apps & Integrations)
+  # =============================================================================
+  posthog-plugins:
+    image: posthog/posthog:release-1.43.0
+    container_name: nextphoton-posthog-plugins
+    restart: unless-stopped
+    depends_on:
+      - posthog-db
+      - posthog-redis
+      - posthog-clickhouse
+      - posthog-kafka
+    command: ./bin/plugin-server --no-restart-loop
+    environment:
+      DATABASE_URL: postgres://posthog:${POSTHOG_POSTGRES_PASSWORD:-posthog}@posthog-db:5432/posthog
+      REDIS_URL: redis://posthog-redis:6379
+      CLICKHOUSE_HOST: posthog-clickhouse
+      CLICKHOUSE_DATABASE: posthog
+      KAFKA_HOSTS: posthog-kafka:9092
+      SECRET_KEY: ${POSTHOG_SECRET:-this_is_a_dev_secret_key_change_in_production}
+    networks:
+      - nextphoton-bi
+
+  # =============================================================================
+  # PostgreSQL Database (Metadata Storage)
+  # =============================================================================
+  posthog-db:
+    image: postgres:14-alpine
+    container_name: nextphoton-posthog-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: posthog
+      POSTGRES_USER: posthog
+      POSTGRES_PASSWORD: ${POSTHOG_POSTGRES_PASSWORD:-posthog}
+    volumes:
+      - posthog_postgres_data:/var/lib/postgresql/data
+    networks:
+      - nextphoton-bi
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U posthog -d posthog"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # Redis (Caching & Task Queue)
+  # =============================================================================
+  posthog-redis:
+    image: redis:7-alpine
+    container_name: nextphoton-posthog-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - posthog_redis_data:/data
+    networks:
+      - nextphoton-bi
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # ClickHouse (Event Analytics Storage)
+  # =============================================================================
+  posthog-clickhouse:
+    image: clickhouse/clickhouse-server:23.3-alpine
+    container_name: nextphoton-posthog-clickhouse
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: posthog
+      CLICKHOUSE_USER: posthog
+      CLICKHOUSE_PASSWORD: ${POSTHOG_CLICKHOUSE_PASSWORD:-posthog}
+    volumes:
+      - posthog_clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse-config.xml:/etc/clickhouse-server/config.d/custom.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - nextphoton-bi
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # Kafka (Event Streaming)
+  # =============================================================================
+  posthog-kafka:
+    image: bitnami/kafka:3.4
+    container_name: nextphoton-posthog-kafka
+    restart: unless-stopped
+    depends_on:
+      - posthog-zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://posthog-kafka:9092
+      KAFKA_CFG_ZOOKEEPER_CONNECT: posthog-zookeeper:2181
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CFG_LOG_RETENTION_HOURS: 168
+      KAFKA_CFG_LOG_RETENTION_BYTES: 10737418240
+    volumes:
+      - posthog_kafka_data:/bitnami/kafka
+    networks:
+      - nextphoton-bi
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # =============================================================================
+  # Zookeeper (Kafka Coordination)
+  # =============================================================================
+  posthog-zookeeper:
+    image: bitnami/zookeeper:3.8
+    container_name: nextphoton-posthog-zookeeper
+    restart: unless-stopped
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+      ZOO_TICK_TIME: 2000
+      ZOO_INIT_LIMIT: 10
+      ZOO_SYNC_LIMIT: 5
+    volumes:
+      - posthog_zookeeper_data:/bitnami/zookeeper
+    networks:
+      - nextphoton-bi
+    healthcheck:
+      test: ["CMD", "zkServer.sh", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# =============================================================================
+# Named Volumes
+# =============================================================================
+volumes:
+  posthog_data:
+    name: nextphoton_posthog_data
+  posthog_postgres_data:
+    name: nextphoton_posthog_postgres_data
+  posthog_redis_data:
+    name: nextphoton_posthog_redis_data
+  posthog_clickhouse_data:
+    name: nextphoton_posthog_clickhouse_data
+  posthog_kafka_data:
+    name: nextphoton_posthog_kafka_data
+  posthog_zookeeper_data:
+    name: nextphoton_posthog_zookeeper_data
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  nextphoton-bi:
+    name: nextphoton-bi-network
+    driver: bridge

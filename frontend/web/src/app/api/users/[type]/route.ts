@@ -1,6 +1,26 @@
-// import { NextResponse } from 'next/server';
-// import prisma from '@/lib/prisma';
+/**
+ * Users API Route (Placeholder)
+ * TODO: Implement user type filtering
+ */
 
+import { NextResponse } from 'next/server';
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ type: string }> }
+) {
+  const { type } = await params;
+
+  return NextResponse.json({
+    message: 'Users API not implemented',
+    type,
+    data: []
+  });
+}
+
+// Original implementation (commented out for mock deployment):
+// import prisma from '@/lib/prisma';
+//
 // export async function GET(
 //     request: Request,
 //     { params }: { params: { type: string } }
@@ -13,7 +33,7 @@
 //             student: prisma.student,
 //             parent: prisma.parent,
 //         };
-
+//
 //         const model = modelMap[type];
 //         if (!model) {
 //             return NextResponse.json(
@@ -21,7 +41,7 @@
 //                 { status: 400 }
 //             );
 //         }
-
+//
 //         const users = await model.findMany();
 //         return NextResponse.json(users);
 //     } catch (error) {
@@ -31,4 +51,4 @@
 //             { status: 500 }
 //         );
 //     }
-// } 
+// }

@@ -5,17 +5,14 @@
   "packageManager": "bun@1.1.38",
   "workspaces": [
     "frontend/web",
-    "backend/server_NestJS",
     "shared/*"
   ],
   "scripts": {
     "web": "cd frontend/web && bun run dev",
-    "server": "cd backend/server_NestJS && bun run dev",
-    "install:all": "cd frontend/web && bun install && cd ../.. && cd backend/server_NestJS && bun install && cd ../.. && cd shared && bun install && cd ..",
+    "install:all": "cd frontend/web && bun install && cd ../.. && cd shared && bun install && cd ..",
     "install:frontend": "cd frontend/web && bun install",
-    "install:backend": "cd backend/server_NestJS && bun install",
     "install:shared": "cd shared && bun install",
-    "start:all": "turbo run dev --filter=frontend-web... --filter=backend-server... --parallel --output-logs=full",
+    "start:all": "turbo run dev --filter=frontend-web... --parallel --output-logs=full",
     "build": "turbo run build",
     "prisma:generate": "bunx prisma generate --schema=shared/prisma/schema",
     "prisma:push": "bunx prisma db push --schema=shared/prisma/schema && bunx prisma generate --schema=shared/prisma/schema",
@@ -24,7 +21,17 @@
     "prisma:studio": "bunx prisma studio --schema=shared/prisma/schema",
     "test:db": "bunx tsx shared/db/test-connection.ts",
     "test:prisma": "bun run test:db",
-    "seed:auth": "cd backend/server_NestJS && bun run seed:auth"
+    "go:auth": "cd backend/services/auth && go run ./cmd/server",
+    "go:user": "cd backend/services/user-service && go run ./cmd/server",
+    "go:session": "cd backend/services/session-service && go run ./cmd/server",
+    "go:notification": "cd backend/services/notification-service && go run ./cmd/server",
+    "go:payment": "cd backend/services/payment-service && go run ./cmd/server",
+    "go:media": "cd backend/services/media-service && go run ./cmd/server",
+    "go:analytics": "cd backend/services/analytics-service && go run ./cmd/server",
+    "go:gateway": "cd backend/api-gateway && go run ./cmd/server",
+    "docker:up": "cd backend && docker-compose up -d",
+    "docker:down": "cd backend && docker-compose down",
+    "docker:logs": "cd backend && docker-compose logs -f"
   },
   "devDependencies": {
     "@better-auth/cli": "^1.2.8",

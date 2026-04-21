@@ -1,0 +1,558 @@
+# =============================================================================
+# NextPhoton EduCare Platform - Default Values
+# =============================================================================
+# This file contains the default configuration values for the NextPhoton platform.
+# Override these values in environment-specific files (values-dev.yaml, values-staging.yaml, values-prod.yaml)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Global Configuration
+# -----------------------------------------------------------------------------
+global:
+  # Environment name (dev, staging, prod)
+  environment: development
+
+  # Container image registry
+  imageRegistry: ghcr.io/nextphoton
+
+  # Image pull secrets for private registries
+  imagePullSecrets:
+    - name: ghcr-credentials
+
+  # Default image pull policy
+  imagePullPolicy: IfNotPresent
+
+  # Namespace for all resources
+  namespace: nextphoton
+
+  # Domain configuration
+  domain: nextphoton.io
+
+  # TLS configuration
+  tls:
+    enabled: true
+    secretName: nextphoton-tls
+
+  # Monitoring configuration
+  monitoring:
+    enabled: true
+    prometheus:
+      scrape: true
+      port: 9090
+      path: /metrics
+
+  # Tracing configuration (Jaeger/OpenTelemetry)
+  tracing:
+    enabled: true
+    endpoint: "http://jaeger-collector.monitoring:14268/api/traces"
+    samplingRate: 0.1
+
+  # Logging configuration
+  logging:
+    level: info
+    format: json
+
+  # Service mesh configuration (optional)
+  serviceMesh:
+    enabled: false
+    provider: istio
+
+  # Pod security context
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+
+  # Container security context
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+# -----------------------------------------------------------------------------
+# Infrastructure Services
+# -----------------------------------------------------------------------------
+# NATS Configuration
+nats:
+  enabled: true
+  cluster:
+    enabled: true
+    replicas: 3
+  jetstream:
+    enabled: true
+    memoryStore:
+      enabled: true
+      size: 1Gi
+    fileStore:
+      enabled: true
+      size: 10Gi
+      storageClassName: standard
+  auth:
+    enabled: true
+    token: ""  # Set via external secrets
+  monitoring:
+    enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+
+# Redis Configuration
+redis:
+  enabled: true
+  architecture: replication
+  auth:
+    enabled: true
+    existingSecret: redis-credentials
+    existingSecretPasswordKey: password
+  master:
+    persistence:
+      enabled: true
+      size: 8Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  replica:
+    replicaCount: 2
+    persistence:
+      enabled: true
+      size: 8Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+  metrics:
+    enabled: true
+
+# PostgreSQL Configuration (optional - typically use NeonDB)
+postgresql:
+  enabled: false
+  auth:
+    existingSecret: postgresql-credentials
+    database: nextphoton
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+  readReplicas:
+    replicaCount: 2
+
+# -----------------------------------------------------------------------------
+# Ingress Configuration
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: api.nextphoton.io
+      paths:
+        - path: /
+          pathType: Prefix
+          service: api-gateway
+          port: 8080
+  tls:
+    - secretName: nextphoton-api-tls
+      hosts:
+        - api.nextphoton.io
+
+# -----------------------------------------------------------------------------
+# API Gateway Service
+# -----------------------------------------------------------------------------
+api-gateway:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: api-gateway
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: LOG_LEVEL
+      value: "info"
+    - name: RATE_LIMIT_ENABLED
+      value: "true"
+    - name: RATE_LIMIT_REQUESTS
+      value: "100"
+    - name: RATE_LIMIT_WINDOW
+      value: "60s"
+
+# -----------------------------------------------------------------------------
+# Auth Service
+# -----------------------------------------------------------------------------
+auth-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: auth-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: JWT_EXPIRY
+      value: "24h"
+    - name: REFRESH_TOKEN_EXPIRY
+      value: "7d"
+  secrets:
+    - name: JWT_SECRET
+      secretName: auth-secrets
+      secretKey: jwt-secret
+    - name: DATABASE_URL
+      secretName: database-credentials
+      secretKey: url
+
+# -----------------------------------------------------------------------------
+# User Service
+# -----------------------------------------------------------------------------
+user-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: user-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Session Service
+# -----------------------------------------------------------------------------
+session-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: session-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Payment Service
+# -----------------------------------------------------------------------------
+payment-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: payment-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 60
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: PAYMENT_PROVIDER
+      value: "stripe"
+
+# -----------------------------------------------------------------------------
+# Analytics Service
+# -----------------------------------------------------------------------------
+analytics-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: analytics-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+
+# -----------------------------------------------------------------------------
+# Notification Service
+# -----------------------------------------------------------------------------
+notification-service:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: notification-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: EMAIL_PROVIDER
+      value: "sendgrid"
+    - name: SMS_PROVIDER
+      value: "twilio"
+
+# -----------------------------------------------------------------------------
+# Media Service
+# -----------------------------------------------------------------------------
+media-service:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: media-service
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+    grpcPort: 9000
+    metricsPort: 9090
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 1
+  env:
+    - name: STORAGE_PROVIDER
+      value: "cloudflare-r2"
+    - name: MAX_UPLOAD_SIZE
+      value: "100MB"
+
+# -----------------------------------------------------------------------------
+# ConfigMap Settings
+# -----------------------------------------------------------------------------
+configMap:
+  # Common configuration shared across services
+  common:
+    NATS_URL: "nats://nats:4222"
+    REDIS_URL: "redis://redis-master:6379"
+    OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4317"
+    ENVIRONMENT: "development"
+
+# -----------------------------------------------------------------------------
+# External Secrets Configuration
+# -----------------------------------------------------------------------------
+externalSecrets:
+  enabled: true
+  refreshInterval: 1h
+  secretStore:
+    name: vault-backend
+    kind: ClusterSecretStore
+  secrets:
+    - name: database-credentials
+      remoteRef:
+        key: nextphoton/database
+        property: url
+    - name: auth-secrets
+      remoteRef:
+        key: nextphoton/auth
+    - name: redis-credentials
+      remoteRef:
+        key: nextphoton/redis
+    - name: nats-credentials
+      remoteRef:
+        key: nextphoton/nats
+    - name: payment-secrets
+      remoteRef:
+        key: nextphoton/payments
+    - name: notification-secrets
+      remoteRef:
+        key: nextphoton/notifications
+
+# -----------------------------------------------------------------------------
+# Service Account Configuration
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: nextphoton-sa
+  annotations:
+    # For AWS IAM roles for service accounts (IRSA)
+    # eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/nextphoton-role
+    # For GCP Workload Identity
+    # iam.gke.io/gcp-service-account: nextphoton@PROJECT.iam.gserviceaccount.com
+
+# -----------------------------------------------------------------------------
+# Network Policies
+# -----------------------------------------------------------------------------
+networkPolicies:
+  enabled: true
+  # Allow traffic only within namespace by default
+  defaultDeny: true
+
+# -----------------------------------------------------------------------------
+# Pod Annotations
+# -----------------------------------------------------------------------------
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9090"
+  prometheus.io/path: "/metrics"
+
+# -----------------------------------------------------------------------------
+# Node Selector (optional)
+# -----------------------------------------------------------------------------
+nodeSelector: {}
+
+# -----------------------------------------------------------------------------
+# Tolerations (optional)
+# -----------------------------------------------------------------------------
+tolerations: []
+
+# -----------------------------------------------------------------------------
+# Affinity Rules (optional)
+# -----------------------------------------------------------------------------
+affinity: {}
+
+# -----------------------------------------------------------------------------
+# Priority Class
+# -----------------------------------------------------------------------------
+priorityClassName: ""
+
+# -----------------------------------------------------------------------------
+# Migration Job Configuration
+# -----------------------------------------------------------------------------
+migrations:
+  enabled: true
+  image:
+    repository: migrations
+    tag: "1.0.0"
+  backoffLimit: 3
+  activeDeadlineSeconds: 300

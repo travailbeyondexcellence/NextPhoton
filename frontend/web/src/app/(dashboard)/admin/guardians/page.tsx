@@ -3,8 +3,8 @@
 import React from "react";
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from "react";
-import GuardiansCardsView_forAdmin from "@/components/GuardiansCardsView_forAdmin";
-import GuardiansList_forAdmin from "@/components/GuardiansList_forAdmin";
+import GuardiansCardsView_forAdmin from "@/components/admin/guardians/GuardiansCardsView_forAdmin";
+import GuardiansList_forAdmin from "@/components/admin/guardians/GuardiansList_forAdmin";
 import { LayoutGrid, List, UserPlus, Users } from "lucide-react";
 
 const Guardians = () => {

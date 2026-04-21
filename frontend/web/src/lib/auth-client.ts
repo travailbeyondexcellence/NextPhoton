@@ -1,8 +1,8 @@
 /**
- * Authentication Client for NestJS JWT Backend
- * 
- * This client handles authentication with the NestJS backend
- * using JWT tokens for session management.
+ * Authentication Client for Go JWT Backend
+ *
+ * This client handles authentication with the Go auth service
+ * via the API Gateway using JWT tokens for session management.
  * 
  * Features:
  * - User registration and login
@@ -14,8 +14,8 @@
 
 import { z } from 'zod';
 
-// Define the backend API URL
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:963';
+// Define the backend API URL (Go API Gateway)
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3960';
 
 // Token storage keys
 const TOKEN_KEY = 'nextphoton_access_token';

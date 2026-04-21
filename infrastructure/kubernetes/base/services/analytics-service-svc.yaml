@@ -1,0 +1,29 @@
+---
+# Analytics Service
+# Internal service for analytics processing
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: nextphoton
+  labels:
+    app: analytics-service
+    component: analytics
+    tier: backend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  selector:
+    app: analytics-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  sessionAffinity: None

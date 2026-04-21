@@ -1,0 +1,245 @@
+---
+# NextPhoton Ingress Configuration
+# NGINX Ingress Controller with TLS termination
+# Routes external traffic to internal services via API Gateway
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextphoton-ingress
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+    component: ingress
+  annotations:
+    # Ingress class
+    kubernetes.io/ingress.class: nginx
+
+    # SSL/TLS Configuration
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # Proxy settings
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+
+    # WebSocket support
+    nginx.ingress.kubernetes.io/websocket-services: "session-service"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "50"
+
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://nextphoton.com,https://app.nextphoton.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-Request-ID"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "86400"
+
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Permissions-Policy: geolocation=(), microphone=(), camera=()";
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.nextphoton.com
+        - ws.nextphoton.com
+      secretName: nextphoton-tls
+  rules:
+    # Main API endpoint
+    - host: api.nextphoton.com
+      http:
+        paths:
+          # API Gateway - main entry point
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          # Direct service routes (if needed for debugging/admin)
+          - path: /api/v1/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          - path: /api/v1/users
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          - path: /api/v1/sessions
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          - path: /api/v1/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          - path: /api/v1/notifications
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          - path: /api/v1/analytics
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          - path: /api/v1/media
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          # Health check endpoint
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+          # Stripe webhook endpoint
+          - path: /webhooks/stripe
+            pathType: Prefix
+            backend:
+              service:
+                name: api-gateway
+                port:
+                  number: 80
+
+    # WebSocket endpoint for real-time features
+    - host: ws.nextphoton.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: session-service
+                port:
+                  number: 8443
+---
+# WebSocket Ingress with specific annotations
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextphoton-ws-ingress
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+    component: ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+    # WebSocket specific settings
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+
+    # Required for WebSocket upgrade
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_http_version 1.1;
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ws.nextphoton.com
+      secretName: nextphoton-ws-tls
+  rules:
+    - host: ws.nextphoton.com
+      http:
+        paths:
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: session-service
+                port:
+                  number: 8443
+          - path: /socket.io
+            pathType: Prefix
+            backend:
+              service:
+                name: session-service
+                port:
+                  number: 8443
+---
+# Network Policy for Ingress
+# Only allows traffic from ingress controller to services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress
+  namespace: nextphoton
+  labels:
+    app: nextphoton
+    component: network
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow traffic from ingress-nginx namespace
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8443
+    # Allow internal pod-to-pod communication
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: nextphoton
+      ports:
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 50051
+        - protocol: TCP
+          port: 9090

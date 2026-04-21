@@ -1,0 +1,33 @@
+---
+# Payment Service
+# Internal service for payment processing
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: nextphoton
+  labels:
+    app: payment-service
+    component: payment
+    tier: backend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP
+  selector:
+    app: payment-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+      protocol: TCP
+    - name: metrics
+      port: 9090
+      targetPort: 9090
+      protocol: TCP
+  sessionAffinity: None

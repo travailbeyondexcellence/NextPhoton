@@ -11,11 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-const AdminPage = ({
-  searchParams,
-}: {
-  searchParams: { [keys: string]: string | undefined };
-}) => {
+const AdminPage = () => {
   const router = useRouter()
 
   // Handler for Create Course button - navigates to academic plans premade section

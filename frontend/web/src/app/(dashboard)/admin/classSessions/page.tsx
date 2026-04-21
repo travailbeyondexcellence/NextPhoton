@@ -76,7 +76,7 @@ export default function ClassSessionsPage() {
   }
 
   const getStatusBadge = (status: string) => {
-    const statusClasses = {
+    const statusClasses: Record<string, string> = {
       live: "bg-red-500/20 text-red-300 border-red-500/50",
       scheduled: "bg-blue-500/20 text-blue-300 border-blue-500/50",
       completed: "bg-green-500/20 text-green-300 border-green-500/50",
@@ -84,7 +84,7 @@ export default function ClassSessionsPage() {
     }
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${statusClasses[status]}`}>
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${statusClasses[status] || 'bg-gray-500/20 text-gray-400'}`}>
         {getStatusIcon(status)}
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>

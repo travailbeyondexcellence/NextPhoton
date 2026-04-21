@@ -1,0 +1,82 @@
+[
+  {
+    "id": "user001",
+    "email": "admin@nextphoton.com",
+    "password": "$2b$10$hashedPasswordForAdmin123",
+    "name": "Admin User",
+    "roles": ["admin"],
+    "emailVerified": true,
+    "createdAt": "2024-01-01T00:00:00Z",
+    "updatedAt": "2025-09-15T10:00:00Z"
+  },
+  {
+    "id": "user002",
+    "email": "priya.sharma@nextphoton.com",
+    "password": "$2b$10$hashedPasswordForEducator1",
+    "name": "Priya Sharma",
+    "roles": ["educator"],
+    "emailVerified": true,
+    "createdAt": "2024-01-15T08:30:00Z",
+    "updatedAt": "2025-09-20T10:15:00Z"
+  },
+  {
+    "id": "user003",
+    "email": "anand.iyer@nextphoton.com",
+    "password": "$2b$10$hashedPasswordForEducator2",
+    "name": "Anand Iyer",
+    "roles": ["educator"],
+    "emailVerified": true,
+    "createdAt": "2024-02-20T09:00:00Z",
+    "updatedAt": "2025-09-18T14:20:00Z"
+  },
+  {
+    "id": "user004",
+    "email": "rajesh.mehta@example.com",
+    "password": "$2b$10$hashedPasswordForGuardian1",
+    "name": "Rajesh Mehta",
+    "roles": ["guardian"],
+    "emailVerified": true,
+    "createdAt": "2024-06-01T10:00:00Z",
+    "updatedAt": "2025-09-20T14:30:00Z"
+  },
+  {
+    "id": "user005",
+    "email": "aarav.mehta@student.nextphoton.com",
+    "password": "$2b$10$hashedPasswordForLearner1",
+    "name": "Aarav Mehta",
+    "roles": ["learner"],
+    "emailVerified": true,
+    "createdAt": "2024-06-01T10:00:00Z",
+    "updatedAt": "2025-09-20T14:30:00Z"
+  },
+  {
+    "id": "user006",
+    "email": "ecm@nextphoton.com",
+    "password": "$2b$10$hashedPasswordForECM",
+    "name": "EduCare Manager",
+    "roles": ["ecm"],
+    "emailVerified": true,
+    "createdAt": "2024-01-10T09:00:00Z",
+    "updatedAt": "2025-09-10T11:00:00Z"
+  },
+  {
+    "id": "user007",
+    "email": "employee@nextphoton.com",
+    "password": "$2b$10$hashedPasswordForEmployee",
+    "name": "General Employee",
+    "roles": ["employee"],
+    "emailVerified": true,
+    "createdAt": "2024-02-01T10:00:00Z",
+    "updatedAt": "2025-09-05T15:00:00Z"
+  },
+  {
+    "id": "user008",
+    "email": "intern@nextphoton.com",
+    "password": "$2b$10$hashedPasswordForIntern",
+    "name": "Intern User",
+    "roles": ["intern"],
+    "emailVerified": false,
+    "createdAt": "2024-08-01T11:00:00Z",
+    "updatedAt": "2025-09-01T12:00:00Z"
+  }
+]

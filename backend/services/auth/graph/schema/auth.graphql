@@ -1,0 +1,75 @@
+# GraphQL schema for Auth Service
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  emailVerified: Boolean!
+  image: String
+  createdAt: Time!
+  updatedAt: Time!
+  userRoles: [UserRole!]!
+}
+
+type LoginResponse {
+  accessToken: String!
+  user: User!
+}
+
+type RegisterResponse {
+  user: User!
+  accessToken: String
+  message: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input RegisterInput {
+  name: String!
+  email: String!
+  password: String!
+  role: String
+}
+
+type Query {
+  me: User
+  user(id: ID!): User
+  users(first: Int, after: String): UserConnection!
+}
+
+type Mutation {
+  login(input: LoginInput!): LoginResponse!
+  register(input: RegisterInput!): RegisterResponse!
+  logout: Boolean!
+  refreshToken: LoginResponse!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type UserRole {
+  id: ID!
+  userId: String!
+  roleId: String!
+  isActive: Boolean!
+  assignedAt: Time!
+}
+
+scalar Time

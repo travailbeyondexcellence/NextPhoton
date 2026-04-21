@@ -9,7 +9,7 @@ import {
   TeacherSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
-import { clerkClient } from "@clerk/nextjs/server";
+// import { clerkClient } from "@clerk/nextjs/server"; // Commented out for mock deployment
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -142,13 +142,15 @@ export const createTeacher = async (
   data: TeacherSchema
 ) => {
   try {
-    const user = await clerkClient().users.createUser({
-      username: data.username,
-      password: data.password,
-      firstName: data.name,
-      lastName: data.surname,
-      publicMetadata:{role:"teacher"}
-    });
+    // Mock deployment: Skip Clerk authentication
+    const user = { id: `mock-teacher-${Date.now()}` };
+    // const user = await clerkClient().users.createUser({
+    //   username: data.username,
+    //   password: data.password,
+    //   firstName: data.name,
+    //   lastName: data.surname,
+    //   publicMetadata:{role:"teacher"}
+    // });
 
     await prisma.teacher.create({
       data: {
@@ -187,12 +189,13 @@ export const updateTeacher = async (
     return { success: false, error: true };
   }
   try {
-    const user = await clerkClient().users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
-    });
+    // Mock deployment: Skip Clerk authentication
+    // const user = await clerkClient().users.updateUser(data.id, {
+    //   username: data.username,
+    //   ...(data.password !== "" && { password: data.password }),
+    //   firstName: data.name,
+    //   lastName: data.surname,
+    // });
 
     await prisma.teacher.update({
       where: {
@@ -231,7 +234,8 @@ export const deleteTeacher = async (
 ) => {
   const id = data.get("id") as string;
   try {
-    await clerkClient().users.deleteUser(id);
+    // Mock deployment: Skip Clerk authentication
+    // await clerkClient().users.deleteUser(id);
 
     await prisma.teacher.delete({
       where: {
@@ -262,13 +266,15 @@ export const createStudent = async (
       return { success: false, error: true };
     }
 
-    const user = await clerkClient().users.createUser({
-      username: data.username,
-      password: data.password,
-      firstName: data.name,
-      lastName: data.surname,
-      publicMetadata:{role:"student"}
-    });
+    // Mock deployment: Skip Clerk authentication
+    const user = { id: `mock-student-${Date.now()}` };
+    // const user = await clerkClient().users.createUser({
+    //   username: data.username,
+    //   password: data.password,
+    //   firstName: data.name,
+    //   lastName: data.surname,
+    //   publicMetadata:{role:"student"}
+    // });
 
     await prisma.student.create({
       data: {
@@ -305,12 +311,13 @@ export const updateStudent = async (
     return { success: false, error: true };
   }
   try {
-    const user = await clerkClient().users.updateUser(data.id, {
-      username: data.username,
-      ...(data.password !== "" && { password: data.password }),
-      firstName: data.name,
-      lastName: data.surname,
-    });
+    // Mock deployment: Skip Clerk authentication
+    // const user = await clerkClient().users.updateUser(data.id, {
+    //   username: data.username,
+    //   ...(data.password !== "" && { password: data.password }),
+    //   firstName: data.name,
+    //   lastName: data.surname,
+    // });
 
     await prisma.student.update({
       where: {
@@ -347,7 +354,8 @@ export const deleteStudent = async (
 ) => {
   const id = data.get("id") as string;
   try {
-    await clerkClient().users.deleteUser(id);
+    // Mock deployment: Skip Clerk authentication
+    // await clerkClient().users.deleteUser(id);
 
     await prisma.student.delete({
       where: {

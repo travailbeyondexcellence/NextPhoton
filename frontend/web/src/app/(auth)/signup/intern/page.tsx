@@ -2,36 +2,37 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signUp } from "better-auth/react"; // Assuming signUp exists and is imported like this
+// import { signUp } from "better-auth/react"; // Commented out for mock deployment
 import Link from "next/link";
 
 const InternSignupPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    try {
-      // Assuming signUp function exists and accepts email, password, and role
-      const result = await signUp({
-        email,
-        password,
-        role: "INTERN", // Specify the role
-      });
+    // Mock deployment: Skip authentication, just redirect
+    router.push("/sign-in");
 
-      if (result?.error) {
-        setError(result.error);
-      } else {
-        // Successful signup, redirect to sign-in or a welcome page
-        router.push("/sign-in");
-      }
-    } catch (error: any) {
-      setError(error.message);
-    }
+    // Original implementation (commented out for mock deployment):
+    // try {
+    //   const result = await signUp({
+    //     email,
+    //     password,
+    //     role: "INTERN",
+    //   });
+    //   if (result?.error) {
+    //     setError(result.error);
+    //   } else {
+    //     router.push("/sign-in");
+    //   }
+    // } catch (error: any) {
+    //   setError(error.message);
+    // }
   };
 
   return (

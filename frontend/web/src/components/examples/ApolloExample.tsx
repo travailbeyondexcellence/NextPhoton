@@ -57,7 +57,7 @@ export function ApolloExample() {
   const [createEducator, { loading: creating }] = useMutation(CREATE_EDUCATOR, {
     // Optimistically update the cache
     update(cache, { data: { createEducator } }) {
-      const existing = cache.readQuery({ query: GET_EDUCATORS });
+      const existing = cache.readQuery({ query: GET_EDUCATORS }) as any;
       if (existing) {
         cache.writeQuery({
           query: GET_EDUCATORS,

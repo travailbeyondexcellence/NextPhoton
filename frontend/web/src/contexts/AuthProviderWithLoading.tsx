@@ -96,7 +96,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
    */
   const login = useCallback(async (credentials: LoginCredentials) => {
     // Start loading
-    const loadingKey = startLoading('auth-login', 'Signing in...');
+    startLoading('auth-login', 'Signing in...');
 
     try {
       const response = await authService.login(credentials);
@@ -121,7 +121,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
       throw error;
     } finally {
       // Always stop loading
-      stopLoading(loadingKey);
+      stopLoading('auth-login');
     }
   }, [router, startLoading, stopLoading]);
 
@@ -130,7 +130,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
    */
   const register = useCallback(async (data: RegisterData) => {
     // Start loading
-    const loadingKey = startLoading('auth-register', 'Creating your account...');
+    startLoading('auth-register', 'Creating your account...');
 
     try {
       const response = await authService.register(data);
@@ -154,7 +154,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
       throw error;
     } finally {
       // Always stop loading
-      stopLoading(loadingKey);
+      stopLoading('auth-register');
     }
   }, [router, startLoading, stopLoading]);
 
@@ -163,7 +163,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
    */
   const logout = useCallback(async () => {
     // Start loading
-    const loadingKey = startLoading('auth-logout', 'Signing out...');
+    startLoading('auth-logout', 'Signing out...');
 
     try {
       await authService.logout();
@@ -176,7 +176,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
       router.push('/sign-in');
     } finally {
       // Always stop loading
-      stopLoading(loadingKey);
+      stopLoading('auth-logout');
     }
   }, [router, startLoading, stopLoading]);
 
@@ -184,7 +184,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
    * Refresh user profile
    */
   const refreshUser = useCallback(async () => {
-    const loadingKey = startLoading('auth-refresh', 'Refreshing profile...');
+    startLoading('auth-refresh', 'Refreshing profile...');
 
     try {
       const profile = await authService.getProfile();
@@ -193,7 +193,7 @@ export function AuthProviderInner({ children }: { children: React.ReactNode }) {
       console.error('Failed to refresh user:', error);
       throw error;
     } finally {
-      stopLoading(loadingKey);
+      stopLoading('auth-refresh');
     }
   }, [startLoading, stopLoading]);
 

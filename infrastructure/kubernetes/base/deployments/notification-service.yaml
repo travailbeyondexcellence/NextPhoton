@@ -1,0 +1,212 @@
+---
+# Notification Service Deployment
+# Handles all notifications: push, email, SMS, in-app
+# Event-driven processing via NATS JetStream
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service
+  namespace: nextphoton
+  labels:
+    app: notification-service
+    component: notification
+    tier: backend
+    version: v1
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: notification-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: notification-service
+        component: notification
+        tier: backend
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: notification-service
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: notification-service
+          image: ghcr.io/nextphoton/notification-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: APP_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: environment
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: log-level
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: database-url
+            - name: NATS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: nats-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: redis-url
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: otel-endpoint
+            # Email provider (SendGrid/Resend)
+            - name: EMAIL_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: email-provider
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: sendgrid-api-key
+                  optional: true
+            - name: RESEND_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: resend-api-key
+                  optional: true
+            # SMS provider (Twilio)
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: twilio-account-sid
+                  optional: true
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: twilio-auth-token
+                  optional: true
+            - name: TWILIO_PHONE_NUMBER
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: twilio-phone-number
+                  optional: true
+            # Push notifications (Firebase)
+            - name: FIREBASE_PROJECT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: firebase-project-id
+                  optional: true
+            - name: FIREBASE_CREDENTIALS
+              valueFrom:
+                secretKeyRef:
+                  name: notification-secrets
+                  key: firebase-credentials
+                  optional: true
+            # Processing configuration
+            - name: NOTIFICATION_BATCH_SIZE
+              value: "100"
+            - name: NOTIFICATION_WORKERS
+              value: "5"
+            - name: NOTIFICATION_RETRY_ATTEMPTS
+              value: "3"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 384Mi
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health/startup
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      imagePullSecrets:
+        - name: ghcr-credentials
+---
+# Pod Disruption Budget for Notification Service
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: notification-service-pdb
+  namespace: nextphoton
+  labels:
+    app: notification-service
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: notification-service
+---
+# Service Account for Notification Service
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: notification-service
+  namespace: nextphoton
+  labels:
+    app: notification-service

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import glassThemes from '@/../../glass-themes.json';
-import modernThemes from '@/../../modern-themes.json';
+import glassThemes from '../../../../glass-themes.json';
+import modernThemes from '../../../../modern-themes.json';
 
 /**
  * GET /api/themes

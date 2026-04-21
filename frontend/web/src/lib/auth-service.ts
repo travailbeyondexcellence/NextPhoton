@@ -2,7 +2,7 @@
  * Authentication Service for Frontend
  * 
  * This service handles all authentication-related operations
- * by communicating with the NestJS backend JWT authentication endpoints.
+ * by communicating with the Go auth service JWT authentication endpoints.
  * 
  * Features:
  * - User registration
@@ -49,8 +49,8 @@ class AuthService {
   private userKey = 'nextphoton_user';
 
   constructor() {
-    // Use environment variable or default to localhost
-    this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:963';
+    // Use environment variable or default to Next.js GraphQL API
+    this.baseUrl = '/api/graphql';
   }
 
   /**
@@ -121,21 +121,56 @@ class AuthService {
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/auth/register`, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          query: `
+            mutation Register($input: RegisterInput!) {
+              register(input: $input) {
+                user {
+                  id
+                  name
+                  email
+                }
+                message
+              }
+            }
+          `,
+          variables: {
+            input: {
+              name: data.name,
+              email: data.email,
+              password: data.password,
+            },
+          },
+        }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+        throw new Error('Registration request failed');
       }
 
-      const authData = await response.json();
-      this.storeAuthData(authData);
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message || 'Registration failed');
+      }
+
+      // Map GraphQL response to AuthResponse format
+      const authData: AuthResponse = {
+        access_token: '', // Register doesn't return token, user needs to login
+        user: {
+          id: result.data.register.user.id,
+          email: result.data.register.user.email,
+          name: result.data.register.user.name,
+          roles: [data.role], // Use the role from registration data
+          emailVerified: false,
+        },
+      };
+
       return authData;
     } catch (error) {
       console.error('Registration error:', error);
@@ -148,20 +183,55 @@ class AuthService {
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify({
+          query: `
+            mutation Login($input: LoginInput!) {
+              login(input: $input) {
+                accessToken
+                user {
+                  id
+                  name
+                  email
+                }
+              }
+            }
+          `,
+          variables: {
+            input: {
+              email: credentials.email,
+              password: credentials.password,
+            },
+          },
+        }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        throw new Error('Login request failed');
       }
 
-      const authData = await response.json();
+      const result = await response.json();
+
+      if (result.errors) {
+        throw new Error(result.errors[0].message || 'Login failed');
+      }
+
+      // Map GraphQL response to AuthResponse format
+      const authData: AuthResponse = {
+        access_token: result.data.login.accessToken,
+        user: {
+          id: result.data.login.user.id,
+          email: result.data.login.user.email,
+          name: result.data.login.user.name,
+          roles: ['learner'], // Default role, should be returned from backend
+          emailVerified: false, // Default value, should be returned from backend
+        },
+      };
+
       this.storeAuthData(authData);
       return authData;
     } catch (error) {

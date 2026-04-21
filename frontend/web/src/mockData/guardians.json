@@ -1,0 +1,172 @@
+[
+  {
+    "id": "guard001",
+    "firstName": "Rajesh",
+    "lastName": "Mehta",
+    "email": "rajesh.mehta@example.com",
+    "phoneNumber": "+91-9876501234",
+    "relationship": "Father",
+    "occupation": "Software Engineer",
+    "address": "123 MG Road, Bangalore, Karnataka - 560001",
+    "emergencyContact": "+91-9876501235",
+    "learnerIds": ["learn001"],
+    "isActive": true,
+    "preferredContactMethod": "Email",
+    "createdAt": "2024-06-01T10:00:00Z",
+    "updatedAt": "2025-09-20T14:30:00Z",
+    "name": "Rajesh Mehta",
+    "relation": "Father",
+    "phone": "+91-9876501234",
+    "assignedLearners": ["learn001"],
+    "paymentInfo": {
+      "paymentMethod": "UPI",
+      "lastPaymentDate": "2025-09-01",
+      "paymentStatus": "Paid"
+    },
+    "communicationPreferences": {
+      "email": true,
+      "sms": false,
+      "whatsapp": true
+    },
+    "lastInteraction": "2025-09-28T10:00:00Z",
+    "profileImage": null,
+    "preferredContactTime": "Evening (6-8 PM)",
+    "notes": "Highly engaged parent. Regularly follows up on child's progress."
+  },
+  {
+    "id": "guard002",
+    "firstName": "Lakshmi",
+    "lastName": "Reddy",
+    "email": "lakshmi.reddy@example.com",
+    "phoneNumber": "+91-9876501236",
+    "relationship": "Mother",
+    "occupation": "Doctor",
+    "address": "45 Jubilee Hills, Hyderabad, Telangana - 500033",
+    "emergencyContact": "+91-9876501237",
+    "learnerIds": ["learn002"],
+    "isActive": true,
+    "preferredContactMethod": "Phone",
+    "createdAt": "2024-07-15T11:30:00Z",
+    "updatedAt": "2025-09-25T09:15:00Z",
+    "name": "Lakshmi Reddy",
+    "relation": "Mother",
+    "phone": "+91-9876501236",
+    "assignedLearners": ["learn002"],
+    "paymentInfo": {
+      "paymentMethod": "Credit Card",
+      "lastPaymentDate": "2025-09-05",
+      "paymentStatus": "Paid"
+    },
+    "communicationPreferences": {
+      "email": true,
+      "sms": true,
+      "whatsapp": true
+    },
+    "lastInteraction": "2025-10-01T15:30:00Z",
+    "profileImage": null,
+    "preferredContactTime": "Morning (9-11 AM)",
+    "notes": "Very supportive. Always available for discussions."
+  },
+  {
+    "id": "guard003",
+    "firstName": "Suresh",
+    "lastName": "Singh",
+    "email": "suresh.singh@example.com",
+    "phoneNumber": "+91-9876501238",
+    "relationship": "Father",
+    "occupation": "Business Owner",
+    "address": "78 Connaught Place, New Delhi - 110001",
+    "emergencyContact": "+91-9876501239",
+    "learnerIds": ["learn003"],
+    "isActive": true,
+    "preferredContactMethod": "WhatsApp",
+    "createdAt": "2024-05-20T09:00:00Z",
+    "updatedAt": "2025-09-28T13:45:00Z",
+    "name": "Suresh Singh",
+    "relation": "Father",
+    "phone": "+91-9876501238",
+    "assignedLearners": ["learn003"],
+    "paymentInfo": {
+      "paymentMethod": "Net Banking",
+      "lastPaymentDate": "2025-08-28",
+      "paymentStatus": "Paid"
+    },
+    "communicationPreferences": {
+      "email": false,
+      "sms": false,
+      "whatsapp": true
+    },
+    "lastInteraction": "2025-09-20T18:00:00Z",
+    "profileImage": null,
+    "preferredContactTime": "Evening (7-9 PM)",
+    "notes": "Prefers brief updates via WhatsApp."
+  },
+  {
+    "id": "guard004",
+    "firstName": "Pradeep",
+    "lastName": "Gupta",
+    "email": "pradeep.gupta@example.com",
+    "phoneNumber": "+91-9876501240",
+    "relationship": "Father",
+    "occupation": "Chartered Accountant",
+    "address": "12 Park Street, Kolkata, West Bengal - 700016",
+    "emergencyContact": "+91-9876501241",
+    "learnerIds": ["learn004"],
+    "isActive": true,
+    "preferredContactMethod": "Email",
+    "createdAt": "2024-08-01T10:30:00Z",
+    "updatedAt": "2025-09-30T10:00:00Z",
+    "name": "Pradeep Gupta",
+    "relation": "Father",
+    "phone": "+91-9876501240",
+    "assignedLearners": ["learn004"],
+    "paymentInfo": {
+      "paymentMethod": "Cheque",
+      "lastPaymentDate": "2025-09-10",
+      "paymentStatus": "Paid"
+    },
+    "communicationPreferences": {
+      "email": true,
+      "sms": true,
+      "whatsapp": false
+    },
+    "lastInteraction": "2025-09-25T14:00:00Z",
+    "profileImage": null,
+    "preferredContactTime": "Afternoon (2-4 PM)",
+    "notes": "Prefers detailed email reports."
+  },
+  {
+    "id": "guard005",
+    "firstName": "Neha",
+    "lastName": "Joshi",
+    "email": "neha.joshi@example.com",
+    "phoneNumber": "+91-9876501242",
+    "relationship": "Mother",
+    "occupation": "Teacher",
+    "address": "56 FC Road, Pune, Maharashtra - 411005",
+    "emergencyContact": "+91-9876501243",
+    "learnerIds": ["learn005"],
+    "isActive": true,
+    "preferredContactMethod": "Phone",
+    "createdAt": "2024-06-10T12:00:00Z",
+    "updatedAt": "2025-08-20T15:30:00Z",
+    "name": "Neha Joshi",
+    "relation": "Mother",
+    "phone": "+91-9876501242",
+    "assignedLearners": ["learn005"],
+    "paymentInfo": {
+      "paymentMethod": "UPI",
+      "lastPaymentDate": "2025-08-01",
+      "paymentStatus": "Overdue"
+    },
+    "communicationPreferences": {
+      "email": true,
+      "sms": true,
+      "whatsapp": true
+    },
+    "lastInteraction": "2025-08-15T11:00:00Z",
+    "profileImage": null,
+    "preferredContactTime": "Evening (5-7 PM)",
+    "notes": "Student has been inactive. Follow-up needed regarding payment and re-enrollment."
+  }
+]

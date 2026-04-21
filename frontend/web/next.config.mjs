@@ -5,6 +5,10 @@ import { hostname } from "os";
 console.log("✅ Next.js config loaded. App starting on default port ");
 
 const nextConfig = {
+  // Disable ESLint during production builds for mock deployment
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {

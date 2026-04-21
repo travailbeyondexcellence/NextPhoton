@@ -1,0 +1,42 @@
+type Media {
+  id: ID!
+  uploadedBy: String!
+  fileName: String!
+  fileSize: Int!
+  mimeType: String!
+  mediaType: String!
+  storageUrl: String!
+  thumbnailUrl: String
+  isPublic: Boolean!
+  description: String
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type MediaList {
+  media: [Media!]!
+  totalCount: Int!
+}
+
+input UploadMediaInput {
+  fileName: String!
+  fileSize: Int!
+  mimeType: String!
+  mediaType: String!
+  storageUrl: String!
+  thumbnailUrl: String
+  isPublic: Boolean!
+  description: String
+}
+
+type Query {
+  media(id: ID!): Media
+  myMedia(limit: Int, offset: Int): MediaList!
+}
+
+type Mutation {
+  uploadMedia(input: UploadMediaInput!): Media!
+  deleteMedia(id: ID!): Boolean!
+}
+
+scalar Time
