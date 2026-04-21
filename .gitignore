@@ -12,3 +12,7 @@ pnpm-lock.yaml
 dist/
 build/
 *.log
+
+# Go compiled binaries
+backend/api-gateway/server
+backend/services/*/server

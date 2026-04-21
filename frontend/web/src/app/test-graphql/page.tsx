@@ -143,7 +143,7 @@ export default function TestGraphQL() {
       }
 
       // Make the request to our GraphQL endpoint
-      const res = await fetch('http://localhost:963/graphql', {
+      const res = await fetch('http://localhost:3960/auth/graphql', {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -205,7 +205,7 @@ export default function TestGraphQL() {
           </div>
           <div className="mt-4 p-4 bg-warning/10 border border-warning/30 rounded-lg backdrop-blur-sm">
             <p className="text-warning text-sm">
-              <strong>Backend URL:</strong> http://localhost:963/graphql
+              <strong>Backend URL:</strong> http://localhost:3960/auth/graphql
             </p>
           </div>
         </div>

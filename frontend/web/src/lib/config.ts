@@ -8,7 +8,7 @@
  * 1. Vercel Production Mode: Uses mock JSON data (read-only)
  * 2. Local Development Mode: Uses API routes with full CRUD operations on JSON files
  *
- * All backend infrastructure (NestJS, GraphQL, Apollo, Prisma) remains untouched.
+ * Backend uses Go microservices with GraphQL (gqlgen) and PostgreSQL.
  */
 
 /**
@@ -34,9 +34,9 @@ export const IS_DEVELOPMENT = process.env.NODE_ENV === 'development';
 
 /**
  * API Base URL
- * Points to the backend API server (NestJS) when not using mock data
+ * Points to the Go API Gateway when not using mock data
  */
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:963';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3960';
 
 /**
  * Frontend App URL

@@ -1,0 +1,106 @@
+# GraphQL schema for User Service
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  emailVerified: Boolean!
+  image: String
+  createdAt: Time!
+  updatedAt: Time!
+  learnerProfile: LearnerProfile
+  guardianProfile: GuardianProfile
+  educatorProfile: EducatorProfile
+  adminProfile: AdminProfile
+}
+
+type LearnerProfile {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  dateOfBirth: Time
+  phoneNumber: String!
+  currentGrade: String!
+  school: String!
+  learningStyle: String!
+  preferredLanguage: String!
+  subjects: [String!]!
+  targetExams: [String!]!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type GuardianProfile {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  relationship: String!
+  occupation: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type EducatorProfile {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  qualifications: [String!]!
+  specializations: [String!]!
+  experience: Int!
+  languages: [String!]!
+  hourlyRate: Float
+  averageRating: Float
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type AdminProfile {
+  id: ID!
+  userId: String!
+  firstName: String!
+  lastName: String!
+  phoneNumber: String!
+  adminLevel: String!
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  image: String
+}
+
+input CreateProfileInput {
+  userId: String!
+  role: String!
+  fullName: String!
+}
+
+type Query {
+  user(id: ID!): User
+  users(limit: Int, offset: Int): UserList!
+  usersByRole(role: String!, limit: Int, offset: Int): UserList!
+  learnerProfile(userId: String!): LearnerProfile
+  educatorProfile(userId: String!): EducatorProfile
+  guardianProfile(userId: String!): GuardianProfile
+  adminProfile(userId: String!): AdminProfile
+}
+
+type Mutation {
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+  createProfile(input: CreateProfileInput!): Boolean!
+}
+
+type UserList {
+  users: [User!]!
+  totalCount: Int!
+}
+
+scalar Time

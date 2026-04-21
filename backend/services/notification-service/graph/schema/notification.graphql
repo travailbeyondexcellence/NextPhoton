@@ -1,0 +1,64 @@
+type Notification {
+  id: ID!
+  userId: String!
+  title: String!
+  body: String!
+  type: String!
+  channel: String!
+  isRead: Boolean!
+  readAt: Time
+  actionUrl: String
+  createdAt: Time!
+}
+
+type Announcement {
+  id: ID!
+  title: String!
+  content: String!
+  priority: String!
+  scope: String!
+  createdById: String!
+  startsAt: Time!
+  expiresAt: Time
+  isActive: Boolean!
+  createdAt: Time!
+}
+
+type NotificationList {
+  notifications: [Notification!]!
+  totalCount: Int!
+}
+
+input CreateNotificationInput {
+  userId: String!
+  title: String!
+  body: String!
+  type: String!
+  channel: String!
+  actionUrl: String
+}
+
+input CreateAnnouncementInput {
+  title: String!
+  content: String!
+  priority: String!
+  scope: String!
+  startsAt: Time!
+  expiresAt: Time
+}
+
+type Query {
+  notifications(limit: Int, offset: Int): NotificationList!
+  unreadCount: Int!
+  announcements(limit: Int, offset: Int): [Announcement!]!
+  announcement(id: ID!): Announcement
+}
+
+type Mutation {
+  createNotification(input: CreateNotificationInput!): Notification!
+  markAsRead(id: ID!): Boolean!
+  markAllAsRead: Int!
+  createAnnouncement(input: CreateAnnouncementInput!): Announcement!
+}
+
+scalar Time

@@ -24,14 +24,16 @@ type PageInfo struct {
 }
 
 type RegisterInput struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name     string  `json:"name"`
+	Email    string  `json:"email"`
+	Password string  `json:"password"`
+	Role     *string `json:"role,omitempty"`
 }
 
 type RegisterResponse struct {
-	User    *ent.User `json:"user"`
-	Message string    `json:"message"`
+	User        *ent.User `json:"user"`
+	AccessToken *string   `json:"accessToken,omitempty"`
+	Message     string    `json:"message"`
 }
 
 type UserConnection struct {

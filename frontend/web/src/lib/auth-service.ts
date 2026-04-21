@@ -2,7 +2,7 @@
  * Authentication Service for Frontend
  * 
  * This service handles all authentication-related operations
- * by communicating with the NestJS backend JWT authentication endpoints.
+ * by communicating with the Go auth service JWT authentication endpoints.
  * 
  * Features:
  * - User registration

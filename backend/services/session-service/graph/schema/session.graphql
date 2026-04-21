@@ -1,0 +1,114 @@
+# GraphQL schema for Session Service
+
+type LearningSession {
+  id: ID!
+  learnerId: String!
+  educatorId: String!
+  subjectId: String
+  sessionType: String!
+  sessionFormat: String!
+  status: String!
+  scheduledStart: Time!
+  scheduledEnd: Time!
+  actualStart: Time
+  actualEnd: Time
+  title: String!
+  description: String
+  meetingLink: String
+  notes: String
+  cancellationReason: String
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type SessionBooking {
+  id: ID!
+  learnerId: String!
+  educatorId: String
+  subjectId: String
+  status: String!
+  learningGoals: String
+  createdAt: Time!
+  updatedAt: Time!
+}
+
+type AttendanceRecord {
+  id: ID!
+  sessionId: String!
+  learnerId: String!
+  status: String!
+  joinTime: Time
+  leaveTime: Time
+  participationLevel: String
+  createdAt: Time!
+}
+
+type SessionFeedback {
+  id: ID!
+  sessionId: String!
+  givenById: String!
+  rating: Int!
+  comments: String
+  topicClarity: Int
+  paceRating: Int
+  createdAt: Time!
+}
+
+input CreateSessionInput {
+  learnerId: String!
+  educatorId: String!
+  subjectId: String
+  sessionType: String!
+  sessionFormat: String!
+  scheduledStart: Time!
+  scheduledEnd: Time!
+  title: String!
+  description: String
+  meetingLink: String
+}
+
+input CreateBookingInput {
+  learnerId: String!
+  educatorId: String
+  subjectId: String
+  learningGoals: String
+}
+
+input RecordAttendanceInput {
+  sessionId: String!
+  learnerId: String!
+  status: String!
+  joinTime: Time
+  leaveTime: Time
+  participationLevel: String
+}
+
+input SubmitFeedbackInput {
+  sessionId: String!
+  rating: Int!
+  comments: String
+  topicClarity: Int
+  paceRating: Int
+}
+
+type SessionList {
+  sessions: [LearningSession!]!
+  totalCount: Int!
+}
+
+type Query {
+  session(id: ID!): LearningSession
+  sessionsByLearner(learnerId: String!, limit: Int, offset: Int): SessionList!
+  sessionsByEducator(educatorId: String!, limit: Int, offset: Int): SessionList!
+}
+
+type Mutation {
+  createSession(input: CreateSessionInput!): LearningSession!
+  updateSessionStatus(id: ID!, status: String!): LearningSession!
+  cancelSession(id: ID!, reason: String!): LearningSession!
+  createBooking(input: CreateBookingInput!): SessionBooking!
+  recordAttendance(input: RecordAttendanceInput!): AttendanceRecord!
+  submitFeedback(input: SubmitFeedbackInput!): SessionFeedback!
+}
+
+scalar Time

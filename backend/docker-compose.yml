@@ -1,0 +1,197 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: nextphoton_dev
+      POSTGRES_USER: nextphoton
+      POSTGRES_PASSWORD: nextphoton_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nextphoton -d nextphoton_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # NATS Message Queue
+  nats:
+    image: nats:latest
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["--jetstream", "--store_dir", "/data"]
+    volumes:
+      - nats_data:/data
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    environment:
+      SERVER_PORT: "3960"
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ALLOWED_ORIGINS: "http://localhost:369,http://localhost:3000"
+      AUTH_SERVICE_URL: http://auth-service:3963
+      USER_SERVICE_URL: http://user-service:3964
+      SESSION_SERVICE_URL: http://session-service:3965
+      NOTIFICATION_SERVICE_URL: http://notification-service:3966
+      PAYMENT_SERVICE_URL: http://payment-service:3967
+      MEDIA_SERVICE_URL: http://media-service:3968
+      ANALYTICS_SERVICE_URL: http://analytics-service:3969
+      REDIS_HOST: redis
+      NATS_URL: nats://nats:4222
+    ports:
+      - "3960:3960"
+    depends_on:
+      - auth-service
+      - redis
+      - nats
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    environment:
+      BACKEND_PORT: "3963"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      JWT_EXPIRATION: 7d
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      NODE_ENV: development
+    ports:
+      - "3963:3963"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+
+  # User Service
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
+    environment:
+      USER_SERVICE_PORT: "3964"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      NODE_ENV: development
+    ports:
+      - "3964:3964"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Session Service
+  session-service:
+    build:
+      context: ./services/session-service
+      dockerfile: Dockerfile
+    environment:
+      SESSION_SERVICE_PORT: "3965"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      NODE_ENV: development
+    ports:
+      - "3965:3965"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    environment:
+      NOTIFICATION_SERVICE_PORT: "3966"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      NODE_ENV: development
+    ports:
+      - "3966:3966"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Payment Service
+  payment-service:
+    build:
+      context: ./services/payment-service
+      dockerfile: Dockerfile
+    environment:
+      PAYMENT_SERVICE_PORT: "3967"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      NODE_ENV: development
+    ports:
+      - "3967:3967"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Media Service
+  media-service:
+    build:
+      context: ./services/media-service
+      dockerfile: Dockerfile
+    environment:
+      MEDIA_SERVICE_PORT: "3968"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      NODE_ENV: development
+    ports:
+      - "3968:3968"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Analytics Service
+  analytics-service:
+    build:
+      context: ./services/analytics-service
+      dockerfile: Dockerfile
+    environment:
+      ANALYTICS_SERVICE_PORT: "3969"
+      DATABASE_URL: postgresql://nextphoton:nextphoton_dev_password@postgres:5432/nextphoton_dev?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:-nextphoton-dev-jwt-secret-key-2024-secure-random-string-min-32-chars}
+      CORS_ORIGIN: http://localhost:369
+      NATS_URL: nats://nats:4222
+      NODE_ENV: development
+    ports:
+      - "3969:3969"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  nats_data:
+  redis_data:

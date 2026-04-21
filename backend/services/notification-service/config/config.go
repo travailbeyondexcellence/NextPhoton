@@ -41,6 +41,9 @@ type Config struct {
 	NATSClientID  string   // Unique client identifier for this service instance
 	NATSSubjects  []string // Subjects to subscribe to
 
+	// Security configuration
+	JWTSecret string // JWT signing secret
+
 	// CORS configuration
 	CORSOrigin string // Allowed CORS origins
 
@@ -110,6 +113,9 @@ func Load() (*Config, error) {
 			"nextphoton.payment.completed.v1",
 			"nextphoton.assignment.due.v1",
 		}),
+
+		// Security settings
+		JWTSecret: getEnv("JWT_SECRET", ""),
 
 		// CORS settings
 		CORSOrigin: getEnv("CORS_ORIGIN", "http://localhost:369"),

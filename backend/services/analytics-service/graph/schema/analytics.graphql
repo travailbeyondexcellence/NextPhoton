@@ -1,0 +1,46 @@
+type AnalyticsEvent {
+  id: ID!
+  userId: String
+  eventType: String!
+  eventName: String!
+  sessionId: String
+  platform: String
+  createdAt: Time!
+}
+
+type DashboardMetric {
+  id: ID!
+  name: String!
+  category: String!
+  value: Float!
+  period: String!
+  date: Time!
+}
+
+type LearningAnalytics {
+  learnerId: String!
+  totalStudyTime: Float!
+  totalSessions: Int!
+  averageScore: Float!
+  assignmentsCompleted: Int!
+  progressRate: Float!
+  consistencyScore: Float!
+}
+
+input TrackEventInput {
+  eventType: String!
+  eventName: String!
+  sessionId: String
+  platform: String
+}
+
+type Query {
+  dashboardMetrics(category: String!, period: String!): [DashboardMetric!]!
+  learningAnalytics(learnerId: String!): LearningAnalytics
+}
+
+type Mutation {
+  trackEvent(input: TrackEventInput!): AnalyticsEvent!
+}
+
+scalar Time

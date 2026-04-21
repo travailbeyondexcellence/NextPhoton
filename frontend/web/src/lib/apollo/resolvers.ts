@@ -621,7 +621,7 @@ export const resolvers = {
   Mutation: {
     // Auth mutations - proxy to Go backend
     login: async (_: any, { input }: { input: any }) => {
-      const response = await fetch('http://localhost:3963/graphql', {
+      const response = await fetch('http://localhost:3960/auth/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -653,7 +653,7 @@ export const resolvers = {
     },
 
     register: async (_: any, { input }: { input: any }) => {
-      const response = await fetch('http://localhost:3963/graphql', {
+      const response = await fetch('http://localhost:3960/auth/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

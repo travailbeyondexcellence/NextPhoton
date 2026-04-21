@@ -17,6 +17,7 @@ type LoginResponse {
 
 type RegisterResponse {
   user: User!
+  accessToken: String
   message: String!
 }
 
@@ -29,6 +30,7 @@ input RegisterInput {
   name: String!
   email: String!
   password: String!
+  role: String
 }
 
 type Query {
